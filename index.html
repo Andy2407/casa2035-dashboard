@@ -1,0 +1,2589 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#faf8f6">
+  <title>Casa 2035</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon.svg">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* =============================================================
+       Casa 2035 — PWA Dashboard v5.0
+       Light Luxury Edition — Schwarz + Gold + Weiss
+       Orientierung: renarados.de — Clean, Elegant, Premium
+       Stand: 14.03.2026 | Agent: @design + @frontend + @leitung
+       ============================================================= */
+
+    :root {
+      /* Light Luxury Palette — Rena Rados Style */
+      --bg: #faf8f6;
+      --bg-warm: #f5f2ef;
+      --surface: #ffffff;
+      --surface-hover: #f0ece8;
+      --surface-active: #e8e2dc;
+      --card: rgba(255,255,255,0.92);
+      --card-solid: #ffffff;
+      --border: rgba(0,0,0,0.06);
+      --border-accent: rgba(180,155,120,0.18);
+
+      /* Text — Schwarz-Abstufungen */
+      --text: #1a1a1a;
+      --text-secondary: #5a5550;
+      --text-dim: #8a8580;
+      --text-micro: #aaa5a0;
+
+      /* Signature Colors — Gold + Schwarz */
+      --rose: #b8962e;
+      --rose-light: #c9a93d;
+      --rose-glow: rgba(184,150,46,0.08);
+      --rose-gradient: linear-gradient(135deg, #b8962e 0%, #c9a93d 40%, #d4b44e 100%);
+      --champagne: #1a1a1a;
+      --champagne-dim: #3a3a3a;
+      --gold: #b8962e;
+      --gold-glow: rgba(184,150,46,0.08);
+
+      /* Status */
+      --success: #2d8a4e;
+      --success-bg: rgba(45,138,78,0.08);
+      --warning: #c48a1a;
+      --warning-bg: rgba(196,138,26,0.08);
+      --danger: #c44040;
+      --danger-bg: rgba(196,64,64,0.08);
+      --info: #3a7abd;
+      --info-bg: rgba(58,122,189,0.08);
+
+      /* Shapes */
+      --radius-sm: 12px;
+      --radius: 16px;
+      --radius-lg: 22px;
+      --radius-xl: 28px;
+      --radius-full: 9999px;
+
+      /* Effects */
+      --shadow-soft: 0 2px 16px rgba(0,0,0,0.06);
+      --shadow-glow: 0 0 40px rgba(184,150,46,0.06);
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --safe-top: env(safe-area-inset-top, 20px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      padding-top: var(--safe-top);
+      padding-bottom: calc(76px + var(--safe-bottom));
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      overscroll-behavior: none;
+    }
+
+    /* Subtle warm ambient gradient */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -30%;
+      left: -20%;
+      width: 140%;
+      height: 70%;
+      background: radial-gradient(ellipse at 30% 20%, rgba(184,150,46,0.03) 0%, transparent 60%),
+                  radial-gradient(ellipse at 70% 40%, rgba(184,150,46,0.02) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .serif { font-family: 'Playfair Display', 'Georgia', serif; }
+    .tabular { font-variant-numeric: tabular-nums; }
+
+    /* Animations */
+    .touch-scale { transition: transform 180ms var(--ease); -webkit-tap-highlight-color: transparent; }
+    .touch-scale:active { transform: scale(0.97); }
+    .stagger > * { animation: slideUp 400ms var(--ease) both; }
+    .stagger > *:nth-child(1) { animation-delay: 0ms; }
+    .stagger > *:nth-child(2) { animation-delay: 50ms; }
+    .stagger > *:nth-child(3) { animation-delay: 100ms; }
+    .stagger > *:nth-child(4) { animation-delay: 150ms; }
+    .stagger > *:nth-child(5) { animation-delay: 200ms; }
+    .stagger > *:nth-child(6) { animation-delay: 250ms; }
+    .stagger > *:nth-child(7) { animation-delay: 300ms; }
+    .stagger > *:nth-child(8) { animation-delay: 350ms; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    @keyframes breathe { 0%,100% { box-shadow: 0 0 0 0 rgba(125,186,138,0.3); } 50% { box-shadow: 0 0 0 6px rgba(125,186,138,0); } }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+    .skeleton { background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hover) 50%, var(--surface) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
+
+    /* === Header === */
+    .header {
+      position: sticky; top: 0; z-index: 100;
+      padding: 12px 20px 10px;
+      background: rgba(250,248,246,0.92);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-top { display: flex; justify-content: space-between; align-items: center; }
+    .header-left { display: flex; flex-direction: column; gap: 0; }
+    .header-greeting { font-size: 11px; font-weight: 500; color: var(--text-dim); letter-spacing: 0.8px; text-transform: uppercase; }
+    .header-salon { font-size: 20px; font-weight: 600; letter-spacing: -0.3px; margin-top: 1px; }
+    .header-salon em { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; color: var(--rose-light); }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .live-dot {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 600; color: var(--success);
+      padding: 4px 10px; border-radius: var(--radius-full);
+      background: var(--success-bg); letter-spacing: 0.3px;
+    }
+    .live-dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: breathe 2.5s infinite; }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--rose-gradient);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: #fff;
+      box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px rgba(184,150,46,0.3);
+    }
+    .header-sub {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 6px; font-size: 10px; color: var(--text-micro); letter-spacing: 0.2px;
+    }
+
+    /* Pull Refresh */
+    .pull-refresh {
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%) translateY(-60px);
+      z-index: 99; padding: 8px 20px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 0 0 var(--radius) var(--radius);
+      font-size: 12px; font-weight: 500; color: var(--rose);
+      display: flex; align-items: center; gap: 8px;
+      transition: transform 300ms var(--ease);
+    }
+    .pull-refresh.visible { transform: translateX(-50%) translateY(calc(var(--safe-top) + 52px)); }
+    .pull-spinner { width: 14px; height: 14px; border: 2px solid var(--border-accent); border-top-color: var(--rose); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Content */
+    .content { padding: 6px 16px 16px; position: relative; z-index: 1; }
+    .page { display: none; }
+    .page.active { display: block; animation: fadeIn 280ms var(--ease); }
+
+    /* Section Headers */
+    .section { display: flex; align-items: center; gap: 10px; margin: 22px 0 12px; }
+    .section-bar { width: 3px; height: 16px; border-radius: 2px; background: var(--rose-gradient); }
+    .section-title {
+      font-size: 11px; font-weight: 600; color: var(--text-dim);
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .section-count {
+      margin-left: auto; font-size: 10px; color: var(--text-micro);
+      background: var(--surface); padding: 3px 10px; border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+    }
+
+    /* === Hero Card (Dashboard) === */
+    .hero-card {
+      position: relative; border-radius: var(--radius-lg); padding: 24px;
+      overflow: hidden; margin-bottom: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border-accent);
+      transition: box-shadow 200ms, transform 200ms var(--ease);
+    }
+    .hero-card[onclick]:hover { box-shadow: 0 6px 28px rgba(184,150,46,0.1); transform: translateY(-1px); cursor: pointer; }
+    .hero-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(184,150,46,0.06) 0%, rgba(184,150,46,0.02) 50%, transparent 100%);
+    }
+    .hero-card::after {
+      content: ''; position: absolute; top: -50%; right: -20%; width: 60%; height: 200%;
+      background: radial-gradient(ellipse, rgba(184,150,46,0.04) 0%, transparent 70%);
+    }
+    .hero-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 18px; }
+    .hero-icon-wrap {
+      width: 54px; height: 54px; border-radius: 16px;
+      background: var(--rose-glow); border: 1px solid rgba(184,150,46,0.12);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .hero-icon-wrap svg { width: 26px; height: 26px; color: var(--rose-light); }
+    .hero-data { flex: 1; }
+    .hero-label { font-size: 11px; font-weight: 500; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.8px; }
+    .hero-value { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 700; letter-spacing: -1px; line-height: 1.05; margin-top: 2px; color: var(--champagne); }
+    .hero-sub { font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+    .trend-badge {
+      font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-full);
+      display: inline-flex; align-items: center; gap: 3px;
+    }
+    .trend-badge.up { background: var(--success-bg); color: var(--success); }
+    .trend-badge.down { background: var(--danger-bg); color: var(--danger); }
+
+    /* === Stat Grid === */
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .stat-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+    .stat-grid.cols-4 { grid-template-columns: 1fr 1fr; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 12px;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      text-align: center; position: relative; overflow: hidden;
+      transition: box-shadow 200ms, transform 200ms var(--ease), border-color 200ms;
+    }
+    .stat-card[onclick]:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateY(-2px); border-color: var(--border-accent); cursor: pointer; }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      border-radius: 2px 2px 0 0; opacity: 0.5;
+    }
+    .stat-card.green::before { background: var(--success); }
+    .stat-card.blue::before { background: var(--info); }
+    .stat-card.yellow::before { background: var(--warning); }
+    .stat-card.rose::before { background: var(--rose); }
+    .stat-card.red::before { background: var(--danger); }
+    .stat-card.gold::before { background: var(--gold); }
+    .stat-icon {
+      width: 36px; height: 36px; border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .stat-icon svg { width: 18px; height: 18px; }
+    .stat-icon.green { background: var(--success-bg); color: var(--success); }
+    .stat-icon.blue { background: var(--info-bg); color: var(--info); }
+    .stat-icon.yellow { background: var(--warning-bg); color: var(--warning); }
+    .stat-icon.rose { background: var(--rose-glow); color: var(--rose); }
+    .stat-icon.red { background: var(--danger-bg); color: var(--danger); }
+    .stat-icon.gold { background: var(--gold-glow); color: var(--gold); }
+    .stat-val { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+    .stat-val.green { color: var(--success); }
+    .stat-val.blue { color: var(--info); }
+    .stat-val.yellow { color: var(--warning); }
+    .stat-val.rose { color: var(--rose-light); }
+    .stat-val.red { color: var(--danger); }
+    .stat-val.gold { color: var(--gold); }
+    .stat-label { font-size: 10px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; }
+    .stat-sub { font-size: 10px; color: var(--text-micro); }
+
+    /* === Event Cards === */
+    .event-list { display: flex; flex-direction: column; gap: 8px; }
+    .ev {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px; position: relative; overflow: hidden;
+      display: flex; gap: 12px; align-items: flex-start;
+      transition: box-shadow 200ms, border-color 200ms, background 200ms;
+    }
+    .ev:hover { box-shadow: 0 3px 16px rgba(0,0,0,0.06); border-color: var(--border-accent); }
+    .ev.unread { border-left: 3px solid var(--rose); padding-left: 11px; background: rgba(184,150,46,0.03); }
+    .ev-icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .ev-icon svg { width: 18px; height: 18px; }
+    .ev-icon.termin { background: var(--success-bg); color: var(--success); }
+    .ev-icon.storno { background: var(--danger-bg); color: var(--danger); }
+    .ev-icon.nachbestellung { background: var(--warning-bg); color: var(--warning); }
+    .ev-icon.antwort { background: var(--rose-glow); color: var(--rose); }
+    .ev-icon.event { background: var(--info-bg); color: var(--info); }
+    .ev-body { flex: 1; min-width: 0; }
+    .ev-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .ev-type { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 6px; }
+    .ev-type.termin { background: var(--success-bg); color: var(--success); }
+    .ev-type.storno { background: var(--danger-bg); color: var(--danger); }
+    .ev-type.event { background: var(--info-bg); color: var(--info); }
+    .ev-type.nachbestellung { background: var(--warning-bg); color: var(--warning); }
+    .ev-type.antwort { background: var(--rose-glow); color: var(--rose); }
+    .ev-time { font-size: 10px; color: var(--text-micro); }
+    .ev-title { font-size: 14px; font-weight: 600; line-height: 1.3; }
+    .ev-msg { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-top: 2px; }
+    .ev-meta { display: flex; gap: 10px; margin-top: 6px; font-size: 10px; color: var(--text-micro); }
+    .ev-meta span { display: inline-flex; align-items: center; gap: 4px; }
+    .ev-meta svg { width: 12px; height: 12px; opacity: .5; }
+
+    /* === Tagesansicht (Termine) — 15-Minuten-Raster === */
+    .day-view { position: relative; margin-left: 48px; min-height: 600px; }
+    .day-time-slot {
+      position: relative; height: 60px;
+      border-top: 1px solid var(--border);
+    }
+    .day-time-slot:nth-child(4n+1) { border-top: 1px solid var(--border-accent); }
+    .day-time-label {
+      position: absolute; left: -52px; top: -7px; width: 44px;
+      font-size: 11px; font-weight: 500; color: var(--text-dim); text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    .day-time-label.full-hour { color: var(--text); font-weight: 600; font-size: 12px; }
+    .day-now-line {
+      position: absolute; left: -4px; right: 0; height: 2px;
+      background: var(--danger); z-index: 5;
+    }
+    .day-now-line::before {
+      content: ''; position: absolute; left: -4px; top: -3px;
+      width: 8px; height: 8px; border-radius: 50%; background: var(--danger);
+    }
+    .day-block {
+      position: absolute; left: 4px; right: 4px;
+      border-radius: var(--radius-sm); padding: 8px 14px;
+      overflow: hidden; cursor: pointer; z-index: 2;
+      transition: transform 150ms var(--ease), box-shadow 150ms;
+      border: 1px solid var(--border);
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .day-block:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+    .day-block:active { transform: scale(0.99); }
+    .day-block.confirmed {
+      background: var(--surface); border-left: 3px solid var(--success);
+      box-shadow: 0 1px 8px rgba(45,138,78,0.08);
+    }
+    .day-block.proposed {
+      background: var(--surface); border-left: 3px solid var(--warning);
+      box-shadow: 0 1px 8px rgba(196,138,26,0.08);
+    }
+    .day-block.cancelled {
+      background: var(--surface); border-left: 3px solid var(--danger);
+      opacity: 0.6;
+    }
+    .day-block-time {
+      font-size: 10px; font-weight: 600; color: var(--text-dim);
+      white-space: nowrap; min-width: 72px; line-height: 1.4;
+    }
+    .day-block-main { flex: 1; min-width: 0; }
+    .day-block-service {
+      font-size: 13px; font-weight: 600; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .day-block-customer { font-size: 11px; color: var(--text-secondary); margin-top: 1px; }
+    .day-block-staff {
+      font-size: 10px; color: var(--rose-light); margin-top: 2px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .day-block-staff::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--rose); }
+    .day-block-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+    .day-block-badge {
+      font-size: 8px; font-weight: 600; padding: 2px 6px; border-radius: var(--radius-full); letter-spacing: 0.3px; white-space: nowrap;
+    }
+    .day-block-badge.confirmed { background: var(--success-bg); color: var(--success); }
+    .day-block-badge.proposed { background: var(--warning-bg); color: var(--warning); }
+    .day-block-badge.cancelled { background: var(--danger-bg); color: var(--danger); }
+    .day-block-dur { font-size: 9px; color: var(--text-micro); white-space: nowrap; }
+
+    /* Compact blocks (≤30 min): single row */
+    .day-block.compact { align-items: center; padding: 4px 14px; gap: 8px; }
+    .day-block.compact .day-block-service { font-size: 12px; }
+    .day-block.compact .day-block-customer { display: inline; margin-top: 0; margin-left: 4px; }
+    .day-block.compact .day-block-customer::before { content: '·'; margin-right: 4px; color: var(--text-micro); }
+    .day-block.compact .day-block-staff { display: none; }
+
+    /* Termine Summary Stats */
+    .termin-stats {
+      display: flex; gap: 8px; margin-bottom: 14px;
+    }
+    .termin-stat {
+      flex: 1; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 12px; text-align: center;
+    }
+    .termin-stat-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--champagne); }
+    .termin-stat-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+    /* === Kasse Hero Ring === */
+    .kasse-hero {
+      background: var(--surface); border: 1px solid var(--border-accent);
+      border-radius: var(--radius-lg); padding: 26px;
+      display: flex; align-items: center; gap: 24px;
+      margin-bottom: 14px; position: relative; overflow: hidden;
+    }
+    .kasse-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(184,150,46,0.04) 0%, rgba(184,150,46,0.02) 100%);
+    }
+    .ring-wrap { position: relative; width: 104px; height: 104px; flex-shrink: 0; z-index: 1; }
+    .ring-wrap svg { width: 100%; height: 100%; }
+    .ring-bg { fill: none; stroke: rgba(184,150,46,0.06); stroke-width: 7; }
+    .ring-fill { fill: none; stroke: url(#ringGrad); stroke-width: 7; stroke-linecap: round; transition: stroke-dashoffset 1s var(--ease); }
+    .ring-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; }
+    .ring-pct { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--champagne); }
+    .ring-sub { font-size: 9px; color: var(--text-dim); letter-spacing: 0.3px; }
+    .kasse-hero-data { position: relative; z-index: 1; flex: 1; }
+    .kasse-hero-label { font-size: 11px; color: var(--text-dim); font-weight: 500; text-transform: uppercase; letter-spacing: 0.8px; }
+    .kasse-hero-val { font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; margin: 4px 0; color: var(--champagne); }
+    .kasse-hero-target { font-size: 11px; color: var(--rose-light); }
+
+    /* Kasse Entries */
+    .kasse-entry {
+      display: flex; align-items: center; gap: 12px;
+      padding: 13px 14px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: background 150ms, box-shadow 150ms;
+    }
+    .kasse-entry:hover { background: var(--surface-hover); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .kasse-entry-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .kasse-entry-icon svg { width: 16px; height: 16px; }
+    .kasse-entry-icon.plus { background: var(--success-bg); color: var(--success); }
+    .kasse-entry-icon.minus { background: var(--danger-bg); color: var(--danger); }
+    .kasse-entry-info { flex: 1; min-width: 0; }
+    .kasse-entry-desc { font-size: 13px; font-weight: 500; }
+    .kasse-entry-time { font-size: 10px; color: var(--text-micro); margin-top: 1px; }
+    .kasse-entry-amt { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; }
+    .kasse-entry-amt.plus { color: var(--success); }
+    .kasse-entry-amt.minus { color: var(--danger); }
+
+    /* Action Buttons */
+    .fab {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 15px; margin-top: 16px;
+      background: var(--rose-gradient); color: #fff;
+      border: none; border-radius: var(--radius); font-size: 14px; font-weight: 600;
+      font-family: 'Inter', sans-serif; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(184,150,46,0.2);
+    }
+    .fab svg { width: 18px; height: 18px; }
+    .fab:active { transform: scale(0.98); opacity: 0.9; }
+    .fab-outline {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 14px; margin-top: 8px;
+      background: transparent; color: var(--rose-light);
+      border: 1.5px solid rgba(184,150,46,0.15); border-radius: var(--radius);
+      font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer;
+    }
+    .fab-outline:active { background: var(--rose-glow); }
+    .fab-outline svg { width: 18px; height: 18px; }
+    .role-hidden { display: none !important; }
+
+    /* === Workflow Status === */
+    .wf-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .wf-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .wf-dot.clean { background: var(--success); }
+    .wf-dot.bug { background: var(--danger); }
+    .wf-dot.gap { background: var(--warning); }
+    .wf-dot.broken { background: var(--danger); }
+    .wf-dot.new { background: var(--info); }
+    .wf-name { flex: 1; font-size: 13px; font-weight: 500; }
+    .wf-badge { font-size: 9px; font-weight: 600; padding: 3px 10px; border-radius: var(--radius-full); letter-spacing: 0.3px; }
+    .wf-badge.clean { background: var(--success-bg); color: var(--success); }
+    .wf-badge.bug { background: var(--danger-bg); color: var(--danger); }
+    .wf-badge.gap { background: var(--warning-bg); color: var(--warning); }
+    .wf-badge.broken { background: var(--danger-bg); color: var(--danger); }
+    .wf-badge.new { background: var(--info-bg); color: var(--info); }
+
+    /* Sprint */
+    .sprint-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px; margin-top: 4px;
+    }
+    .sprint-top { display: flex; align-items: center; gap: 14px; }
+    .sprint-pct { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--rose-light); }
+    .sprint-bar-wrap { height: 6px; background: rgba(184,150,46,0.06); border-radius: var(--radius-full); overflow: hidden; flex: 1; }
+    .sprint-bar-fill { height: 100%; background: var(--rose-gradient); border-radius: var(--radius-full); transition: width 1s var(--ease); }
+    .sprint-sub { font-size: 11px; color: var(--text-dim); margin-top: 8px; }
+
+    /* === Config === */
+    .cfg-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px; cursor: pointer;
+      transition: background 150ms;
+    }
+    .cfg-card:active { background: var(--surface-hover); }
+    .cfg-title { font-size: 14px; font-weight: 600; }
+    .cfg-desc { font-size: 12px; color: var(--text-dim); margin-top: 3px; line-height: 1.5; }
+    .cfg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .cfg-option {
+      padding: 16px; background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius); text-align: center; cursor: pointer;
+      transition: all 150ms var(--ease);
+    }
+    .cfg-option:active { transform: scale(0.97); }
+    .cfg-option.active { border-color: var(--rose); background: var(--rose-glow); }
+    .cfg-option-val { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; color: var(--champagne); }
+    .cfg-option-label { font-size: 10px; color: var(--text-dim); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .role-chip {
+      padding: 14px 16px; background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius); text-align: center; cursor: pointer;
+      font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif;
+      transition: all 150ms var(--ease);
+    }
+    .role-chip:active { transform: scale(0.97); }
+    .role-chip.active { border-color: var(--rose); background: var(--rose-glow); color: var(--rose-light); }
+
+    /* === Bottom Sheet Modal === */
+    .sheet-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      z-index: 200; align-items: flex-end; justify-content: center;
+    }
+    .sheet-overlay.show { display: flex; animation: fadeIn 150ms var(--ease); }
+    .sheet {
+      background: var(--bg-warm); border: 1px solid var(--border-accent);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      padding: 14px 20px calc(24px + var(--safe-bottom));
+      width: 100%; max-width: 480px; max-height: 85vh; overflow-y: auto;
+      animation: sheetUp 300ms var(--ease-spring);
+    }
+    @keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .sheet-handle { width: 40px; height: 4px; background: rgba(184,150,46,0.15); border-radius: 2px; margin: 0 auto 18px; }
+    .sheet h3 { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; margin-bottom: 18px; color: var(--champagne); }
+    .sheet label {
+      display: block; font-size: 10px; font-weight: 600; color: var(--text-dim);
+      margin-bottom: 6px; margin-top: 16px;
+      text-transform: uppercase; letter-spacing: 0.8px;
+    }
+    .sheet label:first-of-type { margin-top: 0; }
+    .sheet input, .sheet select, .sheet textarea {
+      width: 100%; padding: 13px 14px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      color: var(--text); font-size: 15px; font-family: 'Inter', sans-serif;
+      -webkit-appearance: none; appearance: none;
+    }
+    .sheet input:focus, .sheet select:focus, .sheet textarea:focus {
+      outline: none; border-color: var(--rose);
+      box-shadow: 0 0 0 3px var(--rose-glow);
+    }
+    .sheet select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a6b65' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
+    }
+    .sheet textarea { resize: vertical; min-height: 60px; }
+    .sheet-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .sheet-actions { display: flex; gap: 8px; margin-top: 22px; }
+    .btn { flex: 1; padding: 14px; border-radius: var(--radius); border: none; font-size: 15px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; }
+    .btn-primary { background: var(--rose-gradient); color: #fff; }
+    .btn-primary:active { opacity: .9; }
+    .btn-secondary { background: var(--surface); color: var(--text-secondary); border: 1px solid var(--border); }
+    .btn-secondary:active { background: var(--surface-hover); }
+    .brutto-preview { font-size: 13px; color: var(--rose-light); margin-top: 6px; font-weight: 500; }
+
+    /* Tagesabschluss */
+    .ta-summary {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px; margin-top: 10px;
+    }
+    .ta-row { display: flex; justify-content: space-between; padding: 7px 0; font-size: 13px; }
+    .ta-row.total { font-weight: 700; border-top: 1px solid var(--border-accent); margin-top: 6px; padding-top: 12px; font-size: 14px; }
+    .ta-row .ta-label { color: var(--text-secondary); }
+    .ta-input {
+      width: 100%; padding: 14px; margin-top: 12px;
+      background: var(--surface); border: 2px solid var(--rose);
+      border-radius: var(--radius-sm); color: var(--champagne);
+      font-family: 'Playfair Display', serif;
+      font-size: 26px; font-weight: 700; text-align: center;
+    }
+    .ta-input:focus { outline: none; box-shadow: 0 0 0 4px var(--rose-glow); }
+    .ta-diff { text-align: center; margin-top: 10px; font-size: 15px; font-weight: 700; }
+    .ta-diff.ok { color: var(--success); }
+    .ta-diff.warn { color: var(--warning); }
+    .ta-diff.bad { color: var(--danger); }
+
+    /* === Bottom Nav === */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(250,248,246,0.95);
+      backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      border-top: 1px solid var(--border);
+      display: flex; padding: 4px 6px calc(4px + var(--safe-bottom));
+      z-index: 100;
+    }
+    .nav-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; min-height: 54px; padding: 4px 0;
+      background: none; border: none; color: var(--text-dim);
+      font-size: 9px; font-weight: 600; font-family: 'Inter', sans-serif;
+      cursor: pointer; -webkit-tap-highlight-color: transparent;
+      position: relative; transition: color 200ms; text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .nav-btn svg { width: 22px; height: 22px; transition: transform 200ms var(--ease-spring); }
+    .nav-btn.active { color: var(--rose-light); }
+    .nav-btn.active svg { transform: scale(1.1); }
+    .nav-btn.active::before {
+      content: ''; position: absolute; top: 2px;
+      width: 40px; height: 28px; border-radius: var(--radius-full);
+      background: var(--rose-glow); z-index: -1;
+    }
+    .nav-btn .nav-badge {
+      position: absolute; top: 2px; right: calc(50% - 18px);
+      min-width: 16px; height: 16px; padding: 0 4px;
+      background: var(--rose); color: #fff; font-size: 9px; font-weight: 700;
+      border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Empty */
+    .empty { text-align: center; padding: 36px 20px; color: var(--text-dim); font-size: 13px; }
+    .empty svg { width: 40px; height: 40px; color: var(--text-micro); margin-bottom: 8px; }
+
+    /* === V4.0 Premium Effects === */
+
+    /* Goldpartikel-Animation (CSS-only) */
+    .particles {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      overflow: hidden;
+    }
+    .particles::before, .particles::after {
+      content: '';
+      position: absolute;
+      width: 2px; height: 2px;
+      background: rgba(184,150,46,0.4);
+      border-radius: 50%;
+    }
+    .particles::before {
+      box-shadow:
+        80px 120px 0 1px rgba(184,150,46,0.28),
+        200px 300px 0 1.5px rgba(184,150,46,0.22),
+        340px 180px 0 1px rgba(184,150,46,0.25),
+        120px 500px 0 1.5px rgba(184,150,46,0.18),
+        280px 420px 0 1px rgba(184,150,46,0.22),
+        50px 680px 0 1.5px rgba(184,150,46,0.2),
+        320px 750px 0 1px rgba(184,150,46,0.24),
+        180px 850px 0 1.5px rgba(184,150,46,0.15),
+        90px 950px 0 1px rgba(184,150,46,0.2),
+        250px 150px 0 1.5px rgba(184,150,46,0.18),
+        370px 580px 0 1px rgba(184,150,46,0.2);
+      animation: particle-drift-1 20s linear infinite;
+    }
+    .particles::after {
+      box-shadow:
+        150px 80px 0 1.5px rgba(184,150,46,0.22),
+        310px 250px 0 1px rgba(184,150,46,0.28),
+        60px 380px 0 1.5px rgba(184,150,46,0.18),
+        240px 550px 0 1px rgba(184,150,46,0.22),
+        380px 320px 0 1.5px rgba(184,150,46,0.2),
+        100px 720px 0 1px rgba(184,150,46,0.24),
+        290px 900px 0 1.5px rgba(184,150,46,0.15),
+        40px 200px 0 1px rgba(184,150,46,0.25);
+      animation: particle-drift-2 25s linear infinite;
+    }
+    @keyframes particle-drift-1 {
+      0% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(-40px) translateX(15px); }
+      100% { transform: translateY(0) translateX(0); }
+    }
+    @keyframes particle-drift-2 {
+      0% { transform: translateY(0) translateX(0); }
+      50% { transform: translateY(-25px) translateX(-20px); }
+      100% { transform: translateY(0) translateX(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .particles::before, .particles::after { animation: none; }
+      .stagger > * { animation: none; opacity: 1; }
+      .touch-scale { transition: none; }
+      .live-dot::before { animation: none; }
+    }
+
+    /* Toast-Benachrichtigungen */
+    .toast-container {
+      position: fixed; top: calc(var(--safe-top) + 8px); left: 50%;
+      transform: translateX(-50%); z-index: 300;
+      display: flex; flex-direction: column; gap: 8px; align-items: center;
+      pointer-events: none; width: 90%; max-width: 380px;
+    }
+    .toast {
+      padding: 12px 18px; border-radius: var(--radius);
+      font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; gap: 10px;
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-accent);
+      box-shadow: var(--shadow-soft);
+      animation: toastIn 300ms var(--ease-spring) both;
+      pointer-events: auto; cursor: pointer;
+      width: 100%;
+    }
+    .toast.hide { animation: toastOut 200ms var(--ease) both; }
+    .toast.success { background: rgba(125,186,138,0.15); color: var(--success); border-color: rgba(125,186,138,0.2); }
+    .toast.warning { background: rgba(212,169,78,0.15); color: var(--warning); border-color: rgba(212,169,78,0.2); }
+    .toast.danger { background: rgba(200,114,114,0.15); color: var(--danger); border-color: rgba(200,114,114,0.2); }
+    .toast.info { background: rgba(138,164,200,0.15); color: var(--info); border-color: rgba(138,164,200,0.2); }
+    .toast svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .toast-msg { flex: 1; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes toastOut { to { opacity: 0; transform: translateY(-10px) scale(0.95); } }
+
+    /* KI-Status-Indikator */
+    .ki-status {
+      display: none; align-items: center; gap: 8px;
+      padding: 8px 16px; margin: 8px 0;
+      background: rgba(184,150,46,0.06);
+      border: 1px solid rgba(184,150,46,0.12);
+      border-radius: var(--radius);
+      font-size: 12px; font-weight: 500; color: var(--gold);
+    }
+    .ki-status.active { display: flex; }
+    .ki-status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--gold);
+      animation: ki-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes ki-pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(201,169,110,0.4); }
+      50% { opacity: 0.6; box-shadow: 0 0 0 6px rgba(201,169,110,0); }
+    }
+    .ki-status svg { width: 14px; height: 14px; }
+
+    /* Kanal-Badge im Event */
+    .ev-kanal-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 9px; font-weight: 600; letter-spacing: 0.3px;
+      padding: 2px 8px; border-radius: 6px;
+      text-transform: uppercase;
+    }
+    .ev-kanal-badge.email { background: rgba(58,122,189,0.10); color: #3a7abd; }
+    .ev-kanal-badge.whatsapp { background: rgba(37,160,80,0.10); color: #25a050; }
+    .ev-kanal-badge.instagram { background: rgba(193,53,132,0.10); color: #c13584; }
+    .ev-kanal-badge.facebook { background: rgba(24,119,242,0.10); color: #1877f2; }
+    .ev-kanal-badge.homepage { background: rgba(184,150,46,0.08); color: var(--gold); }
+    .ev-kanal-badge.system { background: rgba(122,107,101,0.10); color: var(--text-dim); }
+    .ev-kanal-badge svg { width: 10px; height: 10px; }
+
+    /* Glow-Pulse fuer Hero-Card */
+    .hero-card { transition: box-shadow 400ms var(--ease); }
+    .hero-card:hover, .hero-card:active {
+      box-shadow: 0 0 40px rgba(184,150,46,0.08);
+    }
+
+    /* Verbesserte Hero-Card mit Partikel-Overlay */
+    .hero-card::after {
+      content: ''; position: absolute; top: -50%; right: -20%; width: 60%; height: 200%;
+      background: radial-gradient(ellipse, rgba(184,150,46,0.04) 0%, transparent 70%);
+      animation: hero-shimmer 8s ease-in-out infinite;
+    }
+    @keyframes hero-shimmer {
+      0%, 100% { opacity: 0.5; transform: translateX(0); }
+      50% { opacity: 1; transform: translateX(10px); }
+    }
+
+    /* Trend-Badge Animation */
+    .trend-badge.up { animation: trendPop 600ms var(--ease-spring) both; animation-delay: 400ms; }
+    @keyframes trendPop { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
+    /* === Event/Termin Detail Bottom Sheet === */
+    .detail-sheet .detail-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    }
+    .detail-sheet .detail-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .detail-sheet .detail-icon svg { width: 22px; height: 22px; }
+    .detail-sheet .detail-icon.termin { background: var(--success-bg); color: var(--success); }
+    .detail-sheet .detail-icon.storno { background: var(--danger-bg); color: var(--danger); }
+    .detail-sheet .detail-icon.event { background: var(--info-bg); color: var(--info); }
+    .detail-sheet .detail-icon.nachbestellung { background: var(--warning-bg); color: var(--warning); }
+    .detail-sheet .detail-icon.antwort { background: rgba(184,150,46,0.08); color: var(--rose); }
+    .detail-sheet .detail-type { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-dim); font-weight: 600; }
+    .detail-sheet .detail-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--champagne); }
+    .detail-sheet .detail-body {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+      font-size: 14px; line-height: 1.6; color: var(--text-secondary);
+    }
+    .detail-sheet .detail-meta-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;
+    }
+    .detail-sheet .detail-meta-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 10px 12px;
+    }
+    .detail-sheet .detail-meta-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-micro); font-weight: 600; }
+    .detail-sheet .detail-meta-val { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 2px; }
+    .detail-sheet .detail-actions { display: flex; flex-direction: column; gap: 8px; }
+    .detail-sheet .action-btn {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); cursor: pointer; transition: all 150ms;
+      font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: var(--text);
+    }
+    .detail-sheet .action-btn:active { background: var(--surface-hover); transform: scale(0.98); }
+    .detail-sheet .action-btn svg { width: 18px; height: 18px; flex-shrink: 0; color: var(--rose-light); }
+    .detail-sheet .action-btn.primary {
+      background: var(--rose-gradient); color: #fff; border-color: transparent;
+      box-shadow: 0 4px 20px rgba(184,150,46,0.2);
+    }
+    .detail-sheet .action-btn.primary svg { color: #fff; }
+    .detail-sheet .action-btn.primary:active { opacity: 0.9; }
+
+    /* KI Antwortvorschlag */
+    .ki-response {
+      background: var(--surface); border: 1px solid var(--border-accent);
+      border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+      position: relative; overflow: hidden;
+    }
+    .ki-response::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: var(--rose-gradient);
+    }
+    .ki-response-label {
+      font-size: 9px; text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--rose-light); font-weight: 600; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ki-response-label svg { width: 12px; height: 12px; }
+    .ki-response-text { font-size: 14px; line-height: 1.6; color: var(--text); }
+
+    /* Timeline duration-based height */
+    .tl-card[data-duration] { min-height: 80px; }
+
+    /* === Service-Katalog === */
+    .svc-card {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); cursor: pointer;
+      transition: background 150ms, box-shadow 200ms, border-color 200ms;
+    }
+    .svc-card:hover { background: var(--surface-hover); box-shadow: 0 2px 12px rgba(0,0,0,0.05); border-color: var(--border-accent); }
+    .svc-card:active { background: var(--surface-active); }
+    .svc-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .svc-icon svg { width: 18px; height: 18px; }
+    .svc-icon.dienstleistung { background: var(--rose-glow); color: var(--rose); }
+    .svc-icon.produkt { background: var(--gold-glow); color: var(--gold); }
+    .svc-info { flex: 1; min-width: 0; }
+    .svc-name { font-size: 14px; font-weight: 600; }
+    .svc-detail { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+    .svc-price { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; color: var(--champagne); text-align: right; }
+    .svc-dur { font-size: 10px; color: var(--text-micro); text-align: right; }
+
+    /* === Lagerbestand === */
+    .lager-card {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: background 150ms, box-shadow 200ms;
+    }
+    .lager-card:hover { background: var(--surface-hover); box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .lager-card.niedrig { border-color: rgba(212,169,78,0.3); }
+    .lager-card.leer { border-color: rgba(200,114,114,0.3); }
+    .lager-status { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .lager-status.ok { background: var(--success); }
+    .lager-status.niedrig { background: var(--warning); }
+    .lager-status.leer { background: var(--danger); }
+    .lager-info { flex: 1; min-width: 0; }
+    .lager-name { font-size: 13px; font-weight: 600; }
+    .lager-kat { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+    .lager-bestand { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; text-align: right; }
+    .lager-bestand.ok { color: var(--success); }
+    .lager-bestand.niedrig { color: var(--warning); }
+    .lager-bestand.leer { color: var(--danger); }
+    .lager-min { font-size: 9px; color: var(--text-micro); text-align: right; }
+
+    /* Lager-Warnung */
+    .lager-alert {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px; background: rgba(212,169,78,0.08); border: 1px solid rgba(212,169,78,0.2);
+      border-radius: var(--radius); margin-bottom: 8px;
+      font-size: 12px; color: var(--warning); font-weight: 500;
+    }
+    .lager-alert svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    /* === Rechnung Sheet === */
+    .rechnung-line {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+    }
+    .rechnung-line:last-child { border-bottom: none; }
+    .rechnung-total {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 0; margin-top: 8px; border-top: 2px solid var(--border-accent);
+      font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--champagne);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- V4.0: Goldpartikel-Hintergrund -->
+  <div class="particles" aria-hidden="true"></div>
+
+  <!-- V4.0: Toast-Benachrichtigungen -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <div class="pull-refresh" id="pullRefresh"><div class="pull-spinner"></div>Aktualisiere...</div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-top">
+      <div class="header-left">
+        <div class="header-greeting" id="headerGreeting">Guten Morgen</div>
+        <div class="header-salon"><em>Rena Rados</em> Friseure</div>
+      </div>
+      <div class="header-right">
+        <span class="live-dot" id="liveStatus">Live</span>
+        <div class="avatar" id="avatar">R</div>
+      </div>
+    </div>
+    <div class="header-sub">
+      <span id="headerDate"></span>
+      <span id="lastRefresh">Update: --:--</span>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <!-- PAGE: Dashboard -->
+    <div class="page active" id="page-dashboard">
+      <div class="stagger">
+        <div class="hero-card touch-scale" onclick="switchPage('kasse')" style="cursor:pointer">
+          <div class="hero-inner">
+            <div class="hero-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="hero-data">
+              <div class="hero-label">Tagesumsatz</div>
+              <div class="hero-value tabular" id="statUmsatz">--</div>
+              <div class="hero-sub" id="statUmsatzSub">brutto heute</div>
+            </div>
+            <div id="statTrend"></div>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card green touch-scale" onclick="switchPage('termine')" style="cursor:pointer">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+            </div>
+            <div class="stat-val tabular green" id="statTermine">--</div>
+            <div class="stat-label">Termine</div>
+            <div class="stat-sub" id="statTermineSub"></div>
+          </div>
+          <div class="stat-card blue touch-scale" onclick="scrollToEvents()" style="cursor:pointer">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            </div>
+            <div class="stat-val tabular blue" id="statAnfragen">--</div>
+            <div class="stat-label">Anfragen</div>
+            <div class="stat-sub" id="statAnfragenSub">ungelesen</div>
+          </div>
+          <div class="stat-card yellow touch-scale" onclick="switchPage('kasse')" style="cursor:pointer">
+            <div class="stat-icon yellow">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+            </div>
+            <div class="stat-val tabular yellow" id="statEvents">--</div>
+            <div class="stat-label">Events</div>
+            <div class="stat-sub" id="statEventsSub">offen</div>
+          </div>
+        </div>
+      </div>
+      <!-- V4.0: KI-Status-Indikator -->
+      <div class="ki-status" id="kiStatus" role="status">
+        <div class="ki-status-dot"></div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22l-.75-12.07A4.001 4.001 0 0 1 12 2z"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14c0 3 2.5 6 7 8"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5 0 3-2.5 6-7 8"/></svg>
+        <span id="kiStatusText">KI verarbeitet neue Anfrage...</span>
+      </div>
+      <div class="section"><div class="section-bar"></div><div class="section-title">Letzte Aktivitaeten</div><span class="section-count" id="evCount">--</span></div>
+      <div class="event-list stagger" id="recentEvents">
+        <div class="skeleton" style="height:80px"></div>
+        <div class="skeleton" style="height:80px"></div>
+        <div class="skeleton" style="height:80px"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: Termine -->
+    <div class="page" id="page-termine">
+      <div class="termin-stats" id="terminStats">
+        <div class="termin-stat"><div class="termin-stat-val" id="tsGesamt">--</div><div class="termin-stat-label">Termine</div></div>
+        <div class="termin-stat"><div class="termin-stat-val" id="tsBestaetigt">--</div><div class="termin-stat-label">Bestaetigt</div></div>
+        <div class="termin-stat"><div class="termin-stat-val" id="tsOffen">--</div><div class="termin-stat-label">Offen</div></div>
+        <div class="termin-stat"><div class="termin-stat-val" id="tsStunden">--</div><div class="termin-stat-label">Stunden</div></div>
+      </div>
+      <div class="section"><div class="section-bar"></div><div class="section-title">Heute</div><span class="section-count" id="termineCount">--</span></div>
+      <div class="day-view" id="termineHeute">
+        <div class="skeleton" style="height:400px"></div>
+      </div>
+
+      <div class="section"><div class="section-bar"></div><div class="section-title">Service-Katalog</div><span class="section-count" id="serviceCount">--</span></div>
+      <div class="event-list stagger" id="serviceList">
+        <div class="skeleton" style="height:60px"></div>
+      </div>
+
+      <div class="section"><div class="section-bar"></div><div class="section-title">Lagerbestand</div><span class="section-count" id="lagerCount">--</span></div>
+      <div id="lagerWarning" style="display:none"></div>
+      <div class="event-list stagger" id="lagerList">
+        <div class="skeleton" style="height:60px"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: Kasse -->
+    <div class="page" id="page-kasse">
+      <div class="stagger">
+        <div class="kasse-hero touch-scale">
+          <div class="ring-wrap">
+            <svg viewBox="0 0 120 120">
+              <defs>
+                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#b8962e"/>
+                  <stop offset="100%" stop-color="#2d8a4e"/>
+                </linearGradient>
+              </defs>
+              <circle class="ring-bg" cx="60" cy="60" r="52"/>
+              <circle class="ring-fill" id="ringFill" cx="60" cy="60" r="52" stroke-dasharray="326.73" stroke-dashoffset="326.73" transform="rotate(-90 60 60)"/>
+            </svg>
+            <div class="ring-label">
+              <span class="ring-pct tabular" id="ringPct">0%</span>
+              <span class="ring-sub">vom Ziel</span>
+            </div>
+          </div>
+          <div class="kasse-hero-data">
+            <div class="kasse-hero-label">Kassenbestand</div>
+            <div class="kasse-hero-val tabular" id="kasseBalance">-- &euro;</div>
+            <div class="kasse-hero-target" id="kasseTarget">Tagesziel: -- &euro;</div>
+          </div>
+        </div>
+        <div class="stat-grid cols-4">
+          <div class="stat-card green touch-scale">
+            <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z"/></svg></div>
+            <div class="stat-val tabular green" id="kasseEinBar">--</div>
+            <div class="stat-label">Bar</div>
+          </div>
+          <div class="stat-card blue touch-scale">
+            <div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg></div>
+            <div class="stat-val tabular blue" id="kasseEinKarte">--</div>
+            <div class="stat-label">Karte</div>
+          </div>
+          <div class="stat-card rose touch-scale">
+            <div class="stat-icon rose"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.94s4.18 1.36 4.18 3.85c0 1.89-1.44 2.98-3.12 3.19z"/></svg></div>
+            <div class="stat-val tabular rose" id="kasseTrinkgeld">--</div>
+            <div class="stat-label">Trinkgeld</div>
+          </div>
+          <div class="stat-card gold touch-scale">
+            <div class="stat-icon gold"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div>
+            <div class="stat-val tabular gold" id="kasseMwst">--</div>
+            <div class="stat-label">MwSt</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section"><div class="section-bar"></div><div class="section-title">Heutige Buchungen</div><span class="section-count" id="kasseCount">--</span></div>
+      <div class="event-list stagger" id="kasseEntries">
+        <div class="empty">Keine Buchungen heute</div>
+      </div>
+
+      <button class="fab touch-scale" onclick="openRechnungSheet()" style="margin-top:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z"/><path d="M14 2v6h6"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Rechnung erstellen
+      </button>
+      <button class="fab-outline touch-scale role-ausgabe" onclick="openAusgabeSheet()" style="margin-top:8px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Ausgabe erfassen
+      </button>
+      <button class="fab-outline touch-scale role-tagesabschluss" onclick="openTagesabschluss()" style="margin-top:8px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Tagesabschluss
+      </button>
+    </div>
+
+    <!-- PAGE: System -->
+    <div class="page" id="page-system">
+      <div class="stagger">
+        <div class="stat-grid cols-4">
+          <div class="stat-card green touch-scale">
+            <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div>
+            <div class="stat-val green">22</div>
+            <div class="stat-label">Workflows</div>
+          </div>
+          <div class="stat-card rose touch-scale">
+            <div class="stat-icon rose"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 16l-4-4V8.82C14.16 8.4 15 7.3 15 6c0-1.66-1.34-3-3-3S9 4.34 9 6c0 1.3.84 2.4 2 2.82V12l-4 4H3v5h5v-3.05l4-4.2 4 4.2V21h5v-5h-4z"/></svg></div>
+            <div class="stat-val rose">278</div>
+            <div class="stat-label">Nodes</div>
+          </div>
+          <div class="stat-card red touch-scale">
+            <div class="stat-icon red"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+            <div class="stat-val red">1</div>
+            <div class="stat-label">Offen</div>
+          </div>
+          <div class="stat-card blue touch-scale">
+            <div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg></div>
+            <div class="stat-val blue">19</div>
+            <div class="stat-label">DB Tabs</div>
+          </div>
+        </div>
+      </div>
+      <div class="section"><div class="section-bar"></div><div class="section-title">Workflow-Status</div></div>
+      <div class="event-list stagger" id="wfList"></div>
+      <div class="section"><div class="section-bar"></div><div class="section-title">Sprint S02</div></div>
+      <div class="sprint-card">
+        <div class="sprint-top">
+          <div class="sprint-pct" id="sprintPct">68%</div>
+          <div class="sprint-bar-wrap"><div class="sprint-bar-fill" id="sprintBar" style="width:68%"></div></div>
+        </div>
+        <div class="sprint-sub">15 von 22 Workflows produktionsreif</div>
+      </div>
+    </div>
+
+    <!-- PAGE: Config -->
+    <div class="page" id="page-config">
+      <div class="section"><div class="section-bar"></div><div class="section-title">Rolle</div></div>
+      <div class="cfg-grid stagger" id="roleGrid">
+        <div class="role-chip" data-role="AZU" onclick="setRole('AZU')">AZU</div>
+        <div class="role-chip" data-role="STY" onclick="setRole('STY')">STY</div>
+        <div class="role-chip" data-role="FRM" onclick="setRole('FRM')">FRM</div>
+        <div class="role-chip active" data-role="CHF" onclick="setRole('CHF')">CHF</div>
+      </div>
+
+      <div class="section"><div class="section-bar"></div><div class="section-title">Verbindung</div></div>
+      <div class="cfg-card touch-scale" onclick="openConfigSheet()" style="margin-bottom:8px">
+        <div class="cfg-title">n8n Webhook-URL</div>
+        <div class="cfg-desc" id="cfgUrlDisplay">Nicht konfiguriert — tippen zum Einrichten</div>
+      </div>
+
+      <div class="section"><div class="section-bar"></div><div class="section-title">Tagesziel</div></div>
+      <div class="cfg-grid" style="margin-bottom:8px">
+        <div class="cfg-option touch-scale" data-goal="600" onclick="setGoal(600)">
+          <div class="cfg-option-val">&euro;600</div>
+          <div class="cfg-option-label">Ruhiger Tag</div>
+        </div>
+        <div class="cfg-option touch-scale active" data-goal="800" onclick="setGoal(800)">
+          <div class="cfg-option-val">&euro;800</div>
+          <div class="cfg-option-label">Normal</div>
+        </div>
+        <div class="cfg-option touch-scale" data-goal="1000" onclick="setGoal(1000)">
+          <div class="cfg-option-val">&euro;1.000</div>
+          <div class="cfg-option-label">Stark</div>
+        </div>
+        <div class="cfg-option touch-scale" data-goal="1500" onclick="setGoal(1500)">
+          <div class="cfg-option-val">&euro;1.500</div>
+          <div class="cfg-option-label">Samstag</div>
+        </div>
+      </div>
+
+      <div class="section"><div class="section-bar"></div><div class="section-title">Refresh</div></div>
+      <div class="cfg-grid" style="margin-bottom:8px">
+        <div class="cfg-option touch-scale" data-refresh="15" onclick="setRefresh(15)">
+          <div class="cfg-option-val">15s</div>
+          <div class="cfg-option-label">Echtzeit</div>
+        </div>
+        <div class="cfg-option touch-scale active" data-refresh="30" onclick="setRefresh(30)">
+          <div class="cfg-option-val">30s</div>
+          <div class="cfg-option-label">Standard</div>
+        </div>
+      </div>
+
+      <div class="section"><div class="section-bar"></div><div class="section-title">Modus</div></div>
+      <div class="cfg-card touch-scale" onclick="loadDemoData()" style="margin-bottom:8px">
+        <div class="cfg-title" style="color:var(--rose-light)">Demo-Daten laden</div>
+        <div class="cfg-desc">Beispieldaten ohne n8n-Verbindung anzeigen</div>
+      </div>
+
+      <div class="section"><div class="section-bar"></div><div class="section-title">Info</div></div>
+      <div class="cfg-card">
+        <div class="cfg-title">Casa 2035 Dashboard</div>
+        <div class="cfg-desc">Version 4.0 Luxury Edition | PWA<br>Mistral AI (EU) | n8n Cloud<br>DSGVO-konform | GoBD-konform | EU AI Act</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchPage('dashboard')" data-page="dashboard">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 13h6c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1zm0 8h6c.55 0 1-.45 1-1v-4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1zm10 0h6c.55 0 1-.45 1-1v-8c0-.55-.45-1-1-1h-6c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1zM13 4v4c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1h-6c-.55 0-1 .45-1 1z"/></svg>
+      <span>Home</span>
+      <span class="nav-badge" id="navBadge" style="display:none">0</span>
+    </button>
+    <button class="nav-btn" onclick="switchPage('termine')" data-page="termine">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm-7-9h5v5h-5v-5z"/></svg>
+      <span>Termine</span>
+    </button>
+    <button class="nav-btn" onclick="switchPage('kasse')" data-page="kasse">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+      <span>Kasse</span>
+    </button>
+    <button class="nav-btn" onclick="switchPage('system')" data-page="system">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      <span>System</span>
+    </button>
+    <button class="nav-btn" onclick="switchPage('config')" data-page="config">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+      <span>Config</span>
+    </button>
+  </nav>
+
+  <!-- SHEET: Config -->
+  <div class="sheet-overlay" id="configSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h3>n8n Verbindung</h3>
+      <label>Webhook Base-URL</label>
+      <input type="url" id="cfgUrl" placeholder="https://niniho13.app.n8n.cloud/webhook">
+      <label>Auth Token</label>
+      <input type="text" id="cfgToken" placeholder="tok_...">
+      <label>User ID</label>
+      <input type="text" id="cfgUser" placeholder="MA-001">
+      <div class="sheet-actions">
+        <button class="btn btn-secondary" onclick="closeSheet('configSheet')">Abbrechen</button>
+        <button class="btn btn-primary" onclick="saveConfig()">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHEET: Ausgabe erfassen -->
+  <div class="sheet-overlay" id="ausgabeSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h3>Ausgabe erfassen</h3>
+      <label>Kategorie</label>
+      <select id="ausgabeKat">
+        <option value="material">Material / Wareneinkauf</option>
+        <option value="miete">Miete / Nebenkosten</option>
+        <option value="personal">Personalkosten</option>
+        <option value="versicherung">Versicherungen</option>
+        <option value="marketing">Marketing / Werbung</option>
+        <option value="buero">Buerobedarf</option>
+        <option value="reinigung">Reinigung</option>
+        <option value="reparatur">Reparatur / Wartung</option>
+        <option value="sonstiges">Sonstiges</option>
+      </select>
+      <label>Beschreibung</label>
+      <input type="text" id="ausgabeDesc" placeholder="z.B. LA Biosthetique Shampoo-Lieferung">
+      <label>Lieferant</label>
+      <input type="text" id="ausgabeLief" placeholder="z.B. La Biosthetique Deutschland">
+      <div class="sheet-row">
+        <div>
+          <label>Netto-Betrag (&euro;)</label>
+          <input type="number" id="ausgabeNetto" placeholder="0.00" step="0.01" min="0" oninput="calcBrutto()">
+        </div>
+        <div>
+          <label>MwSt-Satz</label>
+          <select id="ausgabeMwst" onchange="calcBrutto()">
+            <option value="0.19">19% (Produkte)</option>
+            <option value="0.07">7% (Dienstleist.)</option>
+            <option value="0">0% (Keine)</option>
+          </select>
+        </div>
+      </div>
+      <div class="brutto-preview" id="bruttoPreview">Brutto: 0,00 &euro;</div>
+      <div class="sheet-row">
+        <div>
+          <label>Zahlungsart</label>
+          <select id="ausgabeZahl">
+            <option value="bar">Bar</option>
+            <option value="karte">Karte</option>
+            <option value="ueberweisung">Ueberweisung</option>
+          </select>
+        </div>
+        <div>
+          <label>Beleg-Nr.</label>
+          <input type="text" id="ausgabeBeleg" placeholder="LB-2026-M03-001">
+        </div>
+      </div>
+      <div class="sheet-actions">
+        <button class="btn btn-secondary" onclick="closeSheet('ausgabeSheet')">Abbrechen</button>
+        <button class="btn btn-primary" onclick="submitAusgabe()">Erfassen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHEET: Tagesabschluss -->
+  <div class="sheet-overlay" id="taSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h3>Tagesabschluss</h3>
+      <div class="ta-summary" id="taSummary">
+        <div class="ta-row"><span class="ta-label">Einnahmen Bar</span><span id="taEinBar">--</span></div>
+        <div class="ta-row"><span class="ta-label">Einnahmen Karte</span><span id="taEinKarte">--</span></div>
+        <div class="ta-row"><span class="ta-label">Ausgaben Bar</span><span id="taAusgBar">--</span></div>
+        <div class="ta-row"><span class="ta-label">Trinkgeld</span><span id="taTrink">--</span></div>
+        <div class="ta-row"><span class="ta-label">MwSt 7%</span><span id="taMwst7">--</span></div>
+        <div class="ta-row"><span class="ta-label">MwSt 19%</span><span id="taMwst19">--</span></div>
+        <div class="ta-row total"><span class="ta-label">Kasse SOLL</span><span id="taSoll">--</span></div>
+      </div>
+      <label style="margin-top:16px">Kasse IST (gezaehlter Bestand)</label>
+      <input type="number" class="ta-input" id="taIstInput" placeholder="0.00" step="0.01" min="0" oninput="calcDiff()">
+      <div class="ta-diff" id="taDiff"></div>
+      <div class="sheet-actions">
+        <button class="btn btn-secondary" onclick="closeSheet('taSheet')">Abbrechen</button>
+        <button class="btn btn-primary" onclick="submitTagesabschluss()">Abschliessen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rechnung Bottom Sheet -->
+  <div class="sheet-overlay" id="rechnungSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <h3>Rechnung erstellen</h3>
+      <label>Kunde</label>
+      <input type="text" id="reKunde" placeholder="Name des Kunden">
+      <label>Dienstleistung</label>
+      <select id="reService"><option value="">Bitte waehlen...</option></select>
+      <label>Zahlungsart</label>
+      <select id="reZahlart">
+        <option value="bar">Bar</option>
+        <option value="karte">Karte</option>
+        <option value="ueberweisung">Ueberweisung</option>
+      </select>
+      <label>Trinkgeld</label>
+      <input type="number" id="reTrinkgeld" placeholder="0.00" step="0.01" min="0" value="0">
+      <div id="rePreview" class="brutto-preview" style="margin-top:12px"></div>
+      <div class="sheet-actions">
+        <button class="btn btn-secondary" onclick="closeSheet('rechnungSheet')">Abbrechen</button>
+        <button class="btn btn-primary" onclick="submitRechnung()">Rechnung senden</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event/Termin Detail Bottom Sheet -->
+  <div class="sheet-overlay" id="detailSheet">
+    <div class="sheet detail-sheet">
+      <div class="sheet-handle"></div>
+      <div id="detailInner"></div>
+      <div class="sheet-actions" style="margin-top:12px">
+        <button class="btn btn-secondary" onclick="closeSheet('detailSheet')">Schliessen</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =============================================================
+    // Casa 2035 — PWA Dashboard v4.0 Luxury Edition
+    // Goldpartikel + Glasmorphismus + Premium-Effekte
+    // Stand: 14.03.2026 | Agent: @design + @frontend + @leitung
+    // =============================================================
+
+    let currentPage = 'dashboard';
+    let refreshInterval = 30;
+    let refreshTimer = null;
+    let dailyGoal = 800;
+    let userRole = 'CHF';
+    let finanzData = {};
+    let eventsCache = [];
+    let termineCache = [];
+    let lagerCache = [];
+    let servicesCache = [];
+    let config = JSON.parse(localStorage.getItem('casa2035_config') || 'null') || { baseUrl: '', token: '', userId: '' };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('casa2035_settings');
+      if (saved) {
+        const s = JSON.parse(saved);
+        dailyGoal = s.goal || 800;
+        refreshInterval = s.refresh || 30;
+        userRole = s.role || 'CHF';
+      }
+      updateDate();
+      renderWfStatus();
+      applyRole();
+      applyCfgUI();
+
+      if (config.baseUrl) {
+        fetchAll();
+        startAutoRefresh();
+      } else {
+        loadDemoData();
+      }
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+      initPullToRefresh();
+    });
+
+    function switchPage(page) {
+      currentPage = page;
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + page).classList.add('active');
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    function scrollToEvents() {
+      var el = document.getElementById('recentEvents');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function updateDate() {
+      const now = new Date();
+      const h = now.getHours();
+      document.getElementById('headerGreeting').textContent = h < 12 ? 'Guten Morgen' : h < 17 ? 'Guten Tag' : 'Guten Abend';
+      document.getElementById('headerDate').textContent = now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    function updateRefreshTime() {
+      document.getElementById('lastRefresh').textContent = 'Update: ' + new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    async function apiGet(ep) {
+      if (!config.baseUrl) return null;
+      try {
+        const r = await fetch(config.baseUrl + ep, { headers: { 'X-Auth-Token': config.token, 'X-User-ID': config.userId, 'Content-Type': 'application/json' } });
+        if (!r.ok) throw new Error(r.status);
+        return await r.json();
+      } catch (e) { console.warn('API:', ep, e); return null; }
+    }
+    async function apiPost(ep, body) {
+      if (!config.baseUrl) return null;
+      try {
+        const r = await fetch(config.baseUrl + ep, { method: 'POST', headers: { 'X-Auth-Token': config.token, 'X-User-ID': config.userId, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (!r.ok) throw new Error(r.status);
+        return await r.json();
+      } catch (e) { console.warn('API POST:', ep, e); return null; }
+    }
+    async function fetchAll() {
+      showKiStatus('Daten werden geladen...');
+      const [events, termine, finanzen, lager, services] = await Promise.all([
+        apiGet('/pwa-events'),
+        apiGet('/pwa-termine'),
+        apiGet('/finanzen'),
+        apiGet('/pwa-lager'),
+        apiGet('/pwa-services')
+      ]);
+      if (events) renderEvents(events);
+      if (termine) renderTermine(termine);
+      if (finanzen) renderFinanzen(finanzen);
+      if (lager) renderLager(lager);
+      if (services) renderServices(services);
+      updateRefreshTime();
+      document.getElementById('liveStatus').textContent = config.baseUrl ? 'Live' : 'Demo';
+      hideKiStatus();
+      if (events || termine || finanzen) {
+        showToast('Daten aktualisiert', 'success', 2000);
+      } else if (config.baseUrl) {
+        showToast('Verbindungsfehler — Daten nicht geladen', 'danger', 4000);
+      }
+    }
+
+    function renderEvents(data) {
+      const items = Array.isArray(data) ? data : (data.data || data.events || []);
+      eventsCache = items;
+      const unread = items.filter(e => e.Is_Read === 0 || e.Is_Read === '0' || e.Status === 'ungelesen').length;
+      document.getElementById('statAnfragen').textContent = unread;
+      document.getElementById('statAnfragenSub').textContent = 'ungelesen';
+      const openCount = items.filter(e => e.Status !== 'erledigt').length;
+      document.getElementById('statEvents').textContent = openCount;
+      document.getElementById('evCount').textContent = items.length + ' Eintraege';
+
+      const badge = document.getElementById('navBadge');
+      if (unread > 0) { badge.style.display = 'flex'; badge.textContent = unread; } else { badge.style.display = 'none'; }
+
+      var c = document.getElementById('recentEvents');
+      c.textContent = '';
+      if (!items.length) { c.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7"/><path d="M2 17a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4H2v4z"/></svg><br>Keine Aktivitaeten</div>'; return; }
+
+      var iconSvgMap = {
+        termin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+        storno: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+        nachbestellung: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
+        antwort: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+        event: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+      };
+      var kanalNames = { whatsapp: 'WhatsApp', instagram: 'Instagram', email: 'E-Mail', facebook: 'Facebook', system: 'System' };
+
+      items.slice(0, 15).forEach(function(e, idx) {
+        var typ = (e.Typ || 'event').toLowerCase();
+        var isUnread = e.Is_Read === 0 || e.Is_Read === '0';
+        var time = e.Timestamp ? new Date(e.Timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '';
+        var tc = typ.includes('termin') ? 'termin' : typ.includes('storn') ? 'storno' : typ.includes('nachbest') ? 'nachbestellung' : typ.includes('antwort') ? 'antwort' : 'event';
+        var kanal = (e.Kanal || 'system').toLowerCase();
+
+        var row = document.createElement('div');
+        row.className = 'ev touch-scale' + (isUnread ? ' unread' : '');
+        row.style.cursor = 'pointer';
+        row.setAttribute('data-idx', idx);
+        row.addEventListener('click', function() { openEventDetail(idx); });
+
+        var iconDiv = document.createElement('div');
+        iconDiv.className = 'ev-icon ' + tc;
+        iconDiv.innerHTML = iconSvgMap[tc] || iconSvgMap.event;
+
+        var body = document.createElement('div');
+        body.className = 'ev-body';
+
+        var header = document.createElement('div');
+        header.className = 'ev-header';
+        var typeSpan = document.createElement('span');
+        typeSpan.className = 'ev-type ' + tc;
+        typeSpan.textContent = e.Typ || 'Event';
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'ev-time';
+        timeSpan.textContent = time;
+        header.appendChild(typeSpan);
+        header.appendChild(timeSpan);
+
+        var title = document.createElement('div');
+        title.className = 'ev-title';
+        title.textContent = e.Titel || '';
+
+        var msg = document.createElement('div');
+        msg.className = 'ev-msg';
+        msg.textContent = e.Nachricht || '';
+
+        var meta = document.createElement('div');
+        meta.className = 'ev-meta';
+        var kanalSpan = document.createElement('span');
+        kanalSpan.className = 'ev-kanal-badge ' + kanal;
+        var kanalIcons = {
+          email: '<svg viewBox="0 0 24 24" fill="currentColor" style="width:10px;height:10px"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>',
+          whatsapp: '<svg viewBox="0 0 24 24" fill="currentColor" style="width:10px;height:10px"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.89.52 3.66 1.44 5.17L2 22l4.83-1.44C8.34 21.48 10.11 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>',
+          instagram: '<svg viewBox="0 0 24 24" fill="currentColor" style="width:10px;height:10px"><rect x="2" y="2" width="20" height="20" rx="5"/></svg>',
+          facebook: '<svg viewBox="0 0 24 24" fill="currentColor" style="width:10px;height:10px"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5 3.66 9.13 8.44 9.88v-6.99h-2.54V12h2.54V9.8c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.77l-.44 2.89h-2.33v6.99C18.34 21.13 22 17 22 12z"/></svg>',
+          homepage: '<svg viewBox="0 0 24 24" fill="currentColor" style="width:10px;height:10px"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>',
+          system: '<svg viewBox="0 0 24 24" fill="currentColor" style="width:10px;height:10px"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58z"/></svg>'
+        };
+        kanalSpan.innerHTML = (kanalIcons[kanal] || '') + ' ' + (kanalNames[kanal] || kanal);
+        meta.appendChild(kanalSpan);
+        if (e.Anfrage_ID) {
+          var idSpan = document.createElement('span');
+          idSpan.textContent = e.Anfrage_ID;
+          meta.appendChild(idSpan);
+        }
+
+        body.appendChild(header);
+        body.appendChild(title);
+        body.appendChild(msg);
+        body.appendChild(meta);
+        row.appendChild(iconDiv);
+        row.appendChild(body);
+        c.appendChild(row);
+      });
+    }
+
+    function renderTermine(data) {
+      var items = Array.isArray(data) ? data : (data.data || data.termine || []);
+      termineCache = items;
+      var now2 = new Date();
+      var today = now2.getFullYear() + '-' + String(now2.getMonth() + 1).padStart(2, '0') + '-' + String(now2.getDate()).padStart(2, '0');
+      var todayItems = items.filter(function(t) { return (t.Start_ISO || '').startsWith(today); });
+
+      // Stats
+      document.getElementById('statTermine').textContent = todayItems.length;
+      var confirmed = todayItems.filter(function(t) { return t.Status === 'confirmed'; }).length;
+      var proposed = todayItems.filter(function(t) { return t.Status === 'proposed' || !t.Status; }).length;
+      document.getElementById('statTermineSub').textContent = confirmed + ' bestaetigt';
+      document.getElementById('termineCount').textContent = todayItems.length + ' Termine';
+      document.getElementById('tsGesamt').textContent = todayItems.length;
+      document.getElementById('tsBestaetigt').textContent = confirmed;
+      document.getElementById('tsOffen').textContent = proposed;
+      var totalMin = 0;
+      todayItems.forEach(function(t) { totalMin += parseInt(t.Duration_Min) || 30; });
+      document.getElementById('tsStunden').textContent = (totalMin / 60).toFixed(1) + 'h';
+
+      // Day View — 15-minute grid from 8:00 to 20:00
+      var c = document.getElementById('termineHeute');
+      c.textContent = '';
+      c.style.position = 'relative';
+
+      var startHour = 8;
+      var endHour = 20;
+      var slotHeight = 15; // px per 15 minutes
+      var totalSlots = (endHour - startHour) * 4;
+      var totalHeight = totalSlots * slotHeight;
+      c.style.minHeight = totalHeight + 'px';
+
+      // Time labels and grid lines
+      for (var s = 0; s < totalSlots; s++) {
+        var h = startHour + Math.floor(s / 4);
+        var m = (s % 4) * 15;
+        var isFullHour = m === 0;
+
+        var slot = document.createElement('div');
+        slot.className = 'day-time-slot';
+        slot.style.position = 'absolute';
+        slot.style.top = (s * slotHeight) + 'px';
+        slot.style.left = '0';
+        slot.style.right = '0';
+        slot.style.height = slotHeight + 'px';
+        slot.style.borderTop = isFullHour ? '1px solid var(--border-accent)' : '1px solid var(--border)';
+
+        if (isFullHour || m === 30) {
+          var label = document.createElement('div');
+          label.className = 'day-time-label' + (isFullHour ? ' full-hour' : '');
+          label.textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+          slot.appendChild(label);
+        }
+        c.appendChild(slot);
+      }
+
+      // Current time line
+      var nowH = now2.getHours();
+      var nowM = now2.getMinutes();
+      if (nowH >= startHour && nowH < endHour) {
+        var nowOffset = ((nowH - startHour) * 4 + nowM / 15) * slotHeight;
+        var nowLine = document.createElement('div');
+        nowLine.className = 'day-now-line';
+        nowLine.style.top = nowOffset + 'px';
+        c.appendChild(nowLine);
+      }
+
+      // Appointment blocks
+      if (!todayItems.length) return;
+
+      todayItems.forEach(function(t) {
+        var start = t.Start_ISO ? new Date(t.Start_ISO) : null;
+        if (!start) return;
+        var tH = start.getHours();
+        var tM = start.getMinutes();
+        if (tH < startHour || tH >= endHour) return;
+
+        var dur = parseInt(t.Duration_Min) || 30;
+        var st = (t.Status || 'proposed').toLowerCase();
+        var stLabel = st === 'confirmed' ? 'Bestaetigt' : st === 'cancelled' ? 'Storniert' : 'Offen';
+
+        var topPx = ((tH - startHour) * 4 + tM / 15) * slotHeight;
+        var heightPx = Math.max((dur / 15) * slotHeight, slotHeight);
+        var isCompact = dur <= 30;
+
+        var block = document.createElement('div');
+        block.className = 'day-block ' + st + (isCompact ? ' compact' : '');
+        block.style.top = topPx + 'px';
+        block.style.height = heightPx + 'px';
+        block.addEventListener('click', function() { openTerminDetail(t); });
+
+        var timeEl = document.createElement('div');
+        timeEl.className = 'day-block-time';
+        var endTime = new Date(start.getTime() + dur * 60000);
+        timeEl.textContent = String(tH).padStart(2, '0') + ':' + String(tM).padStart(2, '0') + ' – ' + String(endTime.getHours()).padStart(2, '0') + ':' + String(endTime.getMinutes()).padStart(2, '0');
+
+        var svcEl = document.createElement('div');
+        svcEl.className = 'day-block-service';
+        svcEl.textContent = t.Service || '';
+
+        var custEl = document.createElement('div');
+        custEl.className = 'day-block-customer';
+        custEl.textContent = t.Customer_Name || '';
+
+        var staffEl = document.createElement('div');
+        staffEl.className = 'day-block-staff';
+        staffEl.textContent = t.Staff || '';
+
+        // Middle column: service + customer + staff
+        var mainEl = document.createElement('div');
+        mainEl.className = 'day-block-main';
+        mainEl.appendChild(svcEl);
+        mainEl.appendChild(custEl);
+        mainEl.appendChild(staffEl);
+
+        // Right column: badge + duration
+        var rightEl = document.createElement('div');
+        rightEl.className = 'day-block-right';
+        var badge = document.createElement('span');
+        badge.className = 'day-block-badge ' + st;
+        badge.textContent = stLabel;
+        rightEl.appendChild(badge);
+        var durEl = document.createElement('div');
+        durEl.className = 'day-block-dur';
+        durEl.textContent = dur + ' Min';
+        rightEl.appendChild(durEl);
+
+        block.appendChild(timeEl);
+        block.appendChild(mainEl);
+        block.appendChild(rightEl);
+        c.appendChild(block);
+      });
+    }
+
+    function renderFinanzen(data) {
+      const d = data.data || data;
+      finanzData = d;
+      const umsatz = parseFloat(d.umsatz_gesamt || d.Einnahmen_Gesamt || 0);
+      animateValue(document.getElementById('statUmsatz'), umsatz, '', ' €', 1000);
+      document.getElementById('statUmsatzSub').textContent = 'brutto heute';
+
+      const kasse = parseFloat(d.kasse_ist || d.Kasse_Ist || d.saldo || 0);
+      document.getElementById('kasseBalance').textContent = fmtEur(kasse) + ' \u20AC';
+      document.getElementById('kasseTarget').textContent = 'Tagesziel: ' + fmtEur(dailyGoal) + ' \u20AC';
+      document.getElementById('kasseEinBar').textContent = fmtEur(parseFloat(d.einnahmen_bar || d.Einnahmen_Bar || 0));
+      document.getElementById('kasseEinKarte').textContent = fmtEur(parseFloat(d.einnahmen_karte || d.Einnahmen_Karte || 0));
+      document.getElementById('kasseTrinkgeld').textContent = fmtEur(parseFloat(d.trinkgeld || d.Trinkgeld_Gesamt || 0));
+      const m7 = parseFloat(d.mwst_7 || d.MwSt_7_Summe || 0);
+      const m19 = parseFloat(d.mwst_19 || d.MwSt_19_Summe || 0);
+      document.getElementById('kasseMwst').textContent = fmtEur(m7 + m19);
+
+      const pct = Math.min(Math.round((umsatz / dailyGoal) * 100), 100);
+      updateRing(pct);
+
+      document.getElementById('taEinBar').textContent = fmtEur(parseFloat(d.einnahmen_bar || d.Einnahmen_Bar || 0)) + ' \u20AC';
+      document.getElementById('taEinKarte').textContent = fmtEur(parseFloat(d.einnahmen_karte || d.Einnahmen_Karte || 0)) + ' \u20AC';
+      document.getElementById('taAusgBar').textContent = fmtEur(parseFloat(d.ausgaben_bar || d.Ausgaben_Bar || 0)) + ' \u20AC';
+      document.getElementById('taTrink').textContent = fmtEur(parseFloat(d.trinkgeld || d.Trinkgeld_Gesamt || 0)) + ' \u20AC';
+      document.getElementById('taMwst7').textContent = fmtEur(m7) + ' \u20AC';
+      document.getElementById('taMwst19').textContent = fmtEur(m19) + ' \u20AC';
+      document.getElementById('taSoll').textContent = fmtEur(parseFloat(d.kasse_soll || d.Kasse_Soll || 0)) + ' \u20AC';
+    }
+
+    function updateRing(pct) {
+      const circ = 2 * Math.PI * 52;
+      const offset = circ - (pct / 100) * circ;
+      const el = document.getElementById('ringFill');
+      if (el) el.style.strokeDashoffset = offset;
+      const pEl = document.getElementById('ringPct');
+      if (pEl) pEl.textContent = pct + '%';
+    }
+
+    // === Lagerbestand Rendering ===
+    function renderLager(data) {
+      var items = data.data ? data.data.produkte || [] : (Array.isArray(data) ? data : []);
+      lagerCache = items;
+      var niedrig = items.filter(function(p) { return p.Status === 'niedrig' || p.Status === 'leer'; });
+      document.getElementById('lagerCount').textContent = items.length + ' Produkte';
+
+      // Warning on dashboard
+      var warn = document.getElementById('lagerWarning');
+      if (niedrig.length > 0) {
+        warn.style.display = 'block';
+        warn.textContent = '';
+        var alert = document.createElement('div');
+        alert.className = 'lager-alert';
+        alert.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+        var alertText = document.createElement('span');
+        alertText.textContent = niedrig.length + ' Produkt' + (niedrig.length > 1 ? 'e' : '') + ' nachbestellen';
+        alert.appendChild(alertText);
+        warn.appendChild(alert);
+      } else {
+        warn.style.display = 'none';
+      }
+
+      var c = document.getElementById('lagerList');
+      c.textContent = '';
+      if (!items.length) { c.innerHTML = '<div class="empty">Kein Lagerbestand</div>'; return; }
+
+      items.forEach(function(p) {
+        var card = document.createElement('div');
+        card.className = 'lager-card ' + (p.Status || 'ok');
+
+        var dot = document.createElement('div');
+        dot.className = 'lager-status ' + (p.Status || 'ok');
+
+        var info = document.createElement('div');
+        info.className = 'lager-info';
+        var name = document.createElement('div');
+        name.className = 'lager-name';
+        name.textContent = p.Produktname || '';
+        var kat = document.createElement('div');
+        kat.className = 'lager-kat';
+        kat.textContent = (p.Kategorie || '') + (p.Lieferant ? ' — ' + p.Lieferant : '');
+        info.appendChild(name);
+        info.appendChild(kat);
+
+        var bestand = document.createElement('div');
+        bestand.className = 'lager-bestand ' + (p.Status || 'ok');
+        bestand.textContent = p.Bestand + ' ' + (p.Einheit || '');
+        var minEl = document.createElement('div');
+        minEl.className = 'lager-min';
+        minEl.textContent = 'Min: ' + (p.Mindestbestand || 0);
+
+        var right = document.createElement('div');
+        right.appendChild(bestand);
+        right.appendChild(minEl);
+
+        card.appendChild(dot);
+        card.appendChild(info);
+        card.appendChild(right);
+        c.appendChild(card);
+      });
+    }
+
+    // === Service-Katalog Rendering ===
+    function renderServices(data) {
+      var items = data.data ? data.data.services || [] : (Array.isArray(data) ? data : []);
+      servicesCache = items;
+      document.getElementById('serviceCount').textContent = items.length + ' Services';
+
+      // Populate Rechnung dropdown
+      var select = document.getElementById('reService');
+      select.textContent = '';
+      var defaultOpt = document.createElement('option');
+      defaultOpt.value = '';
+      defaultOpt.textContent = 'Bitte waehlen...';
+      select.appendChild(defaultOpt);
+      items.forEach(function(s) {
+        var opt = document.createElement('option');
+        opt.value = s.Service_ID || '';
+        opt.textContent = s.Name + ' — ' + Number(s.Preis_Brutto || 0).toFixed(2).replace('.', ',') + ' EUR';
+        opt.setAttribute('data-preis', s.Preis_Brutto || 0);
+        opt.setAttribute('data-dauer', s.Dauer_Min || 0);
+        opt.setAttribute('data-mwst', s.MwSt_Satz || 0.07);
+        select.appendChild(opt);
+      });
+
+      var c = document.getElementById('serviceList');
+      c.textContent = '';
+      if (!items.length) { c.innerHTML = '<div class="empty">Kein Service-Katalog</div>'; return; }
+
+      items.forEach(function(s) {
+        var card = document.createElement('div');
+        card.className = 'svc-card touch-scale';
+
+        var icon = document.createElement('div');
+        var typ = (s.Typ || 'dienstleistung').toLowerCase();
+        icon.className = 'svc-icon ' + (typ === 'produkt' ? 'produkt' : 'dienstleistung');
+        icon.innerHTML = typ === 'produkt'
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>';
+
+        var info = document.createElement('div');
+        info.className = 'svc-info';
+        var name = document.createElement('div');
+        name.className = 'svc-name';
+        name.textContent = s.Name || '';
+        var detail = document.createElement('div');
+        detail.className = 'svc-detail';
+        detail.textContent = (s.Kategorie || '') + (s.Dauer_Min ? ' — ' + s.Dauer_Min + ' Min' : '');
+        info.appendChild(name);
+        info.appendChild(detail);
+
+        var priceWrap = document.createElement('div');
+        var price = document.createElement('div');
+        price.className = 'svc-price';
+        price.textContent = Number(s.Preis_Brutto || 0).toFixed(2).replace('.', ',') + ' \u20AC';
+        var dur = document.createElement('div');
+        dur.className = 'svc-dur';
+        dur.textContent = s.Dauer_Min ? s.Dauer_Min + ' Min' : '';
+        priceWrap.appendChild(price);
+        priceWrap.appendChild(dur);
+
+        card.appendChild(icon);
+        card.appendChild(info);
+        card.appendChild(priceWrap);
+        c.appendChild(card);
+      });
+    }
+
+    // === Rechnung erstellen ===
+    function openRechnungSheet() {
+      document.getElementById('reKunde').value = '';
+      document.getElementById('reService').selectedIndex = 0;
+      document.getElementById('reTrinkgeld').value = '0';
+      document.getElementById('rePreview').textContent = '';
+      document.getElementById('rechnungSheet').classList.add('show');
+
+      document.getElementById('reService').addEventListener('change', updateRePreview);
+      document.getElementById('reTrinkgeld').addEventListener('input', updateRePreview);
+    }
+    function updateRePreview() {
+      var sel = document.getElementById('reService');
+      var opt = sel.options[sel.selectedIndex];
+      if (!opt || !opt.value) { document.getElementById('rePreview').textContent = ''; return; }
+      var preis = parseFloat(opt.getAttribute('data-preis')) || 0;
+      var trink = parseFloat(document.getElementById('reTrinkgeld').value) || 0;
+      var total = preis + trink;
+      var mwst = parseFloat(opt.getAttribute('data-mwst')) || 0.07;
+      var mwstBetrag = Math.round(preis / (1 + mwst) * mwst * 100) / 100;
+      document.getElementById('rePreview').textContent = 'Gesamt: ' + total.toFixed(2).replace('.', ',') + ' \u20AC (inkl. ' + mwstBetrag.toFixed(2).replace('.', ',') + ' \u20AC MwSt)';
+    }
+    async function submitRechnung() {
+      var kunde = document.getElementById('reKunde').value.trim();
+      if (!kunde) { showToast('Bitte Kundennamen eingeben', 'warning', 2000); return; }
+      var sel = document.getElementById('reService');
+      var opt = sel.options[sel.selectedIndex];
+      if (!opt || !opt.value) { showToast('Bitte Service waehlen', 'warning', 2000); return; }
+      var payload = {
+        kunde: kunde.substring(0, 200),
+        service_id: opt.value,
+        zahlungsart: document.getElementById('reZahlart').value,
+        trinkgeld: parseFloat(document.getElementById('reTrinkgeld').value) || 0,
+        preis_brutto: parseFloat(opt.getAttribute('data-preis')) || 0,
+        mwst_satz: parseFloat(opt.getAttribute('data-mwst')) || 0.07
+      };
+      if (config.baseUrl) {
+        showKiStatus('Rechnung wird erstellt...');
+        var res = await apiPost('/pwa-rechnung', payload);
+        hideKiStatus();
+        if (res) {
+          closeSheet('rechnungSheet');
+          showToast('Rechnung erstellt', 'success', 2500);
+          fetchAll();
+        } else {
+          showToast('Fehler beim Erstellen', 'danger', 3000);
+        }
+      } else {
+        closeSheet('rechnungSheet');
+        showToast('Demo: Rechnung fuer ' + kunde + ' wuerde erstellt', 'info', 3000);
+      }
+    }
+
+    function renderWfStatus() {
+      const wfs = [
+        { n: 'WF-01 Intent', s: 'clean', l: 'V15 Ready' },
+        { n: 'WF-02a Terminbuchung', s: 'clean', l: 'OK' },
+        { n: 'WF-02b Kanal-Router', s: 'clean', l: 'OK' },
+        { n: 'WF-03 Wunschfrisur', s: 'clean', l: 'OK' },
+        { n: 'WF-04 Lagerbestand', s: 'clean', l: 'OK' },
+        { n: 'WF-05 Rechnungen', s: 'clean', l: 'MwSt Fix' },
+        { n: 'WF-06a Stornierung', s: 'clean', l: 'OK' },
+        { n: 'WF-06b Umbuchung', s: 'gap', l: 'Pruefen' },
+        { n: 'WF-07 Follow-Up', s: 'clean', l: 'OK' },
+        { n: 'WF-08 Erinnerung', s: 'clean', l: 'OK' },
+        { n: 'WF-09 Auth', s: 'clean', l: 'OK' },
+        { n: 'WF-10 Finanzen', s: 'clean', l: 'OK' },
+        { n: 'WF-11 Tagesabschluss', s: 'clean', l: 'OK' },
+        { n: 'WF-SEND', s: 'clean', l: 'V3 Ready' },
+        { n: 'WF-ERR Error-Handler', s: 'clean', l: 'OK' },
+        { n: 'WF-MIGRATION', s: 'new', l: 'Einmalig' },
+        { n: 'WF-PWA Events', s: 'clean', l: 'OK' },
+        { n: 'WF-PWA Termine', s: 'clean', l: 'OK' },
+        { n: 'WF-PWA Finanzen', s: 'clean', l: 'OK' },
+        { n: 'WF-PWA Ausgabe', s: 'clean', l: 'OK' },
+        { n: 'WF-PWA Tagesabschluss', s: 'clean', l: 'OK' },
+        { n: 'Auth Middleware', s: 'clean', l: 'OK' },
+      ];
+      var container = document.getElementById('wfList');
+      container.textContent = '';
+      wfs.forEach(function(w) {
+        var row = document.createElement('div');
+        row.className = 'wf-row';
+        var dot = document.createElement('span');
+        dot.className = 'wf-dot ' + w.s;
+        var name = document.createElement('span');
+        name.className = 'wf-name';
+        name.textContent = w.n;
+        var badge = document.createElement('span');
+        badge.className = 'wf-badge ' + w.s;
+        badge.textContent = w.l;
+        row.appendChild(dot);
+        row.appendChild(name);
+        row.appendChild(badge);
+        container.appendChild(row);
+      });
+    }
+
+    function setRole(role) {
+      userRole = role;
+      saveSettings();
+      applyRole();
+      document.querySelectorAll('.role-chip').forEach(c => c.classList.toggle('active', c.dataset.role === role));
+      document.getElementById('avatar').textContent = role.charAt(0);
+    }
+    function applyRole() {
+      const canAusgabe = userRole === 'FRM' || userRole === 'CHF';
+      const canTA = userRole === 'CHF';
+      document.querySelectorAll('.role-ausgabe').forEach(el => el.classList.toggle('role-hidden', !canAusgabe));
+      document.querySelectorAll('.role-tagesabschluss').forEach(el => el.classList.toggle('role-hidden', !canTA));
+    }
+
+    function openConfigSheet() {
+      document.getElementById('cfgUrl').value = config.baseUrl;
+      document.getElementById('cfgToken').value = config.token;
+      document.getElementById('cfgUser').value = config.userId;
+      document.getElementById('configSheet').classList.add('show');
+    }
+    function saveConfig() {
+      config.baseUrl = document.getElementById('cfgUrl').value.replace(/\/$/, '');
+      config.token = document.getElementById('cfgToken').value;
+      config.userId = document.getElementById('cfgUser').value;
+      localStorage.setItem('casa2035_config', JSON.stringify(config));
+      closeSheet('configSheet');
+      applyCfgUI();
+      fetchAll();
+      startAutoRefresh();
+    }
+    function applyCfgUI() {
+      document.getElementById('cfgUrlDisplay').textContent = config.baseUrl || 'Nicht konfiguriert — tippen zum Einrichten';
+      document.querySelectorAll('[data-goal]').forEach(el => el.classList.toggle('active', parseInt(el.dataset.goal) === dailyGoal));
+      document.querySelectorAll('[data-refresh]').forEach(el => el.classList.toggle('active', parseInt(el.dataset.refresh) === refreshInterval));
+      document.querySelectorAll('[data-role]').forEach(el => el.classList.toggle('active', el.dataset.role === userRole));
+    }
+
+    function setGoal(val) { dailyGoal = val; saveSettings(); applyCfgUI(); if (finanzData) renderFinanzen({ data: finanzData }); }
+    function setRefresh(sec) { refreshInterval = sec; saveSettings(); applyCfgUI(); startAutoRefresh(); }
+    function saveSettings() { localStorage.setItem('casa2035_settings', JSON.stringify({ goal: dailyGoal, refresh: refreshInterval, role: userRole })); }
+
+    function startAutoRefresh() {
+      if (refreshTimer) clearInterval(refreshTimer);
+      refreshTimer = setInterval(() => { if (config.baseUrl) fetchAll(); }, refreshInterval * 1000);
+    }
+
+    function closeSheet(id) { document.getElementById(id).classList.remove('show'); }
+
+    function openAusgabeSheet() {
+      document.getElementById('ausgabeDesc').value = '';
+      document.getElementById('ausgabeLief').value = '';
+      document.getElementById('ausgabeNetto').value = '';
+      document.getElementById('ausgabeBeleg').value = '';
+      document.getElementById('bruttoPreview').textContent = 'Brutto: 0,00 \u20AC';
+      document.getElementById('ausgabeSheet').classList.add('show');
+    }
+    function calcBrutto() {
+      const netto = parseFloat(document.getElementById('ausgabeNetto').value) || 0;
+      const mwst = parseFloat(document.getElementById('ausgabeMwst').value) || 0;
+      const brutto = Math.round(netto * (1 + mwst) * 100) / 100;
+      const mwstBetrag = Math.round(netto * mwst * 100) / 100;
+      document.getElementById('bruttoPreview').textContent = 'Brutto: ' + brutto.toFixed(2).replace('.', ',') + ' \u20AC (MwSt: ' + mwstBetrag.toFixed(2).replace('.', ',') + ' \u20AC)';
+    }
+    async function submitAusgabe() {
+      const netto = parseFloat(document.getElementById('ausgabeNetto').value);
+      if (!netto || netto <= 0) { alert('Bitte Netto-Betrag eingeben'); return; }
+      const desc = document.getElementById('ausgabeDesc').value.trim();
+      if (!desc) { alert('Bitte Beschreibung eingeben'); return; }
+      const payload = {
+        kategorie: document.getElementById('ausgabeKat').value,
+        beschreibung: desc.substring(0, 500),
+        lieferant: document.getElementById('ausgabeLief').value.trim().substring(0, 200),
+        netto: netto,
+        mwst_satz: parseFloat(document.getElementById('ausgabeMwst').value),
+        zahlungsart: document.getElementById('ausgabeZahl').value,
+        beleg_nr: document.getElementById('ausgabeBeleg').value.trim().substring(0, 50)
+      };
+      if (config.baseUrl) {
+        const res = await apiPost('/ausgabe', payload);
+        if (res) { closeSheet('ausgabeSheet'); fetchAll(); } else { alert('Fehler beim Speichern'); }
+      } else {
+        closeSheet('ausgabeSheet');
+        alert('Demo-Modus: Ausgabe wuerde an POST /ausgabe gesendet');
+      }
+    }
+
+    function openTagesabschluss() {
+      document.getElementById('taIstInput').value = '';
+      document.getElementById('taDiff').textContent = '';
+      document.getElementById('taSheet').classList.add('show');
+    }
+    function calcDiff() {
+      const ist = parseFloat(document.getElementById('taIstInput').value) || 0;
+      const soll = parseFloat(finanzData.kasse_soll || finanzData.Kasse_Soll || 0);
+      const diff = Math.round((ist - soll) * 100) / 100;
+      const el = document.getElementById('taDiff');
+      if (ist === 0) { el.textContent = ''; return; }
+      const cls = Math.abs(diff) < 0.01 ? 'ok' : Math.abs(diff) <= 5 ? 'warn' : 'bad';
+      el.className = 'ta-diff ' + cls;
+      el.textContent = 'Differenz: ' + (diff >= 0 ? '+' : '') + diff.toFixed(2).replace('.', ',') + ' \u20AC' + (cls === 'ok' ? ' \u2714' : cls === 'warn' ? ' \u26A0' : ' \u2716');
+    }
+    async function submitTagesabschluss() {
+      const ist = parseFloat(document.getElementById('taIstInput').value);
+      if (isNaN(ist)) { alert('Bitte Kasse-Ist eingeben'); return; }
+      if (config.baseUrl) {
+        const res = await apiPost('/tagesabschluss', { kasse_ist: ist });
+        if (res) { closeSheet('taSheet'); fetchAll(); } else { alert('Fehler beim Abschluss'); }
+      } else {
+        closeSheet('taSheet');
+        alert('Demo-Modus: Tagesabschluss wuerde an POST /tagesabschluss gesendet');
+      }
+    }
+
+    function initPullToRefresh() {
+      let startY = 0, pulling = false;
+      document.addEventListener('touchstart', e => { if (window.scrollY === 0) { startY = e.touches[0].clientY; pulling = true; } }, { passive: true });
+      document.addEventListener('touchmove', e => { if (!pulling) return; if (e.touches[0].clientY - startY > 70) document.getElementById('pullRefresh').classList.add('visible'); }, { passive: true });
+      document.addEventListener('touchend', () => {
+        if (!pulling) return; pulling = false;
+        const ind = document.getElementById('pullRefresh');
+        if (ind.classList.contains('visible')) {
+          fetchAll().finally(() => setTimeout(() => ind.classList.remove('visible'), 600));
+        }
+      });
+    }
+
+    function loadDemoData() {
+      const now = new Date();
+      const iso = (h, m) => { const d = new Date(now); d.setHours(h, m, 0, 0); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00'; };
+
+      renderEvents([
+        { Timestamp: iso(9, 15), Typ: 'termin_bestaetigt', Status: 'ungelesen', Is_Read: 0, Titel: 'Termin bestaetigt', Nachricht: 'Maria Mueller \u2014 Damenhaarschnitt, 14:00', Kanal: 'whatsapp', Anfrage_ID: 'ANF-2026-042' },
+        { Timestamp: iso(9, 2), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Neue Anfrage', Nachricht: 'Stefan Braun fragt nach Herrenschnitt + Bart', Kanal: 'instagram', Anfrage_ID: 'ANF-2026-043' },
+        { Timestamp: iso(8, 45), Typ: 'nachbestellung', Status: 'gelesen', Is_Read: 1, Titel: 'Lagerbestand niedrig', Nachricht: 'Shampoo Vital: nur noch 3 Stueck (Min: 5)', Kanal: 'system' },
+        { Timestamp: iso(8, 30), Typ: 'storno', Status: 'erledigt', Is_Read: 1, Titel: 'Stornierung', Nachricht: 'Lisa Wagner hat Termin am 04.03. storniert', Kanal: 'whatsapp', Anfrage_ID: 'ANF-2026-040' },
+        { Timestamp: iso(8, 10), Typ: 'termin_bestaetigt', Status: 'gelesen', Is_Read: 1, Titel: 'Termin bestaetigt', Nachricht: 'Anna Schmidt \u2014 Balayage, 10:00', Kanal: 'email', Anfrage_ID: 'ANF-2026-039' },
+        { Timestamp: iso(7, 50), Typ: 'antwort', Status: 'gelesen', Is_Read: 1, Titel: 'Kundenantwort', Nachricht: 'Danke fuer die Info! Komme gerne.', Kanal: 'facebook', Anfrage_ID: 'ANF-2026-038' },
+      ]);
+
+      renderTermine([
+        { Start_ISO: iso(10, 0), Service: 'Balayage + Schnitt', Customer_Name: 'Anna Schmidt', Staff: 'Rena', Duration_Min: 120, Status: 'confirmed' },
+        { Start_ISO: iso(12, 30), Service: 'Herrenschnitt', Customer_Name: 'Thomas Weber', Staff: 'Lena', Duration_Min: 30, Status: 'confirmed' },
+        { Start_ISO: iso(14, 0), Service: 'Damenhaarschnitt', Customer_Name: 'Maria Mueller', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed' },
+        { Start_ISO: iso(15, 30), Service: 'Farbbehandlung', Customer_Name: 'Julia Koch', Staff: 'Lena', Duration_Min: 90, Status: 'proposed' },
+        { Start_ISO: iso(17, 0), Service: 'Herrenschnitt + Bart', Customer_Name: 'Stefan Braun', Staff: 'Rena', Duration_Min: 45, Status: 'proposed' },
+      ]);
+
+      renderFinanzen({
+        Einnahmen_Gesamt: 630, Einnahmen_Bar: 380, Einnahmen_Karte: 250,
+        Kasse_Ist: 535, Kasse_Soll: 530, Trinkgeld_Gesamt: 25,
+        MwSt_7_Summe: 38.50, MwSt_19_Summe: 4.75, Ausgaben_Bar: 12.50
+      });
+
+      document.getElementById('kasseEntries').innerHTML = [
+        { time: '10:45', desc: 'Balayage \u2014 A. Schmidt', amount: 165, type: 'plus' },
+        { time: '12:55', desc: 'Herrenschnitt \u2014 T. Weber', amount: 35, type: 'plus' },
+        { time: '13:10', desc: 'Shampoo Vital (Verkauf)', amount: 18.90, type: 'plus' },
+        { time: '11:30', desc: 'Kaffeebohnen Nachkauf', amount: -12.50, type: 'minus' },
+      ].map(e => `<div class="kasse-entry touch-scale">
+        <div class="kasse-entry-icon ${e.type}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${e.type === 'plus' ? '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>' : '<line x1="5" y1="12" x2="19" y2="12"/>'}</svg></div>
+        <div class="kasse-entry-info"><div class="kasse-entry-desc">${e.desc}</div><div class="kasse-entry-time">${e.time}</div></div>
+        <div class="kasse-entry-amt ${e.type}">${e.type === 'plus' ? '+' : ''}${e.amount.toFixed(2).replace('.', ',')} \u20AC</div>
+      </div>`).join('');
+      document.getElementById('kasseCount').textContent = '4 Buchungen';
+
+      renderServices({ data: { services: [
+        { Service_ID: 'S001', Name: 'Damenhaarschnitt', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 60, Preis_Netto: 42.06, Preis_Brutto: 45.00, MwSt_Satz: 0.07 },
+        { Service_ID: 'S002', Name: 'Herrenschnitt', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 30, Preis_Netto: 32.71, Preis_Brutto: 35.00, MwSt_Satz: 0.07 },
+        { Service_ID: 'S003', Name: 'Balayage + Schnitt', Kategorie: 'Farbe', Typ: 'dienstleistung', Dauer_Min: 120, Preis_Netto: 154.21, Preis_Brutto: 165.00, MwSt_Satz: 0.07 },
+        { Service_ID: 'S004', Name: 'Farbbehandlung', Kategorie: 'Farbe', Typ: 'dienstleistung', Dauer_Min: 90, Preis_Netto: 93.46, Preis_Brutto: 100.00, MwSt_Satz: 0.07 },
+        { Service_ID: 'S005', Name: 'Herrenschnitt + Bart', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 45, Preis_Netto: 46.73, Preis_Brutto: 50.00, MwSt_Satz: 0.07 },
+        { Service_ID: 'S006', Name: 'Shampoo Vital', Kategorie: 'Pflege', Typ: 'produkt', Dauer_Min: 0, Preis_Netto: 15.88, Preis_Brutto: 18.90, MwSt_Satz: 0.19 },
+        { Service_ID: 'S007', Name: 'Haarkur Repair', Kategorie: 'Pflege', Typ: 'produkt', Dauer_Min: 0, Preis_Netto: 21.01, Preis_Brutto: 24.99, MwSt_Satz: 0.19 },
+      ]}});
+
+      renderLager({ data: { produkte: [
+        { Produkt_ID: 'P001', Produktname: 'Shampoo Vital', Kategorie: 'Pflege', Bestand: 3, Einheit: 'Stueck', Mindestbestand: 5, Lieferant: 'Wella', Verkaufspreis: 18.90, Status: 'niedrig' },
+        { Produkt_ID: 'P002', Produktname: 'Haarkur Repair', Kategorie: 'Pflege', Bestand: 8, Einheit: 'Stueck', Mindestbestand: 5, Lieferant: 'LOreal', Verkaufspreis: 24.99, Status: 'ok' },
+        { Produkt_ID: 'P003', Produktname: 'Haarfarbe Blond 7.0', Kategorie: 'Farbe', Bestand: 2, Einheit: 'Tuben', Mindestbestand: 4, Lieferant: 'Wella', Verkaufspreis: 0, Status: 'niedrig' },
+        { Produkt_ID: 'P004', Produktname: 'Oxidant 6%', Kategorie: 'Farbe', Bestand: 12, Einheit: 'Liter', Mindestbestand: 3, Lieferant: 'Wella', Verkaufspreis: 0, Status: 'ok' },
+        { Produkt_ID: 'P005', Produktname: 'Styling Wax', Kategorie: 'Styling', Bestand: 0, Einheit: 'Stueck', Mindestbestand: 3, Lieferant: 'got2b', Verkaufspreis: 12.50, Status: 'leer' },
+        { Produkt_ID: 'P006', Produktname: 'Haarspray Extra Strong', Kategorie: 'Styling', Bestand: 6, Einheit: 'Stueck', Mindestbestand: 4, Lieferant: 'Schwarzkopf', Verkaufspreis: 14.90, Status: 'ok' },
+      ]}});
+
+      updateRefreshTime();
+      document.getElementById('liveStatus').textContent = 'Demo';
+      showToast('Demo-Modus aktiv', 'info', 2500);
+    }
+
+    // === Event Detail Bottom Sheet ===
+    function openEventDetail(idx) {
+      var e = eventsCache[idx];
+      if (!e) return;
+      var typ = (e.Typ || 'event').toLowerCase();
+      var tc = typ.includes('termin') ? 'termin' : typ.includes('storn') ? 'storno' : typ.includes('nachbest') ? 'nachbestellung' : typ.includes('antwort') ? 'antwort' : 'event';
+      var kanal = (e.Kanal || 'system').toLowerCase();
+      var kanalNames = { whatsapp: 'WhatsApp', instagram: 'Instagram', email: 'E-Mail', facebook: 'Facebook', system: 'System' };
+      var time = e.Timestamp ? new Date(e.Timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '';
+      var date = e.Timestamp ? new Date(e.Timestamp).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
+      var container = document.getElementById('detailInner');
+      container.textContent = '';
+
+      // Header
+      var header = document.createElement('div');
+      header.className = 'detail-header';
+      var iconDiv = document.createElement('div');
+      iconDiv.className = 'detail-icon ' + tc;
+      iconDiv.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+      var headerText = document.createElement('div');
+      var typeLabel = document.createElement('div');
+      typeLabel.className = 'detail-type';
+      typeLabel.textContent = e.Typ || 'Event';
+      var titleEl = document.createElement('div');
+      titleEl.className = 'detail-title';
+      titleEl.textContent = e.Titel || 'Keine Bezeichnung';
+      headerText.appendChild(typeLabel);
+      headerText.appendChild(titleEl);
+      header.appendChild(iconDiv);
+      header.appendChild(headerText);
+      container.appendChild(header);
+
+      // Body / Nachricht
+      var body = document.createElement('div');
+      body.className = 'detail-body';
+      body.textContent = e.Nachricht || 'Keine Details verfuegbar';
+      container.appendChild(body);
+
+      // Meta Grid
+      var grid = document.createElement('div');
+      grid.className = 'detail-meta-grid';
+
+      var metaItems = [
+        { label: 'Kanal', val: kanalNames[kanal] || kanal },
+        { label: 'Uhrzeit', val: time || '--' },
+        { label: 'Status', val: e.Status || '--' },
+        { label: 'Anfrage-ID', val: e.Anfrage_ID || '--' }
+      ];
+      metaItems.forEach(function(m) {
+        var mi = document.createElement('div');
+        mi.className = 'detail-meta-item';
+        var lbl = document.createElement('div');
+        lbl.className = 'detail-meta-label';
+        lbl.textContent = m.label;
+        var val = document.createElement('div');
+        val.className = 'detail-meta-val';
+        val.textContent = m.val;
+        mi.appendChild(lbl);
+        mi.appendChild(val);
+        grid.appendChild(mi);
+      });
+      container.appendChild(grid);
+
+      // KI Antwortvorschlag 1 (formell)
+      var responses = generateKiResponses(e);
+      var selectedResponse = responses[0];
+
+      var kiBox1 = document.createElement('div');
+      kiBox1.className = 'ki-response';
+      kiBox1.style.cursor = 'pointer';
+      kiBox1.style.border = '2px solid var(--rose)';
+      var kiLabel1 = document.createElement('div');
+      kiLabel1.className = 'ki-response-label';
+      kiLabel1.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/></svg>';
+      kiLabel1.appendChild(document.createTextNode(' KI-Vorschlag 1 — Formell'));
+      var kiText1 = document.createElement('div');
+      kiText1.className = 'ki-response-text';
+      kiText1.textContent = responses[0];
+      kiBox1.appendChild(kiLabel1);
+      kiBox1.appendChild(kiText1);
+      kiBox1.addEventListener('click', function() {
+        selectedResponse = responses[0];
+        kiBox1.style.border = '2px solid var(--rose)';
+        kiBox2.style.border = '1px solid var(--border-accent)';
+      });
+      container.appendChild(kiBox1);
+
+      // KI Antwortvorschlag 2 (freundlich/kurz)
+      var kiBox2 = document.createElement('div');
+      kiBox2.className = 'ki-response';
+      kiBox2.style.cursor = 'pointer';
+      var kiLabel2 = document.createElement('div');
+      kiLabel2.className = 'ki-response-label';
+      kiLabel2.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/></svg>';
+      kiLabel2.appendChild(document.createTextNode(' KI-Vorschlag 2 — Locker'));
+      var kiText2 = document.createElement('div');
+      kiText2.className = 'ki-response-text';
+      kiText2.textContent = responses[1];
+      kiBox2.appendChild(kiLabel2);
+      kiBox2.appendChild(kiText2);
+      kiBox2.addEventListener('click', function() {
+        selectedResponse = responses[1];
+        kiBox2.style.border = '2px solid var(--rose)';
+        kiBox1.style.border = '1px solid var(--border-accent)';
+      });
+      container.appendChild(kiBox2);
+
+      // Individuelle Antwort
+      var customBox = document.createElement('div');
+      customBox.style.marginBottom = '14px';
+      var customLabel = document.createElement('div');
+      customLabel.className = 'ki-response-label';
+      customLabel.textContent = 'Oder eigene Antwort schreiben:';
+      customLabel.style.marginBottom = '6px';
+      var customInput = document.createElement('textarea');
+      customInput.placeholder = 'Eigene Nachricht eingeben...';
+      customInput.style.cssText = 'width:100%;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:Inter,sans-serif;resize:vertical;min-height:60px;';
+      customInput.addEventListener('input', function() {
+        if (customInput.value.trim()) {
+          selectedResponse = customInput.value.trim();
+          kiBox1.style.border = '1px solid var(--border-accent)';
+          kiBox2.style.border = '1px solid var(--border-accent)';
+        }
+      });
+      customBox.appendChild(customLabel);
+      customBox.appendChild(customInput);
+      container.appendChild(customBox);
+
+      // Action Buttons
+      var actions = document.createElement('div');
+      actions.className = 'detail-actions';
+
+      // Antwort als Text senden
+      var btnText = document.createElement('button');
+      btnText.className = 'action-btn primary';
+      btnText.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+      btnText.appendChild(document.createTextNode(' Text senden'));
+      btnText.addEventListener('click', function() {
+        var msg = customInput.value.trim() || selectedResponse;
+        sendKiResponse(e, msg);
+      });
+      actions.appendChild(btnText);
+
+      // Sprachnachricht senden
+      var btnVoice = document.createElement('button');
+      btnVoice.className = 'action-btn';
+      btnVoice.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
+      btnVoice.appendChild(document.createTextNode(' Sprachnachricht'));
+      btnVoice.addEventListener('click', function() {
+        closeSheet('detailSheet');
+        showToast('Sprachaufnahme wird vorbereitet...', 'info', 2000);
+      });
+      actions.appendChild(btnVoice);
+
+      // Bild senden
+      var btnImage = document.createElement('button');
+      btnImage.className = 'action-btn';
+      btnImage.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
+      btnImage.appendChild(document.createTextNode(' Bild senden'));
+      btnImage.addEventListener('click', function() {
+        closeSheet('detailSheet');
+        showToast('Bild-Auswahl wird geoeffnet...', 'info', 2000);
+      });
+      actions.appendChild(btnImage);
+
+      // Termin vorschlagen
+      if (tc === 'event' || tc === 'termin') {
+        var btnTermin = document.createElement('button');
+        btnTermin.className = 'action-btn';
+        btnTermin.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+        btnTermin.appendChild(document.createTextNode(' Termin vorschlagen'));
+        btnTermin.addEventListener('click', function() {
+          closeSheet('detailSheet');
+          showToast('Terminvorschlag wird erstellt...', 'info', 2000);
+        });
+        actions.appendChild(btnTermin);
+      }
+
+      // Als gelesen markieren
+      if (e.Is_Read === 0 || e.Is_Read === '0') {
+        var btnRead = document.createElement('button');
+        btnRead.className = 'action-btn';
+        btnRead.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+        btnRead.appendChild(document.createTextNode(' Als gelesen markieren'));
+        btnRead.addEventListener('click', function() { markAsRead(e, idx); });
+        actions.appendChild(btnRead);
+      }
+
+      container.appendChild(actions);
+      document.getElementById('detailSheet').classList.add('show');
+    }
+
+    function generateKiResponses(e) {
+      var typ = (e.Typ || '').toLowerCase();
+      if (typ.includes('termin_bestaetigt')) {
+        return [
+          'Vielen Dank fuer Ihre Terminbestaetigung! Wir freuen uns auf Ihren Besuch bei Rena Rados Friseure. Bitte kommen Sie ca. 5 Minuten vor Ihrem Termin. Bei Fragen erreichen Sie uns jederzeit.',
+          'Super, Ihr Termin ist bestaetigt! Wir freuen uns auf Sie. Bis bald bei Rena Rados!'
+        ];
+      } else if (typ.includes('storno')) {
+        return [
+          'Schade, dass Sie Ihren Termin absagen muessen. Wir haben die Stornierung vorgemerkt. Moechten Sie direkt einen neuen Termin vereinbaren? Wir haben diese Woche noch freie Plaetze.',
+          'Kein Problem, der Termin ist storniert. Melden Sie sich gerne, wenn Sie einen neuen Termin moechten!'
+        ];
+      } else if (typ.includes('nachbestellung')) {
+        return [
+          'Der Lagerbestand wurde geprueft. Eine automatische Nachbestellung wird vorbereitet. Sie erhalten eine Bestaetigung, sobald die Bestellung beim Lieferanten eingegangen ist.',
+          'Nachbestellung ist raus! Wir informieren Sie, sobald die Ware da ist.'
+        ];
+      } else if (typ === 'event' || typ === 'anfrage') {
+        return [
+          'Vielen Dank fuer Ihre Anfrage! Gerne schaue ich nach einem passenden Termin fuer Sie. Haben Sie einen Wunschtermin oder bevorzugen Sie einen bestimmten Stylisten? Wir melden uns in Kuerze zurueck.',
+          'Danke fuer Ihre Nachricht! Wir haben freie Plaetze — wann passt es Ihnen am besten? Rena und Lena freuen sich auf Sie!'
+        ];
+      } else if (typ.includes('antwort')) {
+        return [
+          'Vielen Dank fuer Ihre Rueckmeldung! Wir freuen uns, dass wir Ihnen weiterhelfen konnten. Bei weiteren Fragen stehen wir Ihnen gerne zur Verfuegung.',
+          'Danke fuer die Rueckmeldung! Schoen, dass alles passt. Bis zum naechsten Mal!'
+        ];
+      }
+      return [
+        'Vielen Dank fuer Ihre Nachricht. Wir haben Ihre Anfrage erhalten und melden uns in Kuerze bei Ihnen zurueck. Ihr Team von Rena Rados Friseure.',
+        'Danke fuer Ihre Nachricht! Wir kuemmern uns darum und melden uns schnellstmoeglich bei Ihnen.'
+      ];
+    }
+
+    function sendKiResponse(e, responseText) {
+      if (config.baseUrl) {
+        showKiStatus('Antwort wird gesendet...');
+        apiPost('/pwa-antwort', {
+          anfrage_id: e.Anfrage_ID || '',
+          kanal: e.Kanal || 'email',
+          antwort: responseText,
+          typ: 'ki_antwort'
+        }).then(function(res) {
+          hideKiStatus();
+          if (res) {
+            showToast('Antwort gesendet', 'success', 2500);
+            closeSheet('detailSheet');
+            fetchAll();
+          } else {
+            showToast('Fehler beim Senden', 'danger', 3000);
+          }
+        });
+      } else {
+        closeSheet('detailSheet');
+        showToast('Demo: Antwort wuerde ueber ' + (e.Kanal || 'E-Mail') + ' gesendet', 'info', 3000);
+      }
+    }
+
+    function markAsRead(e, idx) {
+      if (config.baseUrl && e.Anfrage_ID) {
+        apiPost('/pwa-mark-read', { anfrage_id: e.Anfrage_ID }).then(function() {
+          eventsCache[idx].Is_Read = 1;
+          renderEvents(eventsCache);
+          closeSheet('detailSheet');
+          showToast('Als gelesen markiert', 'success', 2000);
+        });
+      } else {
+        eventsCache[idx].Is_Read = 1;
+        eventsCache[idx].Status = 'gelesen';
+        renderEvents(eventsCache);
+        closeSheet('detailSheet');
+        showToast('Als gelesen markiert', 'success', 2000);
+      }
+    }
+
+    // === Termin Detail Bottom Sheet ===
+    function openTerminDetail(t) {
+      var container = document.getElementById('detailInner');
+      container.textContent = '';
+
+      var start = t.Start_ISO ? new Date(t.Start_ISO) : null;
+      var timeStr = start ? start.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+      var dateStr = start ? start.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long' }) : '--';
+      var dur = parseInt(t.Duration_Min) || 30;
+      var endTime = start ? new Date(start.getTime() + dur * 60000) : null;
+      var endStr = endTime ? endTime.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '--:--';
+      var st = (t.Status || 'proposed').toLowerCase();
+      var stLabel = st === 'confirmed' ? 'Bestaetigt' : st === 'cancelled' ? 'Storniert' : 'Vorgeschlagen';
+
+      // Header
+      var header = document.createElement('div');
+      header.className = 'detail-header';
+      var iconDiv = document.createElement('div');
+      iconDiv.className = 'detail-icon termin';
+      iconDiv.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+      var headerText = document.createElement('div');
+      var typeLabel = document.createElement('div');
+      typeLabel.className = 'detail-type';
+      typeLabel.textContent = stLabel;
+      var titleEl = document.createElement('div');
+      titleEl.className = 'detail-title';
+      titleEl.textContent = t.Service || 'Termin';
+      headerText.appendChild(typeLabel);
+      headerText.appendChild(titleEl);
+      header.appendChild(iconDiv);
+      header.appendChild(headerText);
+      container.appendChild(header);
+
+      // Meta Grid
+      var grid = document.createElement('div');
+      grid.className = 'detail-meta-grid';
+      var metaItems = [
+        { label: 'Kunde', val: t.Customer_Name || '--' },
+        { label: 'Stylist', val: t.Staff || '--' },
+        { label: 'Datum', val: dateStr },
+        { label: 'Uhrzeit', val: timeStr + ' – ' + endStr },
+        { label: 'Dauer', val: dur + ' Minuten' },
+        { label: 'Status', val: stLabel }
+      ];
+      metaItems.forEach(function(m) {
+        var mi = document.createElement('div');
+        mi.className = 'detail-meta-item';
+        var lbl = document.createElement('div');
+        lbl.className = 'detail-meta-label';
+        lbl.textContent = m.label;
+        var val = document.createElement('div');
+        val.className = 'detail-meta-val';
+        val.textContent = m.val;
+        mi.appendChild(lbl);
+        mi.appendChild(val);
+        grid.appendChild(mi);
+      });
+      container.appendChild(grid);
+
+      // Actions
+      var actions = document.createElement('div');
+      actions.className = 'detail-actions';
+
+      if (st === 'proposed') {
+        var btnConfirm = document.createElement('button');
+        btnConfirm.className = 'action-btn primary';
+        btnConfirm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+        btnConfirm.appendChild(document.createTextNode(' Termin bestaetigen'));
+        btnConfirm.addEventListener('click', function() {
+          if (config.baseUrl) {
+            apiPost('/pwa-termin-confirm', { termin: t }).then(function() {
+              closeSheet('detailSheet');
+              showToast('Termin bestaetigt', 'success', 2500);
+              fetchAll();
+            });
+          } else {
+            closeSheet('detailSheet');
+            showToast('Demo: Termin wuerde bestaetigt', 'success', 2500);
+          }
+        });
+        actions.appendChild(btnConfirm);
+      }
+
+      var btnReschedule = document.createElement('button');
+      btnReschedule.className = 'action-btn';
+      btnReschedule.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+      btnReschedule.appendChild(document.createTextNode(' Umbuchen'));
+      btnReschedule.addEventListener('click', function() {
+        closeSheet('detailSheet');
+        showToast('Umbuchung wird vorbereitet...', 'info', 2000);
+      });
+      actions.appendChild(btnReschedule);
+
+      if (st !== 'cancelled') {
+        var btnCancel = document.createElement('button');
+        btnCancel.className = 'action-btn';
+        btnCancel.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+        btnCancel.appendChild(document.createTextNode(' Stornieren'));
+        btnCancel.addEventListener('click', function() {
+          closeSheet('detailSheet');
+          showToast('Stornierung eingeleitet...', 'warning', 2500);
+        });
+        actions.appendChild(btnCancel);
+      }
+
+      container.appendChild(actions);
+      document.getElementById('detailSheet').classList.add('show');
+    }
+
+    // === Toast Notification System ===
+    function showToast(message, type, duration) {
+      type = type || 'info';
+      duration = duration || 3000;
+      var container = document.getElementById('toastContainer');
+      var toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      toast.setAttribute('role', 'alert');
+      var iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      iconSvg.setAttribute('viewBox', '0 0 24 24');
+      iconSvg.setAttribute('fill', 'none');
+      iconSvg.setAttribute('stroke', 'currentColor');
+      iconSvg.setAttribute('stroke-width', '2');
+      iconSvg.style.width = '16px';
+      iconSvg.style.height = '16px';
+      iconSvg.style.flexShrink = '0';
+      var path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      if (type === 'success') {
+        path.setAttribute('d', 'M22 11.08V12a10 10 0 1 1-5.93-9.14');
+        var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        poly.setAttribute('points', '22 4 12 14.01 9 11.01');
+        iconSvg.appendChild(path);
+        iconSvg.appendChild(poly);
+      } else if (type === 'danger') {
+        var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        c.setAttribute('cx', '12'); c.setAttribute('cy', '12'); c.setAttribute('r', '10');
+        var l1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        l1.setAttribute('x1', '15'); l1.setAttribute('y1', '9'); l1.setAttribute('x2', '9'); l1.setAttribute('y2', '15');
+        var l2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        l2.setAttribute('x1', '9'); l2.setAttribute('y1', '9'); l2.setAttribute('x2', '15'); l2.setAttribute('y2', '15');
+        iconSvg.appendChild(c); iconSvg.appendChild(l1); iconSvg.appendChild(l2);
+      } else {
+        var ci = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        ci.setAttribute('cx', '12'); ci.setAttribute('cy', '12'); ci.setAttribute('r', '10');
+        var ln1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        ln1.setAttribute('x1', '12'); ln1.setAttribute('y1', '16'); ln1.setAttribute('x2', '12'); ln1.setAttribute('y2', '12');
+        var ln2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        ln2.setAttribute('x1', '12'); ln2.setAttribute('y1', '8'); ln2.setAttribute('x2', '12.01'); ln2.setAttribute('y2', '8');
+        iconSvg.appendChild(ci); iconSvg.appendChild(ln1); iconSvg.appendChild(ln2);
+      }
+      toast.appendChild(iconSvg);
+      var span = document.createElement('span');
+      span.textContent = message;
+      toast.appendChild(span);
+      container.appendChild(toast);
+      setTimeout(function() {
+        toast.style.animation = 'toastOut 300ms ease-in forwards';
+        setTimeout(function() { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 300);
+      }, duration);
+    }
+
+    // === Zaehl-Animation (Count-Up) ===
+    function animateValue(element, target, prefix, suffix, duration) {
+      prefix = prefix || '';
+      suffix = suffix || '';
+      duration = duration || 800;
+      var start = 0;
+      var startTime = null;
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        var progress = Math.min((timestamp - startTime) / duration, 1);
+        var eased = 1 - Math.pow(1 - progress, 3);
+        var current = Math.round(eased * target);
+        element.textContent = prefix + current.toLocaleString('de-DE') + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    // === KI-Status Indicator ===
+    function showKiStatus(text) {
+      var el = document.getElementById('kiStatus');
+      document.getElementById('kiStatusText').textContent = text || 'KI verarbeitet...';
+      el.classList.add('active');
+    }
+    function hideKiStatus() {
+      document.getElementById('kiStatus').classList.remove('active');
+    }
+
+    function fmtEur(n) { return Number(n).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
+    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  </script>
+</body>
+</html>
