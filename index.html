@@ -1006,7 +1006,7 @@
 
     /* === V5.1: FAB — KI-Assistent === */
     .fab-container { position: fixed; bottom: calc(86px + var(--safe-bottom)); right: 18px; z-index: 90; }
-    .fab {
+    .fab-float {
       width: 54px; height: 54px; border-radius: 50%;
       background: var(--rose-gradient); border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
@@ -1014,16 +1014,16 @@
       transition: transform 200ms var(--ease), box-shadow 200ms;
       position: relative; z-index: 2;
     }
-    .fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(184,150,46,0.4); }
-    .fab:active { transform: scale(0.95); }
-    .fab svg { width: 24px; height: 24px; color: #fff; transition: transform 300ms var(--ease); }
-    .fab.open svg { transform: rotate(45deg); }
+    .fab-float:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(184,150,46,0.4); }
+    .fab-float:active { transform: scale(0.95); }
+    .fab-float svg { width: 24px; height: 24px; color: #fff; transition: transform 300ms var(--ease); }
+    .fab-float.open svg { transform: rotate(45deg); }
     .fab-menu {
       position: absolute; bottom: 64px; right: 0; display: flex; flex-direction: column; gap: 10px;
       opacity: 0; pointer-events: none; transform: translateY(10px) scale(0.95);
       transition: all 250ms var(--ease);
     }
-    .fab.open + .fab-menu { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+    .fab-float.open + .fab-menu { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
     .fab-item {
       display: flex; align-items: center; gap: 10px; white-space: nowrap;
       padding: 10px 16px 10px 12px; background: var(--surface);
@@ -1390,6 +1390,10 @@
 
     <!-- PAGE: Config -->
     <div class="page" id="page-config">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;cursor:pointer" onclick="switchPage('system')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--text-dim)"><polyline points="15 18 9 12 15 6"/></svg>
+        <span style="font-size:13px;font-weight:500;color:var(--text-dim)">Zurueck zu System</span>
+      </div>
       <div class="section"><div class="section-bar"></div><div class="section-title">Rolle</div></div>
       <div class="cfg-grid stagger" id="roleGrid">
         <div class="role-chip" data-role="AZU" onclick="setRole('AZU')">AZU</div>
@@ -1453,24 +1457,24 @@
 
   <!-- Bottom Navigation -->
   <nav class="bottom-nav">
-    <button class="nav-btn active" onclick="switchPage('dashboard')" data-page="dashboard">
+    <button class="nav-btn active" onclick="switchPage('dashboard')" data-page="dashboard" aria-label="Home Dashboard">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 13h6c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1zm0 8h6c.55 0 1-.45 1-1v-4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1zm10 0h6c.55 0 1-.45 1-1v-8c0-.55-.45-1-1-1h-6c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1zM13 4v4c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1h-6c-.55 0-1 .45-1 1z"/></svg>
       <span>Home</span>
       <span class="nav-badge" id="navBadge" style="display:none">0</span>
     </button>
-    <button class="nav-btn" onclick="switchPage('termine')" data-page="termine">
+    <button class="nav-btn" onclick="switchPage('termine')" data-page="termine" aria-label="Termine und Kalender">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm-7-9h5v5h-5v-5z"/></svg>
       <span>Termine</span>
     </button>
-    <button class="nav-btn" onclick="switchPage('beratung')" data-page="beratung">
+    <button class="nav-btn" onclick="switchPage('beratung')" data-page="beratung" aria-label="Beratung und Wunschfrisur">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3c-4.97 0-9 3.19-9 7.13 0 2.45 1.56 4.63 4 5.93v4.81l3.5-2.1c.49.07.99.1 1.5.1 4.97 0 9-3.19 9-7.13S16.97 3 12 3zm1 10h-2v-2h2v2zm0-4h-2V5h2v4z"/></svg>
       <span>Beratung</span>
     </button>
-    <button class="nav-btn" onclick="switchPage('kasse')" data-page="kasse">
+    <button class="nav-btn" onclick="switchPage('kasse')" data-page="kasse" aria-label="Kasse und Finanzen">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
       <span>Kasse</span>
     </button>
-    <button class="nav-btn" onclick="switchPage('system')" data-page="system">
+    <button class="nav-btn" onclick="switchPage('system')" data-page="system" aria-label="System und Workflows">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
       <span>System</span>
     </button>
@@ -1478,7 +1482,7 @@
 
   <!-- V5.1: FAB — KI-Assistent Quick Actions -->
   <div class="fab-container">
-    <button class="fab" id="fabBtn" aria-label="KI-Assistent">
+    <button class="fab-float" id="fabBtn" aria-label="KI-Assistent">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
     <div class="fab-menu" id="fabMenu">
@@ -2281,6 +2285,13 @@
     }
 
     function closeSheet(id) { document.getElementById(id).classList.remove('show'); }
+
+    // V5.1: Close sheets on overlay background click
+    document.querySelectorAll('.sheet-overlay').forEach(function(overlay) {
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) overlay.classList.remove('show');
+      });
+    });
 
     function openAusgabeSheet() {
       document.getElementById('ausgabeDesc').value = '';
