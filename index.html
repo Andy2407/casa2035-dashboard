@@ -1176,47 +1176,79 @@
 
     <!-- PAGE: Dashboard -->
     <div class="page active" id="page-dashboard">
-      <div class="stagger">
-        <div class="hero-card touch-scale" onclick="switchPage('kasse')" style="cursor:pointer">
-          <div class="hero-inner">
-            <div class="hero-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-            <div class="hero-data">
-              <div class="hero-label">Tagesumsatz</div>
-              <div class="hero-value tabular" id="statUmsatz">--</div>
-              <div class="hero-sub" id="statUmsatzSub">brutto heute <svg class="sparkline" id="heroSparkline" width="60" height="16" viewBox="0 0 60 16"></svg></div>
-            </div>
-            <div id="statTrend"></div>
+      <!-- V6: Naechster Termin — Highlight -->
+      <div class="hero-card touch-scale" id="nextTerminCard" onclick="switchPage('termine')" style="cursor:pointer">
+        <div class="hero-inner">
+          <div class="hero-icon-wrap" style="background:var(--success-bg);border-color:rgba(45,138,78,0.15)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--success)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
-        </div>
-        <div class="stat-grid">
-          <div class="stat-card green touch-scale" onclick="switchPage('termine')" style="cursor:pointer">
-            <div class="stat-icon green">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-            </div>
-            <div class="stat-val tabular green" id="statTermine">--</div>
-            <div class="stat-label">Termine</div>
-            <div class="stat-sub" id="statTermineSub"></div>
+          <div class="hero-data">
+            <div class="hero-label" style="color:var(--success)">Naechster Termin</div>
+            <div class="hero-value tabular" id="nextTerminTime" style="font-size:28px">--:--</div>
+            <div class="hero-sub" id="nextTerminInfo">Lade Termine...</div>
           </div>
-          <div class="stat-card blue touch-scale" onclick="scrollToEvents()" style="cursor:pointer">
-            <div class="stat-icon blue">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
-            </div>
-            <div class="stat-val tabular blue" id="statAnfragen">--</div>
-            <div class="stat-label">Anfragen</div>
-            <div class="stat-sub" id="statAnfragenSub">ungelesen</div>
-          </div>
-          <div class="stat-card yellow touch-scale" onclick="switchPage('kasse')" style="cursor:pointer">
-            <div class="stat-icon yellow">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-            </div>
-            <div class="stat-val tabular yellow" id="statEvents">--</div>
-            <div class="stat-label">Events</div>
-            <div class="stat-sub" id="statEventsSub">offen</div>
+          <div style="text-align:right">
+            <div id="nextTerminCountdown" style="font-size:20px;font-weight:700;color:var(--rose-light);font-family:'Playfair Display',serif"></div>
+            <div style="font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px">bis zum Start</div>
           </div>
         </div>
       </div>
+
+      <!-- V6: Schnellaktionen -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        <button class="fab touch-scale" onclick="switchPage('termine')" style="margin:0;padding:12px;font-size:13px;border-radius:var(--radius)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Termine
+        </button>
+        <button class="fab touch-scale" onclick="switchPage('kasse')" style="margin:0;padding:12px;font-size:13px;border-radius:var(--radius)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Kasse
+        </button>
+      </div>
+
+      <!-- V6: Kompakte Stats — 2x2 Grid -->
+      <div class="stat-grid cols-2" style="margin-bottom:14px">
+        <div class="stat-card gold touch-scale" onclick="switchPage('kasse')" style="cursor:pointer">
+          <div class="stat-icon gold">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <div class="stat-val tabular gold" id="statUmsatz">--</div>
+          <div class="stat-label">Umsatz</div>
+          <div class="stat-sub" id="statUmsatzSub">brutto heute</div>
+        </div>
+        <div class="stat-card green touch-scale" onclick="switchPage('termine')" style="cursor:pointer">
+          <div class="stat-icon green">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+          </div>
+          <div class="stat-val tabular green" id="statTermine">--</div>
+          <div class="stat-label">Termine</div>
+          <div class="stat-sub" id="statTermineSub"></div>
+        </div>
+        <div class="stat-card blue touch-scale" onclick="scrollToEvents()" style="cursor:pointer">
+          <div class="stat-icon blue">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </div>
+          <div class="stat-val tabular blue" id="statAnfragen">--</div>
+          <div class="stat-label">Anfragen</div>
+          <div class="stat-sub" id="statAnfragenSub">ungelesen</div>
+        </div>
+        <div class="stat-card yellow touch-scale" onclick="switchPage('kasse')" style="cursor:pointer">
+          <div class="stat-icon yellow">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+          </div>
+          <div class="stat-val tabular yellow" id="statEvents">--</div>
+          <div class="stat-label">Events</div>
+          <div class="stat-sub" id="statEventsSub">offen</div>
+        </div>
+      </div>
+
+      <!-- V6: Heutige Termine Mini-Timeline -->
+      <div class="section"><div class="section-bar"></div><div class="section-title">Heutige Termine</div><span class="section-count" id="todayTerminCount">--</span></div>
+      <div class="event-list" id="homeMiniTimeline" style="margin-bottom:6px">
+        <div class="skeleton" style="height:56px"></div>
+        <div class="skeleton" style="height:56px"></div>
+      </div>
+
       <!-- V4.0: KI-Status-Indikator -->
       <div class="ki-status" id="kiStatus" role="status">
         <div class="ki-status-dot"></div>
@@ -2002,6 +2034,155 @@
         block.appendChild(rightEl);
         c.appendChild(block);
       });
+      // V6: Update Home mini-timeline
+      renderHomeTimeline();
+    }
+
+    // V6: Create clock SVG icon safely
+    function createClockSvg() {
+      var ns = 'http://www.w3.org/2000/svg';
+      var svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('stroke-width', '2');
+      var circle = document.createElementNS(ns, 'circle');
+      circle.setAttribute('cx', '12'); circle.setAttribute('cy', '12'); circle.setAttribute('r', '10');
+      var poly = document.createElementNS(ns, 'polyline');
+      poly.setAttribute('points', '12 6 12 12 16 14');
+      svg.appendChild(circle); svg.appendChild(poly);
+      return svg;
+    }
+    function createCheckSvg() {
+      var ns = 'http://www.w3.org/2000/svg';
+      var svg = document.createElementNS(ns, 'svg');
+      svg.setAttribute('viewBox', '0 0 24 24');
+      svg.setAttribute('fill', 'none');
+      svg.setAttribute('stroke', 'currentColor');
+      svg.setAttribute('stroke-width', '2');
+      var p1 = document.createElementNS(ns, 'path');
+      p1.setAttribute('d', 'M22 11.08V12a10 10 0 1 1-5.93-9.14');
+      var p2 = document.createElementNS(ns, 'polyline');
+      p2.setAttribute('points', '22 4 12 14.01 9 11.01');
+      svg.appendChild(p1); svg.appendChild(p2);
+      return svg;
+    }
+
+    // V6: Render Home page — naechster Termin + Mini-Timeline
+    function renderHomeTimeline() {
+      var now = new Date();
+      var sorted = termineCache.slice().filter(function(t) {
+        return t.Status !== 'cancelled';
+      }).sort(function(a, b) {
+        return new Date(a.Start_ISO) - new Date(b.Start_ISO);
+      });
+
+      // Naechster Termin Card
+      var nextTime = document.getElementById('nextTerminTime');
+      var nextInfo = document.getElementById('nextTerminInfo');
+      var nextCountdown = document.getElementById('nextTerminCountdown');
+      var upcoming = sorted.filter(function(t) { return new Date(t.Start_ISO) > now; });
+      if (upcoming.length > 0) {
+        var next = upcoming[0];
+        var start = new Date(next.Start_ISO);
+        var h = String(start.getHours()).padStart(2, '0');
+        var m = String(start.getMinutes()).padStart(2, '0');
+        nextTime.textContent = h + ':' + m;
+        nextInfo.textContent = (next.Service || '') + ' \u2014 ' + (next.Customer_Name || '');
+        var diffMin = Math.round((start - now) / 60000);
+        if (diffMin < 60) {
+          nextCountdown.textContent = diffMin + ' Min';
+        } else {
+          var hrs = Math.floor(diffMin / 60);
+          var mins = diffMin % 60;
+          nextCountdown.textContent = hrs + 'h ' + mins + 'm';
+        }
+      } else if (sorted.length > 0) {
+        nextTime.textContent = 'Fertig';
+        nextInfo.textContent = 'Keine weiteren Termine heute';
+        nextCountdown.textContent = '\u2714';
+        nextCountdown.style.color = 'var(--success)';
+      } else {
+        nextTime.textContent = '--:--';
+        nextInfo.textContent = 'Heute keine Termine';
+        nextCountdown.textContent = '';
+      }
+
+      // Mini-Timeline
+      var tl = document.getElementById('homeMiniTimeline');
+      var countEl = document.getElementById('todayTerminCount');
+      tl.textContent = '';
+      countEl.textContent = sorted.length + ' Termine';
+
+      if (!sorted.length) {
+        var empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.textContent = 'Heute keine Termine';
+        tl.appendChild(empty);
+        return;
+      }
+
+      sorted.forEach(function(t) {
+        var start = new Date(t.Start_ISO);
+        var hh = String(start.getHours()).padStart(2, '0');
+        var mm = String(start.getMinutes()).padStart(2, '0');
+        var dur = t.Duration_Min || 60;
+        var end = new Date(start.getTime() + dur * 60000);
+        var endH = String(end.getHours()).padStart(2, '0');
+        var endM = String(end.getMinutes()).padStart(2, '0');
+        var isPast = end < now;
+        var isNow = start <= now && end > now;
+        var st = (t.Status || 'confirmed').toLowerCase();
+
+        var row = document.createElement('div');
+        row.className = 'ev touch-scale';
+        row.style.cursor = 'pointer';
+        if (isNow) { row.classList.add('unread'); }
+        if (isPast) { row.style.opacity = '0.5'; }
+        row.addEventListener('click', function() { openTerminDetail(t); });
+
+        var icon = document.createElement('div');
+        icon.className = 'ev-icon ' + (isNow ? 'termin' : st === 'proposed' ? 'nachbestellung' : 'termin');
+        icon.appendChild(isPast ? createCheckSvg() : createClockSvg());
+
+        var body = document.createElement('div');
+        body.className = 'ev-body';
+
+        var header = document.createElement('div');
+        header.className = 'ev-header';
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'ev-type ' + (isNow ? 'termin' : st === 'proposed' ? 'nachbestellung' : 'termin');
+        timeSpan.textContent = hh + ':' + mm + ' \u2013 ' + endH + ':' + endM;
+        var durSpan = document.createElement('span');
+        durSpan.className = 'ev-time';
+        durSpan.textContent = dur + ' Min' + (isNow ? ' \u2022 JETZT' : '');
+        if (isNow) { durSpan.style.color = 'var(--success)'; durSpan.style.fontWeight = '700'; }
+        header.appendChild(timeSpan);
+        header.appendChild(durSpan);
+
+        var title = document.createElement('div');
+        title.className = 'ev-title';
+        title.textContent = t.Service || '';
+
+        var meta = document.createElement('div');
+        meta.className = 'ev-meta';
+        var custSpan = document.createElement('span');
+        custSpan.textContent = t.Customer_Name || '';
+        meta.appendChild(custSpan);
+        if (t.Staff) {
+          var staffSpan = document.createElement('span');
+          staffSpan.textContent = t.Staff;
+          staffSpan.style.color = 'var(--rose-light)';
+          meta.appendChild(staffSpan);
+        }
+
+        body.appendChild(header);
+        body.appendChild(title);
+        body.appendChild(meta);
+        row.appendChild(icon);
+        row.appendChild(body);
+        tl.appendChild(row);
+      });
     }
 
     function renderFinanzen(data) {
@@ -2654,7 +2835,6 @@
       document.getElementById('liveStatus').textContent = 'Demo';
       showToast('Demo-Modus aktiv', 'info', 2500);
       // V5.1: Sparkline + KI-Insights
-      renderSparkline('heroSparkline', [120, 185, 220, 310, 385, 420, 480, 535]);
       renderKiInsights();
     }
 
