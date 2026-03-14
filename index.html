@@ -15,8 +15,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     /* =============================================================
-       Casa 2035 — PWA Dashboard v5.0
-       Light Luxury Edition — Schwarz + Gold + Weiss
+       Casa 2035 — PWA Dashboard v5.1 KI-First Edition
+       Light Luxury — Schwarz + Gold + Weiss | KI-Assistent + Beratung
        Orientierung: renarados.de — Clean, Elegant, Premium
        Stand: 14.03.2026 | Agent: @design + @frontend + @leitung
        ============================================================= */
@@ -177,7 +177,8 @@
     /* Content */
     .content { padding: 6px 16px 16px; position: relative; z-index: 1; }
     .page { display: none; }
-    .page.active { display: block; animation: fadeIn 280ms var(--ease); }
+    .page.active { display: block; animation: pageIn 350ms var(--ease); }
+    @keyframes pageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
     /* Section Headers */
     .section { display: flex; align-items: center; gap: 10px; margin: 22px 0 12px; }
@@ -887,8 +888,15 @@
     }
     .beratung-ki {
       margin-top: 12px; padding: 12px 14px;
-      background: var(--rose-glow); border: 1px solid rgba(184,150,46,0.12);
+      background: linear-gradient(135deg, rgba(184,150,46,0.06) 0%, rgba(45,138,78,0.04) 100%);
+      border: 1px solid rgba(184,150,46,0.15);
       border-radius: var(--radius-sm);
+      position: relative; overflow: hidden;
+    }
+    .beratung-ki::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--rose), var(--success));
+      opacity: 0.5;
     }
     .beratung-ki-label {
       font-size: 9px; font-weight: 600; color: var(--rose-light);
@@ -1111,6 +1119,29 @@
       color: var(--text); outline: none;
     }
     .search-bar input::placeholder { color: var(--text-micro); }
+
+    /* === V5.1: Visual Polish === */
+    /* Smooth stat-card number transitions */
+    .stat-val { transition: color 300ms; }
+    /* Better ring animation */
+    .ring-fill { transition: stroke-dashoffset 1.2s var(--ease) !important; }
+    /* Subtle card entrance when page switches */
+    .page.active .stagger > * { animation: slideUp 400ms var(--ease) both; }
+    /* Improved button feedback */
+    .btn-primary { transition: opacity 150ms, transform 150ms; }
+    .btn-primary:hover { opacity: 0.92; }
+    .btn-primary:active { transform: scale(0.98); opacity: 0.85; }
+    .btn-secondary { transition: background 150ms, transform 150ms; }
+    .btn-secondary:active { transform: scale(0.98); }
+    /* Kasse entry slide-in */
+    .kasse-entry { animation: slideUp 300ms var(--ease) both; }
+    /* Section title subtle gradient */
+    .section-bar { background: var(--rose-gradient); min-height: 16px; }
+    /* Better focus rings for accessibility */
+    *:focus-visible { outline: 2px solid var(--rose); outline-offset: 2px; border-radius: 4px; }
+    /* Smooth scrollbar for beratung images */
+    .beratung-images { scroll-snap-type: x mandatory; }
+    .beratung-img { scroll-snap-align: start; }
   </style>
 </head>
 <body>
