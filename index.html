@@ -1003,6 +1003,114 @@
       padding: 14px 0; margin-top: 8px; border-top: 2px solid var(--border-accent);
       font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--champagne);
     }
+
+    /* === V5.1: FAB — KI-Assistent === */
+    .fab-container { position: fixed; bottom: calc(86px + var(--safe-bottom)); right: 18px; z-index: 90; }
+    .fab {
+      width: 54px; height: 54px; border-radius: 50%;
+      background: var(--rose-gradient); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(184,150,46,0.3), 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 200ms var(--ease), box-shadow 200ms;
+      position: relative; z-index: 2;
+    }
+    .fab:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(184,150,46,0.4); }
+    .fab:active { transform: scale(0.95); }
+    .fab svg { width: 24px; height: 24px; color: #fff; transition: transform 300ms var(--ease); }
+    .fab.open svg { transform: rotate(45deg); }
+    .fab-menu {
+      position: absolute; bottom: 64px; right: 0; display: flex; flex-direction: column; gap: 10px;
+      opacity: 0; pointer-events: none; transform: translateY(10px) scale(0.95);
+      transition: all 250ms var(--ease);
+    }
+    .fab.open + .fab-menu { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+    .fab-item {
+      display: flex; align-items: center; gap: 10px; white-space: nowrap;
+      padding: 10px 16px 10px 12px; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius-full);
+      box-shadow: var(--shadow-soft); cursor: pointer; font-size: 13px; font-weight: 500;
+      font-family: 'Inter', sans-serif; color: var(--text);
+      transition: background 150ms, box-shadow 200ms, transform 150ms;
+    }
+    .fab-item:hover { background: var(--surface-hover); box-shadow: 0 4px 16px rgba(0,0,0,0.08); transform: translateX(-4px); }
+    .fab-item-icon {
+      width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .fab-item-icon svg { width: 16px; height: 16px; }
+    .fab-item-icon.green { background: var(--success-bg); color: var(--success); }
+    .fab-item-icon.blue { background: var(--info-bg); color: var(--info); }
+    .fab-item-icon.gold { background: var(--gold-glow); color: var(--gold); }
+    .fab-item-icon.rose { background: var(--rose-glow); color: var(--rose); }
+
+    /* === V5.1: KI-Insights Cards === */
+    .ki-insights { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
+    .ki-insight {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); position: relative; overflow: hidden;
+      transition: box-shadow 200ms, border-color 200ms;
+    }
+    .ki-insight:hover { box-shadow: 0 3px 16px rgba(0,0,0,0.06); border-color: var(--border-accent); }
+    .ki-insight::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--rose-gradient); opacity: 0.6;
+    }
+    .ki-insight-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: var(--rose-glow); color: var(--rose);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .ki-insight-icon svg { width: 16px; height: 16px; }
+    .ki-insight-body { flex: 1; min-width: 0; }
+    .ki-insight-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+    .ki-insight-text { font-size: 11px; color: var(--text-secondary); line-height: 1.5; }
+    .ki-insight-action {
+      margin-top: 8px; font-size: 11px; font-weight: 600; color: var(--rose);
+      cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .ki-insight-action:hover { text-decoration: underline; }
+    .ki-insight-dismiss {
+      position: absolute; top: 8px; right: 8px; width: 20px; height: 20px;
+      border: none; background: none; cursor: pointer; color: var(--text-micro);
+      display: flex; align-items: center; justify-content: center; border-radius: 50%;
+      transition: background 150ms;
+    }
+    .ki-insight-dismiss:hover { background: var(--surface-hover); }
+
+    /* === V5.1: Beratung Filter === */
+    .beratung-filter {
+      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 12px;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+    }
+    .beratung-filter::-webkit-scrollbar { display: none; }
+    .beratung-filter-btn {
+      padding: 6px 14px; border-radius: var(--radius-full); border: 1px solid var(--border);
+      background: var(--surface); font-size: 11px; font-weight: 500; color: var(--text-dim);
+      font-family: 'Inter', sans-serif; cursor: pointer; white-space: nowrap;
+      transition: all 150ms;
+    }
+    .beratung-filter-btn.active { background: var(--rose-gradient); color: #fff; border-color: transparent; }
+    .beratung-filter-btn:hover:not(.active) { background: var(--surface-hover); border-color: var(--border-accent); }
+
+    /* === V5.1: Sparkline === */
+    .sparkline { display: inline-block; vertical-align: middle; margin-left: 8px; }
+    .sparkline polyline { fill: none; stroke: var(--success); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .sparkline .spark-area { fill: var(--success-bg); stroke: none; }
+
+    /* === V5.1: Search === */
+    .search-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-full); margin-bottom: 12px;
+      transition: border-color 200ms, box-shadow 200ms;
+    }
+    .search-bar:focus-within { border-color: var(--border-accent); box-shadow: 0 2px 12px rgba(184,150,46,0.08); }
+    .search-bar svg { width: 16px; height: 16px; color: var(--text-micro); flex-shrink: 0; }
+    .search-bar input {
+      flex: 1; border: none; background: none; font-size: 13px; font-family: 'Inter', sans-serif;
+      color: var(--text); outline: none;
+    }
+    .search-bar input::placeholder { color: var(--text-micro); }
   </style>
 </head>
 <body>
@@ -1046,7 +1154,7 @@
             <div class="hero-data">
               <div class="hero-label">Tagesumsatz</div>
               <div class="hero-value tabular" id="statUmsatz">--</div>
-              <div class="hero-sub" id="statUmsatzSub">brutto heute</div>
+              <div class="hero-sub" id="statUmsatzSub">brutto heute <svg class="sparkline" id="heroSparkline" width="60" height="16" viewBox="0 0 60 16"></svg></div>
             </div>
             <div id="statTrend"></div>
           </div>
@@ -1084,6 +1192,8 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22l-.75-12.07A4.001 4.001 0 0 1 12 2z"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14c0 3 2.5 6 7 8"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5 0 3-2.5 6-7 8"/></svg>
         <span id="kiStatusText">KI verarbeitet neue Anfrage...</span>
       </div>
+      <!-- V5.1: KI-Insights -->
+      <div class="ki-insights" id="kiInsights"></div>
       <div class="section"><div class="section-bar"></div><div class="section-title">Letzte Aktivitaeten</div><span class="section-count" id="evCount">--</span></div>
       <div class="event-list stagger" id="recentEvents">
         <div class="skeleton" style="height:80px"></div>
@@ -1203,6 +1313,21 @@
             <div class="beratung-stat-val success" id="brStatFertig">0</div>
             <div class="beratung-stat-label">Beantwortet</div>
           </div>
+        </div>
+
+        <!-- V5.1: Beratung Search + Filter -->
+        <div class="search-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="beratungSearch" placeholder="Kunde oder Thema suchen..." oninput="filterBeratungen()">
+        </div>
+        <div class="beratung-filter" id="beratungFilter">
+          <button class="beratung-filter-btn active" onclick="setBeratungFilter('alle')">Alle</button>
+          <button class="beratung-filter-btn" onclick="setBeratungFilter('neu')">Offen</button>
+          <button class="beratung-filter-btn" onclick="setBeratungFilter('analyse')">KI-Analyse</button>
+          <button class="beratung-filter-btn" onclick="setBeratungFilter('fertig')">Beantwortet</button>
+          <button class="beratung-filter-btn" onclick="setBeratungFilter('whatsapp')">WhatsApp</button>
+          <button class="beratung-filter-btn" onclick="setBeratungFilter('email')">E-Mail</button>
+          <button class="beratung-filter-btn" onclick="setBeratungFilter('instagram')">Instagram</button>
         </div>
 
         <!-- Beratung Liste -->
@@ -1350,6 +1475,31 @@
       <span>System</span>
     </button>
   </nav>
+
+  <!-- V5.1: FAB — KI-Assistent Quick Actions -->
+  <div class="fab-container">
+    <button class="fab" id="fabBtn" aria-label="KI-Assistent">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+    <div class="fab-menu" id="fabMenu">
+      <div class="fab-item touch-scale" onclick="fabAction('rechnung')">
+        <div class="fab-item-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        Rechnung erstellen
+      </div>
+      <div class="fab-item touch-scale" onclick="fabAction('ausgabe')">
+        <div class="fab-item-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        Ausgabe erfassen
+      </div>
+      <div class="fab-item touch-scale" onclick="fabAction('beratung')">
+        <div class="fab-item-icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        Neue Beratung
+      </div>
+      <div class="fab-item touch-scale" onclick="fabAction('demo')">
+        <div class="fab-item-icon rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14c0 3 2.5 6 7 8"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5 0 3-2.5 6-7 8"/></svg></div>
+        Demo-Daten laden
+      </div>
+    </div>
+  </div>
 
   <!-- SHEET: Config -->
   <div class="sheet-overlay" id="configSheet">
@@ -2240,6 +2390,10 @@
       items.forEach(function(b, idx) {
         var card = document.createElement('div');
         card.className = 'beratung-card touch-scale';
+        card.setAttribute('data-name', b.Kunde || '');
+        card.setAttribute('data-kanal', (b.Kanal || '').toLowerCase());
+        card.setAttribute('data-status', (b.Status || 'neu').toLowerCase());
+        card.setAttribute('data-frage', b.Frage || '');
 
         // Header
         var header = document.createElement('div');
@@ -2457,6 +2611,9 @@
       updateRefreshTime();
       document.getElementById('liveStatus').textContent = 'Demo';
       showToast('Demo-Modus aktiv', 'info', 2500);
+      // V5.1: Sparkline + KI-Insights
+      renderSparkline('heroSparkline', [120, 185, 220, 310, 385, 420, 480, 535]);
+      renderKiInsights();
     }
 
     // === Event Detail Bottom Sheet ===
@@ -2917,6 +3074,137 @@
 
     function fmtEur(n) { return Number(n).toLocaleString('de-DE', { minimumFractionDigits: 0, maximumFractionDigits: 0 }); }
     function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    // === V5.1: FAB Toggle ===
+    var fabOpen = false;
+    document.getElementById('fabBtn').addEventListener('click', function() {
+      fabOpen = !fabOpen;
+      this.classList.toggle('open', fabOpen);
+    });
+    document.addEventListener('click', function(e) {
+      if (fabOpen && !e.target.closest('.fab-container')) {
+        fabOpen = false;
+        document.getElementById('fabBtn').classList.remove('open');
+      }
+    });
+    function fabAction(type) {
+      fabOpen = false;
+      document.getElementById('fabBtn').classList.remove('open');
+      if (type === 'rechnung') { switchPage('kasse'); setTimeout(function() { openRechnungSheet(); }, 300); }
+      else if (type === 'ausgabe') { switchPage('kasse'); setTimeout(function() { openAusgabeSheet(); }, 300); }
+      else if (type === 'beratung') { switchPage('beratung'); showToast('Neue Beratung: Funktion kommt mit WhatsApp-Anbindung', 'info'); }
+      else if (type === 'demo') { loadDemoData(); showToast('Demo-Daten geladen', 'success'); }
+    }
+
+    // === V5.1: KI-Insights (Smart Proactive Tips) ===
+    function renderKiInsights() {
+      var c = document.getElementById('kiInsights');
+      if (!c) return;
+      var insights = [];
+      // Insight based on time of day
+      var hour = new Date().getHours();
+      if (hour >= 8 && hour < 10) {
+        insights.push({ title: 'Guten Morgen-Tipp', text: 'Fruehe Termine haben 23% weniger No-Shows. Ideal fuer Neukunden.', action: 'Termine ansehen', page: 'termine' });
+      } else if (hour >= 17) {
+        insights.push({ title: 'Tagesabschluss', text: 'Vergiss nicht den Kassenabschluss. Heute noch ' + (finanzData.offene_buchungen || 0) + ' offene Buchungen.', action: 'Zur Kasse', page: 'kasse' });
+      }
+      // Insight based on consultations
+      if (beratungenCache.length > 0) {
+        var offene = beratungenCache.filter(function(b) { return b.status === 'neu'; }).length;
+        if (offene > 0) {
+          insights.push({ title: 'Offene Beratungen', text: offene + ' Kundenanfrage' + (offene > 1 ? 'n warten' : ' wartet') + ' auf Antwort. Schnelle Reaktion steigert die Buchungsrate um 40%.', action: 'Jetzt beantworten', page: 'beratung' });
+        }
+      }
+      // General KI insight
+      insights.push({ title: 'KI-Empfehlung', text: 'Dienstag und Mittwoch sind ideal fuer Farb-Specials. Kunden buchen +18% mehr bei gezielten Angeboten.', action: null, page: null });
+
+      c.textContent = '';
+      insights.slice(0, 3).forEach(function(ins) {
+        var card = document.createElement('div');
+        card.className = 'ki-insight';
+        var iconDiv = document.createElement('div');
+        iconDiv.className = 'ki-insight-icon';
+        iconDiv.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5"/></svg>';
+        card.appendChild(iconDiv);
+        var body = document.createElement('div');
+        body.className = 'ki-insight-body';
+        var title = document.createElement('div');
+        title.className = 'ki-insight-title';
+        title.textContent = ins.title;
+        body.appendChild(title);
+        var text = document.createElement('div');
+        text.className = 'ki-insight-text';
+        text.textContent = ins.text;
+        body.appendChild(text);
+        if (ins.action) {
+          var action = document.createElement('span');
+          action.className = 'ki-insight-action';
+          action.textContent = ins.action + ' \u2192';
+          action.addEventListener('click', function() { switchPage(ins.page); });
+          body.appendChild(action);
+        }
+        card.appendChild(body);
+        var dismiss = document.createElement('button');
+        dismiss.className = 'ki-insight-dismiss';
+        dismiss.textContent = '\u2715';
+        dismiss.addEventListener('click', function(ev) {
+          ev.stopPropagation();
+          card.style.opacity = '0';
+          card.style.transform = 'translateX(20px)';
+          card.style.transition = 'all 250ms ease';
+          setTimeout(function() { card.remove(); }, 250);
+        });
+        card.appendChild(dismiss);
+        c.appendChild(card);
+      });
+    }
+
+    // === V5.1: Beratung Filter & Search ===
+    var currentBeratungFilter = 'alle';
+    function setBeratungFilter(filter) {
+      currentBeratungFilter = filter;
+      var btns = document.querySelectorAll('.beratung-filter-btn');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      var target = Array.from(btns).find(function(b) { return b.textContent.toLowerCase().includes(filter === 'alle' ? 'alle' : filter === 'neu' ? 'offen' : filter); });
+      if (target) target.classList.add('active');
+      filterBeratungen();
+    }
+    function filterBeratungen() {
+      var search = (document.getElementById('beratungSearch').value || '').toLowerCase();
+      var cards = document.querySelectorAll('#beratungList .beratung-card');
+      var shown = 0;
+      cards.forEach(function(card) {
+        var name = (card.getAttribute('data-name') || '').toLowerCase();
+        var kanal = (card.getAttribute('data-kanal') || '').toLowerCase();
+        var status = (card.getAttribute('data-status') || '').toLowerCase();
+        var frage = (card.getAttribute('data-frage') || '').toLowerCase();
+        var matchSearch = !search || name.includes(search) || frage.includes(search);
+        var matchFilter = currentBeratungFilter === 'alle' ||
+          status === currentBeratungFilter ||
+          kanal === currentBeratungFilter;
+        var visible = matchSearch && matchFilter;
+        card.style.display = visible ? '' : 'none';
+        if (visible) shown++;
+      });
+      document.getElementById('brCount').textContent = shown + ' Anfragen';
+    }
+
+    // === V5.1: Sparkline Renderer ===
+    function renderSparkline(svgId, values) {
+      var svg = document.getElementById(svgId);
+      if (!svg || !values || values.length < 2) return;
+      var w = 60, h = 16;
+      var max = Math.max.apply(null, values);
+      var min = Math.min.apply(null, values);
+      var range = max - min || 1;
+      var points = values.map(function(v, i) {
+        var x = (i / (values.length - 1)) * w;
+        var y = h - ((v - min) / range) * (h - 2) - 1;
+        return x.toFixed(1) + ',' + y.toFixed(1);
+      });
+      var areaPoints = points.join(' ') + ' ' + w + ',' + h + ' 0,' + h;
+      svg.innerHTML = '<polyline class="spark-area" points="' + areaPoints + '"/><polyline points="' + points.join(' ') + '"/>';
+    }
   </script>
 </body>
 </html>
