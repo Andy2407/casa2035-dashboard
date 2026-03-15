@@ -306,6 +306,90 @@
     .ev-meta span { display: inline-flex; align-items: center; gap: 4px; }
     .ev-meta svg { width: 12px; height: 12px; opacity: .5; }
 
+    /* === Day Navigation === */
+    .day-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface); border: 1px solid var(--border-accent);
+      border-radius: var(--radius); padding: 8px 12px; margin-bottom: 10px;
+    }
+    .day-nav-btn {
+      width: 36px; height: 36px; border: none; border-radius: 50%;
+      background: var(--rose-glow); color: var(--rose); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 200ms var(--ease);
+    }
+    .day-nav-btn:hover { background: var(--rose); color: #fff; }
+    .day-nav-btn svg { width: 18px; height: 18px; }
+    .day-nav-center {
+      text-align: center; cursor: pointer; padding: 4px 16px;
+      border-radius: var(--radius-sm); transition: background 200ms;
+    }
+    .day-nav-center:hover { background: var(--rose-glow); }
+    .day-nav-date {
+      font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600;
+      color: var(--text);
+    }
+    .day-nav-weekday {
+      font-size: 11px; color: var(--text-dim); letter-spacing: 0.3px; margin-top: 1px;
+    }
+    .day-nav-center.is-today .day-nav-date { color: var(--rose); }
+
+    /* === Staff Filter === */
+    .staff-filter {
+      display: flex; gap: 4px; margin-bottom: 10px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-full); padding: 3px; overflow-x: auto;
+    }
+    .staff-filter-btn {
+      padding: 6px 14px; border: none; border-radius: var(--radius-full);
+      font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif;
+      cursor: pointer; transition: all 250ms var(--ease);
+      background: transparent; color: var(--text-dim); white-space: nowrap;
+    }
+    .staff-filter-btn.active { background: var(--rose); color: #fff; box-shadow: 0 2px 8px rgba(184,150,46,0.3); }
+    .staff-filter-btn:not(.active):hover { color: var(--rose); background: var(--rose-glow); }
+
+    /* === Week View (Landscape) === */
+    .week-view {
+      display: none; overflow-x: auto; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      margin-bottom: 14px;
+    }
+    .week-view-grid {
+      display: grid; grid-template-columns: 48px repeat(7, 1fr);
+      min-width: 700px;
+    }
+    .week-view-header {
+      font-size: 10px; font-weight: 600; text-align: center; padding: 8px 4px;
+      color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.3px;
+      border-bottom: 1px solid var(--border); background: var(--bg-warm);
+    }
+    .week-view-header.today { color: var(--rose); background: var(--rose-glow); border-radius: 8px 8px 0 0; }
+    .week-view-time {
+      font-size: 10px; font-weight: 500; color: var(--text-dim); text-align: right;
+      padding: 4px 6px 4px 2px; border-right: 1px solid var(--border);
+      font-variant-numeric: tabular-nums; height: 48px; display: flex; align-items: flex-start;
+    }
+    .week-view-cell {
+      position: relative; min-height: 48px;
+      border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .week-view-cell.today { background: rgba(184,150,46,0.03); }
+    .week-view-block {
+      position: absolute; left: 2px; right: 2px;
+      border-radius: 4px; padding: 2px 4px; font-size: 9px;
+      overflow: hidden; cursor: pointer; z-index: 1;
+    }
+    .week-view-block.confirmed { background: var(--success-bg); border-left: 2px solid var(--success); color: var(--text); }
+    .week-view-block.proposed { background: var(--warning-bg); border-left: 2px solid var(--warning); color: var(--text); }
+    .week-view-block-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .week-view-block-svc { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    @media (orientation: landscape) and (max-height: 600px) {
+      .week-view { display: block !important; }
+      .day-view { display: none !important; }
+    }
+
     /* === Tagesansicht (Termine) — 15-Minuten-Raster === */
     .day-view { position: relative; margin-left: 48px; min-height: 600px; }
     .day-time-slot {
@@ -1273,7 +1357,29 @@
         <div class="termin-stat"><div class="termin-stat-val" id="tsOffen">--</div><div class="termin-stat-label">Offen</div></div>
         <div class="termin-stat"><div class="termin-stat-val" id="tsStunden">--</div><div class="termin-stat-label">Stunden</div></div>
       </div>
-      <div class="section"><div class="section-bar"></div><div class="section-title">Heute</div><span class="section-count" id="termineCount">--</span></div>
+      <!-- Day Navigation -->
+      <div class="day-nav" id="dayNav">
+        <button class="day-nav-btn" id="dayPrev" onclick="changeDay(-1)" aria-label="Vorheriger Tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="day-nav-center" onclick="goToday()">
+          <div class="day-nav-date" id="dayNavDate">Heute</div>
+          <div class="day-nav-weekday" id="dayNavWeekday"></div>
+        </div>
+        <button class="day-nav-btn" id="dayNext" onclick="changeDay(1)" aria-label="Naechster Tag">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 6 15 12 9 18"/></svg>
+        </button>
+      </div>
+      <!-- Staff Filter -->
+      <div class="staff-filter" id="staffFilter">
+        <button class="staff-filter-btn active" data-staff="alle" onclick="filterStaff('alle')">Alle</button>
+        <button class="staff-filter-btn" data-staff="Rena" onclick="filterStaff('Rena')">Rena</button>
+        <button class="staff-filter-btn" data-staff="Lena" onclick="filterStaff('Lena')">Lena</button>
+      </div>
+      <div class="section"><div class="section-bar"></div><div class="section-title" id="dayTitle">Heute</div><span class="section-count" id="termineCount">--</span></div>
+      <!-- Week View (Landscape) -->
+      <div class="week-view" id="weekView" style="display:none"></div>
+      <!-- Day View (Portrait) -->
       <div class="day-view" id="termineHeute">
         <div class="skeleton" style="height:400px"></div>
       </div>
@@ -1718,6 +1824,300 @@
     let finanzData = {};
     let eventsCache = [];
     let termineCache = [];
+    var selectedDay = new Date(); // currently viewed day
+    var activeStaff = 'alle'; // staff filter
+    var currentUser = 'Rena'; // logged-in user (Rena = owner, sees all)
+
+    // Day navigation
+    function changeDay(offset) {
+      selectedDay.setDate(selectedDay.getDate() + offset);
+      renderDayForDate();
+    }
+    function goToday() {
+      selectedDay = new Date();
+      renderDayForDate();
+    }
+    function filterStaff(staff) {
+      activeStaff = staff;
+      document.querySelectorAll('.staff-filter-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-staff') === staff);
+      });
+      renderDayForDate();
+    }
+    function formatDateDE(d) {
+      var days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+      var months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+      return days[d.getDay()] + ', ' + d.getDate() + '. ' + months[d.getMonth()] + ' ' + d.getFullYear();
+    }
+    function isToday(d) {
+      var n = new Date();
+      return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
+    }
+    function dateKey(d) {
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function renderDayForDate() {
+      var dk = dateKey(selectedDay);
+      var navDate = document.getElementById('dayNavDate');
+      var navWeekday = document.getElementById('dayNavWeekday');
+      var navCenter = document.querySelector('.day-nav-center');
+      var dayTitle = document.getElementById('dayTitle');
+
+      if (isToday(selectedDay)) {
+        navDate.textContent = 'Heute';
+        navWeekday.textContent = formatDateDE(selectedDay);
+        navCenter.classList.add('is-today');
+        dayTitle.textContent = 'Heute';
+      } else {
+        navDate.textContent = selectedDay.getDate() + '. ' + ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'][selectedDay.getMonth()];
+        navWeekday.textContent = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][selectedDay.getDay()];
+        navCenter.classList.remove('is-today');
+        dayTitle.textContent = formatDateDE(selectedDay);
+      }
+
+      // Filter items by date + staff
+      var items = termineCache.filter(function(t) {
+        var matchDate = (t.Start_ISO || '').startsWith(dk);
+        var matchStaff = activeStaff === 'alle' || (t.Staff || '') === activeStaff;
+        return matchDate && matchStaff;
+      });
+
+      // Staff permission: non-owner only sees own
+      if (currentUser !== 'Rena') {
+        items = items.filter(function(t) { return (t.Staff || '') === currentUser; });
+        // Hide staff filter (non-owners can't switch)
+        document.getElementById('staffFilter').style.display = 'none';
+      } else {
+        document.getElementById('staffFilter').style.display = '';
+      }
+
+      // Update stats
+      var confirmed = items.filter(function(t) { return t.Status === 'confirmed'; }).length;
+      var proposed = items.filter(function(t) { return t.Status === 'proposed' || !t.Status; }).length;
+      document.getElementById('termineCount').textContent = items.length + ' Termine';
+      document.getElementById('tsGesamt').textContent = items.length;
+      document.getElementById('tsBestaetigt').textContent = confirmed;
+      document.getElementById('tsOffen').textContent = proposed;
+      var totalMin = 0;
+      items.forEach(function(t) { totalMin += parseInt(t.Duration_Min) || 30; });
+      document.getElementById('tsStunden').textContent = (totalMin / 60).toFixed(1) + 'h';
+
+      // Render day view
+      renderDayView(items);
+      // Render week view
+      renderWeekView();
+    }
+
+    function renderDayView(items) {
+      var c = document.getElementById('termineHeute');
+      c.textContent = '';
+      c.style.position = 'relative';
+
+      var startHour = 8;
+      var endHour = 20;
+      var slotHeight = 15;
+      var totalSlots = (endHour - startHour) * 4;
+      var totalHeight = totalSlots * slotHeight;
+      c.style.minHeight = totalHeight + 'px';
+
+      for (var s = 0; s < totalSlots; s++) {
+        var h = startHour + Math.floor(s / 4);
+        var m = (s % 4) * 15;
+        var isFullHour = m === 0;
+        var slot = document.createElement('div');
+        slot.className = 'day-time-slot';
+        slot.style.position = 'absolute';
+        slot.style.top = (s * slotHeight) + 'px';
+        slot.style.left = '0'; slot.style.right = '0';
+        slot.style.height = slotHeight + 'px';
+        slot.style.borderTop = isFullHour ? '1px solid var(--border-accent)' : '1px solid var(--border)';
+        if (isFullHour || m === 30) {
+          var label = document.createElement('div');
+          label.className = 'day-time-label' + (isFullHour ? ' full-hour' : '');
+          label.textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+          slot.appendChild(label);
+        }
+        c.appendChild(slot);
+      }
+
+      // Current time line (only if viewing today)
+      if (isToday(selectedDay)) {
+        var now2 = new Date();
+        var nowH = now2.getHours();
+        var nowM = now2.getMinutes();
+        if (nowH >= startHour && nowH < endHour) {
+          var nowOffset = ((nowH - startHour) * 4 + nowM / 15) * slotHeight;
+          var nowLine = document.createElement('div');
+          nowLine.className = 'day-now-line';
+          nowLine.style.top = nowOffset + 'px';
+          c.appendChild(nowLine);
+        }
+      }
+
+      if (!items.length) {
+        var empty = document.createElement('div');
+        empty.style.cssText = 'text-align:center;padding:60px 20px;color:var(--text-dim);font-size:13px;position:relative;z-index:3';
+        empty.textContent = 'Keine Termine an diesem Tag';
+        c.appendChild(empty);
+        return;
+      }
+
+      items.forEach(function(t) {
+        var start = t.Start_ISO ? new Date(t.Start_ISO) : null;
+        if (!start) return;
+        var tH = start.getHours();
+        var tM = start.getMinutes();
+        if (tH < startHour || tH >= endHour) return;
+
+        var dur = parseInt(t.Duration_Min) || 30;
+        var st = (t.Status || 'proposed').toLowerCase();
+        var stLabel = st === 'confirmed' ? 'Bestaetigt' : st === 'cancelled' ? 'Storniert' : 'Offen';
+
+        var topPx = ((tH - startHour) * 4 + tM / 15) * slotHeight;
+        var heightPx = Math.max((dur / 15) * slotHeight, slotHeight);
+        var isCompact = dur <= 30;
+
+        var block = document.createElement('div');
+        block.className = 'day-block ' + st + (isCompact ? ' compact' : '');
+        block.style.top = topPx + 'px';
+        block.style.height = heightPx + 'px';
+        block.addEventListener('click', function() { openTerminDetail(t); });
+
+        var timeEl = document.createElement('div');
+        timeEl.className = 'day-block-time';
+        var endTime = new Date(start.getTime() + dur * 60000);
+        timeEl.textContent = String(tH).padStart(2, '0') + ':' + String(tM).padStart(2, '0') + ' – ' + String(endTime.getHours()).padStart(2, '0') + ':' + String(endTime.getMinutes()).padStart(2, '0');
+
+        var svcEl = document.createElement('div');
+        svcEl.className = 'day-block-service';
+        svcEl.textContent = t.Service || '';
+
+        var custEl = document.createElement('div');
+        custEl.className = 'day-block-customer';
+        custEl.textContent = t.Customer_Name || '';
+
+        var staffEl = document.createElement('div');
+        staffEl.className = 'day-block-staff';
+        staffEl.textContent = t.Staff || '';
+
+        var mainEl = document.createElement('div');
+        mainEl.className = 'day-block-main';
+        mainEl.appendChild(svcEl);
+        mainEl.appendChild(custEl);
+        mainEl.appendChild(staffEl);
+
+        var rightEl = document.createElement('div');
+        rightEl.className = 'day-block-right';
+        var badge = document.createElement('span');
+        badge.className = 'day-block-badge ' + st;
+        badge.textContent = stLabel;
+        rightEl.appendChild(badge);
+        var durEl = document.createElement('div');
+        durEl.className = 'day-block-dur';
+        durEl.textContent = dur + ' Min';
+        rightEl.appendChild(durEl);
+
+        block.appendChild(timeEl);
+        block.appendChild(mainEl);
+        block.appendChild(rightEl);
+        c.appendChild(block);
+      });
+    }
+
+    // Week View — 7 days from Monday of current selected week
+    function renderWeekView() {
+      var wv = document.getElementById('weekView');
+      wv.textContent = '';
+      var grid = document.createElement('div');
+      grid.className = 'week-view-grid';
+
+      // Find Monday of selected week
+      var mon = new Date(selectedDay);
+      var dayOfWeek = mon.getDay() || 7;
+      mon.setDate(mon.getDate() - dayOfWeek + 1);
+
+      var days = [];
+      for (var i = 0; i < 7; i++) {
+        var d = new Date(mon);
+        d.setDate(d.getDate() + i);
+        days.push(d);
+      }
+
+      // Headers
+      var cornerEl = document.createElement('div');
+      cornerEl.className = 'week-view-header';
+      cornerEl.textContent = '';
+      grid.appendChild(cornerEl);
+      var dayNames = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+      days.forEach(function(d, i) {
+        var hdr = document.createElement('div');
+        hdr.className = 'week-view-header' + (isToday(d) ? ' today' : '');
+        hdr.textContent = dayNames[i] + ' ' + d.getDate() + '.';
+        grid.appendChild(hdr);
+      });
+
+      // Time rows (8:00 - 19:00)
+      for (var h = 8; h < 20; h++) {
+        var timeCell = document.createElement('div');
+        timeCell.className = 'week-view-time';
+        timeCell.textContent = String(h).padStart(2, '0') + ':00';
+        grid.appendChild(timeCell);
+
+        days.forEach(function(d) {
+          var cell = document.createElement('div');
+          cell.className = 'week-view-cell' + (isToday(d) ? ' today' : '');
+          var dk2 = dateKey(d);
+
+          // Find appointments in this hour for this day
+          var hourItems = termineCache.filter(function(t) {
+            if (!(t.Start_ISO || '').startsWith(dk2)) return false;
+            if (activeStaff !== 'alle' && (t.Staff || '') !== activeStaff) return false;
+            if (currentUser !== 'Rena' && (t.Staff || '') !== currentUser) return false;
+            var s = new Date(t.Start_ISO);
+            return s.getHours() === h;
+          });
+
+          hourItems.forEach(function(t) {
+            var s = new Date(t.Start_ISO);
+            var topPct = (s.getMinutes() / 60) * 100;
+            var dur = parseInt(t.Duration_Min) || 30;
+            var heightPct = Math.min((dur / 60) * 100, 200);
+            var st = (t.Status || 'proposed').toLowerCase();
+            var blk = document.createElement('div');
+            blk.className = 'week-view-block ' + st;
+            blk.style.top = topPct + '%';
+            blk.style.height = Math.max(heightPct, 40) + '%';
+            blk.addEventListener('click', function() { openTerminDetail(t); });
+            var nm = document.createElement('div');
+            nm.className = 'week-view-block-name';
+            nm.textContent = (t.Customer_Name || '').split(' ')[0];
+            blk.appendChild(nm);
+            var sv = document.createElement('div');
+            sv.className = 'week-view-block-svc';
+            sv.textContent = t.Service || '';
+            blk.appendChild(sv);
+            cell.appendChild(blk);
+          });
+
+          grid.appendChild(cell);
+        });
+      }
+
+      wv.appendChild(grid);
+    }
+
+    // Listen for orientation change
+    window.addEventListener('resize', function() {
+      var wv = document.getElementById('weekView');
+      var dv = document.getElementById('termineHeute');
+      if (window.innerWidth > window.innerHeight && window.innerHeight <= 600) {
+        wv.style.display = 'block';
+        dv.style.display = 'none';
+      } else {
+        wv.style.display = 'none';
+        dv.style.display = '';
+      }
+    });
     let lagerCache = [];
     let servicesCache = [];
     let config = JSON.parse(localStorage.getItem('casa2035_config') || 'null') || { baseUrl: '', token: '', userId: '' };
@@ -1905,135 +2305,17 @@
     function renderTermine(data) {
       var items = Array.isArray(data) ? data : (data.data || data.termine || []);
       termineCache = items;
-      var now2 = new Date();
-      var today = now2.getFullYear() + '-' + String(now2.getMonth() + 1).padStart(2, '0') + '-' + String(now2.getDate()).padStart(2, '0');
-      var todayItems = items.filter(function(t) { return (t.Start_ISO || '').startsWith(today); });
 
-      // Stats
+      // Update home page stats (always today)
+      var now2 = new Date();
+      var today = dateKey(now2);
+      var todayItems = items.filter(function(t) { return (t.Start_ISO || '').startsWith(today); });
       document.getElementById('statTermine').textContent = todayItems.length;
       var confirmed = todayItems.filter(function(t) { return t.Status === 'confirmed'; }).length;
-      var proposed = todayItems.filter(function(t) { return t.Status === 'proposed' || !t.Status; }).length;
       document.getElementById('statTermineSub').textContent = confirmed + ' bestaetigt';
-      document.getElementById('termineCount').textContent = todayItems.length + ' Termine';
-      document.getElementById('tsGesamt').textContent = todayItems.length;
-      document.getElementById('tsBestaetigt').textContent = confirmed;
-      document.getElementById('tsOffen').textContent = proposed;
-      var totalMin = 0;
-      todayItems.forEach(function(t) { totalMin += parseInt(t.Duration_Min) || 30; });
-      document.getElementById('tsStunden').textContent = (totalMin / 60).toFixed(1) + 'h';
 
-      // Day View — 15-minute grid from 8:00 to 20:00
-      var c = document.getElementById('termineHeute');
-      c.textContent = '';
-      c.style.position = 'relative';
-
-      var startHour = 8;
-      var endHour = 20;
-      var slotHeight = 15; // px per 15 minutes
-      var totalSlots = (endHour - startHour) * 4;
-      var totalHeight = totalSlots * slotHeight;
-      c.style.minHeight = totalHeight + 'px';
-
-      // Time labels and grid lines
-      for (var s = 0; s < totalSlots; s++) {
-        var h = startHour + Math.floor(s / 4);
-        var m = (s % 4) * 15;
-        var isFullHour = m === 0;
-
-        var slot = document.createElement('div');
-        slot.className = 'day-time-slot';
-        slot.style.position = 'absolute';
-        slot.style.top = (s * slotHeight) + 'px';
-        slot.style.left = '0';
-        slot.style.right = '0';
-        slot.style.height = slotHeight + 'px';
-        slot.style.borderTop = isFullHour ? '1px solid var(--border-accent)' : '1px solid var(--border)';
-
-        if (isFullHour || m === 30) {
-          var label = document.createElement('div');
-          label.className = 'day-time-label' + (isFullHour ? ' full-hour' : '');
-          label.textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
-          slot.appendChild(label);
-        }
-        c.appendChild(slot);
-      }
-
-      // Current time line
-      var nowH = now2.getHours();
-      var nowM = now2.getMinutes();
-      if (nowH >= startHour && nowH < endHour) {
-        var nowOffset = ((nowH - startHour) * 4 + nowM / 15) * slotHeight;
-        var nowLine = document.createElement('div');
-        nowLine.className = 'day-now-line';
-        nowLine.style.top = nowOffset + 'px';
-        c.appendChild(nowLine);
-      }
-
-      // Appointment blocks
-      if (!todayItems.length) return;
-
-      todayItems.forEach(function(t) {
-        var start = t.Start_ISO ? new Date(t.Start_ISO) : null;
-        if (!start) return;
-        var tH = start.getHours();
-        var tM = start.getMinutes();
-        if (tH < startHour || tH >= endHour) return;
-
-        var dur = parseInt(t.Duration_Min) || 30;
-        var st = (t.Status || 'proposed').toLowerCase();
-        var stLabel = st === 'confirmed' ? 'Bestaetigt' : st === 'cancelled' ? 'Storniert' : 'Offen';
-
-        var topPx = ((tH - startHour) * 4 + tM / 15) * slotHeight;
-        var heightPx = Math.max((dur / 15) * slotHeight, slotHeight);
-        var isCompact = dur <= 30;
-
-        var block = document.createElement('div');
-        block.className = 'day-block ' + st + (isCompact ? ' compact' : '');
-        block.style.top = topPx + 'px';
-        block.style.height = heightPx + 'px';
-        block.addEventListener('click', function() { openTerminDetail(t); });
-
-        var timeEl = document.createElement('div');
-        timeEl.className = 'day-block-time';
-        var endTime = new Date(start.getTime() + dur * 60000);
-        timeEl.textContent = String(tH).padStart(2, '0') + ':' + String(tM).padStart(2, '0') + ' – ' + String(endTime.getHours()).padStart(2, '0') + ':' + String(endTime.getMinutes()).padStart(2, '0');
-
-        var svcEl = document.createElement('div');
-        svcEl.className = 'day-block-service';
-        svcEl.textContent = t.Service || '';
-
-        var custEl = document.createElement('div');
-        custEl.className = 'day-block-customer';
-        custEl.textContent = t.Customer_Name || '';
-
-        var staffEl = document.createElement('div');
-        staffEl.className = 'day-block-staff';
-        staffEl.textContent = t.Staff || '';
-
-        // Middle column: service + customer + staff
-        var mainEl = document.createElement('div');
-        mainEl.className = 'day-block-main';
-        mainEl.appendChild(svcEl);
-        mainEl.appendChild(custEl);
-        mainEl.appendChild(staffEl);
-
-        // Right column: badge + duration
-        var rightEl = document.createElement('div');
-        rightEl.className = 'day-block-right';
-        var badge = document.createElement('span');
-        badge.className = 'day-block-badge ' + st;
-        badge.textContent = stLabel;
-        rightEl.appendChild(badge);
-        var durEl = document.createElement('div');
-        durEl.className = 'day-block-dur';
-        durEl.textContent = dur + ' Min';
-        rightEl.appendChild(durEl);
-
-        block.appendChild(timeEl);
-        block.appendChild(mainEl);
-        block.appendChild(rightEl);
-        c.appendChild(block);
-      });
+      // Render for selected day
+      renderDayForDate();
       // V6: Update Home mini-timeline
       renderHomeTimeline();
     }
@@ -2751,12 +3033,31 @@
         { Timestamp: iso(7, 50), Typ: 'antwort', Status: 'gelesen', Is_Read: 1, Titel: 'Kundenantwort', Nachricht: 'Danke fuer die Info! Komme gerne.', Kanal: 'facebook', Anfrage_ID: 'ANF-2026-038' },
       ]);
 
+      // Helper for other days
+      const isoDay = (dayOffset, h, m) => {
+        const d = new Date(now);
+        d.setDate(d.getDate() + dayOffset);
+        return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00';
+      };
       renderTermine([
+        // Heute
         { Start_ISO: iso(10, 0), Service: 'Balayage + Schnitt', Customer_Name: 'Anna Schmidt', Staff: 'Rena', Duration_Min: 120, Status: 'confirmed' },
         { Start_ISO: iso(12, 30), Service: 'Maskulin Schnitt', Customer_Name: 'Thomas Weber', Staff: 'Lena', Duration_Min: 30, Status: 'confirmed' },
         { Start_ISO: iso(14, 0), Service: 'Haarschnitt Feminin', Customer_Name: 'Maria Mueller', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed' },
         { Start_ISO: iso(15, 30), Service: 'Farbbehandlung', Customer_Name: 'Julia Koch', Staff: 'Lena', Duration_Min: 90, Status: 'proposed' },
         { Start_ISO: iso(17, 0), Service: 'Maskulin Schnitt + Bart', Customer_Name: 'Stefan Braun', Staff: 'Rena', Duration_Min: 45, Status: 'proposed' },
+        // Morgen
+        { Start_ISO: isoDay(1, 9, 0), Service: 'Haarschnitt Feminin', Customer_Name: 'Petra Maier', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed' },
+        { Start_ISO: isoDay(1, 11, 0), Service: 'Maskulin Schnitt', Customer_Name: 'Klaus Fischer', Staff: 'Lena', Duration_Min: 30, Status: 'confirmed' },
+        { Start_ISO: isoDay(1, 13, 30), Service: 'Balayage + Schnitt', Customer_Name: 'Sophie Wagner', Staff: 'Rena', Duration_Min: 120, Status: 'proposed' },
+        { Start_ISO: isoDay(1, 16, 0), Service: 'Grooming Paket', Customer_Name: 'Michael Braun', Staff: 'Lena', Duration_Min: 45, Status: 'confirmed' },
+        // Gestern
+        { Start_ISO: isoDay(-1, 9, 30), Service: 'Farbbehandlung', Customer_Name: 'Laura Berger', Staff: 'Rena', Duration_Min: 90, Status: 'confirmed' },
+        { Start_ISO: isoDay(-1, 11, 30), Service: 'Maskulin Schnitt + Bart', Customer_Name: 'David Klein', Staff: 'Lena', Duration_Min: 45, Status: 'confirmed' },
+        { Start_ISO: isoDay(-1, 14, 0), Service: 'Haarschnitt Feminin', Customer_Name: 'Nina Hofmann', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed' },
+        // Uebermorgen
+        { Start_ISO: isoDay(2, 10, 0), Service: 'Brautstyling', Customer_Name: 'Eva Mueller', Staff: 'Rena', Duration_Min: 90, Status: 'confirmed' },
+        { Start_ISO: isoDay(2, 14, 0), Service: 'Maskulin Schnitt', Customer_Name: 'Tobias Richter', Staff: 'Lena', Duration_Min: 30, Status: 'proposed' },
       ]);
 
       renderFinanzen({
