@@ -1701,12 +1701,17 @@
     <div class="sheet">
       <div class="sheet-handle"></div>
       <h3>n8n Verbindung</h3>
+      <div style="margin-bottom:14px;padding:12px;background:linear-gradient(135deg,rgba(184,150,46,0.1),rgba(184,150,46,0.04));border-radius:var(--radius-sm);border:1px solid rgba(184,150,46,0.2);">
+        <div style="font-size:12px;font-weight:700;color:var(--rose);margin-bottom:6px;">Schnell-Setup</div>
+        <div style="font-size:11px;color:var(--text-secondary);margin-bottom:8px;">n8n Cloud automatisch verbinden:</div>
+        <button class="btn btn-primary" onclick="quickSetup()" style="width:100%;font-size:13px;padding:10px;">n8n Cloud verbinden (niniho13)</button>
+      </div>
       <label>Webhook Base-URL</label>
       <input type="url" id="cfgUrl" placeholder="https://niniho13.app.n8n.cloud/webhook">
       <label>Auth Token</label>
       <input type="text" id="cfgToken" placeholder="tok_...">
       <label>User ID</label>
-      <input type="text" id="cfgUser" placeholder="MA-001">
+      <input type="text" id="cfgUser" placeholder="MA-001 (Rena)">
       <div class="sheet-actions">
         <button class="btn btn-secondary" onclick="closeSheet('configSheet')">Abbrechen</button>
         <button class="btn btn-primary" onclick="saveConfig()">Speichern</button>
@@ -2230,9 +2235,15 @@
     }
 
     function renderEvents(data) {
-      const items = Array.isArray(data) ? data : (data.data || data.events || []);
+      var rawItems = Array.isArray(data) ? data : (data.data || data.events || []);
+      // n8n Feld-Mapping: Gelesen→Is_Read, Ereignis_ID als Fallback fuer Anfrage_ID
+      const items = rawItems.map(function(e) {
+        if (e.Gelesen !== undefined && e.Is_Read === undefined) e.Is_Read = e.Gelesen;
+        if (!e.Anfrage_ID && e.Ereignis_ID) e.Anfrage_ID = e.Ereignis_ID;
+        return e;
+      });
       eventsCache = items;
-      const unread = items.filter(e => e.Is_Read === 0 || e.Is_Read === '0' || e.Status === 'ungelesen').length;
+      const unread = items.filter(e => e.Is_Read === 0 || e.Is_Read === '0' || e.Gelesen === 0 || e.Gelesen === '0' || e.Status === 'ungelesen').length;
       document.getElementById('statAnfragen').textContent = unread;
       document.getElementById('statAnfragenSub').textContent = 'ungelesen';
       const openCount = items.filter(e => e.Status !== 'erledigt').length;
@@ -2258,7 +2269,7 @@
 
       items.slice(0, 15).forEach(function(e, idx) {
         var typ = (e.Typ || 'event').toLowerCase();
-        var isUnread = e.Is_Read === 0 || e.Is_Read === '0';
+        var isUnread = e.Is_Read === 0 || e.Is_Read === '0' || e.Gelesen === 0 || e.Gelesen === '0';
         var time = e.Timestamp ? new Date(e.Timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '';
         var tc = typ === 'termin_vorschlag' ? 'termin_vorschlag' : typ.includes('termin') ? 'termin' : typ.includes('storn') ? 'storno' : typ.includes('nachbest') ? 'nachbestellung' : typ.includes('antwort') ? 'antwort' : 'event';
         var kanal = (e.Kanal || 'system').toLowerCase();
@@ -2326,7 +2337,19 @@
     }
 
     function renderTermine(data) {
-      var items = Array.isArray(data) ? data : (data.data || data.termine || []);
+      var rawItems = Array.isArray(data) ? data : (data.data || data.termine || []);
+      // n8n Felder auf Dashboard-Felder mappen (Beginn→Start_ISO, Dienstleistung→Service, Kundenname→Customer_Name, Mitarbeiter→Staff)
+      var items = rawItems.map(function(t) {
+        return {
+          Start_ISO: t.Start_ISO || t.Beginn || '',
+          Service: t.Service || t.Dienstleistung || '',
+          Customer_Name: t.Customer_Name || t.Kundenname || '',
+          Staff: t.Staff || t.Mitarbeiter || '',
+          Duration_Min: t.Duration_Min || t.Dauer_Min || 60,
+          Status: t.Status || 'proposed',
+          Proposal_ID: t.Proposal_ID || ''
+        };
+      });
       termineCache = items;
 
       // Update home page stats (always today)
@@ -2774,6 +2797,11 @@
       document.getElementById('cfgToken').value = config.token;
       document.getElementById('cfgUser').value = config.userId;
       document.getElementById('configSheet').classList.add('show');
+    }
+    function quickSetup() {
+      document.getElementById('cfgUrl').value = 'https://niniho13.app.n8n.cloud/webhook';
+      document.getElementById('cfgUser').value = 'Rena';
+      showToast('n8n URL eingetragen! Bitte Auth Token eintragen, dann Speichern.', 'info', 3000);
     }
     function saveConfig() {
       config.baseUrl = document.getElementById('cfgUrl').value.replace(/\/$/, '');
@@ -3632,8 +3660,12 @@
     }
 
     function markAsRead(e, idx) {
-      if (config.baseUrl && e.Anfrage_ID) {
-        apiPost('/pwa-mark-read', { anfrage_id: e.Anfrage_ID }).then(function() {
+      if (config.baseUrl && (e.Anfrage_ID || e.Ereignis_ID)) {
+        apiPost('/pwa-mark-read', {
+          anfrage_id: e.Anfrage_ID || e.Ereignis_ID || '',
+          event_id: e.Ereignis_ID || e.Anfrage_ID || '',
+          row_number: e.row_number || 0
+        }).then(function() {
           eventsCache[idx].Is_Read = 1;
           renderEvents(eventsCache);
           closeSheet('detailSheet');
