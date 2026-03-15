@@ -287,6 +287,7 @@
     }
     .ev-icon svg { width: 18px; height: 18px; }
     .ev-icon.termin { background: var(--success-bg); color: var(--success); }
+    .ev-icon.termin_vorschlag { background: linear-gradient(135deg, rgba(184,150,46,0.12), rgba(184,150,46,0.06)); color: var(--rose); }
     .ev-icon.storno { background: var(--danger-bg); color: var(--danger); }
     .ev-icon.nachbestellung { background: var(--warning-bg); color: var(--warning); }
     .ev-icon.antwort { background: var(--rose-glow); color: var(--rose); }
@@ -295,6 +296,7 @@
     .ev-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
     .ev-type { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 6px; }
     .ev-type.termin { background: var(--success-bg); color: var(--success); }
+    .ev-type.termin_vorschlag { background: linear-gradient(135deg, rgba(184,150,46,0.15), rgba(184,150,46,0.08)); color: var(--rose); }
     .ev-type.storno { background: var(--danger-bg); color: var(--danger); }
     .ev-type.event { background: var(--info-bg); color: var(--info); }
     .ev-type.nachbestellung { background: var(--warning-bg); color: var(--warning); }
@@ -305,6 +307,26 @@
     .ev-meta { display: flex; gap: 10px; margin-top: 6px; font-size: 10px; color: var(--text-micro); }
     .ev-meta span { display: inline-flex; align-items: center; gap: 4px; }
     .ev-meta svg { width: 12px; height: 12px; opacity: .5; }
+
+    /* === Terminvorschlag Detail === */
+    .proposal-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .proposal-info-item { background: var(--surface-hover); padding: 10px 12px; border-radius: var(--radius-sm); }
+    .proposal-info-label { font-size: 10px; color: var(--text-micro); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .proposal-info-val { font-size: 15px; font-weight: 700; color: var(--text); }
+    .slot-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-dim); margin-bottom: 8px; }
+    .slot-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .slot-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; cursor: pointer; transition: all 200ms var(--ease); min-width: 120px; flex: 1; text-align: center; }
+    .slot-card:hover { border-color: var(--rose); background: var(--rose-glow); }
+    .slot-card.selected { border-color: var(--rose); background: linear-gradient(135deg, rgba(184,150,46,0.1), rgba(184,150,46,0.04)); box-shadow: 0 0 0 2px rgba(184,150,46,0.2); }
+    .slot-tag { font-size: 11px; font-weight: 600; color: var(--text-secondary); }
+    .slot-zeit { font-size: 16px; font-weight: 800; color: var(--text); margin: 2px 0; }
+    .slot-ende { font-size: 10px; color: var(--text-micro); }
+    .response-card { background: var(--surface); border: 1.5px solid var(--border-accent); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: all 200ms var(--ease); }
+    .response-card:hover { border-color: var(--rose); }
+    .response-card.selected { border-color: var(--rose); background: var(--rose-glow); box-shadow: 0 0 0 2px rgba(184,150,46,0.15); }
+    .response-card-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--rose); margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+    .response-card-label svg { width: 12px; height: 12px; }
+    .response-card-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
 
     /* === Day Navigation === */
     .day-nav {
@@ -2226,6 +2248,7 @@
 
       var iconSvgMap = {
         termin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+        termin_vorschlag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 15l2 2 4-4"/></svg>',
         storno: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
         nachbestellung: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>',
         antwort: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
@@ -2237,7 +2260,7 @@
         var typ = (e.Typ || 'event').toLowerCase();
         var isUnread = e.Is_Read === 0 || e.Is_Read === '0';
         var time = e.Timestamp ? new Date(e.Timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '';
-        var tc = typ.includes('termin') ? 'termin' : typ.includes('storn') ? 'storno' : typ.includes('nachbest') ? 'nachbestellung' : typ.includes('antwort') ? 'antwort' : 'event';
+        var tc = typ === 'termin_vorschlag' ? 'termin_vorschlag' : typ.includes('termin') ? 'termin' : typ.includes('storn') ? 'storno' : typ.includes('nachbest') ? 'nachbestellung' : typ.includes('antwort') ? 'antwort' : 'event';
         var kanal = (e.Kanal || 'system').toLowerCase();
 
         var row = document.createElement('div');
@@ -3025,6 +3048,27 @@
       const iso = (h, m) => { const d = new Date(now); d.setHours(h, m, 0, 0); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00'; };
 
       renderEvents([
+        { Timestamp: iso(9, 30), Typ: 'termin_vorschlag', Status: 'ungelesen', Is_Read: 0,
+          Titel: 'Terminvorschlag: Haarschnitt & Styling Damen M',
+          Nachricht: 'Maria Testkundin moechte einen Termin fuer Haarschnitt & Styling Damen M (60 Min, 75 EUR)',
+          Kanal: 'email', Anfrage_ID: 'EVT-1773613183602-4wui', Kontakt: 'maria@test.de',
+          Kundenname: 'Maria Testkundin',
+          Proposal_ID: 'PROP-1773613184974',
+          Service: 'Haarschnitt & Styling Damen M',
+          Dauer_Min: 60, Preis: 75,
+          Slots: [
+            { tag: 'Mo 16.03.', zeit: '10:00', ende: '11:00' },
+            { tag: 'Mo 16.03.', zeit: '10:30', ende: '11:30' },
+            { tag: 'Mo 16.03.', zeit: '11:00', ende: '12:00' },
+            { tag: 'Di 17.03.', zeit: '09:00', ende: '10:00' },
+            { tag: 'Di 17.03.', zeit: '14:00', ende: '15:00' }
+          ],
+          Antwortvorschlaege: [
+            'Liebe Maria, vielen Dank fuer Ihre Anfrage! Ich habe folgende Termine fuer Sie reserviert: Mo 16.03. um 10:00 Uhr — Haarschnitt & Styling (60 Min, 75 EUR). Passt Ihnen dieser Termin? Herzliche Gruesse, Rena Rados',
+            'Hallo Maria! Schoen, dass Sie sich fuer einen Termin interessieren. Ich haette am Montag ab 10 Uhr Zeit fuer Sie — Haarschnitt & Styling fuer 75 EUR. Soll ich den Termin fuer Sie eintragen? Liebe Gruesse, Rena',
+            'Hi Maria! Freie Plaetze habe ich am Mo 16.03. (10:00, 10:30, 11:00) und Di 17.03. (09:00, 14:00). Welcher Termin passt Ihnen am besten? Preis: 75 EUR fuer 60 Min. LG Rena'
+          ]
+        },
         { Timestamp: iso(9, 15), Typ: 'termin_bestaetigt', Status: 'ungelesen', Is_Read: 0, Titel: 'Termin bestaetigt', Nachricht: 'Maria Mueller \u2014 Haarschnitt Feminin, 14:00', Kanal: 'whatsapp', Anfrage_ID: 'ANF-2026-042' },
         { Timestamp: iso(9, 2), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Neue Anfrage', Nachricht: 'Stefan Braun fragt nach Maskulin Schnitt + Bart', Kanal: 'instagram', Anfrage_ID: 'ANF-2026-043' },
         { Timestamp: iso(8, 45), Typ: 'nachbestellung', Status: 'gelesen', Is_Read: 1, Titel: 'Lagerbestand niedrig', Nachricht: 'Shampoo Vital: nur noch 3 Stueck (Min: 5)', Kanal: 'system' },
@@ -3144,6 +3188,13 @@
       var e = eventsCache[idx];
       if (!e) return;
       var typ = (e.Typ || 'event').toLowerCase();
+
+      // Spezielle Detail-Ansicht fuer Terminvorschlaege
+      if (typ === 'termin_vorschlag') {
+        openTerminVorschlagDetail(e, idx);
+        return;
+      }
+
       var tc = typ.includes('termin') ? 'termin' : typ.includes('storn') ? 'storno' : typ.includes('nachbest') ? 'nachbestellung' : typ.includes('antwort') ? 'antwort' : 'event';
       var kanal = (e.Kanal || 'system').toLowerCase();
       var kanalNames = { whatsapp: 'WhatsApp', instagram: 'Instagram', email: 'E-Mail', facebook: 'Facebook', system: 'System' };
@@ -3332,8 +3383,198 @@
       document.getElementById('detailSheet').classList.add('show');
     }
 
+    function openTerminVorschlagDetail(e, idx) {
+      var container = document.getElementById('detailInner');
+      container.textContent = '';
+      var selectedSlotIdx = 0;
+      var selectedResponseIdx = 0;
+
+      // Header mit Gold-Akzent
+      var header = document.createElement('div');
+      header.className = 'detail-header';
+      var iconDiv = document.createElement('div');
+      iconDiv.className = 'detail-icon termin_vorschlag';
+      iconDiv.style.cssText = 'background:linear-gradient(135deg,rgba(184,150,46,0.15),rgba(184,150,46,0.06));color:var(--rose);';
+      iconDiv.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M12 15l2 2 4-4"/></svg>';
+      var headerText = document.createElement('div');
+      var typeLabel = document.createElement('div');
+      typeLabel.className = 'detail-type';
+      typeLabel.style.color = 'var(--rose)';
+      typeLabel.textContent = 'Terminvorschlag';
+      var titleEl = document.createElement('div');
+      titleEl.className = 'detail-title';
+      titleEl.textContent = e.Titel || 'Terminvorschlag';
+      headerText.appendChild(typeLabel);
+      headerText.appendChild(titleEl);
+      header.appendChild(iconDiv);
+      header.appendChild(headerText);
+      container.appendChild(header);
+
+      // Kunden + Service Info Grid
+      var info = document.createElement('div');
+      info.className = 'proposal-info';
+      var infoItems = [
+        { label: 'Kundin', val: e.Kundenname || '--' },
+        { label: 'Kontakt', val: e.Kontakt || '--' },
+        { label: 'Service', val: e.Service || '--' },
+        { label: 'Dauer', val: (e.Dauer_Min || '--') + ' Min' },
+        { label: 'Preis', val: (e.Preis || '--') + ' EUR' },
+        { label: 'Kanal', val: { email: 'E-Mail', whatsapp: 'WhatsApp', instagram: 'Instagram', homepage: 'Homepage' }[(e.Kanal||'').toLowerCase()] || e.Kanal || '--' }
+      ];
+      infoItems.forEach(function(item) {
+        var d = document.createElement('div');
+        d.className = 'proposal-info-item';
+        d.innerHTML = '<div class="proposal-info-label">' + item.label + '</div><div class="proposal-info-val">' + item.val + '</div>';
+        info.appendChild(d);
+      });
+      container.appendChild(info);
+
+      // Slot-Auswahl
+      if (e.Slots && e.Slots.length) {
+        var slotTitle = document.createElement('div');
+        slotTitle.className = 'slot-section-title';
+        slotTitle.textContent = 'Verfuegbare Termine (' + e.Slots.length + ' Vorschlaege)';
+        container.appendChild(slotTitle);
+
+        var slotGrid = document.createElement('div');
+        slotGrid.className = 'slot-grid';
+        var slotCards = [];
+
+        e.Slots.forEach(function(slot, si) {
+          var card = document.createElement('div');
+          card.className = 'slot-card' + (si === 0 ? ' selected' : '');
+          card.innerHTML = '<div class="slot-tag">' + slot.tag + '</div><div class="slot-zeit">' + slot.zeit + '</div><div class="slot-ende">bis ' + slot.ende + '</div>';
+          card.addEventListener('click', function() {
+            selectedSlotIdx = si;
+            slotCards.forEach(function(c, i) { c.className = 'slot-card' + (i === si ? ' selected' : ''); });
+          });
+          slotCards.push(card);
+          slotGrid.appendChild(card);
+        });
+        container.appendChild(slotGrid);
+      }
+
+      // Antwortvorschlaege
+      if (e.Antwortvorschlaege && e.Antwortvorschlaege.length) {
+        var respTitle = document.createElement('div');
+        respTitle.className = 'slot-section-title';
+        respTitle.textContent = 'KI-Antwortvorschlaege (' + e.Antwortvorschlaege.length + ')';
+        container.appendChild(respTitle);
+
+        var respCards = [];
+        var labels = ['Formell', 'Freundlich', 'Kurz & knapp'];
+
+        e.Antwortvorschlaege.forEach(function(text, ri) {
+          var card = document.createElement('div');
+          card.className = 'response-card' + (ri === 0 ? ' selected' : '');
+          card.innerHTML = '<div class="response-card-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/></svg> Vorschlag ' + (ri + 1) + ' — ' + (labels[ri] || '') + '</div><div class="response-card-text">' + text + '</div>';
+          card.addEventListener('click', function() {
+            selectedResponseIdx = ri;
+            respCards.forEach(function(c, i) { c.className = 'response-card' + (i === ri ? ' selected' : ''); });
+            // Eigene Antwort leeren
+            var ta = container.querySelector('textarea');
+            if (ta) { ta.value = ''; }
+          });
+          respCards.push(card);
+          container.appendChild(card);
+        });
+
+        // Eigene Antwort
+        var customBox = document.createElement('div');
+        customBox.style.marginBottom = '14px';
+        var customLabel = document.createElement('div');
+        customLabel.className = 'response-card-label';
+        customLabel.style.marginBottom = '6px';
+        customLabel.textContent = 'Oder eigene Antwort schreiben:';
+        var customInput = document.createElement('textarea');
+        customInput.placeholder = 'Eigene Nachricht an die Kundin...';
+        customInput.style.cssText = 'width:100%;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:Inter,sans-serif;resize:vertical;min-height:60px;';
+        customInput.addEventListener('input', function() {
+          if (customInput.value.trim()) {
+            selectedResponseIdx = -1;
+            respCards.forEach(function(c) { c.className = 'response-card'; });
+          }
+        });
+        customBox.appendChild(customLabel);
+        customBox.appendChild(customInput);
+        container.appendChild(customBox);
+      }
+
+      // Aktions-Buttons
+      var actions = document.createElement('div');
+      actions.className = 'detail-actions';
+
+      // Antwort senden
+      var btnSend = document.createElement('button');
+      btnSend.className = 'action-btn primary';
+      btnSend.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>';
+      btnSend.appendChild(document.createTextNode(' Antwort senden'));
+      btnSend.addEventListener('click', function() {
+        var ta = container.querySelector('textarea');
+        var msg = (ta && ta.value.trim()) ? ta.value.trim() : (e.Antwortvorschlaege ? e.Antwortvorschlaege[selectedResponseIdx] || '' : '');
+        var slot = e.Slots ? e.Slots[selectedSlotIdx] : null;
+        if (config.baseUrl) {
+          showKiStatus('Terminvorschlag wird gesendet...');
+          apiPost('/pwa-antwort', {
+            anfrage_id: e.Anfrage_ID || '',
+            proposal_id: e.Proposal_ID || '',
+            kanal: e.Kanal || 'email',
+            antwort: msg,
+            slot: slot,
+            typ: 'termin_vorschlag_antwort'
+          }).then(function(res) {
+            hideKiStatus();
+            closeSheet('detailSheet');
+            showToast(res ? 'Terminvorschlag gesendet!' : 'Fehler beim Senden', res ? 'success' : 'danger', 3000);
+            if (res) fetchAll();
+          });
+        } else {
+          closeSheet('detailSheet');
+          var slotText = slot ? slot.tag + ' ' + slot.zeit : '';
+          showToast('Demo: Antwort an ' + (e.Kundenname || 'Kundin') + ' wuerde gesendet (' + slotText + ')', 'info', 4000);
+        }
+      });
+      actions.appendChild(btnSend);
+
+      // Termin direkt eintragen
+      var btnBook = document.createElement('button');
+      btnBook.className = 'action-btn';
+      btnBook.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
+      btnBook.appendChild(document.createTextNode(' Termin eintragen'));
+      btnBook.addEventListener('click', function() {
+        var slot = e.Slots ? e.Slots[selectedSlotIdx] : null;
+        closeSheet('detailSheet');
+        var slotText = slot ? slot.tag + ' ' + slot.zeit : '';
+        showToast('Demo: Termin fuer ' + (e.Kundenname || 'Kundin') + ' eingetragen (' + slotText + ', ' + (e.Service || '') + ')', 'success', 4000);
+      });
+      actions.appendChild(btnBook);
+
+      // Als gelesen markieren
+      if (e.Is_Read === 0 || e.Is_Read === '0') {
+        var btnRead = document.createElement('button');
+        btnRead.className = 'action-btn';
+        btnRead.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+        btnRead.appendChild(document.createTextNode(' Als gelesen'));
+        btnRead.addEventListener('click', function() { markAsRead(e, idx); });
+        actions.appendChild(btnRead);
+      }
+
+      container.appendChild(actions);
+
+      // Referenz-IDs anzeigen
+      var refDiv = document.createElement('div');
+      refDiv.style.cssText = 'margin-top:12px;padding:10px;background:var(--surface-hover);border-radius:var(--radius-sm);font-size:10px;color:var(--text-micro);';
+      refDiv.innerHTML = '<strong>Event-ID:</strong> ' + (e.Anfrage_ID || '--') + '<br><strong>Proposal-ID:</strong> ' + (e.Proposal_ID || '--');
+      container.appendChild(refDiv);
+
+      document.getElementById('detailSheet').classList.add('show');
+    }
+
     function generateKiResponses(e) {
       var typ = (e.Typ || '').toLowerCase();
+      if (typ === 'termin_vorschlag' && e.Antwortvorschlaege) {
+        return e.Antwortvorschlaege.slice(0, 2);
+      }
       if (typ.includes('termin_bestaetigt')) {
         return [
           'Vielen Dank fuer Ihre Terminbestaetigung! Wir freuen uns auf Ihren Besuch bei Rena Rados Friseure. Bitte kommen Sie ca. 5 Minuten vor Ihrem Termin. Bei Fragen erreichen Sie uns jederzeit.',
