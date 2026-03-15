@@ -2743,8 +2743,8 @@
       const iso = (h, m) => { const d = new Date(now); d.setHours(h, m, 0, 0); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00'; };
 
       renderEvents([
-        { Timestamp: iso(9, 15), Typ: 'termin_bestaetigt', Status: 'ungelesen', Is_Read: 0, Titel: 'Termin bestaetigt', Nachricht: 'Maria Mueller \u2014 Damenhaarschnitt, 14:00', Kanal: 'whatsapp', Anfrage_ID: 'ANF-2026-042' },
-        { Timestamp: iso(9, 2), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Neue Anfrage', Nachricht: 'Stefan Braun fragt nach Herrenschnitt + Bart', Kanal: 'instagram', Anfrage_ID: 'ANF-2026-043' },
+        { Timestamp: iso(9, 15), Typ: 'termin_bestaetigt', Status: 'ungelesen', Is_Read: 0, Titel: 'Termin bestaetigt', Nachricht: 'Maria Mueller \u2014 Haarschnitt Feminin, 14:00', Kanal: 'whatsapp', Anfrage_ID: 'ANF-2026-042' },
+        { Timestamp: iso(9, 2), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Neue Anfrage', Nachricht: 'Stefan Braun fragt nach Maskulin Schnitt + Bart', Kanal: 'instagram', Anfrage_ID: 'ANF-2026-043' },
         { Timestamp: iso(8, 45), Typ: 'nachbestellung', Status: 'gelesen', Is_Read: 1, Titel: 'Lagerbestand niedrig', Nachricht: 'Shampoo Vital: nur noch 3 Stueck (Min: 5)', Kanal: 'system' },
         { Timestamp: iso(8, 30), Typ: 'storno', Status: 'erledigt', Is_Read: 1, Titel: 'Stornierung', Nachricht: 'Lisa Wagner hat Termin am 04.03. storniert', Kanal: 'whatsapp', Anfrage_ID: 'ANF-2026-040' },
         { Timestamp: iso(8, 10), Typ: 'termin_bestaetigt', Status: 'gelesen', Is_Read: 1, Titel: 'Termin bestaetigt', Nachricht: 'Anna Schmidt \u2014 Balayage, 10:00', Kanal: 'email', Anfrage_ID: 'ANF-2026-039' },
@@ -2753,10 +2753,10 @@
 
       renderTermine([
         { Start_ISO: iso(10, 0), Service: 'Balayage + Schnitt', Customer_Name: 'Anna Schmidt', Staff: 'Rena', Duration_Min: 120, Status: 'confirmed' },
-        { Start_ISO: iso(12, 30), Service: 'Herrenschnitt', Customer_Name: 'Thomas Weber', Staff: 'Lena', Duration_Min: 30, Status: 'confirmed' },
-        { Start_ISO: iso(14, 0), Service: 'Damenhaarschnitt', Customer_Name: 'Maria Mueller', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed' },
+        { Start_ISO: iso(12, 30), Service: 'Maskulin Schnitt', Customer_Name: 'Thomas Weber', Staff: 'Lena', Duration_Min: 30, Status: 'confirmed' },
+        { Start_ISO: iso(14, 0), Service: 'Haarschnitt Feminin', Customer_Name: 'Maria Mueller', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed' },
         { Start_ISO: iso(15, 30), Service: 'Farbbehandlung', Customer_Name: 'Julia Koch', Staff: 'Lena', Duration_Min: 90, Status: 'proposed' },
-        { Start_ISO: iso(17, 0), Service: 'Herrenschnitt + Bart', Customer_Name: 'Stefan Braun', Staff: 'Rena', Duration_Min: 45, Status: 'proposed' },
+        { Start_ISO: iso(17, 0), Service: 'Maskulin Schnitt + Bart', Customer_Name: 'Stefan Braun', Staff: 'Rena', Duration_Min: 45, Status: 'proposed' },
       ]);
 
       renderFinanzen({
@@ -2767,7 +2767,7 @@
 
       document.getElementById('kasseEntries').innerHTML = [
         { time: '10:45', desc: 'Balayage \u2014 A. Schmidt', amount: 165, type: 'plus' },
-        { time: '12:55', desc: 'Herrenschnitt \u2014 T. Weber', amount: 35, type: 'plus' },
+        { time: '12:55', desc: 'Maskulin Schnitt \u2014 T. Weber', amount: 35, type: 'plus' },
         { time: '13:10', desc: 'Shampoo Vital (Verkauf)', amount: 18.90, type: 'plus' },
         { time: '11:30', desc: 'Kaffeebohnen Nachkauf', amount: -12.50, type: 'minus' },
       ].map(e => `<div class="kasse-entry touch-scale">
@@ -2778,11 +2778,11 @@
       document.getElementById('kasseCount').textContent = '4 Buchungen';
 
       renderServices({ data: { services: [
-        { Service_ID: 'S001', Name: 'Damenhaarschnitt', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 60, Preis_Netto: 42.06, Preis_Brutto: 45.00, MwSt_Satz: 0.07 },
-        { Service_ID: 'S002', Name: 'Herrenschnitt', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 30, Preis_Netto: 32.71, Preis_Brutto: 35.00, MwSt_Satz: 0.07 },
+        { Service_ID: 'S001', Name: 'Haarschnitt Feminin', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 60, Preis_Netto: 42.06, Preis_Brutto: 45.00, MwSt_Satz: 0.07 },
+        { Service_ID: 'S002', Name: 'Maskulin Schnitt', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 30, Preis_Netto: 32.71, Preis_Brutto: 35.00, MwSt_Satz: 0.07 },
         { Service_ID: 'S003', Name: 'Balayage + Schnitt', Kategorie: 'Farbe', Typ: 'dienstleistung', Dauer_Min: 120, Preis_Netto: 154.21, Preis_Brutto: 165.00, MwSt_Satz: 0.07 },
         { Service_ID: 'S004', Name: 'Farbbehandlung', Kategorie: 'Farbe', Typ: 'dienstleistung', Dauer_Min: 90, Preis_Netto: 93.46, Preis_Brutto: 100.00, MwSt_Satz: 0.07 },
-        { Service_ID: 'S005', Name: 'Herrenschnitt + Bart', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 45, Preis_Netto: 46.73, Preis_Brutto: 50.00, MwSt_Satz: 0.07 },
+        { Service_ID: 'S005', Name: 'Maskulin Schnitt + Bart', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 45, Preis_Netto: 46.73, Preis_Brutto: 50.00, MwSt_Satz: 0.07 },
         { Service_ID: 'S006', Name: 'Shampoo Vital', Kategorie: 'Pflege', Typ: 'produkt', Dauer_Min: 0, Preis_Netto: 15.88, Preis_Brutto: 18.90, MwSt_Satz: 0.19 },
         { Service_ID: 'S007', Name: 'Haarkur Repair', Kategorie: 'Pflege', Typ: 'produkt', Dauer_Min: 0, Preis_Netto: 21.01, Preis_Brutto: 24.99, MwSt_Satz: 0.19 },
       ]}});
