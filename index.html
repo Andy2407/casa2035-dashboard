@@ -2268,9 +2268,40 @@
         return;
       }
 
+      // Collision detection: compute columns for overlapping appointments
+      var slots = [];
       items.forEach(function(t) {
-        var start = t.Start_ISO ? new Date(t.Start_ISO) : null;
-        if (!start) return;
+        var s = t.Start_ISO ? new Date(t.Start_ISO) : null;
+        if (!s) return;
+        var sMin = s.getHours() * 60 + s.getMinutes();
+        var eMin = sMin + (parseInt(t.Duration_Min) || 30);
+        slots.push({ t: t, start: sMin, end: eMin, col: 0, totalCols: 1 });
+      });
+      slots.sort(function(a, b) { return a.start - b.start || a.end - b.end; });
+      // Greedy column assignment
+      for (var si = 0; si < slots.length; si++) {
+        var usedCols = [];
+        for (var sj = 0; sj < si; sj++) {
+          if (slots[sj].end > slots[si].start) usedCols.push(slots[sj].col);
+        }
+        var col = 0;
+        while (usedCols.indexOf(col) !== -1) col++;
+        slots[si].col = col;
+      }
+      // Compute total columns per overlap group
+      for (var si = 0; si < slots.length; si++) {
+        var maxCol = slots[si].col;
+        for (var sj = 0; sj < slots.length; sj++) {
+          if (si !== sj && slots[sj].start < slots[si].end && slots[sj].end > slots[si].start) {
+            if (slots[sj].col > maxCol) maxCol = slots[sj].col;
+          }
+        }
+        slots[si].totalCols = maxCol + 1;
+      }
+
+      slots.forEach(function(slot) {
+        var t = slot.t;
+        var start = new Date(t.Start_ISO);
         var tH = start.getHours();
         var tM = start.getMinutes();
         if (tH < startHour || tH >= endHour) return;
@@ -2289,10 +2320,17 @@
         else if (staffName.indexOf('maria') !== -1) staffClass = ' staff-maria';
         else if (staffName) staffClass = ' staff-other';
 
+        // Column positioning for overlapping appointments
+        var colWidth = 100 / slot.totalCols;
+        var colLeft = slot.col * colWidth;
+
         var block = document.createElement('div');
         block.className = 'day-block ' + st + staffClass + (isCompact ? ' compact' : '');
         block.style.top = topPx + 'px';
         block.style.height = heightPx + 'px';
+        block.style.left = 'calc(' + colLeft + '% + 4px)';
+        block.style.width = 'calc(' + colWidth + '% - 8px)';
+        block.style.right = 'auto';
         block.addEventListener('click', function() { openTerminDetail(t); });
 
         var timeEl = document.createElement('div');
@@ -2436,7 +2474,6 @@
         dv.style.display = '';
       }
     });
-    let lagerCache = [];
     let servicesCache = [];
     var bestellungenCache = [];
     let config = JSON.parse(localStorage.getItem('casa2035_config') || 'null') || { baseUrl: '', token: '', userId: '' };
@@ -2514,7 +2551,7 @@
       if (events) renderEvents(events);
       if (termine) renderTermine(termine);
       if (finanzen) renderFinanzen(finanzen);
-      if (lager) renderLager(lager);
+      if (lager) renderLagerTab(lager);
       if (services) renderServices(services);
       updateRefreshTime();
       document.getElementById('liveStatus').textContent = config.baseUrl ? 'Live' : 'Demo';
@@ -2843,68 +2880,7 @@
       if (pEl) pEl.textContent = pct + '%';
     }
 
-    // === Lagerbestand Rendering ===
-    function renderLager(data) {
-      var items = data.data ? data.data.produkte || [] : (Array.isArray(data) ? data : []);
-      lagerCache = items;
-      var niedrig = items.filter(function(p) { return p.Status === 'niedrig' || p.Status === 'leer'; });
-      document.getElementById('lagerCount').textContent = items.length + ' Produkte';
-
-      // Warning on dashboard
-      var warn = document.getElementById('lagerWarning');
-      if (niedrig.length > 0) {
-        warn.style.display = 'block';
-        warn.textContent = '';
-        var alert = document.createElement('div');
-        alert.className = 'lager-alert';
-        alert.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
-        var alertText = document.createElement('span');
-        alertText.textContent = niedrig.length + ' Produkt' + (niedrig.length > 1 ? 'e' : '') + ' nachbestellen';
-        alert.appendChild(alertText);
-        warn.appendChild(alert);
-      } else {
-        warn.style.display = 'none';
-      }
-
-      var c = document.getElementById('lagerList');
-      c.textContent = '';
-      if (!items.length) { c.innerHTML = '<div class="empty">Kein Lagerbestand</div>'; return; }
-
-      items.forEach(function(p) {
-        var card = document.createElement('div');
-        card.className = 'lager-card ' + (p.Status || 'ok');
-
-        var dot = document.createElement('div');
-        dot.className = 'lager-status ' + (p.Status || 'ok');
-
-        var info = document.createElement('div');
-        info.className = 'lager-info';
-        var name = document.createElement('div');
-        name.className = 'lager-name';
-        name.textContent = p.Produktname || '';
-        var kat = document.createElement('div');
-        kat.className = 'lager-kat';
-        kat.textContent = (p.Kategorie || '') + (p.Lieferant ? ' — ' + p.Lieferant : '');
-        info.appendChild(name);
-        info.appendChild(kat);
-
-        var bestand = document.createElement('div');
-        bestand.className = 'lager-bestand ' + (p.Status || 'ok');
-        bestand.textContent = p.Bestand + ' ' + (p.Einheit || '');
-        var minEl = document.createElement('div');
-        minEl.className = 'lager-min';
-        minEl.textContent = 'Min: ' + (p.Mindestbestand || 0);
-
-        var right = document.createElement('div');
-        right.appendChild(bestand);
-        right.appendChild(minEl);
-
-        card.appendChild(dot);
-        card.appendChild(info);
-        card.appendChild(right);
-        c.appendChild(card);
-      });
-    }
+    // === Lagerbestand Rendering (siehe renderLagerTab weiter unten) ===
 
     // === Service-Katalog Rendering ===
     function renderServices(data) {
@@ -3455,14 +3431,7 @@
         { Service_ID: 'S007', Name: 'Haarkur Repair', Kategorie: 'Pflege', Typ: 'produkt', Dauer_Min: 0, Preis_Netto: 21.01, Preis_Brutto: 24.99, MwSt_Satz: 0.19 },
       ]}});
 
-      renderLager({ data: { produkte: [
-        { Produkt_ID: 'P001', Produktname: 'Shampoo Vital', Kategorie: 'Pflege', Bestand: 3, Einheit: 'Stueck', Mindestbestand: 5, Lieferant: 'Wella', Verkaufspreis: 18.90, Status: 'niedrig' },
-        { Produkt_ID: 'P002', Produktname: 'Haarkur Repair', Kategorie: 'Pflege', Bestand: 8, Einheit: 'Stueck', Mindestbestand: 5, Lieferant: 'LOreal', Verkaufspreis: 24.99, Status: 'ok' },
-        { Produkt_ID: 'P003', Produktname: 'Haarfarbe Blond 7.0', Kategorie: 'Farbe', Bestand: 2, Einheit: 'Tuben', Mindestbestand: 4, Lieferant: 'Wella', Verkaufspreis: 0, Status: 'niedrig' },
-        { Produkt_ID: 'P004', Produktname: 'Oxidant 6%', Kategorie: 'Farbe', Bestand: 12, Einheit: 'Liter', Mindestbestand: 3, Lieferant: 'Wella', Verkaufspreis: 0, Status: 'ok' },
-        { Produkt_ID: 'P005', Produktname: 'Styling Wax', Kategorie: 'Styling', Bestand: 0, Einheit: 'Stueck', Mindestbestand: 3, Lieferant: 'got2b', Verkaufspreis: 12.50, Status: 'leer' },
-        { Produkt_ID: 'P006', Produktname: 'Haarspray Extra Strong', Kategorie: 'Styling', Bestand: 6, Einheit: 'Stueck', Mindestbestand: 4, Lieferant: 'Schwarzkopf', Verkaufspreis: 14.90, Status: 'ok' },
-      ]}});
+      // Alte Lager-Daten entfernt — neue Daten weiter unten (renderLagerTab mit La Biosthetique)
 
       renderBeratungen([
         {
@@ -4430,6 +4399,8 @@
       items.forEach(function(b) {
         var row = document.createElement('div');
         row.className = 'ev touch-scale';
+        row.style.opacity = '1';
+        row.style.animation = 'none';
         var st = (b.Status || 'offen').toLowerCase();
         var stClass = st === 'geliefert' || st === 'erledigt' ? 'termin' : st === 'bestellt' ? 'event' : 'nachbestellung';
         var stLabel = st === 'geliefert' ? 'Geliefert' : st === 'bestellt' ? 'Bestellt' : 'Offen';
@@ -4504,6 +4475,8 @@
         var isLow = bestand <= min;
         var row = document.createElement('div');
         row.className = 'ev touch-scale';
+        row.style.opacity = '1';
+        row.style.animation = 'none';
         if (isLow) row.classList.add('unread');
         var iconClass = isLow ? 'storno' : 'termin';
         row.innerHTML = '<div class="ev-icon ' + iconClass + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>'
