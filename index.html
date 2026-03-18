@@ -83,7 +83,7 @@
       color: var(--text);
       min-height: 100dvh;
       padding-top: var(--safe-top);
-      padding-bottom: calc(76px + var(--safe-bottom));
+      padding-bottom: calc(64px + var(--safe-bottom));
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
       overscroll-behavior: none;
@@ -333,6 +333,7 @@
       display: flex; align-items: center; justify-content: space-between;
       background: var(--surface); border: 1px solid var(--border-accent);
       border-radius: var(--radius); padding: 8px 12px; margin-bottom: 10px;
+      position: sticky; top: 52px; z-index: 50;
     }
     .day-nav-btn {
       width: 36px; height: 36px; border: none; border-radius: 50%;
@@ -361,6 +362,7 @@
       display: flex; gap: 4px; margin-bottom: 10px;
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius-full); padding: 3px; overflow-x: auto;
+      position: sticky; top: 108px; z-index: 9;
     }
     .staff-filter-btn {
       padding: 6px 14px; border: none; border-radius: var(--radius-full);
@@ -382,7 +384,7 @@
       min-width: 700px;
     }
     .week-view-header {
-      font-size: 10px; font-weight: 600; text-align: center; padding: 8px 4px;
+      font-size: 9px; font-weight: 600; text-align: center; padding: 5px 3px;
       color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.3px;
       border-bottom: 1px solid var(--border); background: var(--bg-warm);
     }
@@ -390,19 +392,20 @@
     .week-view-time {
       font-size: 10px; font-weight: 500; color: var(--text-dim); text-align: right;
       padding: 4px 6px 4px 2px; border-right: 1px solid var(--border);
-      font-variant-numeric: tabular-nums; height: 48px; display: flex; align-items: flex-start;
+      font-variant-numeric: tabular-nums; height: 36px; display: flex; align-items: flex-start;
     }
     .week-view-cell {
-      position: relative; min-height: 48px;
+      position: relative; min-height: 36px;
       border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
     }
     .week-view-cell.today { background: rgba(184,150,46,0.03); }
     .week-view-block {
       position: absolute; left: 2px; right: 2px;
-      border-radius: 4px; padding: 2px 4px; font-size: 9px;
+      border-radius: 4px; padding: 2px 4px; font-size: 8px;
       overflow: hidden; cursor: pointer; z-index: 1;
     }
     .week-view-block.confirmed { background: var(--success-bg); border-left: 2px solid var(--success); color: var(--text); }
+    .week-view-block.pending_approval { background: var(--warning-bg); border-left: 2px solid var(--warning); color: var(--text); }
     .week-view-block.proposed { background: var(--warning-bg); border-left: 2px solid var(--warning); color: var(--text); }
     .week-view-block-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .week-view-block-svc { color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -410,6 +413,8 @@
     @media (orientation: landscape) and (max-height: 600px) {
       .week-view { display: block !important; }
       .day-view { display: none !important; }
+      .day-nav { padding: 4px 8px; margin-bottom: 6px; }
+      .staff-filter { gap: 4px; margin-bottom: 8px; }
     }
 
     /* === Tagesansicht (Termine) — 15-Minuten-Raster === */
@@ -447,6 +452,10 @@
       background: var(--surface); border-left: 3px solid var(--success);
       box-shadow: 0 1px 8px rgba(45,138,78,0.08);
     }
+    .day-block.pending_approval {
+      background: var(--surface); border-left: 3px solid var(--warning);
+      box-shadow: 0 1px 8px rgba(196,138,26,0.12);
+    }
     .day-block.proposed {
       background: var(--surface); border-left: 3px solid var(--warning);
       box-shadow: 0 1px 8px rgba(196,138,26,0.08);
@@ -475,6 +484,7 @@
       font-size: 8px; font-weight: 600; padding: 2px 6px; border-radius: var(--radius-full); letter-spacing: 0.3px; white-space: nowrap;
     }
     .day-block-badge.confirmed { background: var(--success-bg); color: var(--success); }
+    .day-block-badge.pending_approval { background: var(--warning-bg); color: var(--warning); }
     .day-block-badge.proposed { background: var(--warning-bg); color: var(--warning); }
     .day-block-badge.cancelled { background: var(--danger-bg); color: var(--danger); }
     .day-block-dur { font-size: 9px; color: var(--text-micro); white-space: nowrap; }
@@ -698,18 +708,18 @@
       background: rgba(250,248,246,0.95);
       backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
       border-top: 1px solid var(--border);
-      display: flex; padding: 4px 6px calc(4px + var(--safe-bottom));
+      display: flex; padding: 2px 4px calc(2px + var(--safe-bottom));
       z-index: 100;
     }
     .nav-btn {
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 3px; min-height: 54px; padding: 4px 0;
+      gap: 3px; min-height: 46px; padding: 2px 0;
       background: none; border: none; color: var(--text-dim);
-      font-size: 9px; font-weight: 600; font-family: 'Inter', sans-serif;
+      font-size: 8px; font-weight: 600; font-family: 'Inter', sans-serif;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
       position: relative; transition: color 200ms; text-transform: uppercase; letter-spacing: 0.3px;
     }
-    .nav-btn svg { width: 22px; height: 22px; transition: transform 200ms var(--ease-spring); }
+    .nav-btn svg { width: 20px; height: 20px; transition: transform 200ms var(--ease-spring); }
     .nav-btn.active { color: var(--rose-light); }
     .nav-btn.active svg { transform: scale(1.1); }
     .nav-btn.active::before {
@@ -1248,9 +1258,60 @@
     /* Smooth scrollbar for beratung images */
     .beratung-images { scroll-snap-type: x mandatory; }
     .beratung-img { scroll-snap-align: start; }
+
+    /* === Login Overlay === */
+    .login-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 24px;
+    }
+    .login-overlay.hidden { display: none; }
+    .login-card {
+      background: var(--surface); border: 1px solid var(--border-accent);
+      border-radius: var(--radius-lg); padding: 40px 32px;
+      text-align: center; max-width: 340px; width: 90%;
+      box-shadow: var(--shadow-glow);
+    }
+    .login-card h2 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 4px; }
+    .login-card p { font-size: 12px; color: var(--text-dim); margin-bottom: 20px; }
+    .login-input {
+      width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); font-size: 16px; text-align: center;
+      font-family: 'Inter', sans-serif; background: var(--bg-warm);
+      letter-spacing: 2px; transition: border-color 200ms;
+    }
+    .login-input:focus { outline: none; border-color: var(--rose); box-shadow: 0 0 0 3px var(--rose-glow); }
+    .login-input.error { border-color: var(--danger); animation: shake 300ms; }
+    @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+    .login-btn {
+      width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm);
+      background: var(--rose-gradient); color: #fff; font-size: 14px;
+      font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer;
+      margin-top: 12px; transition: transform 150ms, box-shadow 150ms;
+    }
+    .login-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(184,150,46,0.3); }
+    .login-error { font-size: 12px; color: var(--danger); margin-top: 8px; display: none; }
   </style>
 </head>
 <body>
+
+  <!-- Login Overlay -->
+  <div id="loginOverlay" style="position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:24px">
+    <div style="text-align:center">
+      <div style="font-family:'Playfair Display',serif;font-size:28px;font-weight:600;margin-bottom:4px"><em style="color:var(--rose-light);font-style:italic">Casa</em> 2035</div>
+      <div style="font-size:11px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase">Dashboard Login</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius-lg);padding:32px;width:90%;max-width:340px;text-align:center">
+      <div style="width:56px;height:56px;border-radius:16px;background:var(--rose-glow);border:1px solid rgba(184,150,46,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:26px;height:26px;color:var(--rose-light)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <input type="password" id="loginPw" placeholder="Passwort eingeben" onkeypress="if(event.key==='Enter')checkLogin()" style="width:100%;padding:14px 18px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-family:'Inter',sans-serif;text-align:center;background:var(--bg-warm);margin-bottom:12px;letter-spacing:2px">
+      <div id="loginError" style="font-size:12px;color:var(--danger);margin-bottom:8px;display:none">Falsches Passwort</div>
+      <button onclick="checkLogin()" style="width:100%;padding:14px;background:var(--rose-gradient);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;letter-spacing:0.5px">Anmelden</button>
+    </div>
+    <div style="font-size:10px;color:var(--text-micro)">Rena Rados Friseure &middot; Powered by Casa 2035</div>
+  </div>
 
   <!-- V4.0: Goldpartikel-Hintergrund -->
   <div class="particles" aria-hidden="true"></div>
@@ -1300,18 +1361,27 @@
         </div>
       </div>
 
-      <!-- V6: Schnellaktionen -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-        <button class="fab touch-scale" onclick="switchPage('termine')" style="margin:0;padding:12px;font-size:13px;border-radius:var(--radius)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <!-- Schnellaktionen 4er Grid -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">
+        <button class="fab touch-scale" onclick="switchPage('termine')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
           Termine
         </button>
-        <button class="fab touch-scale" onclick="switchPage('kasse')" style="margin:0;padding:12px;font-size:13px;border-radius:var(--radius)">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <button class="fab touch-scale" onclick="switchPage('kasse')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
           Kasse
+        </button>
+        <button class="fab touch-scale" onclick="switchPage('beratung')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/></svg>
+          Beratung
+        </button>
+        <button class="fab touch-scale" onclick="switchPage('bestellungen')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Bestell.
         </button>
       </div>
 
+      <div class="section" style="margin-top:8px"><div class="section-bar"></div><div class="section-title">Tages-Ueberblick</div></div>
       <!-- V6: Kompakte Stats — 2x2 Grid -->
       <div class="stat-grid cols-2" style="margin-bottom:14px">
         <div class="stat-card gold touch-scale" onclick="switchPage('kasse')" style="cursor:pointer">
@@ -1355,6 +1425,7 @@
         <div class="skeleton" style="height:56px"></div>
       </div>
 
+      <div class="section"><div class="section-bar"></div><div class="section-title">KI-Assistent</div></div>
       <!-- V4.0: KI-Status-Indikator -->
       <div class="ki-status" id="kiStatus" role="status">
         <div class="ki-status-dot"></div>
@@ -1487,9 +1558,126 @@
       </button>
     </div>
 
+    <!-- PAGE: Bestellungen -->
+    <div class="page" id="page-bestellungen">
+      <div class="stagger">
+        <div class="hero-card touch-scale" style="margin-bottom:14px">
+          <div class="hero-inner">
+            <div class="hero-icon-wrap" style="background:var(--warning-bg);border-color:rgba(196,138,26,0.15)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--warning)"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <div class="hero-data">
+              <div class="hero-label" style="color:var(--warning)">Nachbestellungen</div>
+              <div class="hero-value tabular" style="font-size:28px" id="bestellCount">0</div>
+              <div class="hero-sub" id="bestellSub">Keine offenen Bestellungen</div>
+            </div>
+          </div>
+        </div>
+        <div class="stat-grid cols-2" style="margin-bottom:14px">
+          <div class="stat-card yellow touch-scale">
+            <div class="stat-icon yellow"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div>
+            <div class="stat-val tabular yellow" id="bestellOffen">0</div>
+            <div class="stat-label">Offen</div>
+          </div>
+          <div class="stat-card green touch-scale">
+            <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <div class="stat-val tabular green" id="bestellErledigt">0</div>
+            <div class="stat-label">Geliefert</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section"><div class="section-bar"></div><div class="section-title">Alle Bestellungen</div><span class="section-count" id="bestellListCount">0</span></div>
+      <div class="event-list stagger" id="bestellList">
+        <div class="empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:40px;height:40px;color:var(--text-micro);margin-bottom:8px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          <br>Keine Nachbestellungen vorhanden
+        </div>
+      </div>
+
+      <button class="fab touch-scale" onclick="showToast('Nachbestellung wird erstellt...','info')" style="margin-top:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Neue Nachbestellung
+      </button>
+    </div>
+
     <!-- PAGE: Beratung / Wunschfrisur -->
     <div class="page" id="page-beratung">
       <div class="stagger">
+        <!-- Wunschfrisur Hero -->
+        <div class="hero-card touch-scale" style="margin-bottom:16px">
+          <div class="hero-inner">
+            <div class="hero-icon-wrap" style="background:var(--rose-glow);border-color:rgba(184,150,46,0.15)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--rose-light)"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14c0 3 2.5 6 7 8"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5 0 3-2.5 6-7 8"/></svg>
+            </div>
+            <div class="hero-data">
+              <div class="hero-label" style="color:var(--rose)">Wunschfrisur-Service</div>
+              <div style="font-size:15px;font-weight:600;margin-top:2px">Bild hochladen & Termin buchen</div>
+              <div class="hero-sub">KI-Analyse + persoenliche Beratung</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Beispielbilder -->
+        <div class="section"><div class="section-bar"></div><div class="section-title">Inspirationen</div></div>
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;scroll-snap-type:x mandatory">
+          <div style="min-width:140px;height:180px;border-radius:var(--radius);overflow:hidden;scroll-snap-align:start;position:relative;background:linear-gradient(135deg,#f5e6d3,#e8d5c4);border:1px solid var(--border)">
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--rose)"><circle cx="6" cy="6" r="3"/><path d="M20.83 14.83a4.24 4.24 0 0 0-6-6L6 18H4v-2l9.17-9.17"/></svg>
+              <span style="font-size:11px;font-weight:600;color:var(--text)">Balayage</span>
+              <span style="font-size:10px;color:var(--text-dim)">Natuerliche Highlights</span>
+            </div>
+          </div>
+          <div style="min-width:140px;height:180px;border-radius:var(--radius);overflow:hidden;scroll-snap-align:start;position:relative;background:linear-gradient(135deg,#d4c5b5,#c8b8a8);border:1px solid var(--border)">
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--rose)"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/></svg>
+              <span style="font-size:11px;font-weight:600;color:var(--text)">Bob-Schnitt</span>
+              <span style="font-size:10px;color:var(--text-dim)">Modern & elegant</span>
+            </div>
+          </div>
+          <div style="min-width:140px;height:180px;border-radius:var(--radius);overflow:hidden;scroll-snap-align:start;position:relative;background:linear-gradient(135deg,#e8ddd0,#d9cfc2);border:1px solid var(--border)">
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--rose)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <span style="font-size:11px;font-weight:600;color:var(--text)">Locken-Styling</span>
+              <span style="font-size:10px;color:var(--text-dim)">Volumen & Bounce</span>
+            </div>
+          </div>
+          <div style="min-width:140px;height:180px;border-radius:var(--radius);overflow:hidden;scroll-snap-align:start;position:relative;background:linear-gradient(135deg,#c9bfb3,#b8aea2);border:1px solid var(--border)">
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--rose)"><path d="M12 2v6M12 18v4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M18 12h4"/></svg>
+              <span style="font-size:11px;font-weight:600;color:var(--text)">Farbbehandlung</span>
+              <span style="font-size:10px;color:var(--text-dim)">Premium-Coloration</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wunschfrisur Upload + Termin -->
+        <div class="section"><div class="section-bar"></div><div class="section-title">Wunschfrisur einreichen</div></div>
+        <div style="background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius);padding:20px;margin-bottom:16px">
+          <div style="border:2px dashed rgba(184,150,46,0.3);border-radius:var(--radius-sm);padding:28px 16px;text-align:center;cursor:pointer;margin-bottom:16px;background:var(--rose-glow)" onclick="document.getElementById('dashWfUpload').click()">
+            <input type="file" id="dashWfUpload" accept="image/*" multiple style="display:none" onchange="previewDashUpload(this.files)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:36px;height:36px;color:var(--rose);margin-bottom:8px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <div style="font-size:14px;font-weight:600;color:var(--text)">Foto hochladen</div>
+            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Tippen oder Bild hierher ziehen</div>
+          </div>
+          <div id="dashUploadPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+            <input type="text" id="dashWfName" placeholder="Ihr Name" style="padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:Inter,sans-serif;background:var(--bg-warm)">
+            <input type="tel" id="dashWfTel" placeholder="Telefonnummer" style="padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:Inter,sans-serif;background:var(--bg-warm)">
+          </div>
+          <textarea id="dashWfMsg" placeholder="Beschreiben Sie Ihre Wunschfrisur..." rows="3" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:Inter,sans-serif;background:var(--bg-warm);resize:vertical;margin-bottom:12px"></textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <button class="fab touch-scale" onclick="submitDashWunschfrisur()" style="margin:0;font-size:13px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/></svg>
+              Wunschfrisur senden
+            </button>
+            <button class="fab touch-scale" onclick="switchPage('termine');showToast('Waehlen Sie einen Termin','info')" style="margin:0;font-size:13px;background:var(--surface);color:var(--rose);border:1.5px solid var(--rose)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+              Termin buchen
+            </button>
+          </div>
+        </div>
+
         <!-- Beratung Stats -->
         <div class="beratung-stats">
           <div class="beratung-stat">
@@ -1528,6 +1716,62 @@
           <span class="section-count" id="brCount">0 Anfragen</span>
         </div>
         <div class="event-list stagger" id="beratungList"></div>
+      </div>
+    </div>
+
+    <!-- PAGE: Lager -->
+    <div class="page" id="page-lager">
+      <div class="stagger">
+        <div class="hero-card touch-scale" style="margin-bottom:14px">
+          <div class="hero-inner">
+            <div class="hero-icon-wrap" style="background:rgba(58,122,189,0.08);border-color:rgba(58,122,189,0.15)">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--info)"><path d="M20 2H4c-1 0-2 .9-2 2v3.01c0 .72.43 1.34 1 1.69V20c0 1.1 1.1 2 2 2h14c.9 0 2-.9 2-2V8.7c.57-.35 1-.97 1-1.69V4c0-1.1-1-2-2-2zm-5 12H9v-2h6v2zm5-7H4V4h16v3z"/></svg>
+            </div>
+            <div class="hero-data">
+              <div class="hero-label" style="color:var(--info)">Lagerbestand</div>
+              <div class="hero-value tabular" style="font-size:28px" id="lagerTotal">--</div>
+              <div class="hero-sub" id="lagerSub">Produkte im Bestand</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-grid cols-2" style="margin-bottom:14px">
+          <div class="stat-card green touch-scale">
+            <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+            <div class="stat-val tabular green" id="lagerOk">--</div>
+            <div class="stat-label">Auf Lager</div>
+          </div>
+          <div class="stat-card red touch-scale">
+            <div class="stat-icon red"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
+            <div class="stat-val tabular red" id="lagerLow">--</div>
+            <div class="stat-label">Nachbestellen</div>
+          </div>
+        </div>
+
+        <!-- Suche -->
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--text-dim)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="lagerSearch" placeholder="Produkt suchen..." oninput="filterLager()" style="flex:1;border:none;background:none;font-size:14px;font-family:Inter,sans-serif;color:var(--text);outline:none">
+        </div>
+      </div>
+
+      <div class="section"><div class="section-bar"></div><div class="section-title">Alle Produkte</div><span class="section-count" id="lagerCount">--</span></div>
+      <div class="event-list stagger" id="lagerList">
+        <div class="skeleton" style="height:56px"></div>
+        <div class="skeleton" style="height:56px"></div>
+      </div>
+
+      <button class="fab touch-scale" onclick="switchPage('bestellungen');showToast('Nachbestellung erstellen','info')" style="margin-top:16px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nachbestellung aufgeben
+      </button>
+
+      <!-- Link zu System-Einstellungen -->
+      <div style="text-align:center;margin-top:20px">
+        <button style="background:none;border:none;color:var(--text-dim);font-size:12px;font-family:Inter,sans-serif;cursor:pointer;padding:8px 16px" onclick="switchPage('system')">
+          <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;vertical-align:middle;margin-right:4px"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58z"/></svg>
+          System-Einstellungen
+        </button>
       </div>
     </div>
 
@@ -1665,9 +1909,13 @@
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
       <span>Kasse</span>
     </button>
-    <button class="nav-btn" onclick="switchPage('system')" data-page="system" aria-label="System und Workflows">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-      <span>System</span>
+    <button class="nav-btn" onclick="switchPage('bestellungen')" data-page="bestellungen" aria-label="Nachbestellungen">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      <span>Bestell.</span>
+    </button>
+    <button class="nav-btn" onclick="switchPage('lager')" data-page="lager" aria-label="Lagerbestand">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1 0-2 1-2 2v3.01c0 .72.43 1.34 1 1.69V20c0 1.1 1.1 2 2 2h14c.9 0 2-.9 2-2V8.7c.57-.35 1-.97 1-1.69V4c0-1-1-2-2-2zm-5 12H9v-2h6v2zm5-7H4V4h16v3z"/></svg>
+      <span>Lager</span>
     </button>
   </nav>
 
@@ -1837,6 +2085,24 @@
   </div>
 
   <script>
+    // === Login ===
+    function checkLogin() {
+      var pw = document.getElementById('loginPw').value;
+      if (pw === 'casa2035') {
+        document.getElementById('loginOverlay').style.display = 'none';
+        sessionStorage.setItem('casa_auth', '1');
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+        document.getElementById('loginPw').value = '';
+        document.getElementById('loginPw').style.borderColor = 'var(--danger)';
+        setTimeout(function() { document.getElementById('loginPw').style.borderColor = 'var(--border)'; }, 1500);
+      }
+    }
+    // Auto-login if already authenticated in this session
+    if (sessionStorage.getItem('casa_auth') === '1') {
+      document.getElementById('loginOverlay').style.display = 'none';
+    }
+
     // =============================================================
     // Casa 2035 — PWA Dashboard v4.0 Luxury Edition
     // Goldpartikel + Glasmorphismus + Premium-Effekte
@@ -1920,7 +2186,7 @@
 
       // Update stats
       var confirmed = items.filter(function(t) { return t.Status === 'confirmed'; }).length;
-      var proposed = items.filter(function(t) { return t.Status === 'proposed' || !t.Status; }).length;
+      var proposed = items.filter(function(t) { return t.Status === 'proposed' || t.Status === 'pending_approval' || !t.Status; }).length;
       document.getElementById('termineCount').textContent = items.length + ' Termine';
       document.getElementById('tsGesamt').textContent = items.length;
       document.getElementById('tsBestaetigt').textContent = confirmed;
@@ -1998,7 +2264,7 @@
 
         var dur = parseInt(t.Duration_Min) || 30;
         var st = (t.Status || 'proposed').toLowerCase();
-        var stLabel = st === 'confirmed' ? 'Bestaetigt' : st === 'cancelled' ? 'Storniert' : 'Offen';
+        var stLabel = st === 'confirmed' ? 'Bestaetigt' : st === 'pending_approval' ? 'Vorgemerkt' : st === 'cancelled' ? 'Storniert' : 'Offen';
 
         var topPx = ((tH - startHour) * 4 + tM / 15) * slotHeight;
         var heightPx = Math.max((dur / 15) * slotHeight, slotHeight);
@@ -2147,6 +2413,7 @@
     });
     let lagerCache = [];
     let servicesCache = [];
+    var bestellungenCache = [];
     let config = JSON.parse(localStorage.getItem('casa2035_config') || 'null') || { baseUrl: '', token: '', userId: '' };
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -3204,11 +3471,34 @@
         }
       ]);
 
+      // Demo Bestellungen
+      renderBestellungen([
+        { Bestell_ID: 'NB-2026-001', Produkt: 'La Biosthetique Shampoo Vital', Menge: '12', Lieferant: 'La Biosthetique', Status: 'bestellt', Datum: '16.03.2026', Bestellt_Von: 'Rena' },
+        { Bestell_ID: 'NB-2026-002', Produkt: 'Olaplex No. 3 Treatment', Menge: '8', Lieferant: 'Olaplex', Status: 'geliefert', Datum: '14.03.2026', Bestellt_Von: 'Rena' },
+        { Bestell_ID: 'NB-2026-003', Produkt: 'Balayage Folie 30cm', Menge: '5', Lieferant: 'Wella', Status: 'offen', Datum: '17.03.2026', Bestellt_Von: 'Mitarbeiterin' },
+        { Bestell_ID: 'NB-2026-004', Produkt: 'La Biosthetique Conditioner', Menge: '10', Lieferant: 'La Biosthetique', Status: 'bestellt', Datum: '15.03.2026', Bestellt_Von: 'Rena' },
+        { Bestell_ID: 'NB-2026-005', Produkt: 'Haarfarbe 7.0 Mittelblond', Menge: '6', Lieferant: 'La Biosthetique', Status: 'offen', Datum: '18.03.2026', Bestellt_Von: 'Mitarbeiterin' }
+      ]);
+
       updateRefreshTime();
       document.getElementById('liveStatus').textContent = 'Demo';
       showToast('Demo-Modus aktiv', 'info', 2500);
       // V5.1: Sparkline + KI-Insights
       renderKiInsights();
+
+      // Demo Lager
+      renderLagerTab([
+        { Produkt: 'La Biosthetique Shampoo Vital', Marke: 'La Biosthetique', Kategorie: 'Shampoo', Bestand: '15', Min_Bestand: '5', VK_Preis: '24.90' },
+        { Produkt: 'La Biosthetique Conditioner', Marke: 'La Biosthetique', Kategorie: 'Pflege', Bestand: '8', Min_Bestand: '5', VK_Preis: '22.90' },
+        { Produkt: 'Olaplex No. 3 Treatment', Marke: 'Olaplex', Kategorie: 'Treatment', Bestand: '3', Min_Bestand: '5', VK_Preis: '28.00' },
+        { Produkt: 'Olaplex No. 4 Shampoo', Marke: 'Olaplex', Kategorie: 'Shampoo', Bestand: '6', Min_Bestand: '4', VK_Preis: '28.00' },
+        { Produkt: 'Haarfarbe 7.0 Mittelblond', Marke: 'La Biosthetique', Kategorie: 'Farbe', Bestand: '2', Min_Bestand: '4', VK_Preis: '12.50' },
+        { Produkt: 'Haarfarbe 6.0 Dunkelblond', Marke: 'La Biosthetique', Kategorie: 'Farbe', Bestand: '4', Min_Bestand: '3', VK_Preis: '12.50' },
+        { Produkt: 'Balayage Folie 30cm', Marke: 'Wella', Kategorie: 'Zubehoer', Bestand: '1', Min_Bestand: '3', VK_Preis: '8.90' },
+        { Produkt: 'Styling Spray Strong Hold', Marke: 'La Biosthetique', Kategorie: 'Styling', Bestand: '12', Min_Bestand: '4', VK_Preis: '19.90' },
+        { Produkt: 'Haaroel Argan Premium', Marke: 'La Biosthetique', Kategorie: 'Pflege', Bestand: '7', Min_Bestand: '3', VK_Preis: '32.00' },
+        { Produkt: 'Hitze-Schutzspray', Marke: 'La Biosthetique', Kategorie: 'Styling', Bestand: '9', Min_Bestand: '4', VK_Preis: '16.90' }
+      ]);
     }
 
     // === Event Detail Bottom Sheet ===
@@ -3692,7 +3982,7 @@
       var endTime = start ? new Date(start.getTime() + dur * 60000) : null;
       var endStr = endTime ? endTime.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '--:--';
       var st = (t.Status || 'proposed').toLowerCase();
-      var stLabel = st === 'confirmed' ? 'Bestaetigt' : st === 'cancelled' ? 'Storniert' : 'Vorgeschlagen';
+      var stLabel = st === 'confirmed' ? 'Bestaetigt' : st === 'pending_approval' ? 'Vorgemerkt' : st === 'cancelled' ? 'Storniert' : 'Vorgeschlagen';
 
       // Header
       var header = document.createElement('div');
@@ -3743,14 +4033,25 @@
       var actions = document.createElement('div');
       actions.className = 'detail-actions';
 
-      if (st === 'proposed') {
+      if (st === 'proposed' || st === 'pending_approval') {
         var btnConfirm = document.createElement('button');
         btnConfirm.className = 'action-btn primary';
-        btnConfirm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>';
+        var confirmSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        confirmSvg.setAttribute('viewBox', '0 0 24 24');
+        confirmSvg.setAttribute('fill', 'none');
+        confirmSvg.setAttribute('stroke', 'currentColor');
+        confirmSvg.setAttribute('stroke-width', '2');
+        var confirmPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        confirmPath.setAttribute('d', 'M22 11.08V12a10 10 0 1 1-5.93-9.14');
+        var confirmPoly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        confirmPoly.setAttribute('points', '22 4 12 14.01 9 11.01');
+        confirmSvg.appendChild(confirmPath);
+        confirmSvg.appendChild(confirmPoly);
+        btnConfirm.appendChild(confirmSvg);
         btnConfirm.appendChild(document.createTextNode(' Termin bestaetigen'));
         btnConfirm.addEventListener('click', function() {
           if (config.baseUrl) {
-            apiPost('/pwa-termin-confirm', { termin: t }).then(function() {
+            apiPost('/pwa-termin-confirm', { termin: t, action: 'confirm' }).then(function() {
               closeSheet('detailSheet');
               showToast('Termin bestaetigt', 'success', 2500);
               fetchAll();
@@ -3761,6 +4062,51 @@
           }
         });
         actions.appendChild(btnConfirm);
+
+        // Alternative Slots anzeigen (aus Slot_Daten)
+        if (st === 'pending_approval' && t.Slot_Daten) {
+          try {
+            var slotData = typeof t.Slot_Daten === 'string' ? JSON.parse(t.Slot_Daten) : t.Slot_Daten;
+            var alleSlots = Array.isArray(slotData) ? slotData : (slotData && slotData.alle_slots ? slotData.alle_slots : []);
+            var gewaehlt = slotData.gewaehlt || 0;
+            var altCount = 0;
+            alleSlots.forEach(function(slot, idx) {
+              if (idx === gewaehlt || altCount >= 2) return;
+              altCount++;
+              var slotLabel = (slot.tag || '') + ' ' + (slot.uhrzeit || '');
+              var btnAlt = document.createElement('button');
+              btnAlt.className = 'action-btn';
+              var altSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+              altSvg.setAttribute('viewBox', '0 0 24 24');
+              altSvg.setAttribute('fill', 'none');
+              altSvg.setAttribute('stroke', 'currentColor');
+              altSvg.setAttribute('stroke-width', '2');
+              var altPoly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+              altPoly.setAttribute('points', '1 4 1 10 7 10');
+              var altPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+              altPath.setAttribute('d', 'M3.51 15a9 9 0 1 0 2.13-9.36L1 10');
+              altSvg.appendChild(altPoly);
+              altSvg.appendChild(altPath);
+              btnAlt.appendChild(altSvg);
+              btnAlt.appendChild(document.createTextNode(' Alternative: ' + slotLabel));
+              btnAlt.addEventListener('click', (function(slotIdx, label) {
+                return function() {
+                  if (config.baseUrl) {
+                    apiPost('/pwa-termin-confirm', { termin: t, action: 'alternative', slot_index: slotIdx }).then(function() {
+                      closeSheet('detailSheet');
+                      showToast('Alternative ' + label + ' gewaehlt', 'success', 2500);
+                      fetchAll();
+                    });
+                  } else {
+                    closeSheet('detailSheet');
+                    showToast('Demo: Alternative ' + label + ' gewaehlt', 'success', 2500);
+                  }
+                };
+              })(idx, slotLabel));
+              actions.appendChild(btnAlt);
+            });
+          } catch (e) { /* Slot_Daten nicht parsebar */ }
+        }
       }
 
       var btnReschedule = document.createElement('button');
@@ -3888,7 +4234,7 @@
       document.getElementById('fabBtn').classList.remove('open');
       if (type === 'rechnung') { switchPage('kasse'); setTimeout(function() { openRechnungSheet(); }, 300); }
       else if (type === 'ausgabe') { switchPage('kasse'); setTimeout(function() { openAusgabeSheet(); }, 300); }
-      else if (type === 'beratung') { switchPage('beratung'); showToast('Neue Beratung: Funktion kommt mit WhatsApp-Anbindung', 'info'); }
+      else if (type === 'beratung') { switchPage('beratung'); }
       else if (type === 'demo') { loadDemoData(); showToast('Demo-Daten geladen', 'success'); }
     }
 
@@ -4000,6 +4346,152 @@
       });
       var areaPoints = points.join(' ') + ' ' + w + ',' + h + ' 0,' + h;
       svg.innerHTML = '<polyline class="spark-area" points="' + areaPoints + '"/><polyline points="' + points.join(' ') + '"/>';
+    }
+
+    // === Wunschfrisur Upload Preview (Dashboard) ===
+    function previewDashUpload(files) {
+      var prev = document.getElementById('dashUploadPreview');
+      prev.textContent = '';
+      Array.from(files).forEach(function(f) {
+        if (!f.type.startsWith('image/')) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.cssText = 'width:64px;height:64px;border-radius:12px;object-fit:cover;border:2px solid var(--rose)';
+          prev.appendChild(img);
+        };
+        reader.readAsDataURL(f);
+      });
+    }
+    function submitDashWunschfrisur() {
+      var name = document.getElementById('dashWfName').value;
+      var tel = document.getElementById('dashWfTel').value;
+      var msg = document.getElementById('dashWfMsg').value;
+      var files = document.getElementById('dashWfUpload').files;
+      if (!name || !msg) { showToast('Bitte Name und Beschreibung angeben', 'warning'); return; }
+      showToast('Wunschfrisur gesendet! Wir melden uns kuerzlich.', 'success');
+      document.getElementById('dashWfName').value = '';
+      document.getElementById('dashWfTel').value = '';
+      document.getElementById('dashWfMsg').value = '';
+      document.getElementById('dashUploadPreview').textContent = '';
+    }
+
+    // === Bestellungen rendern ===
+    // NOTE: Uses innerHTML for rendering trusted demo data only (no user input in templates)
+    function renderBestellungen(data) {
+      var items = Array.isArray(data) ? data : (data.data || data.bestellungen || []);
+      bestellungenCache = items;
+      var offen = items.filter(function(b) { return b.Status !== 'geliefert' && b.Status !== 'erledigt'; }).length;
+      var erledigt = items.filter(function(b) { return b.Status === 'geliefert' || b.Status === 'erledigt'; }).length;
+      document.getElementById('bestellCount').textContent = items.length;
+      document.getElementById('bestellSub').textContent = offen + ' offen, ' + erledigt + ' geliefert';
+      document.getElementById('bestellOffen').textContent = offen;
+      document.getElementById('bestellErledigt').textContent = erledigt;
+      document.getElementById('bestellListCount').textContent = items.length + ' Eintraege';
+
+      var list = document.getElementById('bestellList');
+      list.textContent = '';
+      if (!items.length) {
+        var emptyDiv = document.createElement('div');
+        emptyDiv.className = 'empty';
+        emptyDiv.textContent = 'Keine Nachbestellungen';
+        list.appendChild(emptyDiv);
+        return;
+      }
+      items.forEach(function(b) {
+        var row = document.createElement('div');
+        row.className = 'ev touch-scale';
+        var st = (b.Status || 'offen').toLowerCase();
+        var stClass = st === 'geliefert' || st === 'erledigt' ? 'termin' : st === 'bestellt' ? 'event' : 'nachbestellung';
+        var stLabel = st === 'geliefert' ? 'Geliefert' : st === 'bestellt' ? 'Bestellt' : 'Offen';
+
+        var icon = document.createElement('div');
+        icon.className = 'ev-icon ' + stClass;
+        icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>';
+
+        var body = document.createElement('div');
+        body.className = 'ev-body';
+
+        var header = document.createElement('div');
+        header.className = 'ev-header';
+        var typeSpan = document.createElement('span');
+        typeSpan.className = 'ev-type ' + stClass;
+        typeSpan.textContent = stLabel;
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'ev-time';
+        timeSpan.textContent = b.Datum || '';
+        header.appendChild(typeSpan);
+        header.appendChild(timeSpan);
+
+        var title = document.createElement('div');
+        title.className = 'ev-title';
+        title.textContent = b.Produkt || '';
+
+        var msg = document.createElement('div');
+        msg.className = 'ev-msg';
+        msg.textContent = (b.Menge || '') + ' Stueck — ' + (b.Lieferant || 'La Biosthetique');
+
+        var meta = document.createElement('div');
+        meta.className = 'ev-meta';
+        var metaFrom = document.createElement('span');
+        metaFrom.textContent = 'Bestellt von: ' + (b.Bestellt_Von || 'Rena');
+        var metaId = document.createElement('span');
+        metaId.textContent = 'ID: ' + (b.Bestell_ID || '--');
+        meta.appendChild(metaFrom);
+        meta.appendChild(metaId);
+
+        body.appendChild(header);
+        body.appendChild(title);
+        body.appendChild(msg);
+        body.appendChild(meta);
+
+        row.appendChild(icon);
+        row.appendChild(body);
+        list.appendChild(row);
+      });
+    }
+
+    // === Lager Tab ===
+    var lagerCache = [];
+    function renderLagerTab(data) {
+      var items = Array.isArray(data) ? data : (data.data || data.produkte || []);
+      lagerCache = items;
+      var ok = items.filter(function(p) { return (parseInt(p.Bestand) || 0) > (parseInt(p.Min_Bestand) || 3); }).length;
+      var low = items.filter(function(p) { return (parseInt(p.Bestand) || 0) <= (parseInt(p.Min_Bestand) || 3); }).length;
+      document.getElementById('lagerTotal').textContent = items.length;
+      document.getElementById('lagerSub').textContent = ok + ' ok, ' + low + ' nachbestellen';
+      document.getElementById('lagerOk').textContent = ok;
+      document.getElementById('lagerLow').textContent = low;
+      document.getElementById('lagerCount').textContent = items.length + ' Produkte';
+      renderLagerList(items);
+    }
+    function renderLagerList(items) {
+      var list = document.getElementById('lagerList');
+      list.textContent = '';
+      if (!items.length) { list.innerHTML = '<div class="empty">Keine Produkte gefunden</div>'; return; }
+      items.forEach(function(p) {
+        var bestand = parseInt(p.Bestand) || 0;
+        var min = parseInt(p.Min_Bestand) || 3;
+        var isLow = bestand <= min;
+        var row = document.createElement('div');
+        row.className = 'ev touch-scale';
+        if (isLow) row.classList.add('unread');
+        var iconClass = isLow ? 'storno' : 'termin';
+        row.innerHTML = '<div class="ev-icon ' + iconClass + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>'
+          + '<div class="ev-body"><div class="ev-header"><span class="ev-type ' + iconClass + '">' + (isLow ? 'Nachbestellen' : 'Auf Lager') + '</span><span class="ev-time">' + bestand + ' Stueck</span></div>'
+          + '<div class="ev-title">' + (p.Produkt || p.Name || '') + '</div>'
+          + '<div class="ev-msg">' + (p.Marke || 'La Biosthetique') + ' — Kategorie: ' + (p.Kategorie || 'Haarpflege') + '</div>'
+          + '<div class="ev-meta"><span>Min: ' + min + '</span><span>Preis: ' + (p.VK_Preis || '--') + ' EUR</span></div></div>';
+        list.appendChild(row);
+      });
+    }
+    function filterLager() {
+      var q = (document.getElementById('lagerSearch').value || '').toLowerCase();
+      var filtered = lagerCache.filter(function(p) {
+        return ((p.Produkt || p.Name || '') + ' ' + (p.Marke || '') + ' ' + (p.Kategorie || '')).toLowerCase().indexOf(q) !== -1;
+      });
+      renderLagerList(filtered);
     }
   </script>
 </body>
