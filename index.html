@@ -488,6 +488,19 @@
     .day-block-badge.proposed { background: var(--warning-bg); color: var(--warning); }
     .day-block-badge.cancelled { background: var(--danger-bg); color: var(--danger); }
     .day-block-dur { font-size: 9px; color: var(--text-micro); white-space: nowrap; }
+    .day-block-vip {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 8px; font-weight: 700; padding: 2px 6px;
+      border-radius: var(--radius-full); letter-spacing: 0.3px;
+      background: linear-gradient(135deg, rgba(184,150,46,0.15), rgba(184,150,46,0.08));
+      color: var(--rose); border: 1px solid rgba(184,150,46,0.2);
+    }
+    .day-block-vip svg { width: 10px; height: 10px; }
+
+    /* Staff color coding */
+    .day-block.staff-rena { border-left-color: var(--rose) !important; }
+    .day-block.staff-maria { border-left-color: var(--info) !important; }
+    .day-block.staff-other { border-left-color: var(--success) !important; }
 
     /* Compact blocks (≤30 min): single row */
     .day-block.compact { align-items: center; padding: 4px 14px; gap: 8px; }
@@ -1408,7 +1421,7 @@
           <div class="stat-label">Anfragen</div>
           <div class="stat-sub" id="statAnfragenSub">ungelesen</div>
         </div>
-        <div class="stat-card yellow touch-scale" onclick="switchPage('kasse')" style="cursor:pointer">
+        <div class="stat-card yellow touch-scale" onclick="scrollToEvents()" style="cursor:pointer">
           <div class="stat-icon yellow">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
           </div>
@@ -2270,8 +2283,14 @@
         var heightPx = Math.max((dur / 15) * slotHeight, slotHeight);
         var isCompact = dur <= 30;
 
+        var staffClass = '';
+        var staffName = (t.Staff || '').toLowerCase();
+        if (staffName.indexOf('rena') !== -1) staffClass = ' staff-rena';
+        else if (staffName.indexOf('maria') !== -1) staffClass = ' staff-maria';
+        else if (staffName) staffClass = ' staff-other';
+
         var block = document.createElement('div');
-        block.className = 'day-block ' + st + (isCompact ? ' compact' : '');
+        block.className = 'day-block ' + st + staffClass + (isCompact ? ' compact' : '');
         block.style.top = topPx + 'px';
         block.style.height = heightPx + 'px';
         block.addEventListener('click', function() { openTerminDetail(t); });
@@ -2305,6 +2324,12 @@
         badge.className = 'day-block-badge ' + st;
         badge.textContent = stLabel;
         rightEl.appendChild(badge);
+        if (t.VIP) {
+          var vipEl = document.createElement('div');
+          vipEl.className = 'day-block-vip';
+          vipEl.innerHTML = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> VIP';
+          rightEl.appendChild(vipEl);
+        }
         var durEl = document.createElement('div');
         durEl.className = 'day-block-dur';
         durEl.textContent = dur + ' Min';
@@ -3379,24 +3404,27 @@
         return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00';
       };
       renderTermine([
-        // Heute
-        { Start_ISO: iso(10, 0), Service: 'Balayage + Schnitt', Customer_Name: 'Anna Schmidt', Staff: 'Rena', Duration_Min: 120, Status: 'confirmed' },
-        { Start_ISO: iso(12, 30), Service: 'Maskulin Schnitt', Customer_Name: 'Thomas Weber', Staff: 'Lena', Duration_Min: 30, Status: 'confirmed' },
-        { Start_ISO: iso(14, 0), Service: 'Haarschnitt Feminin', Customer_Name: 'Maria Mueller', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed' },
-        { Start_ISO: iso(15, 30), Service: 'Farbbehandlung', Customer_Name: 'Julia Koch', Staff: 'Lena', Duration_Min: 90, Status: 'proposed' },
-        { Start_ISO: iso(17, 0), Service: 'Maskulin Schnitt + Bart', Customer_Name: 'Stefan Braun', Staff: 'Rena', Duration_Min: 45, Status: 'proposed' },
+        // Heute — 8 Termine, 2 VIP, 2 Stylisten
+        { Start_ISO: iso(9, 0), Service: 'Damenhaarschnitt + Foehn', Customer_Name: 'Anna Mueller', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed', VIP: true },
+        { Start_ISO: iso(10, 15), Service: 'Balayage + Schnitt', Customer_Name: 'Lisa Kramer', Staff: 'Rena', Duration_Min: 120, Status: 'confirmed' },
+        { Start_ISO: iso(10, 30), Service: 'Herrenschnitt', Customer_Name: 'Thomas Weber', Staff: 'Maria', Duration_Min: 30, Status: 'confirmed' },
+        { Start_ISO: iso(12, 30), Service: 'Farbbehandlung Komplett', Customer_Name: 'Sandra Fischer', Staff: 'Rena', Duration_Min: 90, Status: 'pending_approval', VIP: true },
+        { Start_ISO: iso(13, 0), Service: 'Kinderhaarschnitt', Customer_Name: 'Max Klein (8J)', Staff: 'Maria', Duration_Min: 30, Status: 'confirmed' },
+        { Start_ISO: iso(14, 0), Service: 'Haarpflege + Olaplex', Customer_Name: 'Julia Berger', Staff: 'Rena', Duration_Min: 45, Status: 'confirmed' },
+        { Start_ISO: iso(15, 0), Service: 'Brautstyling Probe', Customer_Name: 'Sophie Lang', Staff: 'Rena', Duration_Min: 90, Status: 'proposed' },
+        { Start_ISO: iso(16, 0), Service: 'Herrenschnitt + Bartpflege', Customer_Name: 'Markus Huber', Staff: 'Maria', Duration_Min: 45, Status: 'confirmed' },
         // Morgen
         { Start_ISO: isoDay(1, 9, 0), Service: 'Haarschnitt Feminin', Customer_Name: 'Petra Maier', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed' },
-        { Start_ISO: isoDay(1, 11, 0), Service: 'Maskulin Schnitt', Customer_Name: 'Klaus Fischer', Staff: 'Lena', Duration_Min: 30, Status: 'confirmed' },
-        { Start_ISO: isoDay(1, 13, 30), Service: 'Balayage + Schnitt', Customer_Name: 'Sophie Wagner', Staff: 'Rena', Duration_Min: 120, Status: 'proposed' },
-        { Start_ISO: isoDay(1, 16, 0), Service: 'Grooming Paket', Customer_Name: 'Michael Braun', Staff: 'Lena', Duration_Min: 45, Status: 'confirmed' },
+        { Start_ISO: isoDay(1, 11, 0), Service: 'Herrenschnitt', Customer_Name: 'Klaus Fischer', Staff: 'Maria', Duration_Min: 30, Status: 'confirmed' },
+        { Start_ISO: isoDay(1, 13, 30), Service: 'Balayage + Schnitt', Customer_Name: 'Sophie Wagner', Staff: 'Rena', Duration_Min: 120, Status: 'proposed', VIP: true },
+        { Start_ISO: isoDay(1, 16, 0), Service: 'Grooming Paket', Customer_Name: 'Michael Braun', Staff: 'Maria', Duration_Min: 45, Status: 'confirmed' },
         // Gestern
         { Start_ISO: isoDay(-1, 9, 30), Service: 'Farbbehandlung', Customer_Name: 'Laura Berger', Staff: 'Rena', Duration_Min: 90, Status: 'confirmed' },
-        { Start_ISO: isoDay(-1, 11, 30), Service: 'Maskulin Schnitt + Bart', Customer_Name: 'David Klein', Staff: 'Lena', Duration_Min: 45, Status: 'confirmed' },
+        { Start_ISO: isoDay(-1, 11, 30), Service: 'Herrenschnitt + Bartpflege', Customer_Name: 'David Klein', Staff: 'Maria', Duration_Min: 45, Status: 'confirmed' },
         { Start_ISO: isoDay(-1, 14, 0), Service: 'Haarschnitt Feminin', Customer_Name: 'Nina Hofmann', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed' },
         // Uebermorgen
-        { Start_ISO: isoDay(2, 10, 0), Service: 'Brautstyling', Customer_Name: 'Eva Mueller', Staff: 'Rena', Duration_Min: 90, Status: 'confirmed' },
-        { Start_ISO: isoDay(2, 14, 0), Service: 'Maskulin Schnitt', Customer_Name: 'Tobias Richter', Staff: 'Lena', Duration_Min: 30, Status: 'proposed' },
+        { Start_ISO: isoDay(2, 10, 0), Service: 'Brautstyling', Customer_Name: 'Eva Mueller', Staff: 'Rena', Duration_Min: 90, Status: 'confirmed', VIP: true },
+        { Start_ISO: isoDay(2, 14, 0), Service: 'Herrenschnitt', Customer_Name: 'Tobias Richter', Staff: 'Maria', Duration_Min: 30, Status: 'proposed' },
       ]);
 
       renderFinanzen({
