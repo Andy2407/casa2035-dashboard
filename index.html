@@ -83,7 +83,7 @@
       color: var(--text);
       min-height: 100dvh;
       padding-top: var(--safe-top);
-      padding-bottom: calc(64px + var(--safe-bottom));
+      padding-bottom: calc(56px + var(--safe-bottom));
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
       overscroll-behavior: none;
@@ -413,8 +413,17 @@
     @media (orientation: landscape) and (max-height: 600px) {
       .week-view { display: block !important; }
       .day-view { display: none !important; }
-      .day-nav { padding: 4px 8px; margin-bottom: 6px; }
-      .staff-filter { gap: 4px; margin-bottom: 8px; }
+      .header { padding: 4px 16px 3px; }
+      .header-salon { font-size: 16px; }
+      .header-greeting { font-size: 9px; }
+      .header-sub { margin-top: 2px; }
+      .day-nav { padding: 3px 6px; margin-bottom: 4px; }
+      .day-nav-date { font-size: 13px; }
+      .staff-filter { gap: 2px; margin-bottom: 4px; padding: 2px; }
+      .staff-filter-btn { padding: 4px 10px; font-size: 10px; }
+      .bottom-nav { padding: 0 2px calc(0px + var(--safe-bottom)); }
+      .nav-btn { min-height: 34px; font-size: 7px; }
+      .nav-btn svg { width: 16px; height: 16px; }
     }
 
     /* === Tagesansicht (Termine) — 15-Minuten-Raster === */
@@ -498,8 +507,8 @@
     .day-block-vip svg { width: 10px; height: 10px; }
 
     /* Staff color coding */
-    .day-block.staff-rena { border-left-color: var(--rose) !important; }
-    .day-block.staff-lena { border-left-color: var(--info) !important; }
+    .day-block.staff-rena { border-left-color: var(--rose) !important; background: linear-gradient(90deg, rgba(184,150,46,0.04), var(--surface)) !important; }
+    .day-block.staff-lena { border-left-color: var(--info) !important; background: linear-gradient(90deg, rgba(58,122,189,0.06), var(--surface)) !important; }
     .day-block.staff-other { border-left-color: var(--success) !important; }
 
     /* Compact blocks (≤30 min): single row */
@@ -721,14 +730,14 @@
       background: rgba(250,248,246,0.95);
       backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
       border-top: 1px solid var(--border);
-      display: flex; padding: 2px 4px calc(2px + var(--safe-bottom));
+      display: flex; padding: 1px 2px calc(1px + var(--safe-bottom));
       z-index: 100;
     }
     .nav-btn {
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 3px; min-height: 46px; padding: 2px 0;
+      gap: 2px; min-height: 40px; padding: 1px 0;
       background: none; border: none; color: var(--text-dim);
-      font-size: 8px; font-weight: 600; font-family: 'Inter', sans-serif;
+      font-size: 7.5px; font-weight: 600; font-family: 'Inter', sans-serif;
       cursor: pointer; -webkit-tap-highlight-color: transparent;
       position: relative; transition: color 200ms; text-transform: uppercase; letter-spacing: 0.3px;
     }
@@ -1305,6 +1314,34 @@
     }
     .login-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(184,150,46,0.3); }
     .login-error { font-size: 12px; color: var(--danger); margin-top: 8px; display: none; }
+
+    /* === Dashboard Home — Color-coded Sections === */
+    .dash-section {
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .dash-section-termine {
+      background: linear-gradient(135deg, rgba(45,138,78,0.04) 0%, rgba(45,138,78,0.02) 100%);
+      border: 1px solid rgba(45,138,78,0.1);
+    }
+    .dash-section-ki {
+      background: linear-gradient(135deg, rgba(184,150,46,0.05) 0%, rgba(184,150,46,0.02) 100%);
+      border: 1px solid rgba(184,150,46,0.12);
+    }
+    .dash-section-events {
+      background: linear-gradient(135deg, rgba(58,122,189,0.04) 0%, rgba(58,122,189,0.02) 100%);
+      border: 1px solid rgba(58,122,189,0.1);
+    }
+    .dash-section-stats {
+      background: linear-gradient(135deg, rgba(184,150,46,0.03) 0%, rgba(196,138,26,0.02) 100%);
+      border: 1px solid rgba(184,150,46,0.1);
+    }
+
+    /* iPhone responsive fixes */
+    @media (orientation: landscape) and (max-height: 600px) {
+      .dash-section { padding: 10px; margin-bottom: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -1394,9 +1431,10 @@
         </button>
       </div>
 
-      <div class="section" style="margin-top:8px"><div class="section-bar"></div><div class="section-title">Tages-Ueberblick</div></div>
-      <!-- V6: Kompakte Stats — 2x2 Grid -->
-      <div class="stat-grid cols-2" style="margin-bottom:14px">
+      <div class="dash-section dash-section-stats">
+      <div class="section" style="margin-top:0"><div class="section-bar"></div><div class="section-title">Tages-Ueberblick</div></div>
+      <!-- V6.1: Kompakte Stats — 3-Spalten Grid -->
+      <div class="stat-grid" style="margin-bottom:0">
         <div class="stat-card gold touch-scale" onclick="switchPage('kasse')" style="cursor:pointer">
           <div class="stat-icon gold">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -1413,32 +1451,28 @@
           <div class="stat-label">Termine</div>
           <div class="stat-sub" id="statTermineSub"></div>
         </div>
-        <div class="stat-card blue touch-scale" onclick="scrollToEvents()" style="cursor:pointer">
+        <div class="stat-card blue touch-scale" onclick="switchPage('beratung')" style="cursor:pointer">
           <div class="stat-icon blue">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
           </div>
           <div class="stat-val tabular blue" id="statAnfragen">--</div>
           <div class="stat-label">Anfragen</div>
           <div class="stat-sub" id="statAnfragenSub">ungelesen</div>
         </div>
-        <div class="stat-card yellow touch-scale" onclick="scrollToEvents()" style="cursor:pointer">
-          <div class="stat-icon yellow">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-          </div>
-          <div class="stat-val tabular yellow" id="statEvents">--</div>
-          <div class="stat-label">Events</div>
-          <div class="stat-sub" id="statEventsSub">offen</div>
-        </div>
+      </div>
       </div>
 
       <!-- V6: Heutige Termine Mini-Timeline -->
-      <div class="section"><div class="section-bar"></div><div class="section-title">Heutige Termine</div><span class="section-count" id="todayTerminCount">--</span></div>
-      <div class="event-list" id="homeMiniTimeline" style="margin-bottom:6px">
+      <div class="dash-section dash-section-termine">
+      <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--success)"></div><div class="section-title">Heutige Termine</div><span class="section-count" id="todayTerminCount">--</span></div>
+      <div class="event-list" id="homeMiniTimeline" style="margin-bottom:0">
         <div class="skeleton" style="height:56px"></div>
         <div class="skeleton" style="height:56px"></div>
       </div>
+      </div>
 
-      <div class="section"><div class="section-bar"></div><div class="section-title">KI-Assistent</div></div>
+      <div class="dash-section dash-section-ki">
+      <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--rose-gradient)"></div><div class="section-title">KI-Assistent</div></div>
       <!-- V4.0: KI-Status-Indikator -->
       <div class="ki-status" id="kiStatus" role="status">
         <div class="ki-status-dot"></div>
@@ -1447,11 +1481,15 @@
       </div>
       <!-- V5.1: KI-Insights -->
       <div class="ki-insights" id="kiInsights"></div>
-      <div class="section"><div class="section-bar"></div><div class="section-title">Letzte Aktivitaeten</div><span class="section-count" id="evCount">--</span></div>
+      </div>
+
+      <div class="dash-section dash-section-events">
+      <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--info)"></div><div class="section-title">Letzte Aktivitaeten</div><span class="section-count" id="evCount">--</span></div>
       <div class="event-list stagger" id="recentEvents">
         <div class="skeleton" style="height:80px"></div>
         <div class="skeleton" style="height:80px"></div>
         <div class="skeleton" style="height:80px"></div>
+      </div>
       </div>
     </div>
 
@@ -1586,7 +1624,7 @@
             </div>
           </div>
         </div>
-        <div class="stat-grid cols-2" style="margin-bottom:14px">
+        <div class="stat-grid" style="margin-bottom:14px">
           <div class="stat-card yellow touch-scale">
             <div class="stat-icon yellow"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></div>
             <div class="stat-val tabular yellow" id="bestellOffen">0</div>
@@ -1597,7 +1635,19 @@
             <div class="stat-val tabular green" id="bestellErledigt">0</div>
             <div class="stat-label">Geliefert</div>
           </div>
+          <div class="stat-card rose touch-scale" onclick="filterBestellungen('kunde')" style="cursor:pointer">
+            <div class="stat-icon rose"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></div>
+            <div class="stat-val tabular rose" id="bestellKunden">0</div>
+            <div class="stat-label">Kunden</div>
+          </div>
         </div>
+      </div>
+
+      <!-- Filter: Salon / Kunden -->
+      <div class="staff-filter" style="position:static;margin-bottom:10px">
+        <button class="staff-filter-btn active" onclick="filterBestellungen('alle')">Alle</button>
+        <button class="staff-filter-btn" onclick="filterBestellungen('salon')">Salon-Intern</button>
+        <button class="staff-filter-btn" onclick="filterBestellungen('kunde')">Kunden</button>
       </div>
 
       <div class="section"><div class="section-bar"></div><div class="section-title">Alle Bestellungen</div><span class="section-count" id="bestellListCount">0</span></div>
@@ -2575,8 +2625,6 @@
       const unread = items.filter(e => e.Is_Read === 0 || e.Is_Read === '0' || e.Gelesen === 0 || e.Gelesen === '0' || e.Status === 'ungelesen').length;
       document.getElementById('statAnfragen').textContent = unread;
       document.getElementById('statAnfragenSub').textContent = 'ungelesen';
-      const openCount = items.filter(e => e.Status !== 'erledigt').length;
-      document.getElementById('statEvents').textContent = openCount;
       document.getElementById('evCount').textContent = items.length + ' Eintraege';
 
       const badge = document.getElementById('navBadge');
@@ -3475,8 +3523,9 @@
         { Bestell_ID: 'NB-2026-003', Produkt: 'Balayage Folie 30cm', Menge: '5', Lieferant: 'Wella', Status: 'offen', Datum: '17.03.2026', Bestellt_Von: 'Mitarbeiterin' },
         { Bestell_ID: 'NB-2026-004', Produkt: 'La Biosthetique Conditioner', Menge: '10', Lieferant: 'La Biosthetique', Status: 'bestellt', Datum: '15.03.2026', Bestellt_Von: 'Rena' },
         { Bestell_ID: 'NB-2026-005', Produkt: 'Haarfarbe 7.0 Mittelblond', Menge: '6', Lieferant: 'La Biosthetique', Status: 'offen', Datum: '18.03.2026', Bestellt_Von: 'Mitarbeiterin' },
-        { Bestell_ID: 'KB-2026-001', Produkt: 'La Biosthetique Shampoo Vital', Menge: '2', Lieferant: 'Kundenbestellung', Status: 'offen', Datum: '18.03.2026', Bestellt_Von: 'Kundin Anna M.', Typ: 'kunde' },
-        { Bestell_ID: 'KB-2026-002', Produkt: 'Olaplex No. 3 Treatment', Menge: '1', Lieferant: 'Kundenbestellung', Status: 'bestellt', Datum: '17.03.2026', Bestellt_Von: 'Kundin Lisa K.', Typ: 'kunde' }
+        { Bestell_ID: 'KB-2026-001', Produkt: 'La Biosthetique Shampoo Vital', Menge: '2', Lieferant: 'La Biosthetique', Status: 'bestellt', Datum: '18.03.2026', Bestellt_Von: 'Kundin Anna Mueller', Typ: 'kunde' },
+        { Bestell_ID: 'KB-2026-002', Produkt: 'Olaplex No. 3 Treatment', Menge: '1', Lieferant: 'Olaplex', Status: 'geliefert', Datum: '15.03.2026', Bestellt_Von: 'Kundin Lisa Kramer', Typ: 'kunde' },
+        { Bestell_ID: 'KB-2026-003', Produkt: 'Haarkur Repair', Menge: '1', Lieferant: 'La Biosthetique', Status: 'offen', Datum: '19.03.2026', Bestellt_Von: 'Kundin Sandra Fischer', Typ: 'kunde' },
       ]);
 
       updateRefreshTime();
@@ -4376,6 +4425,22 @@
       document.getElementById('dashUploadPreview').textContent = '';
     }
 
+    // === Bestellungen Filter ===
+    var bestellFilter = 'alle';
+    function filterBestellungen(filter) {
+      bestellFilter = filter;
+      document.querySelectorAll('#page-bestellungen .staff-filter-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.textContent.toLowerCase().indexOf(filter === 'alle' ? 'alle' : filter === 'salon' ? 'salon' : 'kunden') !== -1);
+      });
+      var items = bestellungenCache;
+      if (filter === 'kunde') {
+        items = items.filter(function(b) { return b.Typ === 'kunde' || (b.Bestellt_Von || '').indexOf('Kund') !== -1; });
+      } else if (filter === 'salon') {
+        items = items.filter(function(b) { return b.Typ !== 'kunde' && (b.Bestellt_Von || '').indexOf('Kund') === -1; });
+      }
+      renderBestellungenList(items);
+    }
+
     // === Bestellungen rendern ===
     // NOTE: Uses innerHTML for rendering trusted demo data only (no user input in templates)
     function renderBestellungen(data) {
@@ -4387,6 +4452,8 @@
       document.getElementById('bestellSub').textContent = offen + ' offen, ' + erledigt + ' geliefert';
       document.getElementById('bestellOffen').textContent = offen;
       document.getElementById('bestellErledigt').textContent = erledigt;
+      var kunden = items.filter(function(b) { return b.Typ === 'kunde' || (b.Bestellt_Von || '').indexOf('Kund') !== -1; }).length;
+      document.getElementById('bestellKunden').textContent = kunden;
       document.getElementById('bestellListCount').textContent = items.length + ' Eintraege';
 
       var list = document.getElementById('bestellList');
@@ -4395,6 +4462,76 @@
         var emptyDiv = document.createElement('div');
         emptyDiv.className = 'empty';
         emptyDiv.textContent = 'Keine Nachbestellungen';
+        list.appendChild(emptyDiv);
+        return;
+      }
+      items.forEach(function(b) {
+        var row = document.createElement('div');
+        row.className = 'ev touch-scale';
+        row.style.opacity = '1';
+        row.style.animation = 'none';
+        var st = (b.Status || 'offen').toLowerCase();
+        var isKunde = b.Typ === 'kunde' || (b.Bestellt_Von || '').indexOf('Kund') !== -1;
+        var stClass = st === 'geliefert' || st === 'erledigt' ? 'termin' : st === 'bestellt' ? 'event' : 'nachbestellung';
+        var stLabel = st === 'geliefert' ? 'Geliefert' : st === 'bestellt' ? 'Bestellt' : 'Offen';
+        if (isKunde) stLabel = (st === 'geliefert' ? 'Geliefert' : st === 'bestellt' ? 'Bestellt' : 'Neu') + ' (Kunde)';
+
+        var icon = document.createElement('div');
+        icon.className = 'ev-icon ' + (isKunde ? 'termin_vorschlag' : stClass);
+        icon.innerHTML = isKunde
+          ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>';
+
+        var body = document.createElement('div');
+        body.className = 'ev-body';
+
+        var header = document.createElement('div');
+        header.className = 'ev-header';
+        var typeSpan = document.createElement('span');
+        typeSpan.className = 'ev-type ' + stClass;
+        typeSpan.textContent = stLabel;
+        var timeSpan = document.createElement('span');
+        timeSpan.className = 'ev-time';
+        timeSpan.textContent = b.Datum || '';
+        header.appendChild(typeSpan);
+        header.appendChild(timeSpan);
+
+        var title = document.createElement('div');
+        title.className = 'ev-title';
+        title.textContent = b.Produkt || '';
+
+        var msg = document.createElement('div');
+        msg.className = 'ev-msg';
+        msg.textContent = (b.Menge || '') + ' Stueck — ' + (b.Lieferant || 'La Biosthetique');
+
+        var meta = document.createElement('div');
+        meta.className = 'ev-meta';
+        var metaFrom = document.createElement('span');
+        metaFrom.textContent = 'Bestellt von: ' + (b.Bestellt_Von || 'Rena');
+        var metaId = document.createElement('span');
+        metaId.textContent = 'ID: ' + (b.Bestell_ID || '--');
+        meta.appendChild(metaFrom);
+        meta.appendChild(metaId);
+
+        body.appendChild(header);
+        body.appendChild(title);
+        body.appendChild(msg);
+        body.appendChild(meta);
+
+        row.appendChild(icon);
+        row.appendChild(body);
+        list.appendChild(row);
+      });
+    }
+
+    function renderBestellungenList(items) {
+      var list = document.getElementById('bestellList');
+      list.textContent = '';
+      document.getElementById('bestellListCount').textContent = items.length + ' Eintraege';
+      if (!items.length) {
+        var emptyDiv = document.createElement('div');
+        emptyDiv.className = 'empty';
+        emptyDiv.textContent = 'Keine Bestellungen fuer diesen Filter';
         list.appendChild(emptyDiv);
         return;
       }
