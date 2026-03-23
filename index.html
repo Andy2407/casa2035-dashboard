@@ -1343,6 +1343,169 @@
     @media (orientation: landscape) and (max-height: 600px) {
       .dash-section { padding: 10px; margin-bottom: 8px; }
     }
+
+    /* =============================================================
+       Responsive Breakpoints — @designer (23.03.2026)
+       iPhone SE 375px, iPhone 14 Pro 393px, iPad 768px,
+       iPad Pro 1024px, Desktop 1280px+
+       ============================================================= */
+
+    /* --- Mobile: up to 479px (iPhone SE, iPhone 14 Pro portrait) --- */
+    @media (max-width: 479px) {
+      .header { padding: 10px 14px 8px; }
+      .header-salon { font-size: 17px; }
+      .header-greeting { font-size: 10px; }
+      .header-right { gap: 8px; }
+      .avatar { width: 32px; height: 32px; font-size: 11px; }
+      .live-dot { font-size: 9px; padding: 3px 8px; }
+      .content { padding: 4px 12px 12px; }
+      .hero-card { padding: 18px 16px; border-radius: var(--radius); }
+      .hero-value { font-size: 28px; }
+      .hero-icon-wrap { width: 44px; height: 44px; border-radius: 12px; }
+      .hero-icon-wrap svg { width: 22px; height: 22px; }
+      .hero-inner { gap: 14px; }
+      .stat-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .stat-val { font-size: 22px; }
+      .stat-label { font-size: 9px; }
+      .stat-icon { width: 32px; height: 32px; border-radius: 9px; }
+      .stat-icon svg { width: 16px; height: 16px; }
+      .stat-card { padding: 12px 10px; }
+      .beratung-stats { grid-template-columns: 1fr 1fr; gap: 6px; }
+      .beratung-stat { padding: 10px; }
+      .beratung-stat-val { font-size: 18px; }
+      .termin-stats { flex-wrap: wrap; }
+      .termin-stat { min-width: calc(50% - 4px); }
+      .termin-stat-val { font-size: 17px; }
+      .kasse-hero { padding: 18px 14px; gap: 16px; flex-direction: column; align-items: center; text-align: center; }
+      .ring-wrap { width: 88px; height: 88px; }
+      .ring-pct { font-size: 20px; }
+      .kasse-hero-val { font-size: 28px; }
+      .day-view { margin-left: 40px; }
+      .day-time-label { left: -44px; font-size: 10px; width: 38px; }
+      .day-block { padding: 6px 10px; gap: 8px; }
+      .day-block-service { font-size: 12px; }
+      .day-block-time { font-size: 9px; min-width: 60px; }
+      .day-block-right { gap: 2px; }
+      .day-nav { padding: 6px 10px; }
+      .day-nav-date { font-size: 14px; }
+      .day-nav-btn { width: 44px; height: 44px; }
+      .staff-filter { padding: 3px; gap: 3px; }
+      .staff-filter-btn { padding: 8px 14px; font-size: 11px; min-height: 36px; }
+      .sheet { padding: 12px 16px calc(20px + var(--safe-bottom)); max-height: 90vh; }
+      .sheet h3 { font-size: 18px; }
+      .sheet-row { grid-template-columns: 1fr; }
+      .sheet input, .sheet select, .sheet textarea { font-size: 16px; padding: 14px 12px; }
+      .sheet label { margin-top: 12px; }
+      .proposal-info { grid-template-columns: 1fr; }
+      .slot-card { min-width: 100px; padding: 8px 10px; }
+      .detail-sheet .detail-meta-grid { grid-template-columns: 1fr; }
+      .cfg-grid { grid-template-columns: 1fr; gap: 6px; }
+      .fab-container { right: 12px; bottom: calc(76px + var(--safe-bottom)); }
+      .fab-float { width: 50px; height: 50px; }
+      .fab-float svg { width: 22px; height: 22px; }
+      .section { margin: 18px 0 10px; }
+      .section-title { font-size: 10px; }
+      .ev { padding: 12px; gap: 10px; }
+      .ev-icon { width: 36px; height: 36px; border-radius: 10px; }
+      .ev-title { font-size: 13px; }
+      .ev-msg { font-size: 11px; }
+      .beratung-card-header { padding: 12px 14px; }
+      .beratung-avatar { width: 38px; height: 38px; font-size: 12px; }
+      .beratung-body { padding: 12px 14px; }
+      .beratung-img { width: 68px; height: 68px; }
+      .beratung-footer { padding: 10px 14px; }
+      .beratung-action { padding: 10px; font-size: 11px; min-height: 44px; }
+      .fab { padding: 14px; min-height: 48px; }
+      .fab-outline { padding: 13px; min-height: 48px; }
+      .btn { min-height: 48px; }
+      .login-card { padding: 32px 24px; }
+      .login-card h2 { font-size: 20px; }
+      .bottom-nav { padding: 0 0 calc(0px + var(--safe-bottom)); }
+      .nav-btn { min-height: 48px; gap: 2px; }
+      .nav-btn svg { width: 22px; height: 22px; }
+      .kasse-entry { padding: 12px; gap: 10px; }
+      .kasse-entry-amt { font-size: 15px; }
+      .ta-input { font-size: 22px; padding: 12px; }
+      .rechnung-total { font-size: 16px; }
+      .dash-section { padding: 12px; margin-bottom: 10px; }
+    }
+
+    /* --- Small tablets / Large phones: 480-767px --- */
+    @media (min-width: 480px) and (max-width: 767px) {
+      .content { padding: 6px 18px 16px; }
+      .hero-value { font-size: 32px; }
+      .stat-grid { gap: 10px; }
+      .kasse-hero { gap: 20px; }
+      .kasse-hero-val { font-size: 32px; }
+      .sheet { max-width: 420px; }
+      .sheet-row { grid-template-columns: 1fr 1fr; }
+      .cfg-grid { grid-template-columns: 1fr 1fr; }
+      .beratung-stats { grid-template-columns: 1fr 1fr 1fr; }
+    }
+
+    /* --- iPad portrait: 768-1023px --- */
+    @media (min-width: 768px) and (max-width: 1023px) {
+      .content { padding: 8px 24px 20px; max-width: 720px; margin: 0 auto; }
+      .header { padding: 14px 24px 12px; }
+      .hero-card { padding: 28px; }
+      .hero-value { font-size: 40px; }
+      .stat-grid { grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+      .stat-val { font-size: 28px; }
+      .stat-card { padding: 18px 14px; }
+      .sheet { max-width: 480px; }
+      .kasse-hero { padding: 28px; }
+      .kasse-hero-val { font-size: 38px; }
+      .beratung-stats { grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+      .day-nav-btn { width: 44px; height: 44px; }
+      .fab-container { right: 24px; }
+      .bottom-nav { padding: 2px 8px calc(2px + var(--safe-bottom)); }
+      .nav-btn { min-height: 48px; font-size: 8px; }
+      .nav-btn svg { width: 22px; height: 22px; }
+    }
+
+    /* --- iPad Pro / Desktop: 1024px+ --- */
+    @media (min-width: 1024px) {
+      .content { padding: 10px 32px 24px; max-width: 960px; margin: 0 auto; }
+      .header { padding: 14px 32px 12px; }
+      .hero-card { padding: 32px; }
+      .hero-value { font-size: 42px; }
+      .stat-grid { gap: 14px; }
+      .stat-val { font-size: 30px; }
+      .stat-card { padding: 20px 16px; }
+      .sheet { max-width: 520px; }
+      .kasse-hero { padding: 30px; }
+      .beratung-card { max-width: 720px; }
+      .ev { max-width: 720px; }
+      .day-view { margin-left: 56px; }
+      .day-time-label { left: -60px; width: 52px; }
+      .fab-container { right: 32px; }
+      .bottom-nav { max-width: 600px; left: 50%; right: auto; transform: translateX(-50%); border-radius: var(--radius) var(--radius) 0 0; }
+    }
+
+    /* --- iPhone SE landscape (667px wide, ~375px tall) --- */
+    @media (orientation: landscape) and (max-height: 420px) {
+      .header { padding: 2px 12px 2px; }
+      .header-salon { font-size: 14px; }
+      .header-greeting { display: none; }
+      .header-sub { display: none; }
+      .content { padding: 2px 10px 8px; }
+      .section { margin: 8px 0 6px; }
+      .hero-card { padding: 10px 14px; margin-bottom: 8px; }
+      .hero-value { font-size: 22px; }
+      .hero-icon-wrap { width: 36px; height: 36px; }
+      .hero-icon-wrap svg { width: 18px; height: 18px; }
+      .stat-grid { gap: 4px; }
+      .stat-card { padding: 8px 6px; }
+      .stat-val { font-size: 18px; }
+      .stat-label { font-size: 8px; }
+      .stat-icon { width: 28px; height: 28px; }
+      .bottom-nav { padding: 0 2px calc(0px + var(--safe-bottom)); }
+      .nav-btn { min-height: 36px; font-size: 7px; }
+      .nav-btn svg { width: 18px; height: 18px; }
+      .fab-container { bottom: calc(50px + var(--safe-bottom)); right: 10px; }
+      .fab-float { width: 44px; height: 44px; }
+      .dash-section { padding: 8px; margin-bottom: 6px; }
+    }
   </style>
 </head>
 <body>
@@ -1654,7 +1817,7 @@
         </div>
       </div>
 
-      <button class="fab touch-scale" onclick="showToast('Nachbestellung wird erstellt...','info')" style="margin-top:16px">
+      <button class="fab touch-scale" onclick="openNachbestellungSheet()" style="margin-top:16px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Neue Nachbestellung
       </button>
@@ -1757,6 +1920,7 @@
     <!-- PAGE: Lager -->
     <div class="page" id="page-lager">
       <div class="stagger">
+        <!-- Hero: Lagerbestand Ueberblick -->
         <div class="hero-card touch-scale" style="margin-bottom:14px">
           <div class="hero-inner">
             <div class="hero-icon-wrap" style="background:rgba(58,122,189,0.08);border-color:rgba(58,122,189,0.15)">
@@ -1770,44 +1934,56 @@
           </div>
         </div>
 
-        <div class="stat-grid cols-2" style="margin-bottom:14px">
-          <div class="stat-card green touch-scale">
-            <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-            <div class="stat-val tabular green" id="lagerOk">--</div>
-            <div class="stat-label">Auf Lager</div>
+        <!-- Stats: Kompakt -->
+        <div style="display:flex;gap:6px;margin-bottom:14px">
+          <div onclick="setLagerFilter('ok')" style="flex:1;background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius-sm);padding:8px;text-align:center;cursor:pointer;transition:all .2s">
+            <span style="font-size:16px;font-weight:700;color:var(--success)" id="lagerOk">--</span>
+            <span style="font-size:10px;color:var(--text-dim);margin-left:4px">Auf Lager</span>
           </div>
-          <div class="stat-card red touch-scale">
-            <div class="stat-icon red"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
-            <div class="stat-val tabular red" id="lagerLow">--</div>
-            <div class="stat-label">Nachbestellen</div>
+          <div onclick="setLagerFilter('low')" style="flex:1;background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius-sm);padding:8px;text-align:center;cursor:pointer;transition:all .2s">
+            <span style="font-size:16px;font-weight:700;color:var(--danger)" id="lagerLow">--</span>
+            <span style="font-size:10px;color:var(--text-dim);margin-left:4px">Nachbestellen</span>
+          </div>
+          <div onclick="setLagerFilter('alle')" style="flex:1;background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius-sm);padding:8px;text-align:center;cursor:pointer;transition:all .2s">
+            <span style="font-size:16px;font-weight:700;color:var(--info)" id="lagerTotal2">--</span>
+            <span style="font-size:10px;color:var(--text-dim);margin-left:4px">Gesamt</span>
           </div>
         </div>
 
-        <!-- Suche -->
-        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--text-dim)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="lagerSearch" placeholder="Produkt suchen..." oninput="filterLager()" style="flex:1;border:none;background:none;font-size:14px;font-family:Inter,sans-serif;color:var(--text);outline:none">
+        <!-- Suche + Sortierung -->
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;gap:10px">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--text-dim)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="lagerSearch" placeholder="Produkt suchen..." oninput="filterLager()" style="flex:1;border:none;background:none;font-size:14px;font-family:Inter,sans-serif;color:var(--text);outline:none">
+          </div>
+          <select id="lagerSort" onchange="filterLager()" style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px;font-size:12px;font-family:Inter,sans-serif;color:var(--text);cursor:pointer;min-width:100px">
+            <option value="kritisch">Kritisch zuerst</option>
+            <option value="name">A-Z</option>
+            <option value="bestand">Bestand</option>
+            <option value="preis">Preis</option>
+            <option value="kategorie">Kategorie</option>
+          </select>
+        </div>
+
+        <!-- Kategorie-Filter -->
+        <div style="display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px" id="lagerKatFilter">
+          <button class="staff-filter-btn active" onclick="setLagerKategorie('alle')" style="white-space:nowrap;font-size:11px">Alle</button>
+          <button class="staff-filter-btn" onclick="setLagerKategorie('Shampoo')" style="white-space:nowrap;font-size:11px">Shampoo</button>
+          <button class="staff-filter-btn" onclick="setLagerKategorie('Pflege')" style="white-space:nowrap;font-size:11px">Pflege</button>
+          <button class="staff-filter-btn" onclick="setLagerKategorie('Farbe')" style="white-space:nowrap;font-size:11px">Farbe</button>
+          <button class="staff-filter-btn" onclick="setLagerKategorie('Styling')" style="white-space:nowrap;font-size:11px">Styling</button>
+          <button class="staff-filter-btn" onclick="setLagerKategorie('Treatment')" style="white-space:nowrap;font-size:11px">Treatment</button>
+          <button class="staff-filter-btn" onclick="setLagerKategorie('Zubehoer')" style="white-space:nowrap;font-size:11px">Zubehoer</button>
         </div>
       </div>
 
-      <div class="section"><div class="section-bar"></div><div class="section-title">Alle Produkte</div><span class="section-count" id="lagerCount">--</span></div>
-      <div class="event-list stagger" id="lagerList">
-        <div class="skeleton" style="height:56px"></div>
-        <div class="skeleton" style="height:56px"></div>
-      </div>
+      <div class="section"><div class="section-bar"></div><div class="section-title">Produkte</div><span class="section-count" id="lagerCount">--</span></div>
+      <div class="event-list" id="lagerList"></div>
 
-      <button class="fab touch-scale" onclick="switchPage('bestellungen');showToast('Nachbestellung erstellen','info')" style="margin-top:16px">
+      <button class="fab touch-scale" onclick="openNachbestellungSheet()" style="margin-top:16px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Nachbestellung aufgeben
       </button>
-
-      <!-- Link zu System-Einstellungen -->
-      <div style="text-align:center;margin-top:20px">
-        <button style="background:none;border:none;color:var(--text-dim);font-size:12px;font-family:Inter,sans-serif;cursor:pointer;padding:8px 16px" onclick="switchPage('system')">
-          <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;vertical-align:middle;margin-right:4px"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58z"/></svg>
-          System-Einstellungen
-        </button>
-      </div>
     </div>
 
     <!-- PAGE: System -->
@@ -4191,6 +4367,106 @@
       document.getElementById('detailSheet').classList.add('show');
     }
 
+    // === Nachbestellung: Formular-Sheet ===
+    function openNachbestellungSheet() {
+      var sheetId = 'nachbestellungSheet';
+      var existing = document.getElementById(sheetId);
+      if (existing) existing.remove();
+
+      var sheet = document.createElement('div');
+      sheet.id = sheetId;
+      sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:1000;background:var(--surface);border-top-left-radius:var(--radius-xl);border-top-right-radius:var(--radius-xl);padding:20px;box-shadow:0 -4px 24px rgba(0,0,0,0.12);max-height:80vh;overflow-y:auto';
+
+      var header = document.createElement('div');
+      header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:14px';
+      var title = document.createElement('div');
+      title.style.cssText = 'font-size:16px;font-weight:700;color:var(--text);font-family:Playfair Display,serif';
+      title.textContent = 'Neue Nachbestellung';
+      var closeBtn = document.createElement('button');
+      closeBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-dim);padding:4px';
+      closeBtn.textContent = '\u00D7';
+      closeBtn.onclick = function() { sheet.remove(); backdrop.remove(); };
+      header.appendChild(title);
+      header.appendChild(closeBtn);
+      sheet.appendChild(header);
+
+      // Produkt-Auswahl aus Lager-Cache
+      var produktSelect = document.createElement('select');
+      produktSelect.id = 'nbProdukt';
+      produktSelect.style.cssText = 'width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:Inter,sans-serif;color:var(--text);background:var(--surface);margin-bottom:10px;box-sizing:border-box';
+      var defOpt = document.createElement('option');
+      defOpt.value = '';
+      defOpt.textContent = 'Produkt waehlen...';
+      produktSelect.appendChild(defOpt);
+      if (typeof lagerCache !== 'undefined' && lagerCache.length) {
+        lagerCache.forEach(function(p) {
+          var opt = document.createElement('option');
+          opt.textContent = (p.Produkt || p.Name) + ' (' + (p.Marke || '') + ')';
+          produktSelect.appendChild(opt);
+        });
+      }
+      sheet.appendChild(produktSelect);
+
+      // Menge + Lieferant
+      var row = document.createElement('div');
+      row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px';
+      var mengeInput = document.createElement('input');
+      mengeInput.type = 'number';
+      mengeInput.id = 'nbMenge';
+      mengeInput.placeholder = 'Menge';
+      mengeInput.min = '1';
+      mengeInput.value = '5';
+      mengeInput.style.cssText = 'padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:Inter,sans-serif;color:var(--text);background:var(--surface)';
+      var lieferantInput = document.createElement('input');
+      lieferantInput.type = 'text';
+      lieferantInput.id = 'nbLieferant';
+      lieferantInput.placeholder = 'Lieferant';
+      lieferantInput.style.cssText = 'padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:Inter,sans-serif;color:var(--text);background:var(--surface)';
+      row.appendChild(mengeInput);
+      row.appendChild(lieferantInput);
+      sheet.appendChild(row);
+
+      // Notiz
+      var notiz = document.createElement('textarea');
+      notiz.id = 'nbNotiz';
+      notiz.placeholder = 'Anmerkung (optional)';
+      notiz.rows = 2;
+      notiz.style.cssText = 'width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:Inter,sans-serif;color:var(--text);background:var(--surface);resize:none;box-sizing:border-box;margin-bottom:12px';
+      sheet.appendChild(notiz);
+
+      // Bestellen Button
+      var sendBtn = document.createElement('button');
+      sendBtn.style.cssText = 'width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+      sendBtn.textContent = 'Nachbestellung aufgeben';
+      sendBtn.onclick = async function() {
+        var produkt = document.getElementById('nbProdukt').value;
+        var menge = document.getElementById('nbMenge').value;
+        if (!produkt) { showToast('Bitte Produkt waehlen', 'warning'); return; }
+        if (!menge || menge < 1) { showToast('Bitte Menge angeben', 'warning'); return; }
+
+        if (config.baseUrl) {
+          await apiPost('/pwa-nachbestellung', {
+            produkt: produkt,
+            menge: parseInt(menge),
+            lieferant: document.getElementById('nbLieferant').value,
+            notiz: document.getElementById('nbNotiz').value,
+            timestamp: new Date().toISOString()
+          });
+        }
+        showToast('Nachbestellung aufgegeben!', 'success');
+        sheet.remove();
+        backdrop.remove();
+      };
+      sheet.appendChild(sendBtn);
+
+      var backdrop = document.createElement('div');
+      backdrop.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999';
+      backdrop.onclick = function() { sheet.remove(); backdrop.remove(); };
+
+      document.body.appendChild(backdrop);
+      document.body.appendChild(sheet);
+    }
+
     // === Beratung: Antwort-Sheet ===
     function openAntwortSheet(b) {
       var sheetId = 'antwortSheet';
@@ -5080,47 +5356,292 @@
 
     // === Lager Tab ===
     var lagerCache = [];
+    var currentLagerFilter = 'alle';
+    var currentLagerKategorie = 'alle';
+
     function renderLagerTab(data) {
       var items = Array.isArray(data) ? data : (data.data || data.produkte || []);
       lagerCache = items;
       var ok = items.filter(function(p) { return (parseInt(p.Bestand) || 0) > (parseInt(p.Min_Bestand) || 3); }).length;
       var low = items.filter(function(p) { return (parseInt(p.Bestand) || 0) <= (parseInt(p.Min_Bestand) || 3); }).length;
       document.getElementById('lagerTotal').textContent = items.length;
+      var t2 = document.getElementById('lagerTotal2');
+      if (t2) t2.textContent = items.length;
       document.getElementById('lagerSub').textContent = ok + ' ok, ' + low + ' nachbestellen';
       document.getElementById('lagerOk').textContent = ok;
       document.getElementById('lagerLow').textContent = low;
       document.getElementById('lagerCount').textContent = items.length + ' Produkte';
-      renderLagerList(items);
+      filterLager();
     }
+
     function renderLagerList(items) {
       var list = document.getElementById('lagerList');
       list.className = 'event-list';
       list.textContent = '';
-      if (!items.length) { list.innerHTML = '<div class="empty">Keine Produkte gefunden</div>'; return; }
-      items.forEach(function(p) {
+
+      if (!items.length) {
+        var empty = document.createElement('div');
+        empty.className = 'empty';
+        empty.style.cssText = 'text-align:center;padding:40px 20px;color:var(--text-dim)';
+        empty.textContent = 'Keine Produkte gefunden';
+        list.appendChild(empty);
+        return;
+      }
+
+      document.getElementById('lagerCount').textContent = items.length + ' Produkte';
+
+      items.forEach(function(p, idx) {
         var bestand = parseInt(p.Bestand) || 0;
         var min = parseInt(p.Min_Bestand) || 3;
+        var maxDisplay = Math.max(min * 3, 20);
+        var pct = Math.min(100, Math.round((bestand / maxDisplay) * 100));
         var isLow = bestand <= min;
-        var row = document.createElement('div');
-        row.className = 'ev touch-scale';
-        row.style.opacity = '1';
-        row.style.animation = 'none';
-        if (isLow) row.classList.add('unread');
-        var iconClass = isLow ? 'storno' : 'termin';
-        row.innerHTML = '<div class="ev-icon ' + iconClass + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>'
-          + '<div class="ev-body"><div class="ev-header"><span class="ev-type ' + iconClass + '">' + (isLow ? 'Nachbestellen' : 'Auf Lager') + '</span><span class="ev-time">' + bestand + ' Stueck</span></div>'
-          + '<div class="ev-title">' + (p.Produkt || p.Name || '') + '</div>'
-          + '<div class="ev-msg">' + (p.Marke || 'La Biosthetique') + ' — Kategorie: ' + (p.Kategorie || 'Haarpflege') + '</div>'
-          + '<div class="ev-meta"><span>Min: ' + min + '</span><span>Preis: ' + (p.VK_Preis || '--') + ' EUR</span></div></div>';
-        list.appendChild(row);
+        var isCritical = bestand <= Math.floor(min / 2);
+
+        var card = document.createElement('div');
+        card.style.cssText = 'background:var(--surface);border:1px solid ' + (isCritical ? 'var(--danger)' : isLow ? 'rgba(196,138,26,0.4)' : 'var(--border)') + ';border-radius:var(--radius);padding:14px;cursor:pointer;transition:all .2s var(--ease)';
+        if (isCritical) card.style.borderLeft = '3px solid var(--danger)';
+        else if (isLow) card.style.borderLeft = '3px solid var(--warning)';
+
+        // Kategorie-Icon Farben
+        var katColors = { Shampoo: '#3a7abd', Pflege: '#9b59b6', Farbe: '#c9a93d', Styling: '#e67e22', Treatment: '#27ae60', Zubehoer: '#7f8c8d' };
+        var katColor = katColors[(p.Kategorie || '')] || '#7f8c8d';
+
+        // Header: Kategorie-Badge + Bestandsanzeige
+        var header = document.createElement('div');
+        header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:6px';
+
+        var badge = document.createElement('span');
+        badge.style.cssText = 'font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 8px;border-radius:6px;background:' + katColor + '20;color:' + katColor;
+        badge.textContent = p.Kategorie || 'Sonstiges';
+
+        var bestandBadge = document.createElement('span');
+        bestandBadge.style.cssText = 'font-size:12px;font-weight:700;color:' + (isCritical ? 'var(--danger)' : isLow ? 'var(--warning)' : 'var(--success)');
+        bestandBadge.textContent = bestand + ' Stk.';
+
+        header.appendChild(badge);
+        header.appendChild(bestandBadge);
+        card.appendChild(header);
+
+        // Produktname + Marke
+        var titleEl = document.createElement('div');
+        titleEl.style.cssText = 'font-size:14px;font-weight:600;color:var(--text);line-height:1.3';
+        titleEl.textContent = p.Produkt || p.Name || '';
+        card.appendChild(titleEl);
+
+        var marke = document.createElement('div');
+        marke.style.cssText = 'font-size:11px;color:var(--text-dim);margin-top:2px';
+        marke.textContent = (p.Marke || '') + (p.VK_Preis ? ' — ' + parseFloat(p.VK_Preis).toFixed(2).replace('.', ',') + ' EUR' : '');
+        card.appendChild(marke);
+
+        // Bestandsbalken
+        var barWrap = document.createElement('div');
+        barWrap.style.cssText = 'margin-top:8px;height:6px;background:var(--bg-warm);border-radius:3px;overflow:hidden;position:relative';
+        var barFill = document.createElement('div');
+        var barColor = isCritical ? 'var(--danger)' : isLow ? 'var(--warning)' : 'var(--success)';
+        barFill.style.cssText = 'height:100%;border-radius:3px;transition:width .5s ease;width:' + pct + '%;background:' + barColor;
+        barWrap.appendChild(barFill);
+        // Min-Linie
+        var minPct = Math.round((min / maxDisplay) * 100);
+        var minLine = document.createElement('div');
+        minLine.style.cssText = 'position:absolute;top:0;bottom:0;width:1px;background:var(--text-dim);opacity:0.4;left:' + minPct + '%';
+        barWrap.appendChild(minLine);
+        card.appendChild(barWrap);
+
+        // Min-Label
+        var minLabel = document.createElement('div');
+        minLabel.style.cssText = 'font-size:9px;color:var(--text-micro);margin-top:2px;display:flex;justify-content:space-between';
+        var minText = document.createElement('span');
+        minText.textContent = 'Min: ' + min;
+        var statusText = document.createElement('span');
+        statusText.style.fontWeight = '600';
+        statusText.style.color = isCritical ? 'var(--danger)' : isLow ? 'var(--warning)' : 'var(--text-micro)';
+        statusText.textContent = isCritical ? 'KRITISCH' : isLow ? 'Nachbestellen' : 'OK';
+        minLabel.appendChild(minText);
+        minLabel.appendChild(statusText);
+        card.appendChild(minLabel);
+
+        // Schnell-Aktionen (nur bei niedrigem Bestand)
+        if (isLow) {
+          var actions = document.createElement('div');
+          actions.style.cssText = 'display:flex;gap:6px;margin-top:10px';
+
+          var reorderBtn = document.createElement('button');
+          reorderBtn.style.cssText = 'flex:1;padding:8px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+          reorderBtn.textContent = 'Jetzt nachbestellen';
+          (function(produkt) {
+            reorderBtn.onclick = function(ev) {
+              ev.stopPropagation();
+              openNachbestellungSheet();
+              setTimeout(function() {
+                var sel = document.getElementById('nbProdukt');
+                if (sel) {
+                  for (var i = 0; i < sel.options.length; i++) {
+                    if (sel.options[i].textContent.indexOf(produkt) !== -1) { sel.selectedIndex = i; break; }
+                  }
+                }
+              }, 100);
+            };
+          })(p.Produkt || p.Name || '');
+          actions.appendChild(reorderBtn);
+          card.appendChild(actions);
+        }
+
+        // Klick oeffnet Detail
+        (function(produkt) {
+          card.onclick = function() { openProduktDetail(produkt); };
+        })(p);
+
+        list.appendChild(card);
       });
     }
+
+    function setLagerFilter(filter) {
+      currentLagerFilter = filter;
+      filterLager();
+    }
+
+    function setLagerKategorie(kat) {
+      currentLagerKategorie = kat;
+      var btns = document.querySelectorAll('#lagerKatFilter .staff-filter-btn');
+      btns.forEach(function(b) { b.classList.remove('active'); });
+      var target = Array.from(btns).find(function(b) { return b.textContent === kat || (kat === 'alle' && b.textContent === 'Alle'); });
+      if (target) target.classList.add('active');
+      filterLager();
+    }
+
     function filterLager() {
       var q = (document.getElementById('lagerSearch').value || '').toLowerCase();
+      var sort = document.getElementById('lagerSort') ? document.getElementById('lagerSort').value : 'kritisch';
+
       var filtered = lagerCache.filter(function(p) {
-        return ((p.Produkt || p.Name || '') + ' ' + (p.Marke || '') + ' ' + (p.Kategorie || '')).toLowerCase().indexOf(q) !== -1;
+        var matchText = !q || ((p.Produkt || p.Name || '') + ' ' + (p.Marke || '') + ' ' + (p.Kategorie || '')).toLowerCase().indexOf(q) !== -1;
+        var matchKat = currentLagerKategorie === 'alle' || (p.Kategorie || '') === currentLagerKategorie;
+        var bestand = parseInt(p.Bestand) || 0;
+        var min = parseInt(p.Min_Bestand) || 3;
+        var matchFilter = currentLagerFilter === 'alle' ||
+          (currentLagerFilter === 'low' && bestand <= min) ||
+          (currentLagerFilter === 'ok' && bestand > min);
+        return matchText && matchKat && matchFilter;
       });
+
+      // Sortierung
+      filtered.sort(function(a, b) {
+        var aB = parseInt(a.Bestand) || 0, bB = parseInt(b.Bestand) || 0;
+        var aM = parseInt(a.Min_Bestand) || 3, bM = parseInt(b.Min_Bestand) || 3;
+        if (sort === 'kritisch') {
+          var aLow = aB <= aM ? 0 : 1;
+          var bLow = bB <= bM ? 0 : 1;
+          if (aLow !== bLow) return aLow - bLow;
+          return aB - bB;
+        }
+        if (sort === 'name') return (a.Produkt || '').localeCompare(b.Produkt || '');
+        if (sort === 'bestand') return aB - bB;
+        if (sort === 'preis') return (parseFloat(a.VK_Preis) || 0) - (parseFloat(b.VK_Preis) || 0);
+        if (sort === 'kategorie') return (a.Kategorie || '').localeCompare(b.Kategorie || '');
+        return 0;
+      });
+
       renderLagerList(filtered);
+    }
+
+    function openProduktDetail(p) {
+      var sheetId = 'produktDetailSheet';
+      var existing = document.getElementById(sheetId);
+      if (existing) existing.remove();
+
+      var bestand = parseInt(p.Bestand) || 0;
+      var min = parseInt(p.Min_Bestand) || 3;
+      var isLow = bestand <= min;
+      var preis = parseFloat(p.VK_Preis) || 0;
+
+      var sheet = document.createElement('div');
+      sheet.id = sheetId;
+      sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:1000;background:var(--surface);border-top-left-radius:var(--radius-xl);border-top-right-radius:var(--radius-xl);padding:20px;box-shadow:0 -4px 24px rgba(0,0,0,0.12);max-height:80vh;overflow-y:auto';
+
+      // Header
+      var header = document.createElement('div');
+      header.style.cssText = 'display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px';
+      var titleWrap = document.createElement('div');
+      var titleEl = document.createElement('div');
+      titleEl.style.cssText = 'font-size:18px;font-weight:700;color:var(--text);font-family:Playfair Display,serif';
+      titleEl.textContent = p.Produkt || p.Name || '';
+      var subEl = document.createElement('div');
+      subEl.style.cssText = 'font-size:12px;color:var(--text-dim);margin-top:2px';
+      subEl.textContent = (p.Marke || '') + ' — ' + (p.Kategorie || '');
+      titleWrap.appendChild(titleEl);
+      titleWrap.appendChild(subEl);
+      var closeBtn = document.createElement('button');
+      closeBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-dim);padding:4px';
+      closeBtn.textContent = '\u00D7';
+      closeBtn.onclick = function() { sheet.remove(); backdrop.remove(); };
+      header.appendChild(titleWrap);
+      header.appendChild(closeBtn);
+      sheet.appendChild(header);
+
+      // Detail-Grid
+      var grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px';
+      var details = [
+        { label: 'Bestand', value: bestand + ' Stk.', color: isLow ? 'var(--danger)' : 'var(--success)' },
+        { label: 'Min-Bestand', value: min + ' Stk.', color: 'var(--text)' },
+        { label: 'VK-Preis', value: preis ? preis.toFixed(2).replace('.', ',') + ' EUR' : '--', color: 'var(--gold)' }
+      ];
+      details.forEach(function(d) {
+        var box = document.createElement('div');
+        box.style.cssText = 'background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;text-align:center';
+        var val = document.createElement('div');
+        val.style.cssText = 'font-size:18px;font-weight:700;font-family:Playfair Display,serif;color:' + d.color;
+        val.textContent = d.value;
+        var lbl = document.createElement('div');
+        lbl.style.cssText = 'font-size:10px;color:var(--text-dim);text-transform:uppercase;margin-top:2px';
+        lbl.textContent = d.label;
+        box.appendChild(val);
+        box.appendChild(lbl);
+        grid.appendChild(box);
+      });
+      sheet.appendChild(grid);
+
+      // Lagerwert
+      var wert = document.createElement('div');
+      wert.style.cssText = 'background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center';
+      var wertLabel = document.createElement('span');
+      wertLabel.style.cssText = 'font-size:12px;color:var(--text-dim)';
+      wertLabel.textContent = 'Lagerwert (VK)';
+      var wertVal = document.createElement('span');
+      wertVal.style.cssText = 'font-size:14px;font-weight:700;color:var(--text)';
+      wertVal.textContent = (preis * bestand).toFixed(2).replace('.', ',') + ' EUR';
+      wert.appendChild(wertLabel);
+      wert.appendChild(wertVal);
+      sheet.appendChild(wert);
+
+      // Aktionen
+      if (isLow) {
+        var reorderBtn = document.createElement('button');
+        reorderBtn.style.cssText = 'width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:8px';
+        reorderBtn.textContent = 'Jetzt nachbestellen';
+        reorderBtn.onclick = function() {
+          sheet.remove();
+          backdrop.remove();
+          openNachbestellungSheet();
+        };
+        sheet.appendChild(reorderBtn);
+      }
+
+      var editBtn = document.createElement('button');
+      editBtn.style.cssText = 'width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--text-dim);cursor:pointer;font-family:Inter,sans-serif';
+      editBtn.textContent = 'Bestand korrigieren';
+      editBtn.onclick = function() {
+        showToast('Bestandskorrektur kommt in der naechsten Version', 'info');
+      };
+      sheet.appendChild(editBtn);
+
+      var backdrop = document.createElement('div');
+      backdrop.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999';
+      backdrop.onclick = function() { sheet.remove(); backdrop.remove(); };
+
+      document.body.appendChild(backdrop);
+      document.body.appendChild(sheet);
     }
   </script>
 </body>
