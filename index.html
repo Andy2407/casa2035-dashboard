@@ -1749,6 +1749,27 @@
         </div>
       </div>
 
+      <!-- MwSt-Aufschluesselung -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px">MwSt 7% (Dienstleist.)</div>
+          <div style="font-size:16px;font-weight:700;color:var(--text);font-family:'Playfair Display',serif;margin-top:2px" id="kasseMwst7">-- EUR</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px">
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px">MwSt 19% (Produkte)</div>
+          <div style="font-size:16px;font-weight:700;color:var(--text);font-family:'Playfair Display',serif;margin-top:2px" id="kasseMwst19">-- EUR</div>
+        </div>
+      </div>
+
+      <!-- Kassenbuch-Info -->
+      <div style="background:linear-gradient(135deg,rgba(184,150,46,0.06),rgba(184,150,46,0.02));border:1px solid var(--border-accent);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:20px;height:20px;color:var(--gold);flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">Digitales Kassenbuch</div>
+          <div style="font-size:10px;color:var(--text-dim)">GoBD-konform &middot; 10 Jahre Aufbewahrung &middot; MwSt 7%/19% getrennt</div>
+        </div>
+      </div>
+
       <div class="section"><div class="section-bar"></div><div class="section-title">Heutige Buchungen</div><span class="section-count" id="kasseCount">--</span></div>
       <div class="event-list stagger" id="kasseEntries">
         <div class="empty">Keine Buchungen heute</div>
@@ -2261,26 +2282,70 @@
 
   <!-- Rechnung Bottom Sheet -->
   <div class="sheet-overlay" id="rechnungSheet">
-    <div class="sheet">
+    <div class="sheet" style="max-width:520px">
       <div class="sheet-handle"></div>
-      <h3>Rechnung erstellen</h3>
-      <label>Kunde</label>
-      <input type="text" id="reKunde" placeholder="Name des Kunden">
-      <label>Dienstleistung</label>
+      <h3 style="display:flex;justify-content:space-between;align-items:center">
+        Rechnung erstellen
+        <span id="reNr" style="font-size:11px;font-weight:400;color:var(--text-dim);background:var(--bg-warm);padding:4px 10px;border-radius:6px"></span>
+      </h3>
+
+      <!-- Kunde -->
+      <label>Kundenname *</label>
+      <input type="text" id="reKunde" placeholder="Name des Kunden" maxlength="200">
+      <div class="sheet-row">
+        <div><label>Leistungsdatum</label><input type="date" id="reLeistungsDatum"></div>
+        <div><label>Friseur/in</label>
+          <select id="reFriseur">
+            <option value="Rena">Rena</option>
+            <option value="Lena">Lena</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Positionen -->
+      <label>Dienstleistung *</label>
       <select id="reService"><option value="">Bitte waehlen...</option></select>
-      <label>Zahlungsart</label>
-      <select id="reZahlart">
-        <option value="bar">Bar</option>
-        <option value="karte">Karte</option>
-        <option value="ueberweisung">Ueberweisung</option>
+
+      <label style="margin-top:8px">Zusatzleistung (optional)</label>
+      <select id="reZusatz">
+        <option value="">Keine</option>
+        <option value="olaplex" data-preis="15.00" data-mwst="0.07">Olaplex Treatment (+15,00 EUR)</option>
+        <option value="ansatzfarbe" data-preis="25.00" data-mwst="0.07">Ansatzfarbe (+25,00 EUR)</option>
+        <option value="glossing" data-preis="20.00" data-mwst="0.07">Glossing (+20,00 EUR)</option>
+        <option value="kopfhaut" data-preis="15.00" data-mwst="0.07">Kopfhaut-Peeling (+15,00 EUR)</option>
       </select>
-      <label>Trinkgeld</label>
-      <input type="number" id="reTrinkgeld" placeholder="0.00" step="0.01" min="0" value="0">
-      <div id="rePreview" class="brutto-preview" style="margin-top:12px"></div>
+
+      <!-- Produkt (optional) -->
+      <label style="margin-top:8px">Produktverkauf (optional, 19% MwSt)</label>
+      <div class="sheet-row">
+        <div style="flex:2"><input type="text" id="reProdukt" placeholder="z.B. La Biosthetique Shampoo"></div>
+        <div style="flex:1"><input type="number" id="reProduktPreis" placeholder="Preis" step="0.01" min="0" oninput="updateRePreview()"></div>
+      </div>
+
+      <!-- Zahlungsart + Trinkgeld -->
+      <div class="sheet-row">
+        <div>
+          <label>Zahlungsart *</label>
+          <select id="reZahlart">
+            <option value="bar">Bar</option>
+            <option value="karte">EC-Karte</option>
+            <option value="kredit">Kreditkarte</option>
+          </select>
+        </div>
+        <div>
+          <label>Trinkgeld</label>
+          <input type="number" id="reTrinkgeld" placeholder="0,00" step="0.50" min="0" value="0">
+        </div>
+      </div>
+
+      <!-- Rechnungs-Vorschau -->
+      <div id="rePreview" style="background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius-sm);padding:12px;margin-top:12px;font-size:12px;line-height:1.8;color:var(--text)"></div>
+
       <div class="sheet-actions">
         <button class="btn btn-secondary" onclick="closeSheet('rechnungSheet')">Abbrechen</button>
-        <button class="btn btn-primary" onclick="submitRechnung()">Rechnung senden</button>
+        <button class="btn btn-primary" onclick="submitRechnung()">Rechnung erstellen</button>
       </div>
+      <div style="font-size:9px;color:var(--text-micro);text-align:center;margin-top:8px">Rechnungen nach &sect;14 UStG &middot; MwSt 7% Dienstleist. / 19% Produkte &middot; GoBD-konform</div>
     </div>
   </div>
 
@@ -3064,6 +3129,10 @@
       const m7 = parseFloat(d.mwst_7 || d.MwSt_7_Summe || 0);
       const m19 = parseFloat(d.mwst_19 || d.MwSt_19_Summe || 0);
       document.getElementById('kasseMwst').textContent = fmtEur(m7 + m19);
+      var m7El = document.getElementById('kasseMwst7');
+      if (m7El) m7El.textContent = fmtEur(m7) + ' EUR';
+      var m19El = document.getElementById('kasseMwst19');
+      if (m19El) m19El.textContent = fmtEur(m19) + ' EUR';
 
       const pct = Math.min(Math.round((umsatz / dailyGoal) * 100), 100);
       updateRing(pct);
@@ -3155,55 +3224,195 @@
     }
 
     // === Rechnung erstellen ===
+    var rechnungsCounter = parseInt(localStorage.getItem('casa2035_reNr') || '0');
+
     function openRechnungSheet() {
       document.getElementById('reKunde').value = '';
       document.getElementById('reService').selectedIndex = 0;
       document.getElementById('reTrinkgeld').value = '0';
       document.getElementById('rePreview').textContent = '';
+      if (document.getElementById('reProdukt')) document.getElementById('reProdukt').value = '';
+      if (document.getElementById('reProduktPreis')) document.getElementById('reProduktPreis').value = '';
+      if (document.getElementById('reZusatz')) document.getElementById('reZusatz').selectedIndex = 0;
+      var ld = document.getElementById('reLeistungsDatum');
+      if (ld) ld.value = new Date().toISOString().split('T')[0];
+
+      // Rechnungsnummer generieren (RE-JJJJ-NNNN)
+      rechnungsCounter++;
+      var nr = 'RE-' + new Date().getFullYear() + '-' + String(rechnungsCounter).padStart(4, '0');
+      var nrEl = document.getElementById('reNr');
+      if (nrEl) nrEl.textContent = nr;
+
       document.getElementById('rechnungSheet').classList.add('show');
 
-      document.getElementById('reService').addEventListener('change', updateRePreview);
-      document.getElementById('reTrinkgeld').addEventListener('input', updateRePreview);
+      document.getElementById('reService').onchange = updateRePreview;
+      document.getElementById('reTrinkgeld').oninput = updateRePreview;
+      if (document.getElementById('reZusatz')) document.getElementById('reZusatz').onchange = updateRePreview;
+      if (document.getElementById('reProduktPreis')) document.getElementById('reProduktPreis').oninput = updateRePreview;
     }
+
     function updateRePreview() {
       var sel = document.getElementById('reService');
       var opt = sel.options[sel.selectedIndex];
-      if (!opt || !opt.value) { document.getElementById('rePreview').textContent = ''; return; }
-      var preis = parseFloat(opt.getAttribute('data-preis')) || 0;
-      var trink = parseFloat(document.getElementById('reTrinkgeld').value) || 0;
-      var total = preis + trink;
-      var mwst = parseFloat(opt.getAttribute('data-mwst')) || 0.07;
-      var mwstBetrag = Math.round(preis / (1 + mwst) * mwst * 100) / 100;
-      document.getElementById('rePreview').textContent = 'Gesamt: ' + total.toFixed(2).replace('.', ',') + ' \u20AC (inkl. ' + mwstBetrag.toFixed(2).replace('.', ',') + ' \u20AC MwSt)';
+      var preview = document.getElementById('rePreview');
+
+      if (!opt || !opt.value) { preview.textContent = ''; return; }
+
+      // Dienstleistung (7% MwSt)
+      var dlPreis = parseFloat(opt.getAttribute('data-preis')) || 0;
+      var dlMwstSatz = parseFloat(opt.getAttribute('data-mwst')) || 0.07;
+      var dlNetto = Math.round(dlPreis / (1 + dlMwstSatz) * 100) / 100;
+      var dlMwst = Math.round((dlPreis - dlNetto) * 100) / 100;
+
+      // Zusatzleistung (7%)
+      var zusatzSel = document.getElementById('reZusatz');
+      var zusatzPreis = 0;
+      var zusatzMwst = 0;
+      var zusatzName = '';
+      if (zusatzSel && zusatzSel.selectedIndex > 0) {
+        var zOpt = zusatzSel.options[zusatzSel.selectedIndex];
+        zusatzPreis = parseFloat(zOpt.getAttribute('data-preis')) || 0;
+        var zSatz = parseFloat(zOpt.getAttribute('data-mwst')) || 0.07;
+        var zNetto = Math.round(zusatzPreis / (1 + zSatz) * 100) / 100;
+        zusatzMwst = Math.round((zusatzPreis - zNetto) * 100) / 100;
+        zusatzName = zOpt.textContent.split('(')[0].trim();
+      }
+
+      // Produkt (19%)
+      var produktPreis = parseFloat((document.getElementById('reProduktPreis') || {}).value) || 0;
+      var produktName = (document.getElementById('reProdukt') || {}).value || '';
+      var produktNetto = 0;
+      var produktMwst = 0;
+      if (produktPreis > 0) {
+        produktNetto = Math.round(produktPreis / 1.19 * 100) / 100;
+        produktMwst = Math.round((produktPreis - produktNetto) * 100) / 100;
+      }
+
+      var trinkgeld = parseFloat(document.getElementById('reTrinkgeld').value) || 0;
+      var gesamt = dlPreis + zusatzPreis + produktPreis + trinkgeld;
+      var mwst7total = dlMwst + zusatzMwst;
+      var mwst19total = produktMwst;
+
+      // Vorschau rendern (mit DOM statt innerHTML fuer Sicherheit)
+      preview.textContent = '';
+      preview.style.display = gesamt > 0 ? 'block' : 'none';
+
+      var lines = [];
+      lines.push({ label: opt.textContent.split('(')[0].trim(), val: dlPreis, hint: '7% MwSt' });
+      if (zusatzPreis > 0) lines.push({ label: zusatzName, val: zusatzPreis, hint: '7% MwSt' });
+      if (produktPreis > 0) lines.push({ label: produktName || 'Produkt', val: produktPreis, hint: '19% MwSt' });
+      if (trinkgeld > 0) lines.push({ label: 'Trinkgeld', val: trinkgeld, hint: '' });
+
+      lines.forEach(function(l) {
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;justify-content:space-between;font-size:12px;color:var(--text)';
+        var left = document.createElement('span');
+        left.textContent = l.label + (l.hint ? ' (' + l.hint + ')' : '');
+        left.style.color = 'var(--text-secondary)';
+        var right = document.createElement('span');
+        right.style.fontWeight = '600';
+        right.textContent = l.val.toFixed(2).replace('.', ',') + ' EUR';
+        row.appendChild(left);
+        row.appendChild(right);
+        preview.appendChild(row);
+      });
+
+      // Trennlinie
+      var hr = document.createElement('div');
+      hr.style.cssText = 'border-top:1px solid var(--border);margin:6px 0';
+      preview.appendChild(hr);
+
+      // MwSt-Zeilen
+      if (mwst7total > 0) {
+        var m7 = document.createElement('div');
+        m7.style.cssText = 'display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim)';
+        var m7l = document.createElement('span');
+        m7l.textContent = 'davon MwSt 7%';
+        var m7r = document.createElement('span');
+        m7r.textContent = mwst7total.toFixed(2).replace('.', ',') + ' EUR';
+        m7.appendChild(m7l);
+        m7.appendChild(m7r);
+        preview.appendChild(m7);
+      }
+      if (mwst19total > 0) {
+        var m19 = document.createElement('div');
+        m19.style.cssText = 'display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim)';
+        var m19l = document.createElement('span');
+        m19l.textContent = 'davon MwSt 19%';
+        var m19r = document.createElement('span');
+        m19r.textContent = mwst19total.toFixed(2).replace('.', ',') + ' EUR';
+        m19.appendChild(m19l);
+        m19.appendChild(m19r);
+        preview.appendChild(m19);
+      }
+
+      // Gesamt
+      var total = document.createElement('div');
+      total.style.cssText = 'display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:var(--gold);margin-top:4px;font-family:Playfair Display,serif';
+      var tl = document.createElement('span');
+      tl.textContent = 'GESAMT';
+      var tr = document.createElement('span');
+      tr.textContent = gesamt.toFixed(2).replace('.', ',') + ' EUR';
+      total.appendChild(tl);
+      total.appendChild(tr);
+      preview.appendChild(total);
     }
+
     async function submitRechnung() {
       var kunde = document.getElementById('reKunde').value.trim();
       if (!kunde) { showToast('Bitte Kundennamen eingeben', 'warning', 2000); return; }
       var sel = document.getElementById('reService');
       var opt = sel.options[sel.selectedIndex];
       if (!opt || !opt.value) { showToast('Bitte Service waehlen', 'warning', 2000); return; }
+
+      var zusatzSel = document.getElementById('reZusatz');
+      var zusatzPreis = 0;
+      var zusatzName = '';
+      if (zusatzSel && zusatzSel.selectedIndex > 0) {
+        var zOpt = zusatzSel.options[zusatzSel.selectedIndex];
+        zusatzPreis = parseFloat(zOpt.getAttribute('data-preis')) || 0;
+        zusatzName = zOpt.textContent.split('(')[0].trim();
+      }
+
+      var produktPreis = parseFloat((document.getElementById('reProduktPreis') || {}).value) || 0;
+      var produktName = (document.getElementById('reProdukt') || {}).value || '';
+
       var payload = {
+        rechnung_nr: document.getElementById('reNr').textContent,
         kunde: kunde.substring(0, 200),
         service_id: opt.value,
+        service_name: opt.textContent.split('(')[0].trim(),
+        zusatz_name: zusatzName,
+        zusatz_preis: zusatzPreis,
+        produkt_name: produktName.substring(0, 200),
+        produkt_preis: produktPreis,
         zahlungsart: document.getElementById('reZahlart').value,
+        friseur: (document.getElementById('reFriseur') || {}).value || 'Rena',
+        leistungsdatum: (document.getElementById('reLeistungsDatum') || {}).value || new Date().toISOString().split('T')[0],
         trinkgeld: parseFloat(document.getElementById('reTrinkgeld').value) || 0,
-        preis_brutto: parseFloat(opt.getAttribute('data-preis')) || 0,
-        mwst_satz: parseFloat(opt.getAttribute('data-mwst')) || 0.07
+        preis_brutto_dl: parseFloat(opt.getAttribute('data-preis')) || 0,
+        mwst_satz_dl: parseFloat(opt.getAttribute('data-mwst')) || 0.07,
+        preis_brutto_produkt: produktPreis,
+        mwst_satz_produkt: produktPreis > 0 ? 0.19 : 0,
+        timestamp: new Date().toISOString()
       };
+
+      localStorage.setItem('casa2035_reNr', rechnungsCounter);
+
       if (config.baseUrl) {
         showKiStatus('Rechnung wird erstellt...');
         var res = await apiPost('/pwa-rechnung', payload);
         hideKiStatus();
         if (res) {
           closeSheet('rechnungSheet');
-          showToast('Rechnung erstellt', 'success', 2500);
+          showToast('Rechnung ' + payload.rechnung_nr + ' erstellt', 'success', 2500);
           fetchAll();
         } else {
-          showToast('Fehler beim Erstellen', 'danger', 3000);
+          showToast('Fehler beim Erstellen', 'error', 3000);
         }
       } else {
         closeSheet('rechnungSheet');
-        showToast('Demo: Rechnung fuer ' + kunde + ' wuerde erstellt', 'info', 3000);
+        showToast('Demo: ' + payload.rechnung_nr + ' fuer ' + esc(kunde) + ' erstellt', 'info', 3000);
       }
     }
 
