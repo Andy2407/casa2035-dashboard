@@ -1414,9 +1414,9 @@
 
       <!-- Schnellaktionen 4er Grid -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">
-        <button class="fab touch-scale" onclick="switchPage('termine')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
-          Termine
+        <button class="fab touch-scale" onclick="switchPage('lager')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          Lager
         </button>
         <button class="fab touch-scale" onclick="switchPage('kasse')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -1668,78 +1668,54 @@
     <!-- PAGE: Beratung / Wunschfrisur -->
     <div class="page" id="page-beratung">
       <div class="stagger">
-        <!-- Wunschfrisur Hero -->
+        <!-- KI-Beratung Dashboard fuer Friseur -->
         <div class="hero-card touch-scale" style="margin-bottom:16px">
           <div class="hero-inner">
             <div class="hero-icon-wrap" style="background:var(--rose-glow);border-color:rgba(184,150,46,0.15)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--rose-light)"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14c0 3 2.5 6 7 8"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5 0 3-2.5 6-7 8"/></svg>
             </div>
             <div class="hero-data">
-              <div class="hero-label" style="color:var(--rose)">Wunschfrisur-Service</div>
-              <div style="font-size:15px;font-weight:600;margin-top:2px">Bild hochladen & Termin buchen</div>
-              <div class="hero-sub">KI-Analyse + persoenliche Beratung</div>
+              <div class="hero-label" style="color:var(--rose)">KI-Beratung</div>
+              <div style="font-size:15px;font-weight:600;margin-top:2px">Kundenanfragen & KI-Analyse</div>
+              <div class="hero-sub">Wunschfrisuren, Haaranalysen, Farbcodes</div>
             </div>
           </div>
         </div>
 
-        <!-- Beispielbilder -->
-        <div class="section"><div class="section-bar"></div><div class="section-title">Inspirationen</div></div>
-        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;scroll-snap-type:x mandatory">
-          <div style="min-width:140px;height:180px;border-radius:var(--radius);overflow:hidden;scroll-snap-align:start;position:relative;background:linear-gradient(135deg,#f5e6d3,#e8d5c4);border:1px solid var(--border)">
-            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--rose)"><circle cx="6" cy="6" r="3"/><path d="M20.83 14.83a4.24 4.24 0 0 0-6-6L6 18H4v-2l9.17-9.17"/></svg>
-              <span style="font-size:11px;font-weight:600;color:var(--text)">Balayage</span>
-              <span style="font-size:10px;color:var(--text-dim)">Natuerliche Highlights</span>
-            </div>
+        <!-- KI-Tools: 3 Kacheln fuer Friseur -->
+        <div class="section"><div class="section-bar" style="background:var(--rose-gradient)"></div><div class="section-title">KI-Werkzeuge</div></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
+          <!-- Farbcode -->
+          <div id="toolFarbcode" onclick="showKiTool('farbcode')" style="background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s var(--ease)">
+            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#e8d5c4,#c9a93d,#8b6914);margin:0 auto 8px;border:2px solid var(--border-accent)"></div>
+            <div style="font-size:12px;font-weight:600;color:var(--text)">Farbcode</div>
+            <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Int. Color Chart</div>
           </div>
-          <div style="min-width:140px;height:180px;border-radius:var(--radius);overflow:hidden;scroll-snap-align:start;position:relative;background:linear-gradient(135deg,#d4c5b5,#c8b8a8);border:1px solid var(--border)">
-            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--rose)"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/></svg>
-              <span style="font-size:11px;font-weight:600;color:var(--text)">Bob-Schnitt</span>
-              <span style="font-size:10px;color:var(--text-dim)">Modern & elegant</span>
+          <!-- Haaranalyse -->
+          <div id="toolHaaranalyse" onclick="showKiTool('haaranalyse')" style="background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s var(--ease)">
+            <div style="width:40px;height:40px;border-radius:50%;background:var(--info-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:22px;height:22px;color:var(--info)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
             </div>
+            <div style="font-size:12px;font-weight:600;color:var(--text)">Haaranalyse</div>
+            <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Struktur & Zustand</div>
           </div>
-          <div style="min-width:140px;height:180px;border-radius:var(--radius);overflow:hidden;scroll-snap-align:start;position:relative;background:linear-gradient(135deg,#e8ddd0,#d9cfc2);border:1px solid var(--border)">
-            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--rose)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-              <span style="font-size:11px;font-weight:600;color:var(--text)">Locken-Styling</span>
-              <span style="font-size:10px;color:var(--text-dim)">Volumen & Bounce</span>
+          <!-- Wunschfrisur -->
+          <div id="toolWunschfrisur" onclick="showKiTool('wunschfrisur')" style="background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s var(--ease)">
+            <div style="width:40px;height:40px;border-radius:50%;background:var(--success-bg);display:flex;align-items:center;justify-content:center;margin:0 auto 8px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:22px;height:22px;color:var(--success)"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
             </div>
-          </div>
-          <div style="min-width:140px;height:180px;border-radius:var(--radius);overflow:hidden;scroll-snap-align:start;position:relative;background:linear-gradient(135deg,#c9bfb3,#b8aea2);border:1px solid var(--border)">
-            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;text-align:center">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--rose)"><path d="M12 2v6M12 18v4M4.93 4.93l4.24 4.24M14.83 14.83l4.24 4.24M2 12h6M18 12h4"/></svg>
-              <span style="font-size:11px;font-weight:600;color:var(--text)">Farbbehandlung</span>
-              <span style="font-size:10px;color:var(--text-dim)">Premium-Coloration</span>
-            </div>
+            <div style="font-size:12px;font-weight:600;color:var(--text)">Wunschfrisur</div>
+            <div style="font-size:10px;color:var(--text-dim);margin-top:2px">Kunden-Bilder</div>
           </div>
         </div>
 
-        <!-- Wunschfrisur Upload + Termin -->
-        <div class="section"><div class="section-bar"></div><div class="section-title">Wunschfrisur einreichen</div></div>
-        <div style="background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius);padding:20px;margin-bottom:16px">
-          <div style="border:2px dashed rgba(184,150,46,0.3);border-radius:var(--radius-sm);padding:28px 16px;text-align:center;cursor:pointer;margin-bottom:16px;background:var(--rose-glow)" onclick="document.getElementById('dashWfUpload').click()">
-            <input type="file" id="dashWfUpload" accept="image/*" multiple style="display:none" onchange="previewDashUpload(this.files)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:36px;height:36px;color:var(--rose);margin-bottom:8px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <div style="font-size:14px;font-weight:600;color:var(--text)">Foto hochladen</div>
-            <div style="font-size:11px;color:var(--text-dim);margin-top:4px">Tippen oder Bild hierher ziehen</div>
+        <!-- KI-Tool Detail Panel (wird per JS befuellt) -->
+        <div id="kiToolPanel" style="display:none;background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius);padding:20px;margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div style="font-size:14px;font-weight:600;color:var(--text)" id="kiToolTitle">Tool</div>
+            <button onclick="document.getElementById('kiToolPanel').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:18px;padding:4px">&times;</button>
           </div>
-          <div id="dashUploadPreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-            <input type="text" id="dashWfName" placeholder="Ihr Name" style="padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:Inter,sans-serif;background:var(--bg-warm)">
-            <input type="tel" id="dashWfTel" placeholder="Telefonnummer" style="padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:Inter,sans-serif;background:var(--bg-warm)">
-          </div>
-          <textarea id="dashWfMsg" placeholder="Beschreiben Sie Ihre Wunschfrisur..." rows="3" style="width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:14px;font-family:Inter,sans-serif;background:var(--bg-warm);resize:vertical;margin-bottom:12px"></textarea>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-            <button class="fab touch-scale" onclick="submitDashWunschfrisur()" style="margin:0;font-size:13px">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/></svg>
-              Wunschfrisur senden
-            </button>
-            <button class="fab touch-scale" onclick="switchPage('termine');showToast('Waehlen Sie einen Termin','info')" style="margin:0;font-size:13px;background:var(--surface);color:var(--rose);border:1.5px solid var(--rose)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
-              Termin buchen
-            </button>
-          </div>
+          <div id="kiToolContent"></div>
         </div>
 
         <!-- Beratung Stats -->
@@ -4182,6 +4158,73 @@
 
       container.appendChild(actions);
       document.getElementById('detailSheet').classList.add('show');
+    }
+
+    // === KI-Beratungs-Tools (Farbcode, Haaranalyse, Wunschfrisur) ===
+    // NOTE: Content is hardcoded static strings (no user input), safe from XSS
+    function showKiTool(tool) {
+      var panel = document.getElementById('kiToolPanel');
+      var title = document.getElementById('kiToolTitle');
+      var contentEl = document.getElementById('kiToolContent');
+      panel.style.display = 'block';
+      // Clear previous content safely
+      while (contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
+
+      var wrapper = document.createElement('div');
+
+      if (tool === 'farbcode') {
+        title.textContent = 'International Color Chart';
+        wrapper.insertAdjacentHTML('beforeend',
+          '<div style="margin-bottom:12px;font-size:13px;color:var(--text-secondary)">Farbcode-Analyse fuer die aktuelle Kundin. Die KI erkennt den aktuellen Farbton und empfiehlt die passende Coloration.</div>'
+          + '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px">'
+          + '<div style="text-align:center"><div style="width:100%;aspect-ratio:1;border-radius:8px;background:#1a1a1a;margin-bottom:4px;border:1px solid var(--border)"></div><span style="font-size:9px;color:var(--text-dim)">1/0</span></div>'
+          + '<div style="text-align:center"><div style="width:100%;aspect-ratio:1;border-radius:8px;background:#3d2b1f;margin-bottom:4px;border:1px solid var(--border)"></div><span style="font-size:9px;color:var(--text-dim)">3/0</span></div>'
+          + '<div style="text-align:center"><div style="width:100%;aspect-ratio:1;border-radius:8px;background:#6b4423;margin-bottom:4px;border:1px solid var(--border)"></div><span style="font-size:9px;color:var(--text-dim)">5/0</span></div>'
+          + '<div style="text-align:center"><div style="width:100%;aspect-ratio:1;border-radius:8px;background:#a0764a;margin-bottom:4px;border:1px solid var(--border)"></div><span style="font-size:9px;color:var(--text-dim)">7/0</span></div>'
+          + '<div style="text-align:center"><div style="width:100%;aspect-ratio:1;border-radius:8px;background:#d4b896;margin-bottom:4px;border:1px solid var(--border)"></div><span style="font-size:9px;color:var(--text-dim)">9/0</span></div>'
+          + '</div>'
+          + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text-secondary)">'
+          + '<strong style="color:var(--text)">Letzte Analyse:</strong> Kundin Sabine M. — Aktuell 6/3 (Dunkelblond Gold), Ziel: 8/1 (Hellblond Asch)<br>'
+          + '<span style="color:var(--rose);font-weight:600">Empfehlung:</span> Aufhellung 2 Stufen + Asch-Tonung, Dauer ca. 120 Min.'
+          + '</div>');
+      } else if (tool === 'haaranalyse') {
+        title.textContent = 'Haaranalyse-Ergebnisse';
+        wrapper.insertAdjacentHTML('beforeend',
+          '<div style="margin-bottom:12px;font-size:13px;color:var(--text-secondary)">KI-gestuetzte Analyse von Haarstruktur, Zustand und Pflegeempfehlung basierend auf Kundenfotos.</div>'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
+          + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;text-align:center">'
+          + '<div style="font-size:20px;font-weight:700;color:var(--text);font-family:Playfair Display,serif">3</div>'
+          + '<div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px">Heute analysiert</div></div>'
+          + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;text-align:center">'
+          + '<div style="font-size:20px;font-weight:700;color:var(--success);font-family:Playfair Display,serif">12</div>'
+          + '<div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px">Diese Woche</div></div>'
+          + '</div>'
+          + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text-secondary)">'
+          + '<strong style="color:var(--text)">Letzte Analyse:</strong> Laura B. — Feines Haar, leicht geschaedigt (Stufe 2/5)<br>'
+          + '<span style="color:var(--info);font-weight:600">Empfehlung:</span> Olaplex No.3 Kur + Proteinbehandlung vor Coloration'
+          + '</div>');
+      } else if (tool === 'wunschfrisur') {
+        title.textContent = 'Wunschfrisur-Einsendungen';
+        wrapper.insertAdjacentHTML('beforeend',
+          '<div style="margin-bottom:12px;font-size:13px;color:var(--text-secondary)">Kunden-Wunschfrisuren aus WhatsApp, Instagram und Homepage — mit KI-Analyse und Machbarkeitscheck.</div>'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">'
+          + '<div style="background:var(--warning-bg);border-radius:var(--radius-sm);padding:10px;text-align:center">'
+          + '<div style="font-size:18px;font-weight:700;color:var(--warning);font-family:Playfair Display,serif">2</div>'
+          + '<div style="font-size:9px;color:var(--text-dim);text-transform:uppercase">Neu</div></div>'
+          + '<div style="background:var(--rose-glow);border-radius:var(--radius-sm);padding:10px;text-align:center">'
+          + '<div style="font-size:18px;font-weight:700;color:var(--rose);font-family:Playfair Display,serif">1</div>'
+          + '<div style="font-size:9px;color:var(--text-dim);text-transform:uppercase">KI-Analyse</div></div>'
+          + '<div style="background:var(--success-bg);border-radius:var(--radius-sm);padding:10px;text-align:center">'
+          + '<div style="font-size:18px;font-weight:700;color:var(--success);font-family:Playfair Display,serif">5</div>'
+          + '<div style="font-size:9px;color:var(--text-dim);text-transform:uppercase">Beantwortet</div></div>'
+          + '</div>'
+          + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text-secondary)">'
+          + '<strong style="color:var(--text)">Neueste:</strong> Sabine M. via WhatsApp — Gestufter Long Bob mit Beach Waves<br>'
+          + '<span style="color:var(--success);font-weight:600">KI:</span> Machbar bei schulterlangem, duennem Haar. Volumenschnitt + Texturspray empfohlen.'
+          + '</div>');
+      }
+      contentEl.appendChild(wrapper);
+      panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // === Toast Notification System ===
