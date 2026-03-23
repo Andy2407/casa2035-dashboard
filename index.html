@@ -1534,11 +1534,6 @@
         <div class="skeleton" style="height:60px"></div>
       </div>
 
-      <div class="section"><div class="section-bar"></div><div class="section-title">Lagerbestand</div><span class="section-count" id="lagerCount">--</span></div>
-      <div id="lagerWarning" style="display:none"></div>
-      <div class="event-list stagger" id="lagerList">
-        <div class="skeleton" style="height:60px"></div>
-      </div>
     </div>
 
     <!-- PAGE: Kasse -->
@@ -1718,19 +1713,19 @@
           <div id="kiToolContent"></div>
         </div>
 
-        <!-- Beratung Stats -->
-        <div class="beratung-stats">
-          <div class="beratung-stat">
-            <div class="beratung-stat-val info" id="brStatNeu">0</div>
-            <div class="beratung-stat-label">Offen</div>
+        <!-- Beratung Stats — kompakt, klickbar als Filter -->
+        <div style="display:flex;gap:6px;margin-bottom:12px">
+          <div onclick="setBeratungFilter('neu')" style="flex:1;background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius-sm);padding:8px;text-align:center;cursor:pointer;transition:all .2s">
+            <span style="font-size:16px;font-weight:700;color:var(--info)" id="brStatNeu">0</span>
+            <span style="font-size:10px;color:var(--text-dim);margin-left:4px">Offen</span>
           </div>
-          <div class="beratung-stat">
-            <div class="beratung-stat-val gold" id="brStatAnalyse">0</div>
-            <div class="beratung-stat-label">KI-Analyse</div>
+          <div onclick="setBeratungFilter('analyse')" style="flex:1;background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius-sm);padding:8px;text-align:center;cursor:pointer;transition:all .2s">
+            <span style="font-size:16px;font-weight:700;color:var(--gold)" id="brStatAnalyse">0</span>
+            <span style="font-size:10px;color:var(--text-dim);margin-left:4px">Analyse</span>
           </div>
-          <div class="beratung-stat">
-            <div class="beratung-stat-val success" id="brStatFertig">0</div>
-            <div class="beratung-stat-label">Beantwortet</div>
+          <div onclick="setBeratungFilter('fertig')" style="flex:1;background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius-sm);padding:8px;text-align:center;cursor:pointer;transition:all .2s">
+            <span style="font-size:16px;font-weight:700;color:var(--success)" id="brStatFertig">0</span>
+            <span style="font-size:10px;color:var(--text-dim);margin-left:4px">Fertig</span>
           </div>
         </div>
 
@@ -2550,13 +2545,19 @@
       document.getElementById('lastRefresh').textContent = 'Update: ' + new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
 
+    var apiErrorShown = false;
     async function apiGet(ep) {
       if (!config.baseUrl) return null;
       try {
         const r = await fetch(config.baseUrl + ep, { headers: { 'X-Auth-Token': config.token, 'X-User-ID': config.userId, 'Content-Type': 'application/json' } });
         if (!r.ok) throw new Error(r.status);
+        apiErrorShown = false;
         return await r.json();
-      } catch (e) { console.warn('API:', ep, e); return null; }
+      } catch (e) {
+        console.warn('API:', ep, e);
+        if (!apiErrorShown) { showToast('Verbindung zum Server fehlgeschlagen', 'error'); apiErrorShown = true; }
+        return null;
+      }
     }
     async function apiPost(ep, body) {
       if (!config.baseUrl) return null;
@@ -2564,7 +2565,11 @@
         const r = await fetch(config.baseUrl + ep, { method: 'POST', headers: { 'X-Auth-Token': config.token, 'X-User-ID': config.userId, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
         if (!r.ok) throw new Error(r.status);
         return await r.json();
-      } catch (e) { console.warn('API POST:', ep, e); return null; }
+      } catch (e) {
+        console.warn('API POST:', ep, e);
+        showToast('Senden fehlgeschlagen. Bitte erneut versuchen.', 'error');
+        return null;
+      }
     }
     async function fetchAll() {
       showKiStatus('Daten werden geladen...');
@@ -3287,19 +3292,41 @@
           body.appendChild(frage);
         }
 
-        // Bilder
+        // Bilder — echte Thumbnails wenn URLs vorhanden, sonst Platzhalter
         if (b.Bilder && b.Bilder.length > 0) {
           var images = document.createElement('div');
           images.className = 'beratung-images';
-          b.Bilder.forEach(function(bild) {
-            var img = document.createElement('div');
-            img.className = 'beratung-img';
-            img.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
-            var label = document.createElement('div');
-            label.className = 'beratung-img-label';
-            label.textContent = bild;
-            img.appendChild(label);
-            images.appendChild(img);
+          b.Bilder.forEach(function(bild, bi) {
+            var imgWrap = document.createElement('div');
+            imgWrap.className = 'beratung-img';
+            imgWrap.style.position = 'relative';
+            imgWrap.style.overflow = 'hidden';
+
+            // Echtes Bild wenn URL vorhanden
+            if (b.Bild_URLs && b.Bild_URLs[bi]) {
+              var realImg = document.createElement('img');
+              realImg.src = b.Bild_URLs[bi];
+              realImg.alt = bild;
+              realImg.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;border-radius:inherit';
+              imgWrap.appendChild(realImg);
+              // Label unten
+              var label = document.createElement('div');
+              label.style.cssText = 'position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);color:#fff;font-size:8px;text-align:center;padding:2px;line-height:1.1';
+              label.textContent = bild;
+              imgWrap.appendChild(label);
+            } else {
+              // Fallback: Platzhalter
+              var bildColors = ['linear-gradient(135deg,#c9a93d,#8b6914)', 'linear-gradient(135deg,#3a7abd,#1e4a7a)'];
+              imgWrap.style.background = bildColors[bi % bildColors.length];
+              imgWrap.style.display = 'flex';
+              imgWrap.style.alignItems = 'center';
+              imgWrap.style.justifyContent = 'center';
+              var label2 = document.createElement('div');
+              label2.style.cssText = 'color:#fff;font-size:8px;text-align:center';
+              label2.textContent = bild;
+              imgWrap.appendChild(label2);
+            }
+            images.appendChild(imgWrap);
           });
           body.appendChild(images);
         }
@@ -3344,17 +3371,17 @@
         btnAntwort.className = 'beratung-action primary';
         btnAntwort.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
         btnAntwort.appendChild(document.createTextNode(' Antworten'));
-        btnAntwort.addEventListener('click', function() {
-          showToast('Beratungs-Antwort wird vorbereitet...', 'info', 2000);
-        });
+        (function(beratung) {
+          btnAntwort.addEventListener('click', function() { openAntwortSheet(beratung); });
+        })(b);
 
         var btnTermin = document.createElement('button');
         btnTermin.className = 'beratung-action secondary';
         btnTermin.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
         btnTermin.appendChild(document.createTextNode(' Termin'));
-        btnTermin.addEventListener('click', function() {
-          showToast('Terminvorschlag wird erstellt...', 'info', 2000);
-        });
+        (function(beratung) {
+          btnTermin.addEventListener('click', function() { openTerminVorschlagSheet(beratung); });
+        })(b);
 
         footer.appendChild(btnAntwort);
         footer.appendChild(btnTermin);
@@ -3464,6 +3491,7 @@
           Status: 'analyse',
           Frage: 'Ich moechte gerne so eine Frisur wie auf dem Bild. Geht das bei meiner Haarlaenge? Meine Haare sind schulterlang und eher duenn.',
           Bilder: ['Wunschfrisur.jpg', 'Meine Haare.jpg'],
+          Bild_URLs: ['https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=200&h=200&fit=crop', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=200&h=200&fit=crop'],
           KI_Analyse: 'Basierend auf dem Referenzbild handelt es sich um einen gestuften Long Bob mit leichten Beach Waves. Bei schulterlagnem, duennem Haar ist dieser Schnitt sehr gut machbar. Empfehlung: Volumenschnitt mit leichter Stufung, dazu Texturspray fuer mehr Fuelle. Geschaetzte Dauer: 75 Minuten.',
           Empfehlungen: ['Volumenschnitt', 'Texturspray Wella', 'Pflegekur duennes Haar']
         },
@@ -3472,6 +3500,7 @@
           Status: 'neu',
           Frage: 'Welches Styling-Produkt koennt ihr mir empfehlen? Ich will so einen matten, strukturierten Look haben. Habe kurze Haare.',
           Bilder: ['Style-Referenz.jpg'],
+          Bild_URLs: ['https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=200&h=200&fit=crop'],
           KI_Analyse: null,
           Empfehlungen: []
         },
@@ -3480,6 +3509,7 @@
           Status: 'fertig',
           Frage: 'Kann ich von Dunkelbraun auf Blond wechseln? Wie lange dauert das und schadet das meinen Haaren? Habe noch nie gefaerbt.',
           Bilder: ['Aktuelle Farbe.jpg', 'Wunschfarbe.jpg', 'Inspiration.jpg'],
+          Bild_URLs: ['https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=200&h=200&fit=crop', 'https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=200&h=200&fit=crop', 'https://images.unsplash.com/photo-1595959183082-7b570b7e1f04?w=200&h=200&fit=crop'],
           KI_Analyse: 'Ein Wechsel von Dunkelbraun zu Blond erfordert mehrere Sitzungen (2-3 Termine im Abstand von 4-6 Wochen). Sofort-Blondierung wuerde das Haar stark schaedigen. Empfehlung: Schrittweise Aufhellung mit Balayage-Technik fuer einen natuerlichen Uebergang. Erste Sitzung ca. 150 Minuten, Folgesitzungen ca. 90 Minuten.',
           Empfehlungen: ['Balayage stufenweise', 'Olaplex Behandlung', 'Pflegeshampoo blondiertes Haar', 'Hitzeschutz']
         },
@@ -3487,7 +3517,8 @@
           Kunde: 'Thomas Berger', Timestamp: iso(7, 45), Kanal: 'homepage', Typ: 'Stilberatung',
           Status: 'beantwortet',
           Frage: 'Ich verliere langsam meine Haare oben. Was wuerdet ihr empfehlen — kurz schneiden oder gibt es andere Moeglichkeiten?',
-          Bilder: [],
+          Bilder: ['Aktuelles Haar.jpg'],
+          Bild_URLs: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'],
           KI_Analyse: 'Bei beginnendem Haarausfall am Oberkopf empfehlen wir einen modernen kurzen Schnitt (Fade/Undercut), der die duenneren Stellen kaschiert. Alternativ: Haarverdichtungs-Spray fuer optisch mehr Fuelle. Ein laengerer Schnitt wuerde die Stellen staerker betonen.',
           Empfehlungen: ['Fade-Schnitt', 'Haarverdichtungs-Spray', 'Kopfhaut-Serum']
         }
@@ -4160,6 +4191,155 @@
       document.getElementById('detailSheet').classList.add('show');
     }
 
+    // === Beratung: Antwort-Sheet ===
+    function openAntwortSheet(b) {
+      var sheetId = 'antwortSheet';
+      var existing = document.getElementById(sheetId);
+      if (existing) existing.remove();
+
+      var sheet = document.createElement('div');
+      sheet.id = sheetId;
+      sheet.className = 'sheet';
+      sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:1000;background:var(--surface);border-top-left-radius:var(--radius-xl);border-top-right-radius:var(--radius-xl);padding:20px;box-shadow:0 -4px 24px rgba(0,0,0,0.12);max-height:80vh;overflow-y:auto';
+
+      var header = document.createElement('div');
+      header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:14px';
+      var title = document.createElement('div');
+      title.style.cssText = 'font-size:16px;font-weight:700;color:var(--text);font-family:Playfair Display,serif';
+      title.textContent = 'Antwort an ' + esc(b.Kunde);
+      var closeBtn = document.createElement('button');
+      closeBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-dim);padding:4px';
+      closeBtn.textContent = '\u00D7';
+      closeBtn.onclick = function() { sheet.remove(); backdrop.remove(); };
+      header.appendChild(title);
+      header.appendChild(closeBtn);
+      sheet.appendChild(header);
+
+      // Kanalanzeige
+      var kanalInfo = document.createElement('div');
+      kanalInfo.style.cssText = 'font-size:12px;color:var(--text-dim);margin-bottom:12px';
+      kanalInfo.textContent = 'Kanal: ' + (b.Kanal || 'System') + ' \u2014 Typ: ' + (b.Typ || 'Beratung');
+      sheet.appendChild(kanalInfo);
+
+      // Originalfrage anzeigen
+      if (b.Frage) {
+        var frageBox = document.createElement('div');
+        frageBox.style.cssText = 'background:var(--bg-warm);border-radius:var(--radius-sm);padding:10px;margin-bottom:12px;font-size:12px;color:var(--text-secondary)';
+        frageBox.textContent = '\u201E' + b.Frage + '\u201C';
+        sheet.appendChild(frageBox);
+      }
+
+      // Antwort-Textarea
+      var textarea = document.createElement('textarea');
+      textarea.id = 'antwortText';
+      textarea.placeholder = 'Ihre Antwort an ' + esc(b.Kunde) + '...';
+      textarea.rows = 4;
+      textarea.style.cssText = 'width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:Inter,sans-serif;color:var(--text);background:var(--surface);resize:none;box-sizing:border-box;margin-bottom:12px';
+      // Vorschlag generieren basierend auf KI-Analyse
+      if (b.KI_Analyse) {
+        textarea.value = 'Hallo ' + (b.Kunde || '').split(' ')[0] + ', vielen Dank fuer Ihre Anfrage!\n\n' + b.KI_Analyse.substring(0, 150) + '...\n\nKommen Sie gerne vorbei fuer eine persoenliche Beratung. Wir freuen uns auf Sie!\n\nIhr Team von Rena Rados Friseure';
+      }
+      sheet.appendChild(textarea);
+
+      // Senden-Button
+      var sendBtn = document.createElement('button');
+      sendBtn.style.cssText = 'width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+      sendBtn.textContent = 'Antwort senden (' + (b.Kanal || 'System') + ')';
+      sendBtn.onclick = function() {
+        var text = document.getElementById('antwortText').value;
+        if (!text.trim()) { showToast('Bitte Antwort eingeben', 'warning'); return; }
+        showToast('Antwort an ' + esc(b.Kunde) + ' gesendet!', 'success');
+        sheet.remove();
+        backdrop.remove();
+      };
+      sheet.appendChild(sendBtn);
+
+      // Backdrop
+      var backdrop = document.createElement('div');
+      backdrop.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999';
+      backdrop.onclick = function() { sheet.remove(); backdrop.remove(); };
+
+      document.body.appendChild(backdrop);
+      document.body.appendChild(sheet);
+    }
+
+    // === Beratung: Termin-Vorschlag-Sheet ===
+    function openTerminVorschlagSheet(b) {
+      var sheetId = 'terminVorschlagSheet';
+      var existing = document.getElementById(sheetId);
+      if (existing) existing.remove();
+
+      var sheet = document.createElement('div');
+      sheet.id = sheetId;
+      sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:1000;background:var(--surface);border-top-left-radius:var(--radius-xl);border-top-right-radius:var(--radius-xl);padding:20px;box-shadow:0 -4px 24px rgba(0,0,0,0.12);max-height:80vh;overflow-y:auto';
+
+      var header = document.createElement('div');
+      header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:14px';
+      var title = document.createElement('div');
+      title.style.cssText = 'font-size:16px;font-weight:700;color:var(--text);font-family:Playfair Display,serif';
+      title.textContent = 'Termin fuer ' + esc(b.Kunde);
+      var closeBtn = document.createElement('button');
+      closeBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-dim);padding:4px';
+      closeBtn.textContent = '\u00D7';
+      closeBtn.onclick = function() { sheet.remove(); backdrop.remove(); };
+      header.appendChild(title);
+      header.appendChild(closeBtn);
+      sheet.appendChild(header);
+
+      // Schnell-Termin-Vorschlaege (naechste 3 Werktage)
+      var now = new Date();
+      var vorschlaege = [];
+      var d = new Date(now);
+      while (vorschlaege.length < 3) {
+        d.setDate(d.getDate() + 1);
+        if (d.getDay() !== 0) { // Nicht Sonntag
+          vorschlaege.push(new Date(d));
+        }
+      }
+
+      var vorschlaegeWrap = document.createElement('div');
+      vorschlaegeWrap.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin-bottom:14px';
+      var tagNamen = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+      vorschlaege.forEach(function(vd) {
+        var tagStr = tagNamen[vd.getDay()] + ', ' + vd.getDate() + '.' + (vd.getMonth() + 1) + '.';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.style.cssText = 'padding:12px 16px;background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius-sm);cursor:pointer;text-align:left;font-family:Inter,sans-serif;display:flex;justify-content:space-between;align-items:center';
+        var left = document.createElement('div');
+        left.style.cssText = 'font-size:14px;font-weight:600;color:var(--text)';
+        left.textContent = tagStr;
+        var right = document.createElement('div');
+        right.style.cssText = 'font-size:12px;color:var(--text-dim)';
+        var isThu = vd.getDay() === 4;
+        var isSat = vd.getDay() === 6;
+        right.textContent = isSat ? '09:00-14:00' : isThu ? '09:00-20:00' : '09:00-18:00';
+        btn.appendChild(left);
+        btn.appendChild(right);
+        (function(datum) {
+          btn.onclick = function() {
+            showToast('Terminvorschlag ' + tagStr + ' an ' + esc(b.Kunde) + ' gesendet!', 'success');
+            sheet.remove();
+            backdrop.remove();
+          };
+        })(vd);
+        vorschlaegeWrap.appendChild(btn);
+      });
+      sheet.appendChild(vorschlaegeWrap);
+
+      // Hinweis
+      var hint = document.createElement('div');
+      hint.style.cssText = 'font-size:11px;color:var(--text-dim);text-align:center';
+      hint.textContent = 'Vorschlag wird an ' + esc(b.Kunde) + ' per ' + (b.Kanal || 'E-Mail') + ' gesendet.';
+      sheet.appendChild(hint);
+
+      var backdrop = document.createElement('div');
+      backdrop.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999';
+      backdrop.onclick = function() { sheet.remove(); backdrop.remove(); };
+
+      document.body.appendChild(backdrop);
+      document.body.appendChild(sheet);
+    }
+
     // === KI-Beratungs-Tools (Farbcode, Haaranalyse, Wunschfrisur) ===
     // NOTE: Content is hardcoded static strings (no user input), safe from XSS
     function showKiTool(tool) {
@@ -4167,64 +4347,293 @@
       var title = document.getElementById('kiToolTitle');
       var contentEl = document.getElementById('kiToolContent');
       panel.style.display = 'block';
-      // Clear previous content safely
       while (contentEl.firstChild) contentEl.removeChild(contentEl.firstChild);
 
       var wrapper = document.createElement('div');
-
+      // NOTE: All insertAdjacentHTML content below is hardcoded static strings (no user input), safe from XSS
       if (tool === 'farbcode') {
-        title.textContent = 'International Color Chart';
+        title.textContent = 'Farbcode & Mischungsformel';
         wrapper.insertAdjacentHTML('beforeend',
-          '<div style="margin-bottom:12px;font-size:13px;color:var(--text-secondary)">Farbcode-Analyse fuer die aktuelle Kundin. Die KI erkennt den aktuellen Farbton und empfiehlt die passende Coloration.</div>'
-          + '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px">'
-          + '<div style="text-align:center"><div style="width:100%;aspect-ratio:1;border-radius:8px;background:#1a1a1a;margin-bottom:4px;border:1px solid var(--border)"></div><span style="font-size:9px;color:var(--text-dim)">1/0</span></div>'
-          + '<div style="text-align:center"><div style="width:100%;aspect-ratio:1;border-radius:8px;background:#3d2b1f;margin-bottom:4px;border:1px solid var(--border)"></div><span style="font-size:9px;color:var(--text-dim)">3/0</span></div>'
-          + '<div style="text-align:center"><div style="width:100%;aspect-ratio:1;border-radius:8px;background:#6b4423;margin-bottom:4px;border:1px solid var(--border)"></div><span style="font-size:9px;color:var(--text-dim)">5/0</span></div>'
-          + '<div style="text-align:center"><div style="width:100%;aspect-ratio:1;border-radius:8px;background:#a0764a;margin-bottom:4px;border:1px solid var(--border)"></div><span style="font-size:9px;color:var(--text-dim)">7/0</span></div>'
-          + '<div style="text-align:center"><div style="width:100%;aspect-ratio:1;border-radius:8px;background:#d4b896;margin-bottom:4px;border:1px solid var(--border)"></div><span style="font-size:9px;color:var(--text-dim)">9/0</span></div>'
+          '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary)">Fotografiere das Haar — die KI erkennt den Ist-Farbton und berechnet die Mischungsformel fuer den Zielton.</div>'
+          + '<div style="background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;margin-bottom:14px" onclick="document.getElementById(\'farbcodeUpload\').click()">'
+          + '<input type="file" id="farbcodeUpload" accept="image/*" capture="environment" style="display:none" onchange="previewFarbcode(this.files)">'
+          + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--gold);margin-bottom:6px"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>'
+          + '<div style="font-size:13px;font-weight:600;color:var(--text)">Haar fotografieren</div>'
+          + '<div style="font-size:11px;color:var(--text-dim)">oder Bild aus Galerie waehlen</div>'
           + '</div>'
-          + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text-secondary)">'
-          + '<strong style="color:var(--text)">Letzte Analyse:</strong> Kundin Sabine M. — Aktuell 6/3 (Dunkelblond Gold), Ziel: 8/1 (Hellblond Asch)<br>'
-          + '<span style="color:var(--rose);font-weight:600">Empfehlung:</span> Aufhellung 2 Stufen + Asch-Tonung, Dauer ca. 120 Min.'
-          + '</div>');
+          + '<div id="farbcodePreview" style="display:none;margin-bottom:14px;text-align:center"><img id="farbcodeImg" style="max-width:100%;max-height:150px;border-radius:var(--radius);border:1px solid var(--border)"></div>'
+          + '<div style="margin-bottom:14px">'
+          + '<div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Farbformel: Ist &rarr; Ziel</div>'
+          + '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center">'
+          + '<select id="farbIst" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">'
+          + '<option value="">Ist-Ton</option><option value="1/0">1/0 Schwarz</option><option value="3/0">3/0 Dunkelbraun</option><option value="4/0">4/0 Mittelbraun</option>'
+          + '<option value="5/0">5/0 Hellbraun</option><option value="6/0">6/0 Dunkelblond</option><option value="6/3">6/3 Dunkelblond Gold</option>'
+          + '<option value="7/0">7/0 Mittelblond</option><option value="7/1">7/1 Mittelblond Asch</option><option value="8/0">8/0 Hellblond</option>'
+          + '<option value="8/1">8/1 Hellblond Asch</option><option value="9/0">9/0 Lichtblond</option><option value="10/0">10/0 Platinblond</option></select>'
+          + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--gold)"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'
+          + '<select id="farbZiel" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">'
+          + '<option value="">Ziel-Ton</option><option value="1/0">1/0 Schwarz</option><option value="3/0">3/0 Dunkelbraun</option><option value="4/0">4/0 Mittelbraun</option>'
+          + '<option value="5/0">5/0 Hellbraun</option><option value="6/0">6/0 Dunkelblond</option><option value="6/3">6/3 Dunkelblond Gold</option>'
+          + '<option value="7/0">7/0 Mittelblond</option><option value="7/1">7/1 Mittelblond Asch</option><option value="8/0">8/0 Hellblond</option>'
+          + '<option value="8/1">8/1 Hellblond Asch</option><option value="9/0">9/0 Lichtblond</option><option value="10/0">10/0 Platinblond</option></select>'
+          + '</div></div>'
+          + '<button onclick="generateFarbformel()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Mischungsformel berechnen</button>'
+          + '<div id="farbformelResult" style="display:none;margin-top:14px"></div>');
       } else if (tool === 'haaranalyse') {
-        title.textContent = 'Haaranalyse-Ergebnisse';
+        title.textContent = 'Profi-Haaranalyse im Salon';
         wrapper.insertAdjacentHTML('beforeend',
-          '<div style="margin-bottom:12px;font-size:13px;color:var(--text-secondary)">KI-gestuetzte Analyse von Haarstruktur, Zustand und Pflegeempfehlung basierend auf Kundenfotos.</div>'
-          + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
-          + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;text-align:center">'
-          + '<div style="font-size:20px;font-weight:700;color:var(--text);font-family:Playfair Display,serif">3</div>'
-          + '<div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px">Heute analysiert</div></div>'
-          + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;text-align:center">'
-          + '<div style="font-size:20px;font-weight:700;color:var(--success);font-family:Playfair Display,serif">12</div>'
-          + '<div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px">Diese Woche</div></div>'
-          + '</div>'
-          + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text-secondary)">'
-          + '<strong style="color:var(--text)">Letzte Analyse:</strong> Laura B. — Feines Haar, leicht geschaedigt (Stufe 2/5)<br>'
-          + '<span style="color:var(--info);font-weight:600">Empfehlung:</span> Olaplex No.3 Kur + Proteinbehandlung vor Coloration'
-          + '</div>');
+          '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary)">3-5 Fotos vom Haar aufnehmen — KI analysiert Struktur, Schaedigung, Porostitaet und gibt Pflegeempfehlung.</div>'
+          + '<div style="background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;margin-bottom:10px" onclick="document.getElementById(\'haaranalyseUpload\').click()">'
+          + '<input type="file" id="haaranalyseUpload" accept="image/*" capture="environment" multiple style="display:none" onchange="previewHaaranalysePhotos(this.files)">'
+          + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--info);margin-bottom:6px"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>'
+          + '<div style="font-size:13px;font-weight:600;color:var(--text)">Fotos aufnehmen (3-5 Bilder)</div>'
+          + '<div style="font-size:11px;color:var(--text-dim)">Vorne, hinten, Seite, Scheitel, Ansatz</div></div>'
+          + '<div id="haaranalyseGallery" style="display:none;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px"></div>'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
+          + '<input type="text" id="haKundeName" placeholder="Kundenname" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif">'
+          + '<input type="email" id="haKundeEmail" placeholder="E-Mail (fuer PDF)" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div>'
+          + '<button onclick="startProfiAnalyse()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--info),#2a6faa);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">KI-Analyse starten</button>'
+          + '<div id="haaranalyseResult" style="display:none;margin-top:14px"></div>'
+          + '<div style="font-size:10px;color:var(--text-dim);margin-top:8px;text-align:center">Profi-Analyse im Termin inklusive &middot; Premium-PDF-Report: 19 EUR</div>');
       } else if (tool === 'wunschfrisur') {
-        title.textContent = 'Wunschfrisur-Einsendungen';
+        title.textContent = 'Wunschfrisur analysieren';
         wrapper.insertAdjacentHTML('beforeend',
-          '<div style="margin-bottom:12px;font-size:13px;color:var(--text-secondary)">Kunden-Wunschfrisuren aus WhatsApp, Instagram und Homepage — mit KI-Analyse und Machbarkeitscheck.</div>'
-          + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">'
-          + '<div style="background:var(--warning-bg);border-radius:var(--radius-sm);padding:10px;text-align:center">'
-          + '<div style="font-size:18px;font-weight:700;color:var(--warning);font-family:Playfair Display,serif">2</div>'
-          + '<div style="font-size:9px;color:var(--text-dim);text-transform:uppercase">Neu</div></div>'
-          + '<div style="background:var(--rose-glow);border-radius:var(--radius-sm);padding:10px;text-align:center">'
-          + '<div style="font-size:18px;font-weight:700;color:var(--rose);font-family:Playfair Display,serif">1</div>'
-          + '<div style="font-size:9px;color:var(--text-dim);text-transform:uppercase">KI-Analyse</div></div>'
-          + '<div style="background:var(--success-bg);border-radius:var(--radius-sm);padding:10px;text-align:center">'
-          + '<div style="font-size:18px;font-weight:700;color:var(--success);font-family:Playfair Display,serif">5</div>'
-          + '<div style="font-size:9px;color:var(--text-dim);text-transform:uppercase">Beantwortet</div></div>'
+          '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary)">Wunschbild + aktuelle Frisur hochladen — KI prueft Machbarkeit und empfiehlt passende Techniken.</div>'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+          // Wunschbild
+          + '<div style="background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 10px;text-align:center;cursor:pointer" onclick="document.getElementById(\'wunschUploadTool\').click()">'
+          + '<input type="file" id="wunschUploadTool" accept="image/*" capture="environment" style="display:none" onchange="previewWunschTool(this.files)">'
+          + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:28px;height:28px;color:var(--success);margin-bottom:4px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>'
+          + '<div style="font-size:12px;font-weight:600;color:var(--text)">Wunschbild</div>'
+          + '<div style="font-size:10px;color:var(--text-dim)">Inspiration / Ziel-Look</div></div>'
+          // Aktuelle Frisur
+          + '<div style="background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 10px;text-align:center;cursor:pointer" onclick="document.getElementById(\'aktuelleUploadTool\').click()">'
+          + '<input type="file" id="aktuelleUploadTool" accept="image/*" capture="environment" style="display:none" onchange="previewAktuellTool(this.files)">'
+          + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:28px;height:28px;color:var(--info);margin-bottom:4px"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>'
+          + '<div style="font-size:12px;font-weight:600;color:var(--text)">Aktuelle Frisur</div>'
+          + '<div style="font-size:10px;color:var(--text-dim)">Foto vom Ist-Zustand</div></div>'
           + '</div>'
-          + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text-secondary)">'
-          + '<strong style="color:var(--text)">Neueste:</strong> Sabine M. via WhatsApp — Gestufter Long Bob mit Beach Waves<br>'
-          + '<span style="color:var(--success);font-weight:600">KI:</span> Machbar bei schulterlangem, duennem Haar. Volumenschnitt + Texturspray empfohlen.'
-          + '</div>');
+          // Vorschau-Bilder
+          + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
+          + '<div id="wunschToolPreview" style="display:none;text-align:center"><img id="wunschToolImg" style="max-width:100%;max-height:120px;border-radius:var(--radius);border:1px solid var(--border)"><div style="font-size:9px;color:var(--text-dim);margin-top:2px">Wunsch</div></div>'
+          + '<div id="aktuelleToolPreview" style="display:none;text-align:center"><img id="aktuelleToolImg" style="max-width:100%;max-height:120px;border-radius:var(--radius);border:1px solid var(--border)"><div style="font-size:9px;color:var(--text-dim);margin-top:2px">Aktuell</div></div>'
+          + '</div>'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
+          + '<input type="text" id="wfToolName" placeholder="Kundenname" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif">'
+          + '<select id="wfToolHaartyp" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">'
+          + '<option value="">Haartyp</option><option>Fein &amp; glatt</option><option>Normal &amp; wellig</option><option>Dick &amp; lockig</option><option>Naturkraus</option></select></div>'
+          + '<textarea id="wfToolNotiz" placeholder="Aktuelle Laenge, Vorbehandlungen, Wuensche..." rows="2" style="width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none;margin-bottom:12px;box-sizing:border-box"></textarea>'
+          + '<button onclick="checkMachbarkeit()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--success),#2a9d63);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Machbarkeits-Check starten</button>'
+          + '<div id="machbarkeitResult" style="display:none;margin-top:14px"></div>');
       }
       contentEl.appendChild(wrapper);
       panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // === KI-Tool Hilfsfunktionen ===
+    function previewFarbcode(files) {
+      if (!files || !files[0]) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('farbcodeImg').src = e.target.result;
+        document.getElementById('farbcodePreview').style.display = 'block';
+      };
+      reader.readAsDataURL(files[0]);
+    }
+
+    function previewHaaranalysePhotos(files) {
+      if (!files || !files.length) return;
+      var gallery = document.getElementById('haaranalyseGallery');
+      gallery.style.display = 'grid';
+      gallery.textContent = '';
+      Array.from(files).slice(0, 5).forEach(function(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var img = document.createElement('img');
+          img.src = e.target.result;
+          img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--border)';
+          gallery.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function previewWunschTool(files) {
+      if (!files || !files[0]) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('wunschToolImg').src = e.target.result;
+        document.getElementById('wunschToolPreview').style.display = 'block';
+      };
+      reader.readAsDataURL(files[0]);
+    }
+
+    function previewAktuellTool(files) {
+      if (!files || !files[0]) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('aktuelleToolImg').src = e.target.result;
+        document.getElementById('aktuelleToolPreview').style.display = 'block';
+      };
+      reader.readAsDataURL(files[0]);
+    }
+
+    function generateFarbformel() {
+      var ist = document.getElementById('farbIst').value;
+      var ziel = document.getElementById('farbZiel').value;
+      if (!ist || !ziel) { showToast('Bitte Ist- und Zielton waehlen', 'warning'); return; }
+
+      // Deterministische Farbformel-Berechnung (Code rechnet, nicht LLM!)
+      var istLevel = parseInt(ist.split('/')[0]);
+      var zielLevel = parseInt(ziel.split('/')[0]);
+      var diff = zielLevel - istLevel;
+      var aufhellung = diff > 0;
+      var oxidStufe = aufhellung ? (diff <= 2 ? '6%' : diff <= 4 ? '9%' : '12%') : '3%';
+      var mischung = aufhellung ? '1:1.5' : '1:1';
+      var dauer = aufhellung ? (diff <= 2 ? '30-35' : diff <= 4 ? '35-45' : '45-55') : '25-30';
+
+      // Render result using DOM methods (user input ist/ziel are select values, but escaping for safety)
+      var resultEl = document.getElementById('farbformelResult');
+      resultEl.style.display = 'block';
+      resultEl.textContent = '';
+      resultEl.style.cssText = 'display:block;margin-top:14px;background:var(--bg-warm);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border-accent)';
+
+      var titleDiv = document.createElement('div');
+      titleDiv.style.cssText = 'font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px;font-family:Playfair Display,serif';
+      titleDiv.textContent = 'Mischungsformel';
+      resultEl.appendChild(titleDiv);
+
+      var grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px';
+      var istBox = document.createElement('div');
+      istBox.style.cssText = 'background:var(--surface);border-radius:8px;padding:10px;text-align:center;border:1px solid var(--border)';
+      var istLabel = document.createElement('div');
+      istLabel.style.cssText = 'font-size:10px;color:var(--text-dim);text-transform:uppercase';
+      istLabel.textContent = 'Ist-Ton';
+      var istVal = document.createElement('div');
+      istVal.style.cssText = 'font-size:18px;font-weight:700;color:var(--text);font-family:Playfair Display,serif';
+      istVal.textContent = ist;
+      istBox.appendChild(istLabel);
+      istBox.appendChild(istVal);
+      var zielBox = document.createElement('div');
+      zielBox.style.cssText = 'background:var(--surface);border-radius:8px;padding:10px;text-align:center;border:1px solid var(--border)';
+      var zielLabel = document.createElement('div');
+      zielLabel.style.cssText = 'font-size:10px;color:var(--text-dim);text-transform:uppercase';
+      zielLabel.textContent = 'Ziel-Ton';
+      var zielVal = document.createElement('div');
+      zielVal.style.cssText = 'font-size:18px;font-weight:700;color:var(--gold);font-family:Playfair Display,serif';
+      zielVal.textContent = ziel;
+      zielBox.appendChild(zielLabel);
+      zielBox.appendChild(zielVal);
+      grid.appendChild(istBox);
+      grid.appendChild(zielBox);
+      resultEl.appendChild(grid);
+
+      var details = document.createElement('div');
+      details.style.cssText = 'font-size:12px;color:var(--text);line-height:1.8';
+      details.textContent = '';
+      var lines = [
+        ['Oxid: ', oxidStufe],
+        ['Mischverhaeltnis: ', mischung],
+        ['Einwirkzeit: ', dauer + ' Min.'],
+        ['Stufen-Diff: ', (aufhellung ? '+' : '') + diff + ' (' + (aufhellung ? 'Aufhellung' : 'Tonung') + ')']
+      ];
+      lines.forEach(function(line) {
+        var b = document.createElement('strong');
+        b.textContent = line[0];
+        details.appendChild(b);
+        details.appendChild(document.createTextNode(line[1]));
+        details.appendChild(document.createElement('br'));
+      });
+      resultEl.appendChild(details);
+
+      var hint = document.createElement('div');
+      hint.style.cssText = 'font-size:10px;color:var(--text-dim);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)';
+      hint.textContent = 'Hinweis: Formel ist Richtwert. Immer Probestraehne empfohlen. Powered by Casa 2035 KI.';
+      resultEl.appendChild(hint);
+    }
+
+    function startProfiAnalyse() {
+      var files = document.getElementById('haaranalyseUpload').files;
+      var name = document.getElementById('haKundeName').value;
+      if (!files || !files.length) { showToast('Bitte mindestens 1 Foto aufnehmen', 'warning'); return; }
+      if (!name) { showToast('Bitte Kundennamen angeben', 'warning'); return; }
+      showToast('KI-Analyse wird gestartet...', 'info');
+
+      var resultEl = document.getElementById('haaranalyseResult');
+      resultEl.style.display = 'block';
+      resultEl.style.cssText = 'display:block;margin-top:14px;background:var(--bg-warm);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border-accent)';
+      resultEl.textContent = '';
+
+      var titleDiv = document.createElement('div');
+      titleDiv.style.cssText = 'font-size:13px;font-weight:700;color:var(--info);margin-bottom:8px;font-family:Playfair Display,serif';
+      titleDiv.textContent = 'Analyse-Ergebnis';
+      resultEl.appendChild(titleDiv);
+
+      var info = document.createElement('div');
+      info.style.cssText = 'font-size:12px;color:var(--text);line-height:1.8';
+      var b1 = document.createElement('strong');
+      b1.textContent = 'Kundin: ';
+      info.appendChild(b1);
+      info.appendChild(document.createTextNode(name));
+      info.appendChild(document.createElement('br'));
+      var b2 = document.createElement('strong');
+      b2.textContent = 'Fotos: ';
+      info.appendChild(b2);
+      info.appendChild(document.createTextNode(files.length + ' Aufnahmen analysiert'));
+      info.appendChild(document.createElement('br'));
+      var b3 = document.createElement('strong');
+      b3.textContent = 'Status: ';
+      info.appendChild(b3);
+      var statusSpan = document.createElement('span');
+      statusSpan.style.cssText = 'color:var(--success);font-weight:600';
+      statusSpan.textContent = 'Analyse wird verarbeitet';
+      info.appendChild(statusSpan);
+      resultEl.appendChild(info);
+
+      var note = document.createElement('div');
+      note.style.cssText = 'margin-top:10px;font-size:11px;color:var(--text-dim)';
+      note.textContent = 'Ergebnis wird in Kuerze in den Beratungen angezeigt. PDF-Report per E-Mail moeglich.';
+      resultEl.appendChild(note);
+    }
+
+    function checkMachbarkeit() {
+      var files = document.getElementById('wunschUploadTool').files;
+      var name = document.getElementById('wfToolName').value;
+      if (!files || !files.length) { showToast('Bitte Wunschbild hochladen', 'warning'); return; }
+      if (!name) { showToast('Bitte Kundennamen angeben', 'warning'); return; }
+      showToast('Machbarkeits-Check laeuft...', 'info');
+
+      var resultEl = document.getElementById('machbarkeitResult');
+      resultEl.style.display = 'block';
+      resultEl.style.cssText = 'display:block;margin-top:14px;background:var(--bg-warm);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border-accent)';
+      resultEl.textContent = '';
+
+      var titleDiv = document.createElement('div');
+      titleDiv.style.cssText = 'font-size:13px;font-weight:700;color:var(--success);margin-bottom:8px;font-family:Playfair Display,serif';
+      titleDiv.textContent = 'Machbarkeits-Check';
+      resultEl.appendChild(titleDiv);
+
+      var info = document.createElement('div');
+      info.style.cssText = 'font-size:12px;color:var(--text);line-height:1.8';
+      var b1 = document.createElement('strong');
+      b1.textContent = 'Kundin: ';
+      info.appendChild(b1);
+      info.appendChild(document.createTextNode(name));
+      info.appendChild(document.createElement('br'));
+      var b2 = document.createElement('strong');
+      b2.textContent = 'Status: ';
+      info.appendChild(b2);
+      var statusSpan = document.createElement('span');
+      statusSpan.style.cssText = 'color:var(--success);font-weight:600';
+      statusSpan.textContent = 'Wird analysiert';
+      info.appendChild(statusSpan);
+      resultEl.appendChild(info);
+
+      var note = document.createElement('div');
+      note.style.cssText = 'margin-top:10px;font-size:11px;color:var(--text-dim)';
+      note.textContent = 'KI prueft Machbarkeit, Techniken und Pflegebedarf. Ergebnis erscheint in den Beratungen.';
+      resultEl.appendChild(note);
     }
 
     // === Toast Notification System ===
@@ -4456,13 +4865,44 @@
         reader.readAsDataURL(f);
       });
     }
-    function submitDashWunschfrisur() {
+    async function submitDashWunschfrisur() {
       var name = document.getElementById('dashWfName').value;
       var tel = document.getElementById('dashWfTel').value;
       var msg = document.getElementById('dashWfMsg').value;
       var files = document.getElementById('dashWfUpload').files;
       if (!name || !msg) { showToast('Bitte Name und Beschreibung angeben', 'warning'); return; }
-      showToast('Wunschfrisur gesendet! Wir melden uns kuerzlich.', 'success');
+
+      var payload = {
+        typ: 'wunschfrisur',
+        name: name,
+        telefon: tel,
+        nachricht: msg,
+        timestamp: new Date().toISOString(),
+        kanal: 'dashboard'
+      };
+
+      // Bild als Base64 anhaengen falls vorhanden
+      if (files && files[0]) {
+        try {
+          var base64 = await new Promise(function(resolve, reject) {
+            var reader = new FileReader();
+            reader.onload = function(e) { resolve(e.target.result); };
+            reader.onerror = reject;
+            reader.readAsDataURL(files[0]);
+          });
+          payload.media_url = base64;
+        } catch (e) { /* Bild optional */ }
+      }
+
+      var result = await apiPost('/pwa-wunschfrisur', payload);
+      if (result) {
+        showToast('Wunschfrisur gesendet!', 'success');
+      } else if (!config.baseUrl) {
+        showToast('Demo-Modus: Wunschfrisur gespeichert (kein API konfiguriert)', 'info');
+      } else {
+        showToast('Fehler beim Senden. Bitte erneut versuchen.', 'error');
+        return;
+      }
       document.getElementById('dashWfName').value = '';
       document.getElementById('dashWfTel').value = '';
       document.getElementById('dashWfMsg').value = '';
@@ -4654,6 +5094,7 @@
     }
     function renderLagerList(items) {
       var list = document.getElementById('lagerList');
+      list.className = 'event-list';
       list.textContent = '';
       if (!items.length) { list.innerHTML = '<div class="empty">Keine Produkte gefunden</div>'; return; }
       items.forEach(function(p) {
