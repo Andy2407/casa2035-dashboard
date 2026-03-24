@@ -75,6 +75,41 @@
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
+    /* Dark Mode — Premium Noir */
+    [data-theme="dark"] {
+      --bg: #121212;
+      --bg-warm: #1a1a1a;
+      --surface: #1e1e1e;
+      --surface-hover: #2a2a2a;
+      --surface-active: #333333;
+      --card: rgba(30,30,30,0.95);
+      --card-solid: #1e1e1e;
+      --border: rgba(255,255,255,0.08);
+      --border-accent: rgba(184,150,46,0.25);
+      --text: #e8e4e0;
+      --text-secondary: #b0a8a0;
+      --text-dim: #787068;
+      --text-micro: #585048;
+      --text-light: #c0b8b0;
+      --text-muted: #686058;
+      --champagne: #e8e4e0;
+      --champagne-dim: #c0b8b0;
+      --shadow-soft: 0 2px 16px rgba(0,0,0,0.3);
+      --shadow-glow: 0 0 40px rgba(184,150,46,0.1);
+      --success-bg: rgba(45,138,78,0.15);
+      --warning-bg: rgba(196,138,26,0.15);
+      --danger-bg: rgba(196,64,64,0.15);
+      --info-bg: rgba(58,122,189,0.15);
+      --rose-glow: rgba(184,150,46,0.12);
+      --gold-glow: rgba(184,150,46,0.12);
+    }
+    [data-theme="dark"] .bottom-nav { background: rgba(18,18,18,0.95); }
+    [data-theme="dark"] .header { background: rgba(18,18,18,0.95); }
+    [data-theme="dark"] .sheet { background: #1e1e1e; }
+    [data-theme="dark"] .stat-card { background: var(--surface); }
+    [data-theme="dark"] .kasse-entry { background: var(--surface); }
+    [data-theme="dark"] img { opacity: 0.9; }
+
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
@@ -508,9 +543,10 @@
     .day-block-vip svg { width: 10px; height: 10px; }
 
     /* Staff color coding */
-    .day-block.staff-rena { border-left-color: var(--rose) !important; background: linear-gradient(90deg, rgba(184,150,46,0.04), var(--surface)) !important; }
-    .day-block.staff-lena { border-left-color: var(--info) !important; background: linear-gradient(90deg, rgba(58,122,189,0.06), var(--surface)) !important; }
-    .day-block.staff-other { border-left-color: var(--success) !important; }
+    .day-block.staff-rena { border-left-color: var(--gold) !important; border-left-width: 4px !important; background: linear-gradient(90deg, rgba(184,150,46,0.08), var(--surface)) !important; }
+    .day-block.staff-sarah { border-left-color: #3a7abd !important; border-left-width: 4px !important; background: linear-gradient(90deg, rgba(58,122,189,0.08), var(--surface)) !important; }
+    .day-block.staff-julia { border-left-color: #c06080 !important; border-left-width: 4px !important; background: linear-gradient(90deg, rgba(192,96,128,0.08), var(--surface)) !important; }
+    .day-block.staff-other { border-left-color: var(--success) !important; border-left-width: 4px !important; }
 
     /* Compact blocks (≤30 min): single row */
     .day-block.compact { align-items: center; padding: 4px 14px; gap: 8px; }
@@ -1479,7 +1515,9 @@
       .day-view { margin-left: 56px; }
       .day-time-label { left: -60px; width: 52px; }
       .fab-container { right: 32px; }
-      .bottom-nav { max-width: 600px; left: 50%; right: auto; transform: translateX(-50%); border-radius: var(--radius) var(--radius) 0 0; }
+      .bottom-nav { max-width: 860px; left: 50%; right: auto; transform: translateX(-50%); border-radius: var(--radius) var(--radius) 0 0; padding: 4px 16px calc(4px + var(--safe-bottom)); gap: 4px; }
+      .nav-btn { min-height: 52px; font-size: 9px; gap: 3px; }
+      .nav-btn svg { width: 22px; height: 22px; }
     }
 
     /* --- iPhone SE landscape (667px wide, ~375px tall) --- */
@@ -1544,6 +1582,9 @@
       </div>
       <div class="header-right">
         <span class="live-dot" id="liveStatus">Live</span>
+        <button id="darkModeToggle" onclick="toggleDarkMode()" style="background:none;border:1px solid var(--border-accent);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);transition:all .2s" aria-label="Dark Mode">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
         <div class="avatar" id="avatar">R</div>
       </div>
     </div>
@@ -1577,9 +1618,9 @@
 
       <!-- Schnellaktionen 4er Grid -->
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">
-        <button class="fab touch-scale" onclick="switchPage('lager')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          Lager
+        <button class="fab touch-scale" onclick="switchPage('termine')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Termine
         </button>
         <button class="fab touch-scale" onclick="switchPage('kasse')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
@@ -1594,6 +1635,16 @@
           Bestell.
         </button>
       </div>
+
+      <!-- Mein Tag Card — personalisiert fuer eingeloggten User -->
+      <div id="meinTagCard" style="background:linear-gradient(135deg, rgba(184,150,46,0.08), rgba(184,150,46,0.02));border:1px solid rgba(184,150,46,0.2);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:none">
+        <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Dein Tag</div>
+        <div id="meinTagInfo" style="font-size:14px;color:var(--text);font-weight:600"></div>
+        <div id="meinTagDetails" style="font-size:12px;color:var(--text-light);margin-top:4px"></div>
+      </div>
+
+      <!-- KI-Tagesvorschau — intelligente Hinweise basierend auf heutigen Terminen -->
+      <div id="kiTagesvorschau" style="display:none;margin-bottom:14px"></div>
 
       <div class="dash-section dash-section-stats">
       <div class="section" style="margin-top:0"><div class="section-bar"></div><div class="section-title">Tages-Ueberblick</div></div>
@@ -1664,6 +1715,7 @@
         <div class="termin-stat"><div class="termin-stat-val" id="tsBestaetigt">--</div><div class="termin-stat-label">Bestaetigt</div></div>
         <div class="termin-stat"><div class="termin-stat-val" id="tsOffen">--</div><div class="termin-stat-label">Offen</div></div>
         <div class="termin-stat"><div class="termin-stat-val" id="tsStunden">--</div><div class="termin-stat-label">Stunden</div></div>
+        <div class="termin-stat"><div class="termin-stat-val" id="tsAuslastung" style="font-size:16px">--%</div><div class="termin-stat-label">Woche</div></div>
       </div>
       <!-- Day Navigation -->
       <div class="day-nav" id="dayNav">
@@ -1681,8 +1733,9 @@
       <!-- Staff Filter -->
       <div class="staff-filter" id="staffFilter">
         <button class="staff-filter-btn active" data-staff="alle" onclick="filterStaff('alle')">Alle</button>
-        <button class="staff-filter-btn" data-staff="Rena" onclick="filterStaff('Rena')">Rena</button>
-        <button class="staff-filter-btn" data-staff="Lena" onclick="filterStaff('Lena')">Lena</button>
+        <button class="staff-filter-btn" data-staff="Rena" onclick="filterStaff('Rena')"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold);margin-right:4px;vertical-align:middle"></span>Rena</button>
+        <button class="staff-filter-btn" data-staff="Sarah" onclick="filterStaff('Sarah')"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#3a7abd;margin-right:4px;vertical-align:middle"></span>Sarah</button>
+        <button class="staff-filter-btn" data-staff="Julia" onclick="filterStaff('Julia')"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#c06080;margin-right:4px;vertical-align:middle"></span>Julia</button>
       </div>
       <div class="section"><div class="section-bar"></div><div class="section-title" id="dayTitle">Heute</div><span class="section-count" id="termineCount">--</span></div>
       <!-- Week View (Landscape) -->
@@ -1861,8 +1914,8 @@
           </div>
         </div>
 
-        <!-- KI-Tools: 3 Kacheln fuer Friseur -->
-        <div class="section"><div class="section-bar" style="background:var(--rose-gradient)"></div><div class="section-title">KI-Werkzeuge</div></div>
+        <!-- KI-Tools: 3 Kacheln fuer Friseur + Appetit-Modell Paket-Anzeige -->
+        <div class="section"><div class="section-bar" style="background:var(--rose-gradient)"></div><div class="section-title">KI-Werkzeuge</div><span class="section-count" id="paketBadge" style="background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;font-weight:600;padding:2px 8px;border-radius:10px;font-size:10px"></span></div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">
           <!-- Farbcode -->
           <div id="toolFarbcode" onclick="showKiTool('farbcode')" style="background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s var(--ease)">
@@ -2471,6 +2524,27 @@
       items.forEach(function(t) { totalMin += parseInt(t.Duration_Min) || 30; });
       document.getElementById('tsStunden').textContent = (totalMin / 60).toFixed(1) + 'h';
 
+      // Wochen-Auslastung berechnen (Mo-Sa der aktuellen Woche)
+      var weekStart = new Date(selectedDay);
+      var wDay = weekStart.getDay() || 7;
+      weekStart.setDate(weekStart.getDate() - wDay + 1); // Montag
+      var weekTotalMin = 0;
+      for (var wi = 0; wi < 6; wi++) { // Mo-Sa
+        var wd = new Date(weekStart);
+        wd.setDate(wd.getDate() + wi);
+        var wdk = dateKey(wd);
+        termineCache.forEach(function(t) {
+          if ((t.Start_ISO || '').startsWith(wdk)) weekTotalMin += (parseInt(t.Duration_Min) || 30);
+        });
+      }
+      var weekCapacity = 3 * 8 * 60 * 6; // 3 Stylisten x 8h x 6 Tage = 8640 Min
+      var weekPct = Math.round((weekTotalMin / weekCapacity) * 100);
+      var auslEl = document.getElementById('tsAuslastung');
+      if (auslEl) {
+        auslEl.textContent = weekPct + '%';
+        auslEl.style.color = weekPct > 85 ? 'var(--success)' : weekPct > 60 ? 'var(--gold)' : 'var(--info)';
+      }
+
       // Render day view
       renderDayView(items);
       // Render week view
@@ -2484,23 +2558,27 @@
 
       var startHour = 8;
       var endHour = 20;
-      var slotHeight = 15;
-      var totalSlots = (endHour - startHour) * 4;
+      var slotMin = 10; // 10-Minuten-Taktung (minutengenaue Buchung)
+      var slotsPerHour = 60 / slotMin;
+      var slotHeight = 10; // px pro 10-Min-Slot
+      var totalSlots = (endHour - startHour) * slotsPerHour;
       var totalHeight = totalSlots * slotHeight;
       c.style.minHeight = totalHeight + 'px';
 
       for (var s = 0; s < totalSlots; s++) {
-        var h = startHour + Math.floor(s / 4);
-        var m = (s % 4) * 15;
+        var h = startHour + Math.floor(s / slotsPerHour);
+        var m = (s % slotsPerHour) * slotMin;
         var isFullHour = m === 0;
+        var isHalfHour = m === 30;
         var slot = document.createElement('div');
         slot.className = 'day-time-slot';
         slot.style.position = 'absolute';
         slot.style.top = (s * slotHeight) + 'px';
         slot.style.left = '0'; slot.style.right = '0';
         slot.style.height = slotHeight + 'px';
-        slot.style.borderTop = isFullHour ? '1px solid var(--border-accent)' : '1px solid var(--border)';
-        if (isFullHour || m === 30) {
+        slot.style.borderTop = isFullHour ? '1px solid var(--border-accent)' : isHalfHour ? '1px solid var(--border)' : '1px dotted var(--border)';
+        slot.style.opacity = (isFullHour || isHalfHour) ? '1' : '0.5';
+        if (isFullHour || isHalfHour) {
           var label = document.createElement('div');
           label.className = 'day-time-label' + (isFullHour ? ' full-hour' : '');
           label.textContent = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
@@ -2509,13 +2587,26 @@
         c.appendChild(slot);
       }
 
+      // Mittagspause Block (12:00-13:00) — visueller Marker
+      var pauseTop = ((12 - startHour) * 60) / slotMin * slotHeight;
+      var pauseHeight = 60 / slotMin * slotHeight;
+      var pauseBlock = document.createElement('div');
+      pauseBlock.style.cssText = 'position:absolute;left:0;right:0;background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(184,150,46,0.04) 4px,rgba(184,150,46,0.04) 8px);border-top:1px dashed rgba(184,150,46,0.3);border-bottom:1px dashed rgba(184,150,46,0.3);z-index:1;pointer-events:none;display:flex;align-items:center;justify-content:center';
+      pauseBlock.style.top = pauseTop + 'px';
+      pauseBlock.style.height = pauseHeight + 'px';
+      var pauseLabel = document.createElement('span');
+      pauseLabel.style.cssText = 'font-size:10px;color:var(--text-dim);font-weight:600;text-transform:uppercase;letter-spacing:1px;background:rgba(250,248,246,0.8);padding:2px 10px;border-radius:10px';
+      pauseLabel.textContent = 'Mittagspause';
+      pauseBlock.appendChild(pauseLabel);
+      c.appendChild(pauseBlock);
+
       // Current time line (only if viewing today)
       if (isToday(selectedDay)) {
         var now2 = new Date();
         var nowH = now2.getHours();
         var nowM = now2.getMinutes();
         if (nowH >= startHour && nowH < endHour) {
-          var nowOffset = ((nowH - startHour) * 4 + nowM / 15) * slotHeight;
+          var nowOffset = ((nowH - startHour) * 60 + nowM) / slotMin * slotHeight;
           var nowLine = document.createElement('div');
           nowLine.className = 'day-now-line';
           nowLine.style.top = nowOffset + 'px';
@@ -2573,14 +2664,15 @@
         var st = (t.Status || 'proposed').toLowerCase();
         var stLabel = st === 'confirmed' ? 'Bestaetigt' : st === 'pending_approval' ? 'Vorgemerkt' : st === 'cancelled' ? 'Storniert' : 'Offen';
 
-        var topPx = ((tH - startHour) * 4 + tM / 15) * slotHeight;
-        var heightPx = Math.max((dur / 15) * slotHeight, slotHeight);
-        var isCompact = dur <= 30;
+        var topPx = ((tH - startHour) * 60 + tM) / slotMin * slotHeight;
+        var heightPx = Math.max((dur / slotMin) * slotHeight, slotHeight);
+        var isCompact = dur <= 20;
 
         var staffClass = '';
         var staffName = (t.Staff || '').toLowerCase();
         if (staffName.indexOf('rena') !== -1) staffClass = ' staff-rena';
-        else if (staffName.indexOf('lena') !== -1) staffClass = ' staff-lena';
+        else if (staffName.indexOf('sarah') !== -1) staffClass = ' staff-sarah';
+        else if (staffName.indexOf('julia') !== -1) staffClass = ' staff-julia';
         else if (staffName) staffClass = ' staff-other';
 
         // Column positioning for overlapping appointments
@@ -2741,6 +2833,10 @@
     var bestellungenCache = [];
     let config = JSON.parse(localStorage.getItem('casa2035_config') || 'null') || { baseUrl: '', token: '', userId: '' };
 
+    // === Appetit-Modell: Salon-Paket bestimmt KI-Feature-Tiefe ===
+    // "starter" = Smart Start (EUR 49), "pro" = Salon Pro (EUR 79), "fullsuite" = Full Suite (EUR 199)
+    var salonPaket = localStorage.getItem('casa2035_paket') || 'starter'; // Demo: starter zeigt Upgrade-Teaser
+
     document.addEventListener('DOMContentLoaded', () => {
       const saved = localStorage.getItem('casa2035_settings');
       if (saved) {
@@ -2770,6 +2866,7 @@
       document.getElementById('page-' + page).classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === page));
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (typeof updateFabForPage === 'function') updateFabForPage(page);
     }
     function scrollToEvents() {
       var el = document.getElementById('recentEvents');
@@ -3036,11 +3133,84 @@
         nextCountdown.textContent = '';
       }
 
-      // Mini-Timeline
+      // "Mein Tag" Card — personalisierte Uebersicht fuer eingeloggten User
+      var todayKey2 = dateKey(now);
+      var myTermine = sorted.filter(function(t) { return (t.Start_ISO || '').startsWith(todayKey2) && (t.Staff || '') === currentUser; });
+      var meinTagCard = document.getElementById('meinTagCard');
+      if (meinTagCard && myTermine.length > 0) {
+        meinTagCard.style.display = 'block';
+        var myHours = 0; myTermine.forEach(function(t) { myHours += (parseInt(t.Duration_Min) || 30); });
+        var myVIP = myTermine.filter(function(t) { return t.VIP; }).length;
+        document.getElementById('meinTagInfo').textContent = myTermine.length + ' Termine, ' + (myHours / 60).toFixed(1) + 'h' + (myVIP > 0 ? ', ' + myVIP + ' VIP' : '');
+        var firstStart = new Date(myTermine[0].Start_ISO);
+        var lastEnd = new Date(new Date(myTermine[myTermine.length - 1].Start_ISO).getTime() + (parseInt(myTermine[myTermine.length - 1].Duration_Min) || 30) * 60000);
+        document.getElementById('meinTagDetails').textContent = 'Erster Termin: ' + String(firstStart.getHours()).padStart(2,'0') + ':' + String(firstStart.getMinutes()).padStart(2,'0') + ' \u2014 Letzter endet: ' + String(lastEnd.getHours()).padStart(2,'0') + ':' + String(lastEnd.getMinutes()).padStart(2,'0');
+      } else if (meinTagCard) {
+        meinTagCard.style.display = 'none';
+      }
+
+      // KI-Tagesvorschau — intelligente Hinweise
+      var kiVorschau = document.getElementById('kiTagesvorschau');
+      if (kiVorschau) {
+        kiVorschau.textContent = '';
+        var todayKeyK = dateKey(now);
+        var todayTermineK = termineCache.filter(function(t) { return (t.Start_ISO || '').startsWith(todayKeyK); });
+        var hints = [];
+        // Farb-Termine zaehlen
+        var farbTermine = todayTermineK.filter(function(t) { return (t.Service || '').match(/farb|balayage|straehnen|ansatz|glossing/i); });
+        if (farbTermine.length >= 2) {
+          hints.push({ icon: '\uD83C\uDFA8', text: farbTermine.length + ' Farbtermine heute \u2014 Farbvorrat und Oxid pruefen', color: '#a07000' });
+        }
+        // VIP zaehlen
+        var vipCount = todayTermineK.filter(function(t) { return t.VIP; }).length;
+        if (vipCount > 0) {
+          hints.push({ icon: '\u2B50', text: vipCount + ' VIP-Kund' + (vipCount > 1 ? 'en' : 'e') + ' heute \u2014 Extra-Aufmerksamkeit!', color: 'var(--gold)' });
+        }
+        // Offene Beratungen
+        var offeneBeratungen = beratungenCache ? beratungenCache.filter(function(b) { return b.Status === 'neu'; }).length : 0;
+        if (offeneBeratungen > 0) {
+          hints.push({ icon: '\uD83D\uDCAC', text: offeneBeratungen + ' unbeantwortete Anfrage' + (offeneBeratungen > 1 ? 'n' : '') + ' \u2014 Kunden warten!', color: '#c03030' });
+        }
+        // Auslastung
+        var totalMin2 = 0; todayTermineK.forEach(function(t) { totalMin2 += (parseInt(t.Duration_Min) || 30); });
+        var auslastung = Math.round(totalMin2 / (3 * 8 * 60) * 100); // 3 Stylisten x 8h
+        if (auslastung > 85) {
+          hints.push({ icon: '\uD83D\uDD25', text: 'Voller Tag! ' + auslastung + '% Teamauslastung \u2014 Pausen einplanen', color: 'var(--success)' });
+        } else if (auslastung < 50) {
+          hints.push({ icon: '\uD83D\uDCC8', text: auslastung + '% Auslastung \u2014 noch Kapazitaet fuer Walk-Ins oder Nachholtermine', color: 'var(--info)' });
+        }
+
+        if (hints.length > 0) {
+          kiVorschau.style.display = 'block';
+          var vorschauTitle = document.createElement('div');
+          vorschauTitle.style.cssText = 'font-size:11px;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:flex;align-items:center;gap:6px';
+          vorschauTitle.textContent = '\u2728 KI-Tagesvorschau';
+          kiVorschau.appendChild(vorschauTitle);
+          hints.forEach(function(h) {
+            var row = document.createElement('div');
+            row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius-sm);margin-bottom:6px;font-size:13px;color:var(--text)';
+            var iconSpan = document.createElement('span');
+            iconSpan.style.fontSize = '16px';
+            iconSpan.textContent = h.icon;
+            row.appendChild(iconSpan);
+            var textSpan = document.createElement('span');
+            textSpan.textContent = h.text;
+            row.appendChild(textSpan);
+            kiVorschau.appendChild(row);
+          });
+        } else {
+          kiVorschau.style.display = 'none';
+        }
+      }
+
+      // Mini-Timeline — NUR heutige Termine
       var tl = document.getElementById('homeMiniTimeline');
       var countEl = document.getElementById('todayTerminCount');
       tl.textContent = '';
-      countEl.textContent = sorted.length + ' Termine';
+      var todayKey = dateKey(now);
+      var todayOnly = sorted.filter(function(t) { return (t.Start_ISO || '').startsWith(todayKey); });
+      countEl.textContent = todayOnly.length + ' Termine heute';
+      sorted = todayOnly; // Mini-Timeline zeigt nur heute
 
       if (!sorted.length) {
         var empty = document.createElement('div');
@@ -3098,9 +3268,12 @@
         custSpan.textContent = t.Customer_Name || '';
         meta.appendChild(custSpan);
         if (t.Staff) {
+          var staffColors = { rena: 'var(--gold)', sarah: '#3a7abd', julia: '#c06080' };
+          var staffColor = staffColors[(t.Staff || '').toLowerCase()] || 'var(--text-dim)';
           var staffSpan = document.createElement('span');
+          staffSpan.style.color = staffColor;
+          staffSpan.style.fontWeight = '600';
           staffSpan.textContent = t.Staff;
-          staffSpan.style.color = 'var(--rose-light)';
           meta.appendChild(staffSpan);
         }
 
@@ -3660,6 +3833,31 @@
         var statusLabels = { neu: 'Neu', analyse: 'KI analysiert', fertig: 'Fertig', beantwortet: 'Beantwortet' };
         status.textContent = statusLabels[b.Status] || b.Status;
 
+        // Wartezeit-Badge (nur fuer offene Anfragen)
+        if (b.Status === 'neu' || b.Status === 'analyse') {
+          var bTime = b.Timestamp ? new Date(b.Timestamp) : null;
+          if (bTime) {
+            var waitMin = Math.round((new Date() - bTime) / 60000);
+            var waitEl = document.createElement('div');
+            waitEl.style.cssText = 'font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-top:4px;display:inline-block';
+            if (waitMin > 120) {
+              waitEl.style.background = 'rgba(220,50,50,0.1)';
+              waitEl.style.color = '#c03030';
+              waitEl.textContent = 'Wartet ' + Math.floor(waitMin / 60) + 'h ' + (waitMin % 60) + 'm';
+            } else if (waitMin > 30) {
+              waitEl.style.background = 'rgba(200,150,0,0.1)';
+              waitEl.style.color = '#a07000';
+              waitEl.textContent = 'Wartet ' + waitMin + ' Min';
+            } else {
+              waitEl.style.background = 'rgba(50,150,50,0.1)';
+              waitEl.style.color = '#308030';
+              waitEl.textContent = 'Gerade eben';
+            }
+            status.appendChild(document.createElement('br'));
+            status.appendChild(waitEl);
+          }
+        }
+
         header.appendChild(avatar);
         header.appendChild(info);
         header.appendChild(status);
@@ -3768,8 +3966,40 @@
           btnTermin.addEventListener('click', function() { openTerminVorschlagSheet(beratung); });
         })(b);
 
+        // "Zuweisen" Button
+        var btnZuweisen = document.createElement('button');
+        btnZuweisen.className = 'beratung-action secondary';
+        btnZuweisen.style.cssText = 'flex:0.6;font-size:11px';
+        var zuweiseSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        zuweiseSvg.setAttribute('viewBox', '0 0 24 24');
+        zuweiseSvg.setAttribute('fill', 'none');
+        zuweiseSvg.setAttribute('stroke', 'currentColor');
+        zuweiseSvg.setAttribute('stroke-width', '2');
+        var zp1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        zp1.setAttribute('d', 'M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2');
+        var zp2 = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        zp2.setAttribute('cx', '8.5'); zp2.setAttribute('cy', '7'); zp2.setAttribute('r', '4');
+        var zp3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        zp3.setAttribute('x1', '20'); zp3.setAttribute('y1', '8'); zp3.setAttribute('x2', '20'); zp3.setAttribute('y2', '14');
+        var zp4 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        zp4.setAttribute('x1', '23'); zp4.setAttribute('y1', '11'); zp4.setAttribute('x2', '17'); zp4.setAttribute('y2', '11');
+        zuweiseSvg.appendChild(zp1); zuweiseSvg.appendChild(zp2); zuweiseSvg.appendChild(zp3); zuweiseSvg.appendChild(zp4);
+        btnZuweisen.appendChild(zuweiseSvg);
+        btnZuweisen.appendChild(document.createTextNode(' Zuweisen'));
+        (function(beratung) {
+          btnZuweisen.addEventListener('click', function() {
+            var staffNames = ['Sarah', 'Julia', 'Rena'];
+            var current = beratung.ZugewiesenAn || '';
+            var next = staffNames[(staffNames.indexOf(current) + 1) % staffNames.length];
+            beratung.ZugewiesenAn = next;
+            showToast('Zugewiesen an ' + next, 'success', 2000);
+            renderBeratungen(beratungenCache);
+          });
+        })(b);
+
         footer.appendChild(btnAntwort);
         footer.appendChild(btnTermin);
+        footer.appendChild(btnZuweisen);
         card.appendChild(footer);
 
         c.appendChild(card);
@@ -3816,47 +4046,261 @@
         d.setDate(d.getDate() + dayOffset);
         return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00';
       };
-      renderTermine([
-        // Heute — 8 Termine, 2 VIP, 2 Stylisten
-        { Start_ISO: iso(9, 0), Service: 'Damenhaarschnitt + Foehn', Customer_Name: 'Anna Mueller', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed', VIP: true },
-        { Start_ISO: iso(10, 15), Service: 'Balayage + Schnitt', Customer_Name: 'Lisa Kramer', Staff: 'Rena', Duration_Min: 120, Status: 'confirmed' },
-        { Start_ISO: iso(10, 30), Service: 'Herrenschnitt', Customer_Name: 'Thomas Weber', Staff: 'Lena', Duration_Min: 30, Status: 'confirmed' },
-        { Start_ISO: iso(12, 30), Service: 'Farbbehandlung Komplett', Customer_Name: 'Sandra Fischer', Staff: 'Rena', Duration_Min: 90, Status: 'pending_approval', VIP: true },
-        { Start_ISO: iso(13, 0), Service: 'Kinderhaarschnitt', Customer_Name: 'Max Klein (8J)', Staff: 'Lena', Duration_Min: 30, Status: 'confirmed' },
-        { Start_ISO: iso(14, 0), Service: 'Haarpflege + Olaplex', Customer_Name: 'Julia Berger', Staff: 'Rena', Duration_Min: 45, Status: 'confirmed' },
-        { Start_ISO: iso(15, 0), Service: 'Brautstyling Probe', Customer_Name: 'Sophie Lang', Staff: 'Rena', Duration_Min: 90, Status: 'proposed' },
-        { Start_ISO: iso(16, 0), Service: 'Herrenschnitt + Bartpflege', Customer_Name: 'Markus Huber', Staff: 'Lena', Duration_Min: 45, Status: 'confirmed' },
-        // Morgen
-        { Start_ISO: isoDay(1, 9, 0), Service: 'Haarschnitt Feminin', Customer_Name: 'Petra Maier', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed' },
-        { Start_ISO: isoDay(1, 11, 0), Service: 'Herrenschnitt', Customer_Name: 'Klaus Fischer', Staff: 'Lena', Duration_Min: 30, Status: 'confirmed' },
-        { Start_ISO: isoDay(1, 13, 30), Service: 'Balayage + Schnitt', Customer_Name: 'Sophie Wagner', Staff: 'Rena', Duration_Min: 120, Status: 'proposed', VIP: true },
-        { Start_ISO: isoDay(1, 16, 0), Service: 'Grooming Paket', Customer_Name: 'Michael Braun', Staff: 'Lena', Duration_Min: 45, Status: 'confirmed' },
-        // Gestern
-        { Start_ISO: isoDay(-1, 9, 30), Service: 'Farbbehandlung', Customer_Name: 'Laura Berger', Staff: 'Rena', Duration_Min: 90, Status: 'confirmed' },
-        { Start_ISO: isoDay(-1, 11, 30), Service: 'Herrenschnitt + Bartpflege', Customer_Name: 'David Klein', Staff: 'Lena', Duration_Min: 45, Status: 'confirmed' },
-        { Start_ISO: isoDay(-1, 14, 0), Service: 'Haarschnitt Feminin', Customer_Name: 'Nina Hofmann', Staff: 'Rena', Duration_Min: 60, Status: 'confirmed' },
-        // Uebermorgen
-        { Start_ISO: isoDay(2, 10, 0), Service: 'Brautstyling', Customer_Name: 'Eva Mueller', Staff: 'Rena', Duration_Min: 90, Status: 'confirmed', VIP: true },
-        { Start_ISO: isoDay(2, 14, 0), Service: 'Herrenschnitt', Customer_Name: 'Tobias Richter', Staff: 'Lena', Duration_Min: 30, Status: 'proposed' },
-      ]);
+      // === Produkt-Zuordnung pro Service (fuer Termin-Detail) ===
+      var serviceProdukte = {
+        'Damenhaarschnitt + Foehn': { aufgaben: ['Waschen', 'Schneiden', 'Foehnen + Styling'], produkte: ['Shampoo Vital', 'Conditioner', 'Hitzeschutz-Spray'] },
+        'Haarschnitt Feminin': { aufgaben: ['Waschen', 'Schneiden', 'Foehnen'], produkte: ['Shampoo Vital', 'Conditioner'] },
+        'Balayage + Schnitt': { aufgaben: ['Farbanalyse', 'Straehnen setzen (Freihand)', 'Einwirkzeit 35 Min', 'Auswaschen + Pflege', 'Schneiden', 'Foehnen'], produkte: ['Blondierpulver', 'Oxid 6%', 'Balayage Folie 30cm', 'Olaplex No. 1', 'Olaplex No. 2', 'Shampoo Silber', 'Pflegekur'] },
+        'Farbbehandlung Komplett': { aufgaben: ['Farbberatung', 'Farbe anmischen', 'Auftragen', 'Einwirkzeit 30 Min', 'Auswaschen', 'Pflege + Foehnen'], produkte: ['Haarfarbe (lt. Farbcode)', 'Oxid (lt. Stufe)', 'Handschuhe', 'Farbschale', 'Pflegekur Color'] },
+        'Farbbehandlung': { aufgaben: ['Farbberatung', 'Farbe anmischen', 'Auftragen', 'Einwirkzeit 30 Min', 'Auswaschen', 'Pflege + Foehnen'], produkte: ['Haarfarbe (lt. Farbcode)', 'Oxid (lt. Stufe)', 'Handschuhe', 'Pflegekur Color'] },
+        'Herrenschnitt': { aufgaben: ['Waschen', 'Schneiden (Maschine + Schere)', 'Styling'], produkte: ['Shampoo Men', 'Styling Paste'] },
+        'Herrenschnitt + Bartpflege': { aufgaben: ['Waschen', 'Schneiden', 'Bart trimmen + konturieren', 'Styling'], produkte: ['Shampoo Men', 'Bartoel', 'Styling Paste'] },
+        'Haarpflege + Olaplex': { aufgaben: ['Waschen', 'Olaplex No. 1 auftragen', 'Einwirkzeit 15 Min', 'Olaplex No. 2 auftragen', 'Einwirkzeit 20 Min', 'Auswaschen + Pflege', 'Foehnen'], produkte: ['Olaplex No. 1', 'Olaplex No. 2', 'Shampoo Vital', 'Pflegekur'] },
+        'Brautstyling Probe': { aufgaben: ['Beratungsgespraech', 'Probefrisur aufbauen', 'Locken/Wellen', 'Haarschmuck einarbeiten', 'Fotos machen', 'Styling dokumentieren'], produkte: ['Haarspray Extra Strong', 'Lockenspray', 'Haarnadeln', 'Hitzeschutz-Spray'] },
+        'Brautstyling': { aufgaben: ['Waschen + Pflege', 'Locken/Wellen setzen', 'Hochsteckfrisur', 'Haarschmuck einarbeiten', 'Finishing + Fixierung'], produkte: ['Shampoo Vital', 'Volumen-Mousse', 'Haarspray Extra Strong', 'Haarnadeln', 'Hitzeschutz-Spray'] },
+        'Kinderhaarschnitt': { aufgaben: ['Waschen', 'Schneiden', 'Trocknen'], produkte: ['Shampoo Mild'] },
+        'Grooming Paket': { aufgaben: ['Waschen', 'Schneiden', 'Bart trimmen', 'Augenbrauen', 'Styling'], produkte: ['Shampoo Men', 'Bartoel', 'Styling Paste', 'Aftershave'] },
+        'Dauerwelle': { aufgaben: ['Waschen', 'Wickler setzen', 'Dauerwellfluessigkeit', 'Einwirkzeit 20 Min', 'Fixierung', 'Auswaschen + Pflege', 'Foehnen'], produkte: ['Dauerwellmittel', 'Fixierung', 'Wickler', 'Pflegekur'] },
+        'Ansatzfarbe': { aufgaben: ['Ansatz vorbereiten', 'Farbe anmischen', 'Auftragen am Ansatz', 'Einwirkzeit 25 Min', 'Auswaschen', 'Pflege'], produkte: ['Haarfarbe (lt. Farbcode)', 'Oxid 3%', 'Handschuhe', 'Pflegekur Color'] },
+        'Straehnen + Schnitt': { aufgaben: ['Straehnen-Beratung', 'Folienstraehnen setzen', 'Einwirkzeit 30 Min', 'Auswaschen', 'Schneiden', 'Foehnen'], produkte: ['Blondierpulver', 'Oxid 6%', 'Alufolie', 'Shampoo Silber', 'Pflegekur'] },
+        'Haarpflege Intensiv': { aufgaben: ['Kopfhautanalyse', 'Waschen', 'Pflegekur einarbeiten', 'Einwirkzeit 15 Min', 'Auswaschen', 'Foehnen'], produkte: ['Shampoo Vital', 'Intensiv-Kur', 'Kopfhaut-Serum'] },
+        'Glossing': { aufgaben: ['Waschen', 'Glossing anmischen', 'Auftragen', 'Einwirkzeit 10 Min', 'Auswaschen', 'Foehnen'], produkte: ['Glossing-Farbe', 'Shampoo Color', 'Pflegekur Color'] }
+      };
+      window.serviceProdukte = serviceProdukte;
+
+      // === Team-Struktur: Rena (Chefin, 2-3 Wochen ausgebucht, grosse Damen-Termine) ===
+      // === Sarah + Julia (Meisterfriseurinnen, 4-5 Termine/Tag), Azubis KEINE eigenen Termine ===
+      var demoTermine = [];
+      // Rena: Premium-Damen (80% lang: Balayage, Farbe, Braut, Dauerwelle)
+      var renaServices = [
+        { s: 'Balayage + Schnitt', d: 120 }, { s: 'Balayage + Schnitt', d: 120 },
+        { s: 'Farbbehandlung Komplett', d: 90 }, { s: 'Farbbehandlung Komplett', d: 90 },
+        { s: 'Straehnen + Schnitt', d: 120 }, { s: 'Brautstyling Probe', d: 90 },
+        { s: 'Brautstyling', d: 90 }, { s: 'Dauerwelle', d: 90 },
+        { s: 'Haarschnitt Feminin', d: 60 }, { s: 'Damenhaarschnitt + Foehn', d: 60 },
+        { s: 'Haarpflege + Olaplex', d: 45 }, { s: 'Glossing', d: 40 },
+        { s: 'Ansatzfarbe', d: 75 }
+      ];
+      // Sarah/Julia: Mix aus kurz und mittel
+      var teamServices = [
+        { s: 'Haarschnitt Feminin', d: 60 }, { s: 'Herrenschnitt', d: 30 },
+        { s: 'Herrenschnitt + Bartpflege', d: 45 }, { s: 'Kinderhaarschnitt', d: 30 },
+        { s: 'Farbbehandlung Komplett', d: 90 }, { s: 'Ansatzfarbe', d: 75 },
+        { s: 'Grooming Paket', d: 45 }, { s: 'Haarpflege Intensiv', d: 45 },
+        { s: 'Damenhaarschnitt + Foehn', d: 60 }, { s: 'Glossing', d: 40 },
+        { s: 'Balayage + Schnitt', d: 120 }, { s: 'Straehnen + Schnitt', d: 120 }
+      ];
+      var kundenNamen = [
+        'Anna Mueller', 'Lisa Kramer', 'Thomas Weber', 'Sandra Fischer', 'Julia Berger',
+        'Sophie Lang', 'Markus Huber', 'Petra Maier', 'Klaus Fischer', 'Sophie Wagner',
+        'Michael Braun', 'Laura Berger', 'David Klein', 'Nina Hofmann', 'Eva Mueller',
+        'Tobias Richter', 'Hannah Schneider', 'Leon Becker', 'Emma Schulz', 'Paul Hoffmann',
+        'Marie Wagner', 'Jan Richter', 'Lena Koch', 'Felix Wolf', 'Sarah Bauer',
+        'Lukas Schreiber', 'Mia Hartmann', 'Tim Lange', 'Clara Frank', 'Max Zimmermann',
+        'Nora Krueger', 'Ben Lehmann', 'Ella Meier', 'Jonas Brandt', 'Amelie Werner',
+        'Katharina Wolff', 'Christina Braun', 'Stefanie Vogel', 'Monika Stein', 'Birgit Sommer'
+      ];
+      // Seeded random fuer konsistente Daten
+      var seed = 42;
+      function seededRand() { seed = (seed * 16807 + 0) % 2147483647; return (seed - 1) / 2147483646; }
+
+      // Hilfsfunktion: Termine fuer einen Stylisten generieren, minutengenau, ohne Ueberlappung
+      function generateDayTermine(dayOff, staff, services, count, vipRate) {
+        var result = [];
+        var nextFree = 9 * 60; // ab 09:00 in Minuten
+        var endOfDay = 19 * 60; // bis 19:00
+        for (var i = 0; i < count; i++) {
+          if (nextFree >= endOfDay) break;
+          var svc = services[Math.floor(seededRand() * services.length)];
+          // Kleine Pause zwischen Terminen (5-15 Min)
+          var pause = (i === 0) ? 0 : 5 + Math.floor(seededRand() * 11);
+          var startMin = nextFree + pause;
+          if (startMin + svc.d > endOfDay + 30) break; // nicht ueber 19:30
+          var h = Math.floor(startMin / 60);
+          var m = startMin % 60;
+          // Auf 5-Min runden
+          m = Math.round(m / 5) * 5;
+          if (m >= 60) { h++; m = 0; }
+          var kunde = kundenNamen[Math.floor(seededRand() * kundenNamen.length)];
+          var isVIP = seededRand() < vipRate;
+          var status = dayOff < 0 ? 'confirmed' : (seededRand() < 0.8 ? 'confirmed' : (seededRand() < 0.5 ? 'proposed' : 'pending_approval'));
+          result.push({
+            Start_ISO: isoDay(dayOff, h, m),
+            Service: svc.s, Customer_Name: kunde, Staff: staff,
+            Duration_Min: svc.d, Status: status, VIP: isVIP
+          });
+          nextFree = h * 60 + m + svc.d;
+        }
+        return result;
+      }
+
+      // 30 Tage generieren (14 zurueck, heute, 15 vorwaerts) — Mo-Sa, Sonntag frei
+      for (var dayOff = -14; dayOff <= 15; dayOff++) {
+        var testDate = new Date(now);
+        testDate.setDate(testDate.getDate() + dayOff);
+        if (testDate.getDay() === 0) continue; // Sonntag frei
+        var isSaturday = testDate.getDay() === 6;
+
+        // Rena: 7-8 Termine/Tag (Sa: 5-6), fast immer ausgebucht, 25% VIP
+        var renaCount = isSaturday ? (5 + Math.floor(seededRand() * 2)) : (7 + Math.floor(seededRand() * 2));
+        demoTermine = demoTermine.concat(generateDayTermine(dayOff, 'Rena', renaServices, renaCount, 0.25));
+
+        // Sarah: 4-6 Termine/Tag (Sa: 3-4)
+        var sarahCount = isSaturday ? (3 + Math.floor(seededRand() * 2)) : (4 + Math.floor(seededRand() * 3));
+        demoTermine = demoTermine.concat(generateDayTermine(dayOff, 'Sarah', teamServices, sarahCount, 0.08));
+
+        // Julia: 4-5 Termine/Tag (Sa: 3-4)
+        var juliaCount = isSaturday ? (3 + Math.floor(seededRand() * 2)) : (4 + Math.floor(seededRand() * 2));
+        demoTermine = demoTermine.concat(generateDayTermine(dayOff, 'Julia', teamServices, juliaCount, 0.05));
+      }
+
+      renderTermine(demoTermine);
+
+      // Realistische Kassen-Buchungen aus heutigen Terminen generieren
+      var todayKeyK = dateKey(now);
+      var todayTermineK = demoTermine.filter(function(t) {
+        return (t.Start_ISO || '').startsWith(todayKeyK) && t.Status === 'confirmed';
+      }).sort(function(a, b) { return a.Start_ISO.localeCompare(b.Start_ISO); });
+      // Preise pro Service (Brutto, 7% MwSt)
+      var servicePreise = {
+        'Haarschnitt Feminin': 45, 'Damenhaarschnitt + Foehn': 55, 'Herrenschnitt': 35,
+        'Herrenschnitt + Bartpflege': 50, 'Balayage + Schnitt': 165, 'Farbbehandlung Komplett': 100,
+        'Farbbehandlung': 85, 'Ansatzfarbe': 65, 'Straehnen + Schnitt': 145,
+        'Haarpflege + Olaplex': 60, 'Haarpflege Intensiv': 45, 'Brautstyling Probe': 95,
+        'Brautstyling': 120, 'Dauerwelle': 90, 'Kinderhaarschnitt': 25,
+        'Grooming Paket': 55, 'Glossing': 50
+      };
+      var kasseEntries = [];
+      var umsatzGesamt = 0, barGesamt = 0, karteGesamt = 0, mwst7 = 0;
+      var umsatzProMA = { Rena: 0, Sarah: 0, Julia: 0 };
+      var trinkgeldProMA = { Rena: 0, Sarah: 0, Julia: 0 };
+      // Nur bereits vergangene Termine als bezahlt
+      todayTermineK.forEach(function(t) {
+        var endTime = new Date(new Date(t.Start_ISO).getTime() + (parseInt(t.Duration_Min) || 30) * 60000);
+        if (endTime > now) return; // Noch nicht fertig
+        var preis = servicePreise[t.Service] || 50;
+        var isBar = seededRand() < 0.55;
+        var trinkgeld = seededRand() < 0.4 ? Math.round(seededRand() * 8 + 2) : 0;
+        umsatzGesamt += preis;
+        if (isBar) barGesamt += preis; else karteGesamt += preis;
+        mwst7 += preis - (preis / 1.07);
+        var staff = t.Staff || 'Rena';
+        if (umsatzProMA[staff] !== undefined) umsatzProMA[staff] += preis;
+        if (trinkgeldProMA[staff] !== undefined) trinkgeldProMA[staff] += trinkgeld;
+        var s = new Date(t.Start_ISO);
+        kasseEntries.push({
+          time: String(endTime.getHours()).padStart(2,'0') + ':' + String(endTime.getMinutes()).padStart(2,'0'),
+          desc: t.Service + ' \u2014 ' + (t.Customer_Name || '').split(' ')[0] + ' (' + t.Staff + ')',
+          amount: preis,
+          type: 'plus',
+          isBar: isBar
+        });
+      });
+      // Ausgabe (Kaffeebohnen)
+      kasseEntries.push({ time: '11:30', desc: 'Kaffeebohnen Nachkauf', amount: -12.50, type: 'minus', isBar: true });
+      // Produktverkauf
+      kasseEntries.push({ time: '13:15', desc: 'Shampoo Vital (Verkauf, 19% MwSt)', amount: 18.90, type: 'plus', isBar: false });
+      umsatzGesamt += 18.90;
+      karteGesamt += 18.90;
+      var mwst19 = 18.90 - (18.90 / 1.19);
+      var trinkgeldGesamt = trinkgeldProMA.Rena + trinkgeldProMA.Sarah + trinkgeldProMA.Julia;
 
       renderFinanzen({
-        Einnahmen_Gesamt: 630, Einnahmen_Bar: 380, Einnahmen_Karte: 250,
-        Kasse_Ist: 535, Kasse_Soll: 530, Trinkgeld_Gesamt: 25,
-        MwSt_7_Summe: 38.50, MwSt_19_Summe: 4.75, Ausgaben_Bar: 12.50
+        Einnahmen_Gesamt: Math.round(umsatzGesamt * 100) / 100,
+        Einnahmen_Bar: Math.round(barGesamt * 100) / 100,
+        Einnahmen_Karte: Math.round(karteGesamt * 100) / 100,
+        Kasse_Ist: Math.round((barGesamt + 150 - 12.50) * 100) / 100,
+        Kasse_Soll: Math.round((barGesamt + 150) * 100) / 100,
+        Trinkgeld_Gesamt: trinkgeldGesamt,
+        MwSt_7_Summe: Math.round(mwst7 * 100) / 100,
+        MwSt_19_Summe: Math.round(mwst19 * 100) / 100,
+        Ausgaben_Bar: 12.50
       });
 
-      document.getElementById('kasseEntries').innerHTML = [
-        { time: '10:45', desc: 'Balayage \u2014 A. Schmidt', amount: 165, type: 'plus' },
-        { time: '12:55', desc: 'Maskulin Schnitt \u2014 T. Weber', amount: 35, type: 'plus' },
-        { time: '13:10', desc: 'Shampoo Vital (Verkauf)', amount: 18.90, type: 'plus' },
-        { time: '11:30', desc: 'Kaffeebohnen Nachkauf', amount: -12.50, type: 'minus' },
-      ].map(e => `<div class="kasse-entry touch-scale">
-        <div class="kasse-entry-icon ${e.type}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">${e.type === 'plus' ? '<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>' : '<line x1="5" y1="12" x2="19" y2="12"/>'}</svg></div>
-        <div class="kasse-entry-info"><div class="kasse-entry-desc">${e.desc}</div><div class="kasse-entry-time">${e.time}</div></div>
-        <div class="kasse-entry-amt ${e.type}">${e.type === 'plus' ? '+' : ''}${e.amount.toFixed(2).replace('.', ',')} \u20AC</div>
-      </div>`).join('');
-      document.getElementById('kasseCount').textContent = '4 Buchungen';
+      // Buchungen rendern (safe DOM, kein innerHTML mit User-Input)
+      var kasseEl = document.getElementById('kasseEntries');
+      kasseEl.textContent = '';
+      kasseEntries.sort(function(a, b) { return a.time.localeCompare(b.time); }).forEach(function(e) {
+        var row = document.createElement('div');
+        row.className = 'kasse-entry touch-scale';
+        var iconDiv = document.createElement('div');
+        iconDiv.className = 'kasse-entry-icon ' + (e.type === 'plus' ? 'plus' : 'minus');
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '2.5');
+        if (e.type === 'plus') {
+          var l1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          l1.setAttribute('x1','12'); l1.setAttribute('y1','5'); l1.setAttribute('x2','12'); l1.setAttribute('y2','19');
+          var l2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          l2.setAttribute('x1','5'); l2.setAttribute('y1','12'); l2.setAttribute('x2','19'); l2.setAttribute('y2','12');
+          svg.appendChild(l1); svg.appendChild(l2);
+        } else {
+          var l3 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          l3.setAttribute('x1','5'); l3.setAttribute('y1','12'); l3.setAttribute('x2','19'); l3.setAttribute('y2','12');
+          svg.appendChild(l3);
+        }
+        iconDiv.appendChild(svg);
+        var infoDiv = document.createElement('div');
+        infoDiv.className = 'kasse-entry-info';
+        var descEl = document.createElement('div');
+        descEl.className = 'kasse-entry-desc';
+        descEl.textContent = e.desc;
+        var timeEl = document.createElement('div');
+        timeEl.className = 'kasse-entry-time';
+        timeEl.textContent = e.time + (e.isBar ? ' \u2022 Bar' : ' \u2022 Karte');
+        infoDiv.appendChild(descEl);
+        infoDiv.appendChild(timeEl);
+        var amtEl = document.createElement('div');
+        amtEl.className = 'kasse-entry-amt ' + e.type;
+        amtEl.textContent = (e.type === 'plus' ? '+' : '') + Math.abs(e.amount).toFixed(2).replace('.', ',') + ' \u20AC';
+        row.appendChild(iconDiv);
+        row.appendChild(infoDiv);
+        row.appendChild(amtEl);
+        kasseEl.appendChild(row);
+      });
+      document.getElementById('kasseCount').textContent = kasseEntries.length + ' Buchungen';
+
+      // Umsatz pro Mitarbeiter Card (nach Kasse-Buchungen einfuegen)
+      var umsatzMAEl = document.getElementById('umsatzProMA');
+      if (!umsatzMAEl) {
+        umsatzMAEl = document.createElement('div');
+        umsatzMAEl.id = 'umsatzProMA';
+        umsatzMAEl.style.cssText = 'margin-top:12px;padding:14px;background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius)';
+        var kasseSection = document.getElementById('kasseEntries').parentElement;
+        if (kasseSection) kasseSection.appendChild(umsatzMAEl);
+      }
+      umsatzMAEl.textContent = '';
+      var umaTitle = document.createElement('div');
+      umaTitle.style.cssText = 'font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px';
+      umaTitle.textContent = 'Umsatz & Trinkgeld pro Mitarbeiter';
+      umsatzMAEl.appendChild(umaTitle);
+      var staffColorsK = { Rena: 'var(--gold)', Sarah: '#3a7abd', Julia: '#c06080' };
+      ['Rena', 'Sarah', 'Julia'].forEach(function(name) {
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)';
+        var left = document.createElement('div');
+        left.style.cssText = 'display:flex;align-items:center;gap:8px';
+        var dot = document.createElement('span');
+        dot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:' + (staffColorsK[name] || 'var(--text-dim)');
+        var nameEl = document.createElement('span');
+        nameEl.style.cssText = 'font-size:13px;font-weight:600;color:var(--text)';
+        nameEl.textContent = name;
+        left.appendChild(dot);
+        left.appendChild(nameEl);
+        var right = document.createElement('div');
+        right.style.cssText = 'text-align:right';
+        var umsatzEl = document.createElement('div');
+        umsatzEl.style.cssText = 'font-size:14px;font-weight:700;color:var(--text);font-family:Playfair Display,serif';
+        umsatzEl.textContent = fmtEur(umsatzProMA[name]) + ' \u20AC';
+        var tgEl = document.createElement('div');
+        tgEl.style.cssText = 'font-size:10px;color:var(--text-dim)';
+        tgEl.textContent = 'Trinkgeld: ' + fmtEur(trinkgeldProMA[name]) + ' \u20AC';
+        right.appendChild(umsatzEl);
+        right.appendChild(tgEl);
+        row.appendChild(left);
+        row.appendChild(right);
+        umsatzMAEl.appendChild(row);
+      });
 
       renderServices({ data: { services: [
         { Service_ID: 'S001', Name: 'Haarschnitt Feminin', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 60, Preis_Netto: 42.06, Preis_Brutto: 45.00, MwSt_Satz: 0.07 },
@@ -3869,6 +4313,11 @@
       ]}});
 
       // Alte Lager-Daten entfernt — neue Daten weiter unten (renderLagerTab mit La Biosthetique)
+
+      // Appetit-Modell: Paket-Badge initialisieren
+      var paketLabels = { starter: 'Smart Start', pro: 'Salon Pro', fullsuite: 'Full Suite' };
+      var badge = document.getElementById('paketBadge');
+      if (badge) badge.textContent = paketLabels[salonPaket] || 'Smart Start';
 
       renderBeratungen([
         {
@@ -3913,9 +4362,9 @@
       renderBestellungen([
         { Bestell_ID: 'NB-2026-001', Produkt: 'La Biosthetique Shampoo Vital', Menge: '12', Lieferant: 'La Biosthetique', Status: 'bestellt', Datum: '16.03.2026', Bestellt_Von: 'Rena' },
         { Bestell_ID: 'NB-2026-002', Produkt: 'Olaplex No. 3 Treatment', Menge: '8', Lieferant: 'Olaplex', Status: 'geliefert', Datum: '14.03.2026', Bestellt_Von: 'Rena' },
-        { Bestell_ID: 'NB-2026-003', Produkt: 'Balayage Folie 30cm', Menge: '5', Lieferant: 'Wella', Status: 'offen', Datum: '17.03.2026', Bestellt_Von: 'Mitarbeiterin' },
+        { Bestell_ID: 'NB-2026-003', Produkt: 'Balayage Folie 30cm', Menge: '5', Lieferant: 'Wella', Status: 'offen', Datum: '17.03.2026', Bestellt_Von: 'Sarah' },
         { Bestell_ID: 'NB-2026-004', Produkt: 'La Biosthetique Conditioner', Menge: '10', Lieferant: 'La Biosthetique', Status: 'bestellt', Datum: '15.03.2026', Bestellt_Von: 'Rena' },
-        { Bestell_ID: 'NB-2026-005', Produkt: 'Haarfarbe 7.0 Mittelblond', Menge: '6', Lieferant: 'La Biosthetique', Status: 'offen', Datum: '18.03.2026', Bestellt_Von: 'Mitarbeiterin' },
+        { Bestell_ID: 'NB-2026-005', Produkt: 'Haarfarbe 7.0 Mittelblond', Menge: '6', Lieferant: 'La Biosthetique', Status: 'offen', Datum: '18.03.2026', Bestellt_Von: 'Julia' },
         { Bestell_ID: 'KB-2026-001', Produkt: 'La Biosthetique Shampoo Vital', Menge: '2', Lieferant: 'La Biosthetique', Status: 'bestellt', Datum: '18.03.2026', Bestellt_Von: 'Kundin Anna Mueller', Typ: 'kunde' },
         { Bestell_ID: 'KB-2026-002', Produkt: 'Olaplex No. 3 Treatment', Menge: '1', Lieferant: 'Olaplex', Status: 'geliefert', Datum: '15.03.2026', Bestellt_Von: 'Kundin Lisa Kramer', Typ: 'kunde' },
         { Bestell_ID: 'KB-2026-003', Produkt: 'Haarkur Repair', Menge: '1', Lieferant: 'La Biosthetique', Status: 'offen', Datum: '19.03.2026', Bestellt_Von: 'Kundin Sandra Fischer', Typ: 'kunde' },
@@ -4470,6 +4919,75 @@
       });
       container.appendChild(grid);
 
+      // === Aufgaben + benoetigte Produkte (aus serviceProdukte Map) ===
+      var sp = window.serviceProdukte ? window.serviceProdukte[t.Service] : null;
+      if (sp) {
+        // Aufgaben-Checkliste
+        var taskSection = document.createElement('div');
+        taskSection.style.cssText = 'margin-top:16px;padding:16px;background:var(--bg);border:1px solid var(--border-accent);border-radius:var(--radius)';
+        var taskTitle = document.createElement('div');
+        taskTitle.style.cssText = 'font-size:13px;font-weight:700;color:var(--champagne);margin-bottom:10px;display:flex;align-items:center;gap:6px';
+        var taskIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        taskIcon.setAttribute('viewBox', '0 0 24 24'); taskIcon.setAttribute('fill', 'none');
+        taskIcon.setAttribute('stroke', 'currentColor'); taskIcon.setAttribute('stroke-width', '2');
+        taskIcon.style.cssText = 'width:16px;height:16px';
+        var tp1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        tp1.setAttribute('d', 'M9 11l3 3L22 4');
+        var tp2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        tp2.setAttribute('d', 'M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11');
+        taskIcon.appendChild(tp1); taskIcon.appendChild(tp2);
+        taskTitle.appendChild(taskIcon);
+        taskTitle.appendChild(document.createTextNode(' Aufgaben'));
+        taskSection.appendChild(taskTitle);
+        sp.aufgaben.forEach(function(task, idx) {
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-light)';
+          if (idx === sp.aufgaben.length - 1) row.style.borderBottom = 'none';
+          var num = document.createElement('span');
+          num.style.cssText = 'color:var(--text-dim);font-size:11px;min-width:18px';
+          num.textContent = (idx + 1) + '.';
+          row.appendChild(num);
+          row.appendChild(document.createTextNode(' ' + task));
+          taskSection.appendChild(row);
+        });
+        container.appendChild(taskSection);
+
+        // Benoetigte Produkte
+        var prodSection = document.createElement('div');
+        prodSection.style.cssText = 'margin-top:10px;padding:16px;background:linear-gradient(135deg, rgba(184,150,46,0.06), rgba(184,150,46,0.02));border:1px solid rgba(184,150,46,0.2);border-radius:var(--radius)';
+        var prodTitle = document.createElement('div');
+        prodTitle.style.cssText = 'font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px';
+        var prodIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        prodIcon.setAttribute('viewBox', '0 0 24 24'); prodIcon.setAttribute('fill', 'none');
+        prodIcon.setAttribute('stroke', 'currentColor'); prodIcon.setAttribute('stroke-width', '2');
+        prodIcon.style.cssText = 'width:16px;height:16px';
+        var pp1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        pp1.setAttribute('d', 'M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z');
+        var pp2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        pp2.setAttribute('x1','3'); pp2.setAttribute('y1','6'); pp2.setAttribute('x2','21'); pp2.setAttribute('y2','6');
+        var pp3 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        pp3.setAttribute('d', 'M16 10a4 4 0 0 1-8 0');
+        prodIcon.appendChild(pp1); prodIcon.appendChild(pp2); prodIcon.appendChild(pp3);
+        prodTitle.appendChild(prodIcon);
+        prodTitle.appendChild(document.createTextNode(' Benoetigte Produkte'));
+        prodSection.appendChild(prodTitle);
+        sp.produkte.forEach(function(prod) {
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;color:var(--text-light)';
+          var dot = document.createElement('span');
+          dot.style.cssText = 'color:var(--gold);font-size:10px';
+          dot.textContent = '\u25CF';
+          row.appendChild(dot);
+          row.appendChild(document.createTextNode(' ' + prod));
+          prodSection.appendChild(row);
+        });
+        var hint = document.createElement('div');
+        hint.style.cssText = 'margin-top:8px;font-size:11px;color:var(--text-dim);font-style:italic';
+        hint.textContent = 'Produkte vor dem Termin vorbereiten \u2014 Lagerbestand pruefen';
+        prodSection.appendChild(hint);
+        container.appendChild(prodSection);
+      }
+
       // Actions
       var actions = document.createElement('div');
       actions.className = 'detail-actions';
@@ -4864,6 +5382,25 @@
           + '</div></div>'
           + '<button onclick="generateFarbformel()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Mischungsformel berechnen</button>'
           + '<div id="farbformelResult" style="display:none;margin-top:14px"></div>');
+        // Appetit-Modell: Farbcode-Teaser fuer Starter
+        if (salonPaket === 'starter') {
+          var farbTeaser = document.createElement('div');
+          farbTeaser.style.cssText = 'margin-top:14px;padding:16px;background:linear-gradient(135deg, rgba(184,150,46,0.08), rgba(184,150,46,0.03));border:2px solid rgba(184,150,46,0.3);border-radius:var(--radius)';
+          var farbTeaserTitle = document.createElement('div');
+          farbTeaserTitle.style.cssText = 'font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px';
+          farbTeaserTitle.textContent = '\u2605 Smart Start: Farbcode-Vorschau';
+          farbTeaser.appendChild(farbTeaserTitle);
+          var farbTeaserDesc = document.createElement('div');
+          farbTeaserDesc.style.cssText = 'font-size:12px;color:var(--text-light);margin-bottom:10px;line-height:1.5';
+          farbTeaserDesc.textContent = 'Sie sehen Farbrichtung + Empfehlung. Mit Salon Pro erhalten Sie: Exakter Farbcode, Mischverhaeltnis, Oxid-Stufe + Einwirkzeit.';
+          farbTeaser.appendChild(farbTeaserDesc);
+          var farbUpgrade = document.createElement('button');
+          farbUpgrade.style.cssText = 'width:100%;padding:10px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+          farbUpgrade.textContent = 'Upgrade auf Salon Pro \u2192';
+          farbUpgrade.addEventListener('click', function() { showToast('Kontaktieren Sie uns fuer ein Upgrade auf Salon Pro', 'info', 3000); });
+          farbTeaser.appendChild(farbUpgrade);
+          wrapper.appendChild(farbTeaser);
+        }
       } else if (tool === 'haaranalyse') {
         title.textContent = 'Profi-Haaranalyse im Salon';
         wrapper.insertAdjacentHTML('beforeend',
@@ -4880,6 +5417,25 @@
           + '<button onclick="startProfiAnalyse()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--info),#2a6faa);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">KI-Analyse starten</button>'
           + '<div id="haaranalyseResult" style="display:none;margin-top:14px"></div>'
           + '<div style="font-size:10px;color:var(--text-dim);margin-top:8px;text-align:center">Profi-Analyse im Termin inklusive &middot; Premium-PDF-Report: 19 EUR</div>');
+        // Appetit-Modell: Upgrade-Teaser fuer Starter-Paket
+        if (salonPaket === 'starter') {
+          var teaser = document.createElement('div');
+          teaser.style.cssText = 'margin-top:14px;padding:16px;background:linear-gradient(135deg, rgba(184,150,46,0.08), rgba(184,150,46,0.03));border:2px solid rgba(184,150,46,0.3);border-radius:var(--radius)';
+          var teaserTitle = document.createElement('div');
+          teaserTitle.style.cssText = 'font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px';
+          teaserTitle.textContent = '\u2605 Smart Start: Light-Analyse (5 von 17 Parametern)';
+          teaser.appendChild(teaserTitle);
+          var teaserDesc = document.createElement('div');
+          teaserDesc.style.cssText = 'font-size:12px;color:var(--text-light);margin-bottom:10px;line-height:1.5';
+          teaserDesc.textContent = 'Ihr Paket zeigt: Haartyp, Schaedigung, Kopfhaut, Porenstruktur, Farbhistorie. Mit Salon Pro erhalten Sie alle 17 Parameter + Scoring + Pflegeempfehlung + Produkt-Matching.';
+          teaser.appendChild(teaserDesc);
+          var upgradeBtn = document.createElement('button');
+          upgradeBtn.style.cssText = 'width:100%;padding:10px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+          upgradeBtn.textContent = 'Upgrade auf Salon Pro \u2192';
+          upgradeBtn.addEventListener('click', function() { showToast('Kontaktieren Sie uns fuer ein Upgrade auf Salon Pro', 'info', 3000); });
+          teaser.appendChild(upgradeBtn);
+          wrapper.appendChild(teaser);
+        }
       } else if (tool === 'wunschfrisur') {
         title.textContent = 'Wunschfrisur analysieren';
         wrapper.insertAdjacentHTML('beforeend',
@@ -5204,6 +5760,22 @@
     function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
 
     // === V5.1: FAB Toggle ===
+    // Dark Mode Toggle
+    function toggleDarkMode() {
+      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      localStorage.setItem('casa2035_theme', isDark ? 'light' : 'dark');
+    }
+    // Auto-apply saved theme or auto-dark after 20:00
+    (function() {
+      var saved = localStorage.getItem('casa2035_theme');
+      if (saved) {
+        document.documentElement.setAttribute('data-theme', saved);
+      } else if (new Date().getHours() >= 20 || new Date().getHours() < 7) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+
     var fabOpen = false;
     document.getElementById('fabBtn').addEventListener('click', function() {
       fabOpen = !fabOpen;
@@ -5221,7 +5793,61 @@
       if (type === 'rechnung') { switchPage('kasse'); setTimeout(function() { openRechnungSheet(); }, 300); }
       else if (type === 'ausgabe') { switchPage('kasse'); setTimeout(function() { openAusgabeSheet(); }, 300); }
       else if (type === 'beratung') { switchPage('beratung'); }
+      else if (type === 'termin') { switchPage('termine'); showToast('Tippe auf eine freie Stelle im Kalender um einen Termin anzulegen', 'info', 3000); }
+      else if (type === 'nachbestellen') { switchPage('lager'); }
       else if (type === 'demo') { loadDemoData(); showToast('Demo-Daten geladen', 'success'); }
+    }
+    // FAB-Menu kontextabhaengig aktualisieren
+    function updateFabForPage(page) {
+      var menu = document.getElementById('fabMenu');
+      if (!menu) return;
+      menu.textContent = '';
+      var items = [];
+      if (page === 'termine') {
+        items = [
+          { icon: 'green', svg: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>', label: 'Neuer Termin', action: 'termin' },
+          { icon: 'gold', svg: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>', label: 'Neue Beratung', action: 'beratung' }
+        ];
+      } else if (page === 'kasse') {
+        items = [
+          { icon: 'green', svg: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>', label: 'Rechnung erstellen', action: 'rechnung' },
+          { icon: 'blue', svg: '<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>', label: 'Ausgabe erfassen', action: 'ausgabe' }
+        ];
+      } else if (page === 'beratung') {
+        items = [
+          { icon: 'gold', svg: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>', label: 'Neue Beratung', action: 'beratung' }
+        ];
+      } else if (page === 'lager' || page === 'bestellungen') {
+        items = [
+          { icon: 'blue', svg: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>', label: 'Nachbestellen', action: 'nachbestellen' }
+        ];
+      } else {
+        items = [
+          { icon: 'green', svg: '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>', label: 'Neuer Termin', action: 'termin' },
+          { icon: 'green', svg: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>', label: 'Rechnung erstellen', action: 'rechnung' },
+          { icon: 'gold', svg: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>', label: 'Neue Beratung', action: 'beratung' },
+          { icon: 'rose', svg: '<path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14c0 3 2.5 6 7 8"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5 0 3-2.5 6-7 8"/>', label: 'Demo-Daten laden', action: 'demo' }
+        ];
+      }
+      items.forEach(function(item) {
+        var el = document.createElement('div');
+        el.className = 'fab-item touch-scale';
+        el.addEventListener('click', function() { fabAction(item.action); });
+        var iconEl = document.createElement('div');
+        iconEl.className = 'fab-item-icon ' + item.icon;
+        var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-width', '2');
+        // Safe: all SVG paths are hardcoded static strings, not user input
+        var temp = document.createElement('div');
+        temp.insertAdjacentHTML('beforeend', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + item.svg + '</svg>');
+        iconEl.appendChild(temp.firstChild);
+        el.appendChild(iconEl);
+        el.appendChild(document.createTextNode(item.label));
+        menu.appendChild(el);
+      });
     }
 
     // === V5.1: KI-Insights (Smart Proactive Tips) ===
@@ -5482,6 +6108,33 @@
         meta.appendChild(metaFrom);
         meta.appendChild(metaId);
 
+        // Lieferzeit-Schaetzung
+        if (st === 'bestellt') {
+          var lieferETA = document.createElement('div');
+          lieferETA.style.cssText = 'font-size:11px;color:var(--info);margin-top:4px;font-weight:600';
+          var bestellDatum = b.Datum ? new Date(b.Datum.split('.').reverse().join('-')) : new Date();
+          var etaDate = new Date(bestellDatum.getTime() + 4 * 86400000); // +4 Tage
+          lieferETA.textContent = '\u2192 Voraussichtlich: ' + String(etaDate.getDate()).padStart(2,'0') + '.' + String(etaDate.getMonth()+1).padStart(2,'0') + '.' + etaDate.getFullYear();
+          meta.appendChild(document.createElement('br'));
+          meta.appendChild(lieferETA);
+        }
+
+        // "Geliefert markieren" Button (bei offenen/bestellten)
+        if (st !== 'geliefert' && st !== 'erledigt') {
+          var geliefertBtn = document.createElement('button');
+          geliefertBtn.style.cssText = 'margin-top:8px;padding:6px 14px;background:var(--success-bg);color:var(--success);border:1px solid var(--success);border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+          geliefertBtn.textContent = '\u2714 Als geliefert markieren';
+          (function(btn, bItem, rowEl) {
+            btn.addEventListener('click', function(e) {
+              e.stopPropagation();
+              bItem.Status = 'geliefert';
+              renderBestellungen(bestellungenCache);
+              showToast(bItem.Produkt + ' als geliefert markiert', 'success', 2500);
+            });
+          })(geliefertBtn, b, row);
+          body.appendChild(geliefertBtn);
+        }
+
         body.appendChild(header);
         body.appendChild(title);
         body.appendChild(msg);
@@ -5491,6 +6144,28 @@
         row.appendChild(body);
         list.appendChild(row);
       });
+
+      // Kosten-Summe offener Bestellungen
+      var produktPreise = { 'La Biosthetique Shampoo Vital': 8.50, 'Olaplex No. 3 Treatment': 28.00, 'Balayage Folie 30cm': 8.90, 'La Biosthetique Conditioner': 9.50, 'Haarfarbe 7.0 Mittelblond': 12.50 };
+      var offeneItems = items.filter(function(b) { return b.Status !== 'geliefert' && b.Status !== 'erledigt'; });
+      var kostenSumme = 0;
+      offeneItems.forEach(function(b) {
+        var preis = produktPreise[b.Produkt] || 10;
+        kostenSumme += preis * (parseInt(b.Menge) || 1);
+      });
+      if (kostenSumme > 0) {
+        var summeEl = document.createElement('div');
+        summeEl.style.cssText = 'margin-top:12px;padding:12px 16px;background:linear-gradient(135deg, rgba(184,150,46,0.06), rgba(184,150,46,0.02));border:1px solid rgba(184,150,46,0.2);border-radius:var(--radius);display:flex;justify-content:space-between;align-items:center';
+        var summeLabel = document.createElement('span');
+        summeLabel.style.cssText = 'font-size:12px;color:var(--text-dim);font-weight:600';
+        summeLabel.textContent = 'Offene Bestellungen (' + offeneItems.length + ')';
+        var summeVal = document.createElement('span');
+        summeVal.style.cssText = 'font-size:16px;font-weight:700;color:var(--gold);font-family:Playfair Display,serif';
+        summeVal.textContent = kostenSumme.toFixed(2).replace('.', ',') + ' \u20AC';
+        summeEl.appendChild(summeLabel);
+        summeEl.appendChild(summeVal);
+        list.appendChild(summeEl);
+      }
     }
 
     function renderBestellungenList(items) {
@@ -5657,7 +6332,7 @@
         barWrap.appendChild(minLine);
         card.appendChild(barWrap);
 
-        // Min-Label
+        // Min-Label + Verbrauchstrend + Reichweite
         var minLabel = document.createElement('div');
         minLabel.style.cssText = 'font-size:9px;color:var(--text-micro);margin-top:2px;display:flex;justify-content:space-between';
         var minText = document.createElement('span');
@@ -5669,6 +6344,22 @@
         minLabel.appendChild(minText);
         minLabel.appendChild(statusText);
         card.appendChild(minLabel);
+
+        // Verbrauchstrend + Reichweite (simuliert basierend auf Produkttyp)
+        var verbrauchRaten = { Shampoo: 4, Pflege: 3, Farbe: 5, Styling: 2, Treatment: 3, Zubehoer: 2 };
+        var verbrauchProWoche = verbrauchRaten[(p.Kategorie || '')] || 3;
+        var reichweiteTage = bestand > 0 ? Math.round((bestand / verbrauchProWoche) * 7) : 0;
+        var trendEl = document.createElement('div');
+        trendEl.style.cssText = 'font-size:10px;color:var(--text-dim);margin-top:4px;display:flex;justify-content:space-between';
+        var verbrauchText = document.createElement('span');
+        verbrauchText.textContent = '\u223C' + verbrauchProWoche + '/Woche';
+        var reichweiteText = document.createElement('span');
+        reichweiteText.style.fontWeight = '600';
+        reichweiteText.style.color = reichweiteTage <= 7 ? 'var(--danger)' : reichweiteTage <= 14 ? 'var(--warning)' : 'var(--text-dim)';
+        reichweiteText.textContent = reichweiteTage > 0 ? 'Reicht noch ' + reichweiteTage + ' Tage' : 'Leer!';
+        trendEl.appendChild(verbrauchText);
+        trendEl.appendChild(reichweiteText);
+        card.appendChild(trendEl);
 
         // Schnell-Aktionen (nur bei niedrigem Bestand)
         if (isLow) {
