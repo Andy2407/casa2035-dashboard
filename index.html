@@ -1558,9 +1558,13 @@
       <div style="width:56px;height:56px;border-radius:16px;background:var(--rose-glow);border:1px solid rgba(184,150,46,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:26px;height:26px;color:var(--rose-light)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
-      <input type="password" id="loginPw" placeholder="Passwort eingeben" onkeypress="if(event.key==='Enter')checkLogin()" style="width:100%;padding:14px 18px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-family:'Inter',sans-serif;text-align:center;background:var(--bg-warm);margin-bottom:12px;letter-spacing:2px">
-      <div id="loginError" style="font-size:12px;color:var(--danger);margin-bottom:8px;display:none">Falsches Passwort</div>
+      <input type="text" id="loginUser" placeholder="Benutzername" onkeypress="if(event.key==='Enter')document.getElementById('loginPw').focus()" style="width:100%;padding:14px 18px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-family:'Inter',sans-serif;text-align:center;background:var(--bg-warm);margin-bottom:10px">
+      <input type="password" id="loginPw" placeholder="Passwort" onkeypress="if(event.key==='Enter')checkLogin()" style="width:100%;padding:14px 18px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-family:'Inter',sans-serif;text-align:center;background:var(--bg-warm);margin-bottom:12px;letter-spacing:2px">
+      <div id="loginError" style="font-size:12px;color:var(--danger);margin-bottom:8px;display:none">Benutzername oder Passwort falsch</div>
       <button onclick="checkLogin()" style="width:100%;padding:14px;background:var(--rose-gradient);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;letter-spacing:0.5px">Anmelden</button>
+      <div style="margin-top:16px;font-size:10px;color:var(--text-dim);line-height:1.5">
+        <span id="loginRoleHint"></span>
+      </div>
     </div>
     <div style="font-size:10px;color:var(--text-micro)">Rena Rados Friseure &middot; Powered by Casa 2035</div>
   </div>
@@ -2414,12 +2418,31 @@
   </div>
 
   <script>
-    // === Login ===
+    // === Login mit Benutzer + Rolle ===
+    // Testphase: Benutzer-Datenbank (spaeter Supabase Auth)
+    var USERS = {
+      'rena':    { pw: 'casa2035', rolle: 'CHF', name: 'Rena Rados', titel: 'Inhaberin & Friseurmeisterin' },
+      'maria':   { pw: 'casa2035', rolle: 'FRM', name: 'Maria K.', titel: 'Friseurmeisterin' },
+      'sophie':  { pw: 'casa2035', rolle: 'STY', name: 'Sophie L.', titel: 'Stylistin' },
+      'lisa':    { pw: 'casa2035', rolle: 'AZU', name: 'Lisa M.', titel: 'Auszubildende' },
+      'admin':   { pw: 'casa2035', rolle: 'CHF', name: 'Andy', titel: 'Administrator' }
+    };
+    var ROLLEN_LABEL = { CHF: 'Chefin', FRM: 'Meisterin', STY: 'Stylistin', AZU: 'Azubi' };
+
     function checkLogin() {
+      var user = document.getElementById('loginUser').value.trim().toLowerCase();
       var pw = document.getElementById('loginPw').value;
-      if (pw === 'casa2035') {
+      var account = USERS[user];
+      if (account && account.pw === pw) {
         document.getElementById('loginOverlay').style.display = 'none';
         sessionStorage.setItem('casa_auth', '1');
+        sessionStorage.setItem('casa_user', user);
+        sessionStorage.setItem('casa_rolle', account.rolle);
+        sessionStorage.setItem('casa_name', account.name);
+        // Rolle im Dashboard setzen
+        userRole = account.rolle;
+        currentUser = account.name;
+        applyRole(account.rolle, account.name, account.titel);
       } else {
         document.getElementById('loginError').style.display = 'block';
         document.getElementById('loginPw').value = '';
@@ -2427,9 +2450,31 @@
         setTimeout(function() { document.getElementById('loginPw').style.borderColor = 'var(--border)'; }, 1500);
       }
     }
-    // Auto-login if already authenticated in this session
+    function applyRole(rolle, name, titel) {
+      // Header-Anzeige aktualisieren (Begruessung)
+      var greet = document.querySelector('.header-sub');
+      if (greet) greet.textContent = 'Willkommen, ' + name + ' (' + ROLLEN_LABEL[rolle] + ')';
+      // Sichtbarkeit nach Rolle steuern
+      document.querySelectorAll('[data-min-role]').forEach(function(el) {
+        var minRole = el.getAttribute('data-min-role');
+        var hierarchy = ['AZU', 'STY', 'FRM', 'CHF'];
+        var userLevel = hierarchy.indexOf(rolle);
+        var minLevel = hierarchy.indexOf(minRole);
+        el.style.display = userLevel >= minLevel ? '' : 'none';
+      });
+    }
+    // Auto-login wenn bereits authentifiziert
     if (sessionStorage.getItem('casa_auth') === '1') {
       document.getElementById('loginOverlay').style.display = 'none';
+      var savedUser = USERS[sessionStorage.getItem('casa_user')];
+      if (savedUser) {
+        userRole = savedUser.rolle;
+        currentUser = savedUser.name;
+        // applyRole nach DOM-Ready
+        window.addEventListener('DOMContentLoaded', function() {
+          applyRole(savedUser.rolle, savedUser.name, savedUser.titel);
+        });
+      }
     }
 
     // =============================================================
