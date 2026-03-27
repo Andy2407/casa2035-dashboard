@@ -1670,7 +1670,7 @@
           <div class="stat-label">Termine</div>
           <div class="stat-sub" id="statTermineSub"></div>
         </div>
-        <div class="stat-card blue touch-scale" onclick="switchPage('beratung')" style="cursor:pointer">
+        <div class="stat-card blue touch-scale" onclick="openAnfragenOverview()" style="cursor:pointer">
           <div class="stat-icon blue">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
           </div>
@@ -3009,7 +3009,12 @@
       };
       var kanalNames = { whatsapp: 'WhatsApp', instagram: 'Instagram', email: 'E-Mail', facebook: 'Facebook', system: 'System' };
 
-      items.slice(0, 15).forEach(function(e, idx) {
+      var eventsExpanded = false;
+      var EVENTS_INITIAL = 3;
+      function renderEventRows(list, limit) {
+        c.textContent = '';
+        var showing = limit ? list.slice(0, limit) : list.slice(0, 15);
+        showing.forEach(function(e, idx) {
         var typ = (e.Typ || 'event').toLowerCase();
         var isUnread = e.Is_Read === 0 || e.Is_Read === '0' || e.Gelesen === 0 || e.Gelesen === '0';
         var time = e.Timestamp ? new Date(e.Timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '';
@@ -3075,7 +3080,20 @@
         row.appendChild(iconDiv);
         row.appendChild(body);
         c.appendChild(row);
-      });
+        });
+        // Expand/Collapse for events
+        if (list.length > EVENTS_INITIAL) {
+          var toggleBtn = document.createElement('button');
+          toggleBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;margin-top:6px;background:var(--bg-warm);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-light);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;transition:all 150ms';
+          toggleBtn.textContent = limit ? 'Alle ' + list.length + ' Aktivitaeten anzeigen' : 'Weniger anzeigen';
+          toggleBtn.addEventListener('click', function() {
+            eventsExpanded = !eventsExpanded;
+            renderEventRows(list, eventsExpanded ? null : EVENTS_INITIAL);
+          });
+          c.appendChild(toggleBtn);
+        }
+      }
+      renderEventRows(items, eventsExpanded ? null : EVENTS_INITIAL);
     }
 
     function renderTermine(data) {
@@ -3265,70 +3283,95 @@
         return;
       }
 
-      sorted.forEach(function(t) {
-        var start = new Date(t.Start_ISO);
-        var hh = String(start.getHours()).padStart(2, '0');
-        var mm = String(start.getMinutes()).padStart(2, '0');
-        var dur = t.Duration_Min || 60;
-        var end = new Date(start.getTime() + dur * 60000);
-        var endH = String(end.getHours()).padStart(2, '0');
-        var endM = String(end.getMinutes()).padStart(2, '0');
-        var isPast = end < now;
-        var isNow = start <= now && end > now;
-        var st = (t.Status || 'confirmed').toLowerCase();
+      var INITIAL_SHOW = 3;
+      var homeTimelineExpanded = false;
 
-        var row = document.createElement('div');
-        row.className = 'ev touch-scale';
-        row.style.cursor = 'pointer';
-        if (isNow) { row.classList.add('unread'); }
-        if (isPast) { row.style.opacity = '0.5'; }
-        row.addEventListener('click', function() { openTerminDetail(t); });
+      function renderTimelineRows(items, limit) {
+        tl.textContent = '';
+        var showing = limit ? items.slice(0, limit) : items;
+        showing.forEach(function(t) {
+          var start = new Date(t.Start_ISO);
+          var hh = String(start.getHours()).padStart(2, '0');
+          var mm = String(start.getMinutes()).padStart(2, '0');
+          var dur = t.Duration_Min || 60;
+          var end = new Date(start.getTime() + dur * 60000);
+          var endH = String(end.getHours()).padStart(2, '0');
+          var endM = String(end.getMinutes()).padStart(2, '0');
+          var isPast = end < now;
+          var isNow = start <= now && end > now;
+          var st = (t.Status || 'confirmed').toLowerCase();
 
-        var icon = document.createElement('div');
-        icon.className = 'ev-icon ' + (isNow ? 'termin' : st === 'proposed' ? 'nachbestellung' : 'termin');
-        icon.appendChild(isPast ? createCheckSvg() : createClockSvg());
+          var row = document.createElement('div');
+          row.className = 'ev touch-scale';
+          row.style.cursor = 'pointer';
+          if (isNow) { row.classList.add('unread'); }
+          if (isPast) { row.style.opacity = '0.5'; }
+          row.addEventListener('click', function() { openTerminDetail(t); });
 
-        var body = document.createElement('div');
-        body.className = 'ev-body';
+          var icon = document.createElement('div');
+          icon.className = 'ev-icon ' + (isNow ? 'termin' : st === 'proposed' ? 'nachbestellung' : 'termin');
+          icon.appendChild(isPast ? createCheckSvg() : createClockSvg());
 
-        var header = document.createElement('div');
-        header.className = 'ev-header';
-        var timeSpan = document.createElement('span');
-        timeSpan.className = 'ev-type ' + (isNow ? 'termin' : st === 'proposed' ? 'nachbestellung' : 'termin');
-        timeSpan.textContent = hh + ':' + mm + ' \u2013 ' + endH + ':' + endM;
-        var durSpan = document.createElement('span');
-        durSpan.className = 'ev-time';
-        durSpan.textContent = dur + ' Min' + (isNow ? ' \u2022 JETZT' : '');
-        if (isNow) { durSpan.style.color = 'var(--success)'; durSpan.style.fontWeight = '700'; }
-        header.appendChild(timeSpan);
-        header.appendChild(durSpan);
+          var body = document.createElement('div');
+          body.className = 'ev-body';
 
-        var title = document.createElement('div');
-        title.className = 'ev-title';
-        title.textContent = t.Service || '';
+          var header = document.createElement('div');
+          header.className = 'ev-header';
+          var timeSpan = document.createElement('span');
+          timeSpan.className = 'ev-type ' + (isNow ? 'termin' : st === 'proposed' ? 'nachbestellung' : 'termin');
+          timeSpan.textContent = hh + ':' + mm + ' \u2013 ' + endH + ':' + endM;
+          var durSpan = document.createElement('span');
+          durSpan.className = 'ev-time';
+          durSpan.textContent = dur + ' Min' + (isNow ? ' \u2022 JETZT' : '');
+          if (isNow) { durSpan.style.color = 'var(--success)'; durSpan.style.fontWeight = '700'; }
+          header.appendChild(timeSpan);
+          header.appendChild(durSpan);
 
-        var meta = document.createElement('div');
-        meta.className = 'ev-meta';
-        var custSpan = document.createElement('span');
-        custSpan.textContent = t.Customer_Name || '';
-        meta.appendChild(custSpan);
-        if (t.Staff) {
-          var staffColors = { rena: 'var(--gold)', sarah: '#3a7abd', julia: '#c06080' };
-          var staffColor = staffColors[(t.Staff || '').toLowerCase()] || 'var(--text-dim)';
-          var staffSpan = document.createElement('span');
-          staffSpan.style.color = staffColor;
-          staffSpan.style.fontWeight = '600';
-          staffSpan.textContent = t.Staff;
-          meta.appendChild(staffSpan);
+          var title = document.createElement('div');
+          title.className = 'ev-title';
+          title.textContent = t.Service || '';
+
+          var meta = document.createElement('div');
+          meta.className = 'ev-meta';
+          var custSpan = document.createElement('span');
+          custSpan.textContent = t.Customer_Name || '';
+          meta.appendChild(custSpan);
+          if (t.Staff) {
+            var staffColors = { rena: 'var(--gold)', sarah: '#3a7abd', julia: '#c06080' };
+            var staffColor = staffColors[(t.Staff || '').toLowerCase()] || 'var(--text-dim)';
+            var staffSpan = document.createElement('span');
+            staffSpan.style.color = staffColor;
+            staffSpan.style.fontWeight = '600';
+            staffSpan.textContent = t.Staff;
+            meta.appendChild(staffSpan);
+          }
+
+          body.appendChild(header);
+          body.appendChild(title);
+          body.appendChild(meta);
+          row.appendChild(icon);
+          row.appendChild(body);
+          tl.appendChild(row);
+        });
+
+        // Expand/Collapse button if more than INITIAL_SHOW
+        if (items.length > INITIAL_SHOW) {
+          var toggleBtn = document.createElement('button');
+          toggleBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;margin-top:6px;background:var(--bg-warm);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-light);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;transition:all 150ms';
+          if (limit) {
+            toggleBtn.textContent = 'Alle ' + items.length + ' Termine anzeigen';
+          } else {
+            toggleBtn.textContent = 'Weniger anzeigen';
+          }
+          toggleBtn.addEventListener('click', function() {
+            homeTimelineExpanded = !homeTimelineExpanded;
+            renderTimelineRows(items, homeTimelineExpanded ? null : INITIAL_SHOW);
+          });
+          tl.appendChild(toggleBtn);
         }
+      }
 
-        body.appendChild(header);
-        body.appendChild(title);
-        body.appendChild(meta);
-        row.appendChild(icon);
-        row.appendChild(body);
-        tl.appendChild(row);
-      });
+      renderTimelineRows(sorted, homeTimelineExpanded ? null : INITIAL_SHOW);
     }
 
     function renderFinanzen(data) {
@@ -4092,24 +4135,262 @@
         return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00';
       };
       // === Produkt-Zuordnung pro Service (fuer Termin-Detail) ===
+      // Erweitert: aufgaben mit dauer_min, produkte mit menge + mischung, einwirkzeiten
       var serviceProdukte = {
-        'Damenhaarschnitt + Foehn': { aufgaben: ['Waschen', 'Schneiden', 'Foehnen + Styling'], produkte: ['Shampoo Vital', 'Conditioner', 'Hitzeschutz-Spray'] },
-        'Haarschnitt Feminin': { aufgaben: ['Waschen', 'Schneiden', 'Foehnen'], produkte: ['Shampoo Vital', 'Conditioner'] },
-        'Balayage + Schnitt': { aufgaben: ['Farbanalyse', 'Straehnen setzen (Freihand)', 'Einwirkzeit 35 Min', 'Auswaschen + Pflege', 'Schneiden', 'Foehnen'], produkte: ['Blondierpulver', 'Oxid 6%', 'Balayage Folie 30cm', 'Olaplex No. 1', 'Olaplex No. 2', 'Shampoo Silber', 'Pflegekur'] },
-        'Farbbehandlung Komplett': { aufgaben: ['Farbberatung', 'Farbe anmischen', 'Auftragen', 'Einwirkzeit 30 Min', 'Auswaschen', 'Pflege + Foehnen'], produkte: ['Haarfarbe (lt. Farbcode)', 'Oxid (lt. Stufe)', 'Handschuhe', 'Farbschale', 'Pflegekur Color'] },
-        'Farbbehandlung': { aufgaben: ['Farbberatung', 'Farbe anmischen', 'Auftragen', 'Einwirkzeit 30 Min', 'Auswaschen', 'Pflege + Foehnen'], produkte: ['Haarfarbe (lt. Farbcode)', 'Oxid (lt. Stufe)', 'Handschuhe', 'Pflegekur Color'] },
-        'Herrenschnitt': { aufgaben: ['Waschen', 'Schneiden (Maschine + Schere)', 'Styling'], produkte: ['Shampoo Men', 'Styling Paste'] },
-        'Herrenschnitt + Bartpflege': { aufgaben: ['Waschen', 'Schneiden', 'Bart trimmen + konturieren', 'Styling'], produkte: ['Shampoo Men', 'Bartoel', 'Styling Paste'] },
-        'Haarpflege + Olaplex': { aufgaben: ['Waschen', 'Olaplex No. 1 auftragen', 'Einwirkzeit 15 Min', 'Olaplex No. 2 auftragen', 'Einwirkzeit 20 Min', 'Auswaschen + Pflege', 'Foehnen'], produkte: ['Olaplex No. 1', 'Olaplex No. 2', 'Shampoo Vital', 'Pflegekur'] },
-        'Brautstyling Probe': { aufgaben: ['Beratungsgespraech', 'Probefrisur aufbauen', 'Locken/Wellen', 'Haarschmuck einarbeiten', 'Fotos machen', 'Styling dokumentieren'], produkte: ['Haarspray Extra Strong', 'Lockenspray', 'Haarnadeln', 'Hitzeschutz-Spray'] },
-        'Brautstyling': { aufgaben: ['Waschen + Pflege', 'Locken/Wellen setzen', 'Hochsteckfrisur', 'Haarschmuck einarbeiten', 'Finishing + Fixierung'], produkte: ['Shampoo Vital', 'Volumen-Mousse', 'Haarspray Extra Strong', 'Haarnadeln', 'Hitzeschutz-Spray'] },
-        'Kinderhaarschnitt': { aufgaben: ['Waschen', 'Schneiden', 'Trocknen'], produkte: ['Shampoo Mild'] },
-        'Grooming Paket': { aufgaben: ['Waschen', 'Schneiden', 'Bart trimmen', 'Augenbrauen', 'Styling'], produkte: ['Shampoo Men', 'Bartoel', 'Styling Paste', 'Aftershave'] },
-        'Dauerwelle': { aufgaben: ['Waschen', 'Wickler setzen', 'Dauerwellfluessigkeit', 'Einwirkzeit 20 Min', 'Fixierung', 'Auswaschen + Pflege', 'Foehnen'], produkte: ['Dauerwellmittel', 'Fixierung', 'Wickler', 'Pflegekur'] },
-        'Ansatzfarbe': { aufgaben: ['Ansatz vorbereiten', 'Farbe anmischen', 'Auftragen am Ansatz', 'Einwirkzeit 25 Min', 'Auswaschen', 'Pflege'], produkte: ['Haarfarbe (lt. Farbcode)', 'Oxid 3%', 'Handschuhe', 'Pflegekur Color'] },
-        'Straehnen + Schnitt': { aufgaben: ['Straehnen-Beratung', 'Folienstraehnen setzen', 'Einwirkzeit 30 Min', 'Auswaschen', 'Schneiden', 'Foehnen'], produkte: ['Blondierpulver', 'Oxid 6%', 'Alufolie', 'Shampoo Silber', 'Pflegekur'] },
-        'Haarpflege Intensiv': { aufgaben: ['Kopfhautanalyse', 'Waschen', 'Pflegekur einarbeiten', 'Einwirkzeit 15 Min', 'Auswaschen', 'Foehnen'], produkte: ['Shampoo Vital', 'Intensiv-Kur', 'Kopfhaut-Serum'] },
-        'Glossing': { aufgaben: ['Waschen', 'Glossing anmischen', 'Auftragen', 'Einwirkzeit 10 Min', 'Auswaschen', 'Foehnen'], produkte: ['Glossing-Farbe', 'Shampoo Color', 'Pflegekur Color'] }
+        'Damenhaarschnitt + Foehn': {
+          aufgaben: [
+            { schritt: 'Waschen', dauer_min: 5 },
+            { schritt: 'Schneiden', dauer_min: 25 },
+            { schritt: 'Foehnen + Styling', dauer_min: 15 }
+          ],
+          produkte: [
+            { name: 'Shampoo Vital', menge: '10 ml' },
+            { name: 'Conditioner', menge: '8 ml' },
+            { name: 'Hitzeschutz-Spray', menge: '3 Spruehstoesse' }
+          ]
+        },
+        'Haarschnitt Feminin': {
+          aufgaben: [
+            { schritt: 'Waschen', dauer_min: 5 },
+            { schritt: 'Schneiden', dauer_min: 25 },
+            { schritt: 'Foehnen', dauer_min: 10 }
+          ],
+          produkte: [
+            { name: 'Shampoo Vital', menge: '10 ml' },
+            { name: 'Conditioner', menge: '8 ml' }
+          ]
+        },
+        'Balayage + Schnitt': {
+          aufgaben: [
+            { schritt: 'Farbanalyse + Beratung', dauer_min: 10 },
+            { schritt: 'Straehnen setzen (Freihand)', dauer_min: 45 },
+            { schritt: 'Einwirkzeit', dauer_min: 35, einwirkzeit: true },
+            { schritt: 'Auswaschen + Pflege', dauer_min: 10 },
+            { schritt: 'Schneiden', dauer_min: 20 },
+            { schritt: 'Foehnen + Styling', dauer_min: 15 }
+          ],
+          produkte: [
+            { name: 'Blondierpulver', menge: '30 g' },
+            { name: 'Oxid 6%', menge: '60 ml', mischung: '1:2 mit Blondierpulver' },
+            { name: 'Balayage Folie 30cm', menge: '15-20 Stueck' },
+            { name: 'Olaplex No. 1', menge: '3.75 ml', mischung: 'In Blondierung einmischen' },
+            { name: 'Olaplex No. 2', menge: '15 ml', mischung: 'Nach Auswaschen einarbeiten, 10 Min einwirken' },
+            { name: 'Shampoo Silber', menge: '15 ml' },
+            { name: 'Pflegekur', menge: '20 ml' }
+          ]
+        },
+        'Farbbehandlung Komplett': {
+          aufgaben: [
+            { schritt: 'Farbberatung', dauer_min: 5 },
+            { schritt: 'Farbe anmischen', dauer_min: 5 },
+            { schritt: 'Auftragen (Ansatz + Laengen)', dauer_min: 20 },
+            { schritt: 'Einwirkzeit', dauer_min: 30, einwirkzeit: true },
+            { schritt: 'Auswaschen + Emulgieren', dauer_min: 8 },
+            { schritt: 'Pflege + Foehnen', dauer_min: 15 }
+          ],
+          produkte: [
+            { name: 'Haarfarbe (lt. Farbcode)', menge: '60 ml', mischung: '1:1 mit Oxid' },
+            { name: 'Oxid (lt. Stufe)', menge: '60 ml', mischung: '3% Tonung / 6% Aufhellung' },
+            { name: 'Handschuhe', menge: '1 Paar' },
+            { name: 'Farbschale + Pinsel', menge: '1 Set' },
+            { name: 'Pflegekur Color', menge: '20 ml' }
+          ]
+        },
+        'Farbbehandlung': {
+          aufgaben: [
+            { schritt: 'Farbberatung', dauer_min: 5 },
+            { schritt: 'Farbe anmischen', dauer_min: 5 },
+            { schritt: 'Auftragen', dauer_min: 15 },
+            { schritt: 'Einwirkzeit', dauer_min: 30, einwirkzeit: true },
+            { schritt: 'Auswaschen', dauer_min: 5 },
+            { schritt: 'Pflege + Foehnen', dauer_min: 15 }
+          ],
+          produkte: [
+            { name: 'Haarfarbe (lt. Farbcode)', menge: '60 ml', mischung: '1:1 mit Oxid' },
+            { name: 'Oxid (lt. Stufe)', menge: '60 ml' },
+            { name: 'Handschuhe', menge: '1 Paar' },
+            { name: 'Pflegekur Color', menge: '15 ml' }
+          ]
+        },
+        'Herrenschnitt': {
+          aufgaben: [
+            { schritt: 'Waschen', dauer_min: 3 },
+            { schritt: 'Schneiden (Maschine + Schere)', dauer_min: 20 },
+            { schritt: 'Styling', dauer_min: 5 }
+          ],
+          produkte: [
+            { name: 'Shampoo Men', menge: '8 ml' },
+            { name: 'Styling Paste', menge: 'erbsengrosse Menge' }
+          ]
+        },
+        'Herrenschnitt + Bartpflege': {
+          aufgaben: [
+            { schritt: 'Waschen', dauer_min: 3 },
+            { schritt: 'Schneiden', dauer_min: 20 },
+            { schritt: 'Bart trimmen + konturieren', dauer_min: 10 },
+            { schritt: 'Styling', dauer_min: 5 }
+          ],
+          produkte: [
+            { name: 'Shampoo Men', menge: '8 ml' },
+            { name: 'Bartoel', menge: '3-4 Tropfen' },
+            { name: 'Styling Paste', menge: 'erbsengrosse Menge' }
+          ]
+        },
+        'Haarpflege + Olaplex': {
+          aufgaben: [
+            { schritt: 'Waschen', dauer_min: 5 },
+            { schritt: 'Olaplex No. 1 auftragen', dauer_min: 3 },
+            { schritt: 'Einwirkzeit No. 1', dauer_min: 15, einwirkzeit: true },
+            { schritt: 'Olaplex No. 2 auftragen', dauer_min: 3 },
+            { schritt: 'Einwirkzeit No. 2', dauer_min: 20, einwirkzeit: true },
+            { schritt: 'Auswaschen + Pflege', dauer_min: 5 },
+            { schritt: 'Foehnen', dauer_min: 10 }
+          ],
+          produkte: [
+            { name: 'Olaplex No. 1', menge: '3.75 ml', mischung: 'Pur auftragen, Scheitel bis Spitzen' },
+            { name: 'Olaplex No. 2', menge: '15 ml', mischung: 'Grosszuegig einarbeiten' },
+            { name: 'Shampoo Vital', menge: '10 ml' },
+            { name: 'Pflegekur', menge: '20 ml' }
+          ]
+        },
+        'Brautstyling Probe': {
+          aufgaben: [
+            { schritt: 'Beratungsgespraech', dauer_min: 15 },
+            { schritt: 'Probefrisur aufbauen', dauer_min: 30 },
+            { schritt: 'Locken/Wellen', dauer_min: 20 },
+            { schritt: 'Haarschmuck einarbeiten', dauer_min: 10 },
+            { schritt: 'Fotos machen', dauer_min: 5 },
+            { schritt: 'Styling dokumentieren', dauer_min: 5 }
+          ],
+          produkte: [
+            { name: 'Haarspray Extra Strong', menge: '5-8 Spruehstoesse' },
+            { name: 'Lockenspray', menge: '3 Spruehstoesse' },
+            { name: 'Haarnadeln', menge: '20-30 Stueck' },
+            { name: 'Hitzeschutz-Spray', menge: '3 Spruehstoesse' }
+          ]
+        },
+        'Brautstyling': {
+          aufgaben: [
+            { schritt: 'Waschen + Pflege', dauer_min: 10 },
+            { schritt: 'Locken/Wellen setzen', dauer_min: 25 },
+            { schritt: 'Hochsteckfrisur', dauer_min: 30 },
+            { schritt: 'Haarschmuck einarbeiten', dauer_min: 10 },
+            { schritt: 'Finishing + Fixierung', dauer_min: 10 }
+          ],
+          produkte: [
+            { name: 'Shampoo Vital', menge: '10 ml' },
+            { name: 'Volumen-Mousse', menge: 'walnussgrosse Menge' },
+            { name: 'Haarspray Extra Strong', menge: '8-10 Spruehstoesse' },
+            { name: 'Haarnadeln', menge: '30-40 Stueck' },
+            { name: 'Hitzeschutz-Spray', menge: '3 Spruehstoesse' }
+          ]
+        },
+        'Kinderhaarschnitt': {
+          aufgaben: [
+            { schritt: 'Waschen', dauer_min: 3 },
+            { schritt: 'Schneiden', dauer_min: 15 },
+            { schritt: 'Trocknen', dauer_min: 5 }
+          ],
+          produkte: [
+            { name: 'Shampoo Mild', menge: '5 ml' }
+          ]
+        },
+        'Grooming Paket': {
+          aufgaben: [
+            { schritt: 'Waschen', dauer_min: 3 },
+            { schritt: 'Schneiden', dauer_min: 20 },
+            { schritt: 'Bart trimmen', dauer_min: 10 },
+            { schritt: 'Augenbrauen', dauer_min: 5 },
+            { schritt: 'Styling', dauer_min: 5 }
+          ],
+          produkte: [
+            { name: 'Shampoo Men', menge: '8 ml' },
+            { name: 'Bartoel', menge: '3-4 Tropfen' },
+            { name: 'Styling Paste', menge: 'erbsengrosse Menge' },
+            { name: 'Aftershave', menge: '2-3 Spruehstoesse' }
+          ]
+        },
+        'Dauerwelle': {
+          aufgaben: [
+            { schritt: 'Waschen', dauer_min: 5 },
+            { schritt: 'Wickler setzen', dauer_min: 20 },
+            { schritt: 'Dauerwellfluessigkeit auftragen', dauer_min: 5 },
+            { schritt: 'Einwirkzeit', dauer_min: 20, einwirkzeit: true },
+            { schritt: 'Fixierung auftragen', dauer_min: 5 },
+            { schritt: 'Einwirkzeit Fixierung', dauer_min: 10, einwirkzeit: true },
+            { schritt: 'Auswaschen + Pflege', dauer_min: 5 },
+            { schritt: 'Foehnen', dauer_min: 10 }
+          ],
+          produkte: [
+            { name: 'Dauerwellmittel', menge: '80 ml' },
+            { name: 'Fixierung', menge: '80 ml' },
+            { name: 'Wickler', menge: '30-40 Stueck (je nach Laenge)' },
+            { name: 'Pflegekur', menge: '20 ml' }
+          ]
+        },
+        'Ansatzfarbe': {
+          aufgaben: [
+            { schritt: 'Ansatz vorbereiten', dauer_min: 3 },
+            { schritt: 'Farbe anmischen', dauer_min: 5 },
+            { schritt: 'Auftragen am Ansatz', dauer_min: 15 },
+            { schritt: 'Einwirkzeit', dauer_min: 25, einwirkzeit: true },
+            { schritt: 'Auswaschen + Emulgieren', dauer_min: 5 },
+            { schritt: 'Pflege + Foehnen', dauer_min: 12 }
+          ],
+          produkte: [
+            { name: 'Haarfarbe (lt. Farbcode)', menge: '40 ml', mischung: '1:1 mit Oxid' },
+            { name: 'Oxid 3%', menge: '40 ml' },
+            { name: 'Handschuhe', menge: '1 Paar' },
+            { name: 'Pflegekur Color', menge: '15 ml' }
+          ]
+        },
+        'Straehnen + Schnitt': {
+          aufgaben: [
+            { schritt: 'Straehnen-Beratung', dauer_min: 5 },
+            { schritt: 'Folienstraehnen setzen', dauer_min: 35 },
+            { schritt: 'Einwirkzeit', dauer_min: 30, einwirkzeit: true },
+            { schritt: 'Auswaschen + Pflege', dauer_min: 8 },
+            { schritt: 'Schneiden', dauer_min: 20 },
+            { schritt: 'Foehnen', dauer_min: 12 }
+          ],
+          produkte: [
+            { name: 'Blondierpulver', menge: '25 g' },
+            { name: 'Oxid 6%', menge: '50 ml', mischung: '1:2 mit Blondierpulver' },
+            { name: 'Alufolie', menge: '20-25 Stueck (vorgeschnitten)' },
+            { name: 'Shampoo Silber', menge: '15 ml' },
+            { name: 'Pflegekur', menge: '20 ml' }
+          ]
+        },
+        'Haarpflege Intensiv': {
+          aufgaben: [
+            { schritt: 'Kopfhautanalyse', dauer_min: 5 },
+            { schritt: 'Waschen', dauer_min: 5 },
+            { schritt: 'Pflegekur einarbeiten', dauer_min: 5 },
+            { schritt: 'Einwirkzeit unter Waerme', dauer_min: 15, einwirkzeit: true },
+            { schritt: 'Auswaschen', dauer_min: 5 },
+            { schritt: 'Foehnen', dauer_min: 10 }
+          ],
+          produkte: [
+            { name: 'Shampoo Vital', menge: '10 ml' },
+            { name: 'Intensiv-Kur', menge: '25 ml', mischung: 'Grosszuegig in Laengen + Spitzen' },
+            { name: 'Kopfhaut-Serum', menge: '5 ml', mischung: 'Tropfenweise auf Kopfhaut' }
+          ]
+        },
+        'Glossing': {
+          aufgaben: [
+            { schritt: 'Waschen', dauer_min: 5 },
+            { schritt: 'Glossing anmischen', dauer_min: 3 },
+            { schritt: 'Auftragen', dauer_min: 10 },
+            { schritt: 'Einwirkzeit', dauer_min: 10, einwirkzeit: true },
+            { schritt: 'Auswaschen', dauer_min: 5 },
+            { schritt: 'Foehnen', dauer_min: 10 }
+          ],
+          produkte: [
+            { name: 'Glossing-Farbe', menge: '30 ml', mischung: '1:1 mit Aktivator' },
+            { name: 'Shampoo Color', menge: '10 ml' },
+            { name: 'Pflegekur Color', menge: '15 ml' }
+          ]
+        }
       };
       window.serviceProdukte = serviceProdukte;
 
@@ -4964,14 +5245,21 @@
       });
       container.appendChild(grid);
 
-      // === Aufgaben + benoetigte Produkte (aus serviceProdukte Map) ===
+      // === Aufgaben-Rezept + benoetigte Produkte (aus serviceProdukte Map) ===
       var sp = window.serviceProdukte ? window.serviceProdukte[t.Service] : null;
       if (sp) {
-        // Aufgaben-Checkliste
+        // Gesamtzeit berechnen
+        var totalMin = 0;
+        var einwirkMin = 0;
+        sp.aufgaben.forEach(function(a) { totalMin += (a.dauer_min || 0); if (a.einwirkzeit) einwirkMin += (a.dauer_min || 0); });
+
+        // Aufgaben-Rezept (Schritt-fuer-Schritt)
         var taskSection = document.createElement('div');
         taskSection.style.cssText = 'margin-top:16px;padding:16px;background:var(--bg);border:1px solid var(--border-accent);border-radius:var(--radius)';
+        var taskHeader = document.createElement('div');
+        taskHeader.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:12px';
         var taskTitle = document.createElement('div');
-        taskTitle.style.cssText = 'font-size:13px;font-weight:700;color:var(--champagne);margin-bottom:10px;display:flex;align-items:center;gap:6px';
+        taskTitle.style.cssText = 'font-size:13px;font-weight:700;color:var(--champagne);display:flex;align-items:center;gap:6px';
         var taskIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
         taskIcon.setAttribute('viewBox', '0 0 24 24'); taskIcon.setAttribute('fill', 'none');
         taskIcon.setAttribute('stroke', 'currentColor'); taskIcon.setAttribute('stroke-width', '2');
@@ -4982,22 +5270,47 @@
         tp2.setAttribute('d', 'M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11');
         taskIcon.appendChild(tp1); taskIcon.appendChild(tp2);
         taskTitle.appendChild(taskIcon);
-        taskTitle.appendChild(document.createTextNode(' Aufgaben'));
-        taskSection.appendChild(taskTitle);
+        taskTitle.appendChild(document.createTextNode(' Ablauf-Rezept'));
+        taskHeader.appendChild(taskTitle);
+        var timeBadge = document.createElement('span');
+        timeBadge.style.cssText = 'font-size:11px;font-weight:600;color:var(--success);background:var(--success-bg);padding:3px 8px;border-radius:10px';
+        timeBadge.textContent = totalMin + ' Min gesamt';
+        taskHeader.appendChild(timeBadge);
+        taskSection.appendChild(taskHeader);
+
+        // Einwirkzeit-Info wenn vorhanden
+        if (einwirkMin > 0) {
+          var ewInfo = document.createElement('div');
+          ewInfo.style.cssText = 'font-size:11px;color:var(--warning);background:rgba(245,166,35,0.08);padding:6px 10px;border-radius:var(--radius-sm);margin-bottom:10px;display:flex;align-items:center;gap:6px';
+          ewInfo.textContent = 'Davon ' + einwirkMin + ' Min Einwirkzeit — Parallelarbeiten moeglich';
+          taskSection.appendChild(ewInfo);
+        }
+
         sp.aufgaben.forEach(function(task, idx) {
+          var taskObj = typeof task === 'string' ? { schritt: task } : task;
           var row = document.createElement('div');
-          row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-light)';
+          row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px';
           if (idx === sp.aufgaben.length - 1) row.style.borderBottom = 'none';
           var num = document.createElement('span');
-          num.style.cssText = 'color:var(--text-dim);font-size:11px;min-width:18px';
+          num.style.cssText = 'color:var(--text-dim);font-size:10px;min-width:20px;font-weight:600';
           num.textContent = (idx + 1) + '.';
           row.appendChild(num);
-          row.appendChild(document.createTextNode(' ' + task));
+          var nameSpan = document.createElement('span');
+          nameSpan.style.cssText = 'flex:1;color:' + (taskObj.einwirkzeit ? 'var(--warning)' : 'var(--text-light)');
+          if (taskObj.einwirkzeit) nameSpan.style.fontStyle = 'italic';
+          nameSpan.textContent = taskObj.schritt;
+          row.appendChild(nameSpan);
+          if (taskObj.dauer_min) {
+            var durBadge = document.createElement('span');
+            durBadge.style.cssText = 'font-size:10px;color:var(--text-dim);background:var(--bg-warm);padding:2px 6px;border-radius:8px;white-space:nowrap';
+            durBadge.textContent = taskObj.dauer_min + ' Min';
+            row.appendChild(durBadge);
+          }
           taskSection.appendChild(row);
         });
         container.appendChild(taskSection);
 
-        // Benoetigte Produkte
+        // Benoetigte Produkte (mit Menge + Mischung)
         var prodSection = document.createElement('div');
         prodSection.style.cssText = 'margin-top:10px;padding:16px;background:linear-gradient(135deg, rgba(184,150,46,0.06), rgba(184,150,46,0.02));border:1px solid rgba(184,150,46,0.2);border-radius:var(--radius)';
         var prodTitle = document.createElement('div');
@@ -5014,20 +5327,39 @@
         pp3.setAttribute('d', 'M16 10a4 4 0 0 1-8 0');
         prodIcon.appendChild(pp1); prodIcon.appendChild(pp2); prodIcon.appendChild(pp3);
         prodTitle.appendChild(prodIcon);
-        prodTitle.appendChild(document.createTextNode(' Benoetigte Produkte'));
+        prodTitle.appendChild(document.createTextNode(' Produkte & Mengen'));
         prodSection.appendChild(prodTitle);
         sp.produkte.forEach(function(prod) {
+          var prodObj = typeof prod === 'string' ? { name: prod } : prod;
           var row = document.createElement('div');
-          row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13px;color:var(--text-light)';
+          row.style.cssText = 'padding:6px 0;border-bottom:1px solid rgba(184,150,46,0.1)';
+          var topRow = document.createElement('div');
+          topRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:8px';
+          var nameDiv = document.createElement('div');
+          nameDiv.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-light)';
           var dot = document.createElement('span');
-          dot.style.cssText = 'color:var(--gold);font-size:10px';
+          dot.style.cssText = 'color:var(--gold);font-size:8px;flex-shrink:0';
           dot.textContent = '\u25CF';
-          row.appendChild(dot);
-          row.appendChild(document.createTextNode(' ' + prod));
+          nameDiv.appendChild(dot);
+          nameDiv.appendChild(document.createTextNode(prodObj.name));
+          topRow.appendChild(nameDiv);
+          if (prodObj.menge) {
+            var mengeBadge = document.createElement('span');
+            mengeBadge.style.cssText = 'font-size:11px;font-weight:600;color:var(--gold);background:rgba(184,150,46,0.1);padding:2px 8px;border-radius:8px;white-space:nowrap';
+            mengeBadge.textContent = prodObj.menge;
+            topRow.appendChild(mengeBadge);
+          }
+          row.appendChild(topRow);
+          if (prodObj.mischung) {
+            var mixDiv = document.createElement('div');
+            mixDiv.style.cssText = 'font-size:11px;color:var(--text-dim);margin-top:2px;padding-left:14px;font-style:italic';
+            mixDiv.textContent = 'Mischung: ' + prodObj.mischung;
+            row.appendChild(mixDiv);
+          }
           prodSection.appendChild(row);
         });
         var hint = document.createElement('div');
-        hint.style.cssText = 'margin-top:8px;font-size:11px;color:var(--text-dim);font-style:italic';
+        hint.style.cssText = 'margin-top:10px;font-size:11px;color:var(--text-dim);font-style:italic';
         hint.textContent = 'Produkte vor dem Termin vorbereiten \u2014 Lagerbestand pruefen';
         prodSection.appendChild(hint);
         container.appendChild(prodSection);
@@ -5651,41 +5983,93 @@
       resultEl.style.cssText = 'display:block;margin-top:14px;background:var(--bg-warm);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border-accent)';
       resultEl.textContent = '';
 
-      var titleDiv = document.createElement('div');
-      titleDiv.style.cssText = 'font-size:13px;font-weight:700;color:var(--info);margin-bottom:8px;font-family:Playfair Display,serif';
-      titleDiv.textContent = 'Analyse-Ergebnis';
-      resultEl.appendChild(titleDiv);
+      // Lade-Animation
+      var loader = document.createElement('div');
+      loader.style.cssText = 'text-align:center;padding:20px';
+      var spinner = document.createElement('div');
+      spinner.style.cssText = 'width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--info);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px';
+      loader.appendChild(spinner);
+      var loadText = document.createElement('div');
+      loadText.style.cssText = 'font-size:12px;color:var(--text-dim)';
+      loadText.textContent = 'KI analysiert ' + files.length + ' Foto(s)...';
+      loader.appendChild(loadText);
+      resultEl.appendChild(loader);
 
-      var info = document.createElement('div');
-      info.style.cssText = 'font-size:12px;color:var(--text);line-height:1.8';
-      var b1 = document.createElement('strong');
-      b1.textContent = 'Kundin: ';
-      info.appendChild(b1);
-      info.appendChild(document.createTextNode(name));
-      info.appendChild(document.createElement('br'));
-      var b2 = document.createElement('strong');
-      b2.textContent = 'Fotos: ';
-      info.appendChild(b2);
-      info.appendChild(document.createTextNode(files.length + ' Aufnahmen analysiert'));
-      info.appendChild(document.createElement('br'));
-      var b3 = document.createElement('strong');
-      b3.textContent = 'Status: ';
-      info.appendChild(b3);
-      var statusSpan = document.createElement('span');
-      statusSpan.style.cssText = 'color:var(--success);font-weight:600';
-      statusSpan.textContent = 'Analyse wird verarbeitet';
-      info.appendChild(statusSpan);
-      resultEl.appendChild(info);
+      // Simulierte KI-Antwort nach 2s
+      setTimeout(function() {
+        resultEl.textContent = '';
+        var titleDiv = document.createElement('div');
+        titleDiv.style.cssText = 'font-size:14px;font-weight:700;color:var(--info);margin-bottom:12px;font-family:Playfair Display,serif';
+        titleDiv.textContent = 'Haaranalyse-Ergebnis';
+        resultEl.appendChild(titleDiv);
 
-      var note = document.createElement('div');
-      note.style.cssText = 'margin-top:10px;font-size:11px;color:var(--text-dim)';
-      note.textContent = 'Ergebnis wird in Kuerze in den Beratungen angezeigt. PDF-Report per E-Mail moeglich.';
-      resultEl.appendChild(note);
+        // Ergebnis-Grid
+        var params = [
+          { label: 'Haartyp', wert: '2A — Fein, leicht wellig', score: 'normal' },
+          { label: 'Schaedigung', wert: 'Stufe 2/5 — Leichte Trockenheit', score: 'gut' },
+          { label: 'Kopfhaut', wert: 'Leicht trocken, keine Schuppen', score: 'normal' },
+          { label: 'Porenstruktur', wert: 'Mittlere Porositaet', score: 'gut' },
+          { label: 'Farbhistorie', wert: 'Natuerlich dunkelblond, 1x Balayage (6 Mo.)', score: 'normal' },
+          { label: 'Elastizitaet', wert: 'Gut — normaler Ruecksprung', score: 'gut' },
+          { label: 'Dichte', wert: 'Mitteldicht (~100 Haare/cm\u00B2)', score: 'normal' },
+          { label: 'Glanz', wert: 'Leicht matt — Pflege empfohlen', score: 'warnung' }
+        ];
+        var grid = document.createElement('div');
+        grid.style.cssText = 'display:grid;gap:6px;margin-bottom:12px';
+        params.forEach(function(p) {
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:var(--surface);border-radius:6px;border:1px solid var(--border)';
+          var lbl = document.createElement('span');
+          lbl.style.cssText = 'font-size:11px;font-weight:600;color:var(--text-dim);min-width:90px';
+          lbl.textContent = p.label;
+          var val = document.createElement('span');
+          val.style.cssText = 'font-size:12px;color:var(--text);text-align:right;flex:1';
+          val.textContent = p.wert;
+          var dot = document.createElement('span');
+          dot.style.cssText = 'width:8px;height:8px;border-radius:50%;margin-left:8px;flex-shrink:0;background:' + (p.score === 'gut' ? 'var(--success)' : p.score === 'warnung' ? 'var(--warning)' : 'var(--info)');
+          row.appendChild(lbl);
+          row.appendChild(val);
+          row.appendChild(dot);
+          grid.appendChild(row);
+        });
+        resultEl.appendChild(grid);
+
+        // Empfehlungen
+        var empfTitle = document.createElement('div');
+        empfTitle.style.cssText = 'font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px';
+        empfTitle.textContent = 'Pflegeempfehlung';
+        resultEl.appendChild(empfTitle);
+        var empfs = ['Feuchtigkeitspflege 1x/Woche (Intensiv-Kur)', 'Hitzeschutz vor jedem Foehnen', 'Glossing-Auffrischung alle 6-8 Wochen', 'La Biosthetique Shampoo Vital + Conditioner'];
+        empfs.forEach(function(e) {
+          var eRow = document.createElement('div');
+          eRow.style.cssText = 'font-size:12px;color:var(--text-light);padding:3px 0;display:flex;gap:6px';
+          eRow.textContent = '\u2714 ' + e;
+          resultEl.appendChild(eRow);
+        });
+
+        var kundinInfo = document.createElement('div');
+        kundinInfo.style.cssText = 'margin-top:10px;padding:8px 10px;background:var(--surface);border-radius:6px;font-size:11px;color:var(--text-dim)';
+        kundinInfo.textContent = 'Kundin: ' + name + ' \u2022 ' + files.length + ' Fotos \u2022 Analysiert am ' + new Date().toLocaleDateString('de-DE');
+        resultEl.appendChild(kundinInfo);
+
+        var pdfBtn = document.createElement('button');
+        pdfBtn.style.cssText = 'margin-top:10px;width:100%;padding:10px;background:linear-gradient(135deg,var(--info),#2a6faa);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+        pdfBtn.textContent = 'PDF-Report per E-Mail senden (19 EUR)';
+        pdfBtn.addEventListener('click', function() { showToast('PDF-Report wird erstellt und versendet...', 'success', 3000); });
+        resultEl.appendChild(pdfBtn);
+
+        var note = document.createElement('div');
+        note.style.cssText = 'margin-top:8px;font-size:10px;color:var(--text-dim);text-align:center';
+        note.textContent = 'Powered by Casa 2035 KI \u2022 Ergebnis ist Richtwert, keine medizinische Diagnose';
+        resultEl.appendChild(note);
+      }, 2000);
     }
 
     function checkMachbarkeit() {
       var files = document.getElementById('wunschUploadTool').files;
       var name = document.getElementById('wfToolName').value;
+      var haartyp = document.getElementById('wfToolHaartyp').value;
+      var notiz = document.getElementById('wfToolNotiz').value;
       if (!files || !files.length) { showToast('Bitte Wunschbild hochladen', 'warning'); return; }
       if (!name) { showToast('Bitte Kundennamen angeben', 'warning'); return; }
       showToast('Machbarkeits-Check laeuft...', 'info');
@@ -5695,31 +6079,97 @@
       resultEl.style.cssText = 'display:block;margin-top:14px;background:var(--bg-warm);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border-accent)';
       resultEl.textContent = '';
 
-      var titleDiv = document.createElement('div');
-      titleDiv.style.cssText = 'font-size:13px;font-weight:700;color:var(--success);margin-bottom:8px;font-family:Playfair Display,serif';
-      titleDiv.textContent = 'Machbarkeits-Check';
-      resultEl.appendChild(titleDiv);
+      // Lade-Animation
+      var loader = document.createElement('div');
+      loader.style.cssText = 'text-align:center;padding:20px';
+      var spinner = document.createElement('div');
+      spinner.style.cssText = 'width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--success);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 10px';
+      loader.appendChild(spinner);
+      var loadText = document.createElement('div');
+      loadText.style.cssText = 'font-size:12px;color:var(--text-dim)';
+      loadText.textContent = 'KI vergleicht Wunsch- mit Ist-Zustand...';
+      loader.appendChild(loadText);
+      resultEl.appendChild(loader);
 
-      var info = document.createElement('div');
-      info.style.cssText = 'font-size:12px;color:var(--text);line-height:1.8';
-      var b1 = document.createElement('strong');
-      b1.textContent = 'Kundin: ';
-      info.appendChild(b1);
-      info.appendChild(document.createTextNode(name));
-      info.appendChild(document.createElement('br'));
-      var b2 = document.createElement('strong');
-      b2.textContent = 'Status: ';
-      info.appendChild(b2);
-      var statusSpan = document.createElement('span');
-      statusSpan.style.cssText = 'color:var(--success);font-weight:600';
-      statusSpan.textContent = 'Wird analysiert';
-      info.appendChild(statusSpan);
-      resultEl.appendChild(info);
+      setTimeout(function() {
+        resultEl.textContent = '';
 
-      var note = document.createElement('div');
-      note.style.cssText = 'margin-top:10px;font-size:11px;color:var(--text-dim)';
-      note.textContent = 'KI prueft Machbarkeit, Techniken und Pflegebedarf. Ergebnis erscheint in den Beratungen.';
-      resultEl.appendChild(note);
+        // Machbarkeits-Score
+        var scoreDiv = document.createElement('div');
+        scoreDiv.style.cssText = 'text-align:center;margin-bottom:14px';
+        var scoreCircle = document.createElement('div');
+        scoreCircle.style.cssText = 'width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--success),#2a9d63);color:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;font-family:Playfair Display,serif;margin:0 auto 6px;box-shadow:0 4px 12px rgba(45,138,78,0.3)';
+        scoreCircle.textContent = '87%';
+        scoreDiv.appendChild(scoreCircle);
+        var scoreLabel = document.createElement('div');
+        scoreLabel.style.cssText = 'font-size:14px;font-weight:700;color:var(--success);font-family:Playfair Display,serif';
+        scoreLabel.textContent = 'Gut machbar';
+        scoreDiv.appendChild(scoreLabel);
+        var scoreSubLabel = document.createElement('div');
+        scoreSubLabel.style.cssText = 'font-size:11px;color:var(--text-dim)';
+        scoreSubLabel.textContent = 'In 1 Termin erreichbar';
+        scoreDiv.appendChild(scoreSubLabel);
+        resultEl.appendChild(scoreDiv);
+
+        // Analyse-Details
+        var details = [
+          { label: 'Technik', wert: 'Balayage + leichte Stufen', icon: '\u2702\uFE0F' },
+          { label: 'Geschaetzte Dauer', wert: '2,5 - 3 Stunden', icon: '\u23F1' },
+          { label: 'Aufhellungsbedarf', wert: '+2-3 Stufen (moderat)', icon: '\uD83C\uDF1F' },
+          { label: 'Pflegebedarf', wert: 'Olaplex empfohlen', icon: '\uD83D\uDCA7' },
+          { label: 'Preisrahmen', wert: '145 - 195 EUR', icon: '\uD83D\uDCB0' }
+        ];
+        details.forEach(function(d) {
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 10px;margin-bottom:4px;background:var(--surface);border-radius:6px;border:1px solid var(--border)';
+          var iconSpan = document.createElement('span');
+          iconSpan.style.cssText = 'font-size:14px;flex-shrink:0';
+          iconSpan.textContent = d.icon;
+          var lblSpan = document.createElement('span');
+          lblSpan.style.cssText = 'font-size:11px;color:var(--text-dim);min-width:80px';
+          lblSpan.textContent = d.label;
+          var valSpan = document.createElement('span');
+          valSpan.style.cssText = 'font-size:12px;color:var(--text);font-weight:600;flex:1;text-align:right';
+          valSpan.textContent = d.wert;
+          row.appendChild(iconSpan);
+          row.appendChild(lblSpan);
+          row.appendChild(valSpan);
+          resultEl.appendChild(row);
+        });
+
+        // Hinweise
+        var hinweisTitle = document.createElement('div');
+        hinweisTitle.style.cssText = 'font-size:12px;font-weight:700;color:var(--warning);margin:12px 0 6px';
+        hinweisTitle.textContent = 'Hinweise fuer den Termin';
+        resultEl.appendChild(hinweisTitle);
+        var hinweise = [
+          'Haare 2 Tage vor dem Termin nicht waschen',
+          'Vorbehandlung (Olaplex No.0) empfohlen',
+          'Silbershampoo fuer zuhause mitgeben'
+        ];
+        hinweise.forEach(function(h) {
+          var hRow = document.createElement('div');
+          hRow.style.cssText = 'font-size:12px;color:var(--text-light);padding:2px 0';
+          hRow.textContent = '\u26A0 ' + h;
+          resultEl.appendChild(hRow);
+        });
+
+        var kundinInfo = document.createElement('div');
+        kundinInfo.style.cssText = 'margin-top:10px;padding:8px 10px;background:var(--surface);border-radius:6px;font-size:11px;color:var(--text-dim)';
+        kundinInfo.textContent = 'Kundin: ' + name + (haartyp ? ' \u2022 ' + haartyp : '') + ' \u2022 ' + new Date().toLocaleDateString('de-DE');
+        resultEl.appendChild(kundinInfo);
+
+        var bookBtn = document.createElement('button');
+        bookBtn.style.cssText = 'margin-top:10px;width:100%;padding:10px;background:linear-gradient(135deg,var(--success),#2a9d63);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+        bookBtn.textContent = 'Termin buchen fuer diesen Look';
+        bookBtn.addEventListener('click', function() { showToast('Terminvorschlag wird erstellt...', 'success', 3000); });
+        resultEl.appendChild(bookBtn);
+
+        var note = document.createElement('div');
+        note.style.cssText = 'margin-top:8px;font-size:10px;color:var(--text-dim);text-align:center';
+        note.textContent = 'Powered by Casa 2035 KI \u2022 Machbarkeit basiert auf Bildanalyse, Beratung im Salon empfohlen';
+        resultEl.appendChild(note);
+      }, 2500);
     }
 
     // === Toast Notification System ===
@@ -5893,6 +6343,97 @@
         el.appendChild(document.createTextNode(item.label));
         menu.appendChild(el);
       });
+    }
+
+    // === Anfragen-Uebersicht (Bottom Sheet mit offenen Kundenanfragen) ===
+    function openAnfragenOverview() {
+      var sheetId = 'anfragenOverviewSheet';
+      var existing = document.getElementById(sheetId);
+      if (existing) existing.remove();
+
+      var unreadItems = (eventsCache || []).filter(function(e) {
+        return e.Is_Read === 0 || e.Is_Read === '0' || e.Gelesen === 0 || e.Gelesen === '0' || e.Status === 'ungelesen';
+      });
+
+      var sheet = document.createElement('div');
+      sheet.id = sheetId;
+      sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:75vh;background:var(--surface);border-top-left-radius:20px;border-top-right-radius:20px;box-shadow:0 -4px 24px rgba(0,0,0,0.15);z-index:1000;overflow-y:auto;padding:0 0 env(safe-area-inset-bottom, 16px) 0;animation:slideUp 300ms ease';
+
+      var handle = document.createElement('div');
+      handle.style.cssText = 'width:36px;height:4px;background:var(--border);border-radius:2px;margin:10px auto 0';
+      sheet.appendChild(handle);
+
+      var headerDiv = document.createElement('div');
+      headerDiv.style.cssText = 'padding:14px 20px 10px;display:flex;align-items:center;justify-content:space-between';
+      var titleSpan = document.createElement('div');
+      titleSpan.style.cssText = 'font-size:16px;font-weight:700;color:var(--text);font-family:Playfair Display,serif';
+      titleSpan.textContent = 'Offene Anfragen';
+      var closeBtn = document.createElement('button');
+      closeBtn.style.cssText = 'background:none;border:none;color:var(--text-dim);font-size:22px;cursor:pointer;padding:0;line-height:1';
+      closeBtn.textContent = '\u00D7';
+      closeBtn.onclick = function() { sheet.remove(); backdrop.remove(); };
+      headerDiv.appendChild(titleSpan);
+      var countBadge = document.createElement('span');
+      countBadge.style.cssText = 'background:var(--info);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:8px';
+      countBadge.textContent = unreadItems.length;
+      titleSpan.appendChild(countBadge);
+      headerDiv.appendChild(closeBtn);
+      sheet.appendChild(headerDiv);
+
+      if (unreadItems.length === 0) {
+        var emptyDiv = document.createElement('div');
+        emptyDiv.style.cssText = 'padding:30px 20px;text-align:center;color:var(--text-dim);font-size:13px';
+        emptyDiv.textContent = 'Keine offenen Anfragen — alles bearbeitet!';
+        sheet.appendChild(emptyDiv);
+      } else {
+        var listDiv = document.createElement('div');
+        listDiv.style.cssText = 'padding:0 16px 16px';
+        unreadItems.forEach(function(e) {
+          var kanalIcons = { whatsapp: '\uD83D\uDCAC', instagram: '\uD83D\uDCF7', email: '\u2709\uFE0F', facebook: '\uD83D\uDD35', system: '\u2699\uFE0F' };
+          var kanal = (e.Kanal || 'system').toLowerCase();
+          var timeStr = e.Timestamp ? new Date(e.Timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '';
+          var row = document.createElement('div');
+          row.style.cssText = 'padding:12px;margin-bottom:8px;background:var(--bg-warm);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:background 150ms';
+          row.onclick = function() {
+            sheet.remove(); backdrop.remove();
+            switchPage('beratung');
+          };
+          var rowTop = document.createElement('div');
+          rowTop.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:4px';
+          var kanalSpan = document.createElement('span');
+          kanalSpan.style.cssText = 'font-size:12px;font-weight:600;color:var(--info)';
+          kanalSpan.textContent = (kanalIcons[kanal] || '') + ' ' + (e.Typ || 'Anfrage');
+          var timeSpan = document.createElement('span');
+          timeSpan.style.cssText = 'font-size:11px;color:var(--text-dim)';
+          timeSpan.textContent = timeStr;
+          rowTop.appendChild(kanalSpan);
+          rowTop.appendChild(timeSpan);
+          row.appendChild(rowTop);
+          var titleDiv = document.createElement('div');
+          titleDiv.style.cssText = 'font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px';
+          titleDiv.textContent = e.Titel || 'Kundenanfrage';
+          row.appendChild(titleDiv);
+          var msgDiv = document.createElement('div');
+          msgDiv.style.cssText = 'font-size:12px;color:var(--text-light);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden';
+          msgDiv.textContent = e.Nachricht || '';
+          row.appendChild(msgDiv);
+          listDiv.appendChild(row);
+        });
+        sheet.appendChild(listDiv);
+      }
+
+      var viewAllBtn = document.createElement('button');
+      viewAllBtn.style.cssText = 'display:block;width:calc(100% - 32px);margin:0 16px 16px;padding:12px;background:linear-gradient(135deg,var(--info),#2a6faa);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+      viewAllBtn.textContent = 'Alle Anfragen anzeigen';
+      viewAllBtn.onclick = function() { sheet.remove(); backdrop.remove(); switchPage('beratung'); };
+      sheet.appendChild(viewAllBtn);
+
+      var backdrop = document.createElement('div');
+      backdrop.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999';
+      backdrop.onclick = function() { sheet.remove(); backdrop.remove(); };
+
+      document.body.appendChild(backdrop);
+      document.body.appendChild(sheet);
     }
 
     // === V5.1: KI-Insights (Smart Proactive Tips) ===
@@ -6591,10 +7132,10 @@
   </script>
 
   <!-- Feedback Widget (Tester-Feedback) -->
-  <div id="dashFeedbackFab" onclick="toggleDashFeedback()" style="position:fixed;bottom:90px;left:24px;z-index:100;width:48px;height:48px;border-radius:50%;background:rgba(184,150,46,0.12);border:1px solid rgba(184,150,46,0.25);color:var(--rose);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 200ms;box-shadow:0 2px 12px rgba(184,150,46,0.15)" title="Feedback geben">
+  <div id="dashFeedbackFab" onclick="toggleDashFeedback()" style="position:fixed;bottom:calc(env(safe-area-inset-bottom, 0px) + 74px);left:16px;z-index:100;width:44px;height:44px;border-radius:50%;background:rgba(184,150,46,0.12);border:1px solid rgba(184,150,46,0.25);color:var(--rose);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 200ms;box-shadow:0 2px 12px rgba(184,150,46,0.15)" title="Feedback geben">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="12" y1="7" x2="12" y2="13"/></svg>
   </div>
-  <div id="dashFeedbackPanel" style="display:none;position:fixed;bottom:148px;left:24px;z-index:101;width:320px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-soft);overflow:hidden;font-family:Inter,sans-serif">
+  <div id="dashFeedbackPanel" style="display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom, 0px) + 126px);left:16px;z-index:101;width:min(320px, calc(100vw - 32px));border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-soft);overflow:hidden;font-family:Inter,sans-serif">
     <div style="padding:14px 18px;background:linear-gradient(135deg,var(--rose),#c9a93d);color:#fff;display:flex;align-items:center;justify-content:space-between">
       <span style="font-weight:600;font-size:14px">Dashboard Feedback</span>
       <button onclick="toggleDashFeedback()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:18px;padding:0;line-height:1">&times;</button>
