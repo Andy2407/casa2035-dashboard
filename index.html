@@ -635,11 +635,20 @@
     .role-hidden { display: none !important; }
 
     /* === Workflow Status === */
+    .wf-test-badge { font-size:8px; font-weight:700; padding:2px 6px; border-radius:var(--radius-full); margin-left:4px; }
+    .wf-test-badge.tested { background:var(--success-bg); color:var(--success); }
+    .wf-test-badge.untested { background:var(--warning-bg); color:var(--warning); }
+    .wf-test-badge.partial { background:var(--info-bg); color:var(--info); }
+    .wf-detail-note { display:none; margin:0 0 6px 20px; padding:10px 14px; background:var(--surface-hover); border-left:3px solid var(--rose); border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-size:11px; color:var(--text-secondary); line-height:1.5; }
+    .wf-detail-note.open { display:block; animation: fadeIn 200ms ease; }
+    .wf-detail-meta { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+    .wf-detail-chip { font-size:9px; padding:2px 8px; background:var(--rose-glow); border:1px solid rgba(184,150,46,0.15); border-radius:var(--radius-full); color:var(--text-secondary); }
     .wf-row {
       display: flex; align-items: center; gap: 10px;
       padding: 12px 14px; background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--radius); cursor: pointer; transition: background 150ms;
     }
+    .wf-row:active { transform: scale(0.98); }
     .wf-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .wf-dot.clean { background: var(--success); }
     .wf-dot.bug { background: var(--danger); }
@@ -1226,6 +1235,43 @@
     .fab-item-icon.gold { background: var(--gold-glow); color: var(--gold); }
     .fab-item-icon.rose { background: var(--rose-glow); color: var(--rose); }
 
+    /* === KI-Tab-Assistent Panel === */
+    .ki-assist-panel {
+      position: fixed; bottom: calc(86px + var(--safe-bottom)); right: 18px; z-index: 89;
+      width: min(360px, calc(100vw - 36px)); max-height: 55vh;
+      background: var(--surface); border: 1px solid var(--border-accent);
+      border-radius: var(--radius-lg); box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+      overflow: hidden; opacity: 0; pointer-events: none;
+      transform: translateY(12px) scale(0.96);
+      transition: all 250ms var(--ease);
+    }
+    .ki-assist-panel.open { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+    .ki-assist-header {
+      padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, rgba(184,150,46,0.08), rgba(184,150,46,0.03));
+      border-bottom: 1px solid var(--border);
+    }
+    .ki-assist-header-icon { width:32px;height:32px;border-radius:10px;background:var(--rose-glow);border:1px solid rgba(184,150,46,0.12);display:flex;align-items:center;justify-content:center; }
+    .ki-assist-header-icon svg { width:16px;height:16px;color:var(--rose-light); }
+    .ki-assist-title { font-size:13px;font-weight:700;color:var(--text);flex:1; }
+    .ki-assist-subtitle { font-size:10px;color:var(--text-dim);font-weight:400;display:block; }
+    .ki-assist-close { background:none;border:none;font-size:18px;color:var(--text-dim);cursor:pointer;padding:4px;line-height:1; }
+    .ki-assist-body { padding: 14px 16px; overflow-y: auto; max-height: calc(55vh - 60px); }
+    .ki-assist-tip {
+      padding: 12px; background: var(--bg-warm); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); margin-bottom: 8px; cursor: pointer;
+      transition: background 150ms;
+    }
+    .ki-assist-tip:hover { background: var(--surface-hover); }
+    .ki-assist-tip:active { transform: scale(0.98); }
+    .ki-assist-tip-title { font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px; }
+    .ki-assist-tip-text { font-size:11px;color:var(--text-secondary);line-height:1.4; }
+    .ki-assist-tip-action { font-size:11px;color:var(--rose);font-weight:600;margin-top:4px;display:inline-block; }
+    .ki-assist-input-wrap { display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border); }
+    .ki-assist-input { flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;font-family:Inter,sans-serif;background:var(--bg-warm);color:var(--text); }
+    .ki-assist-input:focus { outline:none;border-color:var(--rose); }
+    .ki-assist-send { padding:10px 14px;background:var(--rose-gradient);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-size:12px;font-weight:600;font-family:Inter,sans-serif; }
+
     /* === V5.1: KI-Insights Cards === */
     .ki-insights { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; }
     .ki-insight {
@@ -1339,10 +1385,12 @@
       width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
       border-radius: var(--radius-sm); font-size: 16px; text-align: center;
       font-family: 'Inter', sans-serif; background: var(--bg-warm);
+      color: #1a1a1a; -webkit-text-fill-color: #1a1a1a;
       letter-spacing: 2px; transition: border-color 200ms;
     }
     .login-input:focus { outline: none; border-color: var(--rose); box-shadow: 0 0 0 3px var(--rose-glow); }
     .login-input.error { border-color: var(--danger); animation: shake 300ms; }
+    #loginUser:-webkit-autofill, #loginPw:-webkit-autofill { -webkit-text-fill-color: #1a1a1a; -webkit-box-shadow: 0 0 0 50px var(--bg-warm) inset; }
     @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
     .login-btn {
       width: 100%; padding: 14px; border: none; border-radius: var(--radius-sm);
@@ -1559,8 +1607,8 @@
       <div style="width:56px;height:56px;border-radius:16px;background:var(--rose-glow);border:1px solid rgba(184,150,46,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 20px">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:26px;height:26px;color:var(--rose-light)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
-      <input type="text" id="loginUser" placeholder="Benutzername" onkeypress="if(event.key==='Enter')document.getElementById('loginPw').focus()" style="width:100%;padding:14px 18px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-family:'Inter',sans-serif;text-align:center;background:var(--bg-warm);margin-bottom:10px">
-      <input type="password" id="loginPw" placeholder="Passwort" onkeypress="if(event.key==='Enter')checkLogin()" style="width:100%;padding:14px 18px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-family:'Inter',sans-serif;text-align:center;background:var(--bg-warm);margin-bottom:12px;letter-spacing:2px">
+      <input type="text" id="loginUser" placeholder="Benutzername" onkeypress="if(event.key==='Enter')document.getElementById('loginPw').focus()" style="width:100%;padding:14px 18px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-family:'Inter',sans-serif;text-align:center;background:var(--bg-warm);color:#1a1a1a;-webkit-text-fill-color:#1a1a1a;margin-bottom:10px">
+      <input type="password" id="loginPw" placeholder="Passwort" onkeypress="if(event.key==='Enter')checkLogin()" style="width:100%;padding:14px 18px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-family:'Inter',sans-serif;text-align:center;background:var(--bg-warm);color:#1a1a1a;-webkit-text-fill-color:#1a1a1a;margin-bottom:12px;letter-spacing:2px">
       <div id="loginError" style="font-size:12px;color:var(--danger);margin-bottom:8px;display:none">Benutzername oder Passwort falsch</div>
       <button onclick="checkLogin()" style="width:100%;padding:14px;background:var(--rose-gradient);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;letter-spacing:0.5px">Anmelden</button>
       <div style="margin-top:16px;font-size:10px;color:var(--text-dim);line-height:1.5">
@@ -2129,10 +2177,43 @@
           <div class="sprint-sub">15 von 22 Workflows produktionsreif</div>
         </div>
 
+        <!-- Aktivierungs-Reihenfolge -->
+        <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--info)"></div><div class="section-title">Go-Live Phasen</div></div>
+        <div id="adminGoLivePhases" style="margin-bottom:14px"></div>
+
+        <!-- Letzte Aktivitaeten (System-Log) -->
+        <div class="section" style="margin-top:0"><div class="section-bar"></div><div class="section-title">System-Log</div></div>
+        <div id="adminActivityLog" style="margin-bottom:14px"></div>
+
+        <!-- Blocker-Uebersicht -->
+        <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--warning)"></div><div class="section-title">Offene Blocker</div></div>
+        <div id="adminBlockers" style="margin-bottom:14px"></div>
+
         <!-- Personal: Rechte vergeben -->
         <div id="personalSection">
           <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--gold)"></div><div class="section-title">Team-Berechtigungen</div></div>
           <div id="personalPermGrid" style="margin-bottom:14px"></div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--rose)"></div><div class="section-title">Quick Actions</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+          <button onclick="window.open('https://niniho13.app.n8n.cloud','_blank')" style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:11px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:6px;justify-content:center">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;color:var(--rose)"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>
+            n8n Cloud
+          </button>
+          <button onclick="window.open('https://github.com/Andy2407/casa2035-dashboard','_blank')" style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:11px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:6px;justify-content:center">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;color:var(--text-dim)"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub
+          </button>
+          <button onclick="window.open('https://cloud.qdrant.io','_blank')" style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:11px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:6px;justify-content:center">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;color:var(--info)"><circle cx="12" cy="12" r="10"/></svg>
+            Qdrant Cloud
+          </button>
+          <button onclick="switchPage('config')" style="padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);font-size:11px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;color:var(--text);display:flex;align-items:center;gap:6px;justify-content:center">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;color:var(--text-dim)"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.09-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg>
+            Einstellungen
+          </button>
         </div>
 
         <!-- Einstellungen -->
@@ -2315,8 +2396,8 @@
 
   <!-- V5.1: FAB — KI-Assistent Quick Actions -->
   <div class="fab-container">
-    <button class="fab-float" id="fabBtn" aria-label="KI-Assistent">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    <button class="fab-float" id="fabBtn" aria-label="KI-Assistent" title="Tippe: Aktionen | Halte: KI-Assistent">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14c0 3 2.5 6 7 8"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5 0 3-2.5 6-7 8"/></svg>
     </button>
     <div class="fab-menu" id="fabMenu">
       <div class="fab-item touch-scale" onclick="fabAction('rechnung')">
@@ -2336,6 +2417,18 @@
         Demo-Daten laden
       </div>
     </div>
+  </div>
+
+  <!-- KI-Tab-Assistent Panel -->
+  <div class="ki-assist-panel" id="kiAssistPanel">
+    <div class="ki-assist-header">
+      <div class="ki-assist-header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5"/></svg>
+      </div>
+      <div class="ki-assist-title" id="kiAssistTitle">KI-Assistent<span class="ki-assist-subtitle" id="kiAssistSub">Home</span></div>
+      <button class="ki-assist-close" onclick="toggleKiAssist(false)">&times;</button>
+    </div>
+    <div class="ki-assist-body" id="kiAssistBody"></div>
   </div>
 
   <!-- SHEET: Config -->
@@ -3158,6 +3251,8 @@
 
       // System-Tab: Panels initialisieren wenn noetig
       if (page === 'system') initSystemPanels();
+      // KI-Assistent aktualisieren wenn offen
+      if (kiAssistOpen) renderKiAssistContent();
     }
     function scrollToEvents() {
       var el = document.getElementById('recentEvents');
@@ -3924,48 +4019,195 @@
     }
 
     function renderWfStatus() {
-      const wfs = [
-        { n: 'WF-01 Intent', s: 'clean', l: 'V15 Ready' },
-        { n: 'WF-02a Terminbuchung', s: 'clean', l: 'OK' },
-        { n: 'WF-02b Kanal-Router', s: 'clean', l: 'OK' },
-        { n: 'WF-03 Wunschfrisur', s: 'clean', l: 'OK' },
-        { n: 'WF-04 Lagerbestand', s: 'clean', l: 'OK' },
-        { n: 'WF-05 Rechnungen', s: 'clean', l: 'MwSt Fix' },
-        { n: 'WF-06a Stornierung', s: 'clean', l: 'OK' },
-        { n: 'WF-06b Umbuchung', s: 'gap', l: 'Pruefen' },
-        { n: 'WF-07 Follow-Up', s: 'clean', l: 'OK' },
-        { n: 'WF-08 Erinnerung', s: 'clean', l: 'OK' },
-        { n: 'WF-09 Auth', s: 'clean', l: 'OK' },
-        { n: 'WF-10 Finanzen', s: 'clean', l: 'OK' },
-        { n: 'WF-11 Tagesabschluss', s: 'clean', l: 'OK' },
-        { n: 'WF-SEND', s: 'clean', l: 'V3 Ready' },
-        { n: 'WF-ERR Error-Handler', s: 'clean', l: 'OK' },
-        { n: 'WF-MIGRATION', s: 'new', l: 'Einmalig' },
-        { n: 'WF-PWA Events', s: 'clean', l: 'OK' },
-        { n: 'WF-PWA Termine', s: 'clean', l: 'OK' },
-        { n: 'WF-PWA Finanzen', s: 'clean', l: 'OK' },
-        { n: 'WF-PWA Ausgabe', s: 'clean', l: 'OK' },
-        { n: 'WF-PWA Tagesabschluss', s: 'clean', l: 'OK' },
-        { n: 'Auth Middleware', s: 'clean', l: 'OK' },
+      var wfs = [
+        // Phase 1: Kern-System
+        { id: 'WF-01', n: 'Eingangskanal', s: 'clean', l: 'V15', t: 'tested', phase: 1, nodes: 45,
+          desc: 'Empfaengt Nachrichten aus allen 5 Kanaelen (WhatsApp, Instagram, Facebook, E-Mail, Homepage). Klassifiziert den Intent per Keyword-Whitelist und routet an den richtigen Folge-Workflow.',
+          tech: ['Gmail Trigger', 'Mistral AI', 'Whitelist'] },
+        { id: 'WF-09', n: 'Authentifizierung', s: 'clean', l: 'OK', t: 'tested', phase: 1, nodes: 12,
+          desc: 'SHA-256 Token-basierte Authentifizierung fuer Dashboard und API-Zugriffe. Prueft Mitarbeiter-Credentials gegen die DB.',
+          tech: ['SHA-256', 'Header Auth'] },
+        { id: 'Auth-MW', n: 'Auth Middleware', s: 'clean', l: 'OK', t: 'tested', phase: 1, nodes: 13,
+          desc: 'Zentrale Middleware die bei jedem API-Call Token + Rolle prueft. Schuetzt alle internen Endpunkte.',
+          tech: ['Middleware', 'RBAC'] },
+
+        // Phase 2: Booking-Flow
+        { id: 'WF-02a', n: 'Terminbuchung', s: 'clean', l: 'OK', t: 'tested', phase: 2, nodes: 28,
+          desc: 'Extrahiert Service-Namen aus Freitext per LLM+RAG. Berechnet Gesamtdauer deterministisch, sucht freie Slots in Google Calendar und schlaegt 3 Optionen vor.',
+          tech: ['Mistral AI', 'Qdrant RAG', 'Google Calendar', 'Code-Calc'] },
+        { id: 'WF-02b', n: 'Buchungsbestaetigung', s: 'clean', l: 'OK', t: 'tested', phase: 2, nodes: 34,
+          desc: 'Verarbeitet die Kundenauswahl, erstellt den Calendar-Eintrag und sendet die personalisierte Bestaetigungsnachricht ueber den gleichen Kanal zurueck.',
+          tech: ['Mistral AI', 'Qdrant RAG', 'Kanal-Router'] },
+        { id: 'WF-06a', n: 'Stornierung', s: 'clean', l: 'OK', t: 'tested', phase: 2, nodes: 15,
+          desc: 'Verarbeitet Stornierungsanfragen. Deterministisch — kein LLM. Prueft Storno-Frist (24h) und loescht den Calendar-Eintrag.',
+          tech: ['Deterministisch', 'Google Calendar'] },
+        { id: 'WF-06b', n: 'Storno-Bestaetigung', s: 'clean', l: 'OK', t: 'tested', phase: 2, nodes: 28,
+          desc: 'Sendet die Storno-Bestaetigung und optional Umbuchungsvorschlaege. Loggt in Stornierungen-Tab.',
+          tech: ['Kanal-Router', 'Google Sheets'] },
+
+        // Phase 3: Features
+        { id: 'WF-03a', n: 'Wunschfrisur-Analyse', s: 'clean', l: 'OK', t: 'tested', phase: 3, nodes: 28,
+          desc: 'Pixtral Large analysiert Kundenfotos: Machbarkeits-Score, Technik, Dauer, Aufhellungsbedarf, Pflegebedarf, Preisrahmen. Consent-Tracking integriert.',
+          tech: ['Pixtral Large', 'Qdrant RAG', 'DSGVO Consent'] },
+        { id: 'WF-03b', n: 'KI-Haaranalyse Profi', s: 'new', l: 'Geplant', t: 'untested', phase: 3, nodes: 0,
+          desc: '17-Parameter Haaranalyse im Salon: Haartyp, Schaedigung, Kopfhaut, Porositaet, Farbhistorie, Elastizitaet, Dichte, Glanz etc. PDF-Report fuer Kunden.',
+          tech: ['Pixtral Large', 'haaranalyse_wissen RAG', '17 Parameter'] },
+        { id: 'WF-03c', n: 'Haar-Check Homepage', s: 'new', l: 'Geplant', t: 'untested', phase: 3, nodes: 0,
+          desc: 'Kostenloser Schnell-Check auf der Homepage: 2-3 Saetze Teaser-Ergebnis. Volle Analyse nur im Salon (Lead-Generierung).',
+          tech: ['Pixtral Large', 'Lead-Gen', 'Teaser'] },
+        { id: 'WF-04', n: 'Lagerbestand', s: 'clean', l: 'OK', t: 'tested', phase: 3, nodes: 11,
+          desc: 'Lagerbestandsabfrage per Keyword. Deterministisch — kein LLM. Liefert Produktname, Menge, Nachbestellstatus.',
+          tech: ['Deterministisch', 'Google Sheets'] },
+        { id: 'WF-05', n: 'Rechnungen', s: 'clean', l: 'MwSt OK', t: 'tested', phase: 3, nodes: 12,
+          desc: 'Rechnungserstellung mit differenzierter MwSt: 7% Dienstleistungen, 19% Produktverkauf. GoBD-konform, 10 Jahre Aufbewahrung.',
+          tech: ['Code-Calc', 'MwSt 7%/19%', 'GoBD'] },
+
+        // Phase 4: Dashboard + Finanzen
+        { id: 'WF-10', n: 'Finanzen', s: 'clean', l: 'OK', t: 'tested', phase: 4, nodes: 11,
+          desc: '100% deterministisch: Tagesumsatz, Wochenumsatz, offene Posten, Kassenbestand. Kein LLM — reine Berechnungen.',
+          tech: ['Deterministisch', 'Code-Calc'] },
+        { id: 'WF-11', n: 'Tagesabschluss', s: 'clean', l: 'OK', t: 'tested', phase: 4, nodes: 27,
+          desc: 'Automatischer Tagesabschluss: Umsatz-Reconciliation, Kassendifferenz, Bar/Karte Split, MA-Umsaetze. GoBD-Pflicht.',
+          tech: ['Deterministisch', 'GoBD', '22 Spalten'] },
+        { id: 'WF-12', n: 'DSGVO-Bereinigung', s: 'clean', l: 'OK', t: 'partial', phase: 4, nodes: 41,
+          desc: 'Automatische Loeschung personenbezogener Daten nach Ablauf der Aufbewahrungsfrist. Art. 17 DSGVO + Art. 5 Speicherbegrenzung.',
+          tech: ['DSGVO Art. 17', 'Cron', 'Loeschkonzept'] },
+
+        // Phase 5: Automatisierung
+        { id: 'WF-07', n: 'Tages-Trigger', s: 'clean', l: 'OK', t: 'tested', phase: 5, nodes: 8,
+          desc: 'Cron-basierter Trigger: Startet taeglich um 07:00 die Erinnerungs- und Follow-Up Workflows.',
+          tech: ['Cron', 'Schedule Trigger'] },
+        { id: 'WF-08', n: 'Erinnerung', s: 'clean', l: 'OK', t: 'tested', phase: 5, nodes: 32,
+          desc: 'Sendet personalisierte Terminerinnerungen 24h vorher. LLM formuliert die Nachricht, Code berechnet den Zeitpunkt.',
+          tech: ['Mistral AI', 'Qdrant RAG', 'Kanal-Router'] },
+
+        // Infrastruktur
+        { id: 'WF-SEND', n: 'Universal-Antwort', s: 'clean', l: 'V3', t: 'tested', phase: 0, nodes: 17,
+          desc: 'Zentraler Kanal-Router: Sendet Antworten ueber den richtigen Kanal (WhatsApp, Instagram, Facebook, E-Mail). respondToWebhook fuer alle Workflows.',
+          tech: ['Multi-Channel', 'respondToWebhook'] },
+        { id: 'WF-ERR', n: 'Error-Handler', s: 'clean', l: 'OK', t: 'tested', phase: 0, nodes: 4,
+          desc: 'Faengt Fehler aus allen Workflows ab. Loggt in Ereignis_Protokoll, benachrichtigt Admin bei kritischen Fehlern.',
+          tech: ['Error Catch', 'Alerting'] },
+        { id: 'WF-MIGR', n: 'Token-Migration', s: 'new', l: 'Einmalig', t: 'untested', phase: 0, nodes: 7,
+          desc: 'Einmalige Migration: Konvertiert Klartext-Passwoerter in SHA-256 Hashes. Wird nur einmal ausgefuehrt.',
+          tech: ['SHA-256', 'Migration'] },
+
+        // PWA-Workflows
+        { id: 'PWA-Dash', n: 'Dashboard API', s: 'clean', l: 'OK', t: 'tested', phase: 4, nodes: 59,
+          desc: 'Haupt-API fuer das Dashboard: Liefert Termine, Events, Beratungen, Lager, Kasse, Tagesabschluss an die PWA.',
+          tech: ['REST API', 'Auth-MW', '59 Nodes'] },
+        { id: 'PWA-Reply', n: 'Antwortvorschlaege', s: 'clean', l: 'OK', t: 'tested', phase: 4, nodes: 16,
+          desc: 'Generiert KI-Antwortvorschlaege fuer eingehende Anfragen. 2x LLM + alle 3 RAG-Collections.',
+          tech: ['Mistral AI', 'Qdrant RAG', '2x LLM'] },
+        { id: 'PWA-Reord', n: 'Nachbestellungen', s: 'clean', l: 'OK', t: 'tested', phase: 4, nodes: 12,
+          desc: 'Verarbeitet Nachbestellungen aus dem Dashboard. Schreibt in Nachbestellungen-Tab, aktualisiert Lager.',
+          tech: ['Google Sheets', 'Lager-Update'] },
+        { id: 'Ingest', n: 'Qdrant Ingest', s: 'clean', l: 'V11', t: 'tested', phase: 0, nodes: 17,
+          desc: 'RAG-Dokumente in Qdrant einlesen: Mistral-Embed (1024 dims) fuer alle 4 Collections. Aktuell 99 Docs, 98 weitere geplant.',
+          tech: ['mistral-embed', '1024 dims', '4 Collections'] }
       ];
+
       var container = document.getElementById('wfList');
+      if (!container) return;
       container.textContent = '';
-      wfs.forEach(function(w) {
-        var row = document.createElement('div');
-        row.className = 'wf-row';
-        var dot = document.createElement('span');
-        dot.className = 'wf-dot ' + w.s;
-        var name = document.createElement('span');
-        name.className = 'wf-name';
-        name.textContent = w.n;
-        var badge = document.createElement('span');
-        badge.className = 'wf-badge ' + w.s;
-        badge.textContent = w.l;
-        row.appendChild(dot);
-        row.appendChild(name);
-        row.appendChild(badge);
-        container.appendChild(row);
+
+      // Group by phase
+      var phases = [
+        { id: 1, label: 'Phase 1: Kern-System', color: 'var(--success)' },
+        { id: 2, label: 'Phase 2: Booking-Flow', color: 'var(--info)' },
+        { id: 3, label: 'Phase 3: Features', color: 'var(--rose)' },
+        { id: 4, label: 'Phase 4: Dashboard + Finanzen', color: 'var(--gold)' },
+        { id: 5, label: 'Phase 5: Automatisierung', color: 'var(--champagne)' },
+        { id: 0, label: 'Infrastruktur', color: 'var(--text-dim)' }
+      ];
+
+      phases.forEach(function(phase) {
+        var phaseWfs = wfs.filter(function(w) { return w.phase === phase.id; });
+        if (phaseWfs.length === 0) return;
+
+        // Phase header
+        var header = document.createElement('div');
+        header.style.cssText = 'font-size:10px;font-weight:700;color:' + phase.color + ';text-transform:uppercase;letter-spacing:0.8px;padding:8px 0 4px;margin-top:4px';
+        header.textContent = phase.label;
+        container.appendChild(header);
+
+        phaseWfs.forEach(function(w) {
+          // Wrapper for row + detail
+          var wrapper = document.createElement('div');
+
+          var row = document.createElement('div');
+          row.className = 'wf-row';
+          var dot = document.createElement('span');
+          dot.className = 'wf-dot ' + w.s;
+          var nameWrap = document.createElement('span');
+          nameWrap.className = 'wf-name';
+          nameWrap.style.cssText = 'display:flex;align-items:center;gap:4px;flex-wrap:wrap';
+          var idEl = document.createElement('span');
+          idEl.style.cssText = 'font-size:10px;color:var(--text-dim);font-weight:600';
+          idEl.textContent = w.id;
+          var nameEl = document.createElement('span');
+          nameEl.textContent = w.n;
+          nameWrap.appendChild(idEl);
+          nameWrap.appendChild(nameEl);
+
+          // Test badge
+          var testBadge = document.createElement('span');
+          testBadge.className = 'wf-test-badge ' + w.t;
+          testBadge.textContent = w.t === 'tested' ? 'Getestet' : w.t === 'partial' ? 'Teilweise' : 'Ausstehend';
+          nameWrap.appendChild(testBadge);
+
+          var badge = document.createElement('span');
+          badge.className = 'wf-badge ' + w.s;
+          badge.textContent = w.l;
+          row.appendChild(dot);
+          row.appendChild(nameWrap);
+          row.appendChild(badge);
+
+          // Detail note (hidden, toggle on click)
+          var detail = document.createElement('div');
+          detail.className = 'wf-detail-note';
+          var descP = document.createElement('div');
+          descP.textContent = w.desc;
+          detail.appendChild(descP);
+
+          // Meta chips
+          var meta = document.createElement('div');
+          meta.className = 'wf-detail-meta';
+          if (w.nodes > 0) {
+            var nodesChip = document.createElement('span');
+            nodesChip.className = 'wf-detail-chip';
+            nodesChip.textContent = w.nodes + ' Nodes';
+            meta.appendChild(nodesChip);
+          }
+          w.tech.forEach(function(t) {
+            var chip = document.createElement('span');
+            chip.className = 'wf-detail-chip';
+            chip.textContent = t;
+            meta.appendChild(chip);
+          });
+          detail.appendChild(meta);
+
+          row.addEventListener('click', function() { detail.classList.toggle('open'); });
+
+          wrapper.appendChild(row);
+          wrapper.appendChild(detail);
+          container.appendChild(wrapper);
+        });
       });
+
+      // Update admin stat
+      var nodeCount = document.getElementById('adminNodeCount');
+      if (nodeCount) {
+        var total = 0;
+        wfs.forEach(function(w) { total += w.nodes; });
+        nodeCount.textContent = total + '+';
+      }
+      // Update workflow count
+      var wfCountEl = container.closest('#adminSystemPanel');
+      if (wfCountEl) {
+        var countEl = wfCountEl.querySelector('.stat-val.green');
+        if (countEl) countEl.textContent = wfs.length;
+      }
     }
 
     function setRole(role) {
@@ -6518,14 +6760,36 @@
     })();
 
     var fabOpen = false;
+    var kiAssistOpen = false;
     document.getElementById('fabBtn').addEventListener('click', function() {
+      // Toggle: erst KI-Assistent, bei Doppelklick FAB-Menu
+      if (kiAssistOpen) {
+        toggleKiAssist(false);
+        return;
+      }
       fabOpen = !fabOpen;
       this.classList.toggle('open', fabOpen);
+      if (fabOpen) toggleKiAssist(false);
     });
+    // Long press: KI-Assistent oeffnen
+    var fabLongTimer = null;
+    document.getElementById('fabBtn').addEventListener('touchstart', function(e) {
+      fabLongTimer = setTimeout(function() {
+        fabLongTimer = null;
+        fabOpen = false;
+        document.getElementById('fabBtn').classList.remove('open');
+        toggleKiAssist(true);
+      }, 400);
+    });
+    document.getElementById('fabBtn').addEventListener('touchend', function() { if (fabLongTimer) clearTimeout(fabLongTimer); });
+    document.getElementById('fabBtn').addEventListener('touchmove', function() { if (fabLongTimer) clearTimeout(fabLongTimer); });
     document.addEventListener('click', function(e) {
       if (fabOpen && !e.target.closest('.fab-container')) {
         fabOpen = false;
         document.getElementById('fabBtn').classList.remove('open');
+      }
+      if (kiAssistOpen && !e.target.closest('.ki-assist-panel') && !e.target.closest('.fab-container')) {
+        toggleKiAssist(false);
       }
     });
     function fabAction(type) {
@@ -6589,6 +6853,208 @@
         el.appendChild(document.createTextNode(item.label));
         menu.appendChild(el);
       });
+    }
+
+    // === KI-Tab-Assistent: Kontextbezogene Hilfe pro Tab ===
+    function toggleKiAssist(open) {
+      var panel = document.getElementById('kiAssistPanel');
+      if (!panel) return;
+      kiAssistOpen = typeof open === 'boolean' ? open : !kiAssistOpen;
+      panel.classList.toggle('open', kiAssistOpen);
+      if (kiAssistOpen) renderKiAssistContent();
+    }
+
+    function renderKiAssistContent() {
+      var body = document.getElementById('kiAssistBody');
+      var titleEl = document.getElementById('kiAssistTitle');
+      var subEl = document.getElementById('kiAssistSub');
+      if (!body) return;
+      body.textContent = '';
+
+      var page = currentPage || 'dashboard';
+      var tabConfig = getKiAssistConfig(page);
+      if (titleEl) titleEl.firstChild.textContent = tabConfig.title;
+      if (subEl) subEl.textContent = tabConfig.sub;
+
+      // Tips
+      tabConfig.tips.forEach(function(tip) {
+        var card = document.createElement('div');
+        card.className = 'ki-assist-tip';
+        var title = document.createElement('div');
+        title.className = 'ki-assist-tip-title';
+        title.textContent = tip.title;
+        card.appendChild(title);
+        var text = document.createElement('div');
+        text.className = 'ki-assist-tip-text';
+        text.textContent = tip.text;
+        card.appendChild(text);
+        if (tip.action) {
+          var action = document.createElement('div');
+          action.className = 'ki-assist-tip-action';
+          action.textContent = tip.action + ' \u2192';
+          card.appendChild(action);
+          card.addEventListener('click', function() {
+            if (tip.fn) tip.fn();
+            else if (tip.page) switchPage(tip.page);
+          });
+        }
+        body.appendChild(card);
+      });
+
+      // Quick-Actions
+      if (tabConfig.actions && tabConfig.actions.length > 0) {
+        var actSection = document.createElement('div');
+        actSection.style.cssText = 'margin-top:10px;padding-top:10px;border-top:1px solid var(--border)';
+        var actTitle = document.createElement('div');
+        actTitle.style.cssText = 'font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px';
+        actTitle.textContent = 'Schnellaktionen';
+        actSection.appendChild(actTitle);
+        var actGrid = document.createElement('div');
+        actGrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:6px';
+        tabConfig.actions.forEach(function(act) {
+          var btn = document.createElement('button');
+          btn.style.cssText = 'padding:10px 8px;background:var(--bg-warm);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:11px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;color:var(--text);text-align:center;transition:background 150ms';
+          btn.textContent = act.label;
+          btn.addEventListener('click', function() { toggleKiAssist(false); act.fn(); });
+          actGrid.appendChild(btn);
+        });
+        actSection.appendChild(actGrid);
+        body.appendChild(actSection);
+      }
+
+      // Frage-Input
+      var inputWrap = document.createElement('div');
+      inputWrap.className = 'ki-assist-input-wrap';
+      var input = document.createElement('input');
+      input.className = 'ki-assist-input';
+      input.type = 'text';
+      input.placeholder = 'Frage an KI-Assistent...';
+      var sendBtn = document.createElement('button');
+      sendBtn.className = 'ki-assist-send';
+      sendBtn.textContent = 'Fragen';
+      sendBtn.addEventListener('click', function() {
+        var q = input.value.trim();
+        if (!q) return;
+        input.value = '';
+        showToast('KI verarbeitet: "' + q.substring(0, 40) + '..."', 'info', 2000);
+        // Demo: Simulierte Antwort
+        setTimeout(function() {
+          var answer = document.createElement('div');
+          answer.className = 'ki-assist-tip';
+          answer.style.cssText += ';background:linear-gradient(135deg,rgba(184,150,46,0.06),rgba(184,150,46,0.02));border-color:rgba(184,150,46,0.2)';
+          var aTitle = document.createElement('div');
+          aTitle.className = 'ki-assist-tip-title';
+          aTitle.style.color = 'var(--rose)';
+          aTitle.textContent = 'KI-Antwort';
+          answer.appendChild(aTitle);
+          var aText = document.createElement('div');
+          aText.className = 'ki-assist-tip-text';
+          aText.textContent = getKiDemoResponse(page, q);
+          answer.appendChild(aText);
+          body.insertBefore(answer, body.firstChild);
+        }, 1500);
+      });
+      input.addEventListener('keypress', function(e) { if (e.key === 'Enter') sendBtn.click(); });
+      inputWrap.appendChild(input);
+      inputWrap.appendChild(sendBtn);
+      body.appendChild(inputWrap);
+    }
+
+    function getKiAssistConfig(page) {
+      var configs = {
+        dashboard: {
+          title: 'KI-Assistent', sub: 'Home-Ueberblick',
+          tips: [
+            { title: 'Tagesplanung optimieren', text: 'Basierend auf den heutigen Terminen empfehle ich, Farbbehandlungen morgens zu legen — Einwirkzeiten koennen fuer Beratung genutzt werden.', action: 'Termine ansehen', page: 'termine' },
+            { title: 'Umsatz-Prognose', text: 'Aktueller Tagesumsatz liegt ' + (finanzData.tages_umsatz > dailyGoal ? 'ueber' : 'unter') + ' dem Tagesziel. ' + (termineCache.length > 0 ? termineCache.length + ' Termine heute.' : 'Keine Termine geladen.') },
+            { title: 'Lager-Tipp', text: 'Pruefe regelmaessig den Lagerbestand — Nachbestellungen fuer beliebte Produkte koennten bald faellig sein.', action: 'Lager pruefen', page: 'lager' }
+          ],
+          actions: [
+            { label: 'Rechnung erstellen', fn: function() { fabAction('rechnung'); } },
+            { label: 'Ausgabe erfassen', fn: function() { fabAction('ausgabe'); } },
+            { label: 'Demo-Daten laden', fn: function() { fabAction('demo'); } },
+            { label: 'Neue Beratung', fn: function() { fabAction('beratung'); } }
+          ]
+        },
+        termine: {
+          title: 'Termin-Assistent', sub: 'Kalender & Planung',
+          tips: [
+            { title: 'Lucken erkennen', text: 'Suche nach freien Slots zwischen Terminen. Kurze Services (Herrenschnitt 30min) koennen Lucken fuellen und den Umsatz steigern.' },
+            { title: 'Einwirkzeiten nutzen', text: 'Bei Farbbehandlungen mit 30-45min Einwirkzeit: Plane parallel einen Herrenschnitt oder eine kurze Beratung ein.' },
+            { title: 'No-Show Praevention', text: 'Erinnerungen 24h vor dem Termin reduzieren No-Shows um 60%. WF-08 sendet diese automatisch.', action: 'Erinnerungen pruefen', page: 'system' }
+          ],
+          actions: [
+            { label: 'Neuer Termin', fn: function() { showToast('Tippe auf eine freie Stelle im Kalender', 'info', 3000); } },
+            { label: 'Tages-Uebersicht', fn: function() { switchPage('dashboard'); } }
+          ]
+        },
+        kasse: {
+          title: 'Kassen-Assistent', sub: 'Finanzen & Rechnungen',
+          tips: [
+            { title: 'MwSt-Hinweis', text: '7% MwSt fuer Friseurdienstleistungen (seit 01.01.2026), 19% fuer Produktverkaeufe. Die Rechnung differenziert automatisch.' },
+            { title: 'Tagesabschluss', text: 'Der Tagesabschluss sollte taeglich um Ladenschluss gemacht werden. GoBD-Pflicht: Lueckenlose Kassenfuehrung.', action: 'Tagesabschluss starten', fn: function() { if (typeof openTagesabschluss === 'function') openTagesabschluss(); } },
+            { title: 'Ausgaben erfassen', text: 'Betriebsausgaben wie Produkteinkauf, Miete oder Material direkt erfassen fuer die EUeR-Abrechnung.', action: 'Ausgabe erfassen', fn: function() { fabAction('ausgabe'); } }
+          ],
+          actions: [
+            { label: 'Rechnung erstellen', fn: function() { fabAction('rechnung'); } },
+            { label: 'Ausgabe erfassen', fn: function() { fabAction('ausgabe'); } }
+          ]
+        },
+        beratung: {
+          title: 'Beratungs-Assistent', sub: 'KI-Tools & Kundenberatung',
+          tips: [
+            { title: 'Haaranalyse nutzen', text: 'Die KI-Profi-Analyse erkennt 8 Parameter: Haartyp, Schaedigung, Kopfhaut, Porositaet, Farbhistorie, Elastizitaet, Dichte, Glanz. Ideal fuer Erstberatung.' },
+            { title: 'Wunschfrisur-Check', text: 'Kunden koennen ein Foto ihrer Wunschfrisur zeigen. Die KI prueft Machbarkeit, Technik, Dauer und Preis — direkt am Platz.' },
+            { title: 'Farbcode-Berechnung', text: 'Der Farbcode-Rechner bestimmt deterministisch die richtige Mischung. Kein LLM — reine Formelberechnung fuer praezise Ergebnisse.' }
+          ],
+          actions: []
+        },
+        lager: {
+          title: 'Lager-Assistent', sub: 'Bestand & Nachbestellungen',
+          tips: [
+            { title: 'Mindestbestand pruefen', text: 'Produkte unter Mindestbestand werden gelb markiert. Nachbestellungen fuer kritische Artikel sollten priorisiert werden.' },
+            { title: 'Verbrauchstrend', text: 'Analysiere, welche Produkte schneller verbraucht werden als erwartet. Saisonale Schwankungen bei Pflegeprodukten beachten.' },
+            { title: 'La Biosthetique', text: 'Als La Biosthetique Partner: Bestellungen ueber den Aussendienst oder Online-Portal. Lieferzeit ca. 2-3 Werktage.' }
+          ],
+          actions: [
+            { label: 'Nachbestellen', fn: function() { if (typeof openNachbestellungSheet === 'function') openNachbestellungSheet(); } }
+          ]
+        },
+        bestellungen: {
+          title: 'Bestell-Assistent', sub: 'Nachbestellungen verwalten',
+          tips: [
+            { title: 'Bestellstatus', text: 'Offene Bestellungen im Blick behalten. Bei Verzoegerungen ueber 5 Werktage den Lieferanten kontaktieren.' },
+            { title: 'Sammelbestellung', text: 'Tipp: Mehrere Artikel gleichzeitig bestellen spart Versandkosten und reduziert den Aufwand.' }
+          ],
+          actions: [
+            { label: 'Neue Bestellung', fn: function() { if (typeof openNachbestellungSheet === 'function') openNachbestellungSheet(); } }
+          ]
+        },
+        system: {
+          title: 'System-Assistent', sub: 'Administration & Monitoring',
+          tips: [
+            { title: 'Workflow-Status', text: 'Alle 26 Workflows im Blick. Gruene Punkte = aktiv, gelbe = Pruefung noetig, rote = Fehler. Klicke auf einen Workflow fuer Details.' },
+            { title: 'Debug-Prozess', text: 'Bei Fehlern: Der Debug-Prozess prueft alle Systeme automatisch und gibt Loesungsvorschlaege. Kritische Fehler werden priorisiert.' },
+            { title: 'Go-Live Checkliste', text: 'Vor der Aktivierung: Phase 1-5 Reihenfolge beachten! Auth + Intent zuerst, Automatisierung (Erinnerungen) zuletzt.' }
+          ],
+          actions: []
+        }
+      };
+      return configs[page] || configs.dashboard;
+    }
+
+    function getKiDemoResponse(page, question) {
+      var q = question.toLowerCase();
+      if (q.indexOf('termin') > -1 || q.indexOf('buchen') > -1) return 'Termine koennen ueber den Kalender-Tab angelegt werden. Der KI-Buchungsassistent (WF-02a) extrahiert Services aus Freitext und findet automatisch freie Slots.';
+      if (q.indexOf('farbe') > -1 || q.indexOf('balayage') > -1 || q.indexOf('straehne') > -1) return 'Farbbehandlungen benoetigen je nach Technik 60-180min. Balayage: Blondierpulver + Oxid 6% (1:2), 35min Einwirkzeit. Immer Olaplex Nr. 1 zur Struktursicherung.';
+      if (q.indexOf('preis') > -1 || q.indexOf('kosten') > -1) return 'Preise werden aus der Services_Preisliste geladen. MwSt 7% fuer Dienstleistungen, 19% fuer Produkte. Alle Berechnungen deterministisch im Code, nie durch das LLM.';
+      if (q.indexOf('lager') > -1 || q.indexOf('produkt') > -1 || q.indexOf('bestell') > -1) return 'Der Lagerbestand wird in Echtzeit geprueft. Produkte unter Mindestbestand werden gelb markiert. Nachbestellungen ueber den Lager-Tab oder per Sprachbefehl an die KI.';
+      if (q.indexOf('umsatz') > -1 || q.indexOf('kasse') > -1) return 'Der aktuelle Tagesumsatz wird live berechnet (WF-10). Tagesabschluss taeglich um Ladenschluss machen — GoBD-Pflicht fuer lueckenlose Kassenfuehrung.';
+      if (q.indexOf('haar') > -1 || q.indexOf('analyse') > -1) return 'Die KI-Haaranalyse erfasst 8-17 Parameter (je nach Paket). Ergebnis: Pflegeempfehlung, Produktvorschlaege, PDF-Report. Basis: 98 trichologische Fachdokumente in der Qdrant-Wissensbasis.';
+      if (page === 'termine') return 'Ich kann dir bei der Terminplanung helfen. Freie Slots finden, Einwirkzeiten optimal nutzen oder Termine umbuchen — frag mich einfach!';
+      if (page === 'kasse') return 'Bei Kassenfragen helfe ich gerne. Rechnungen, Ausgaben, MwSt-Differenzierung oder Tagesabschluss — alles GoBD-konform.';
+      if (page === 'beratung') return 'Fuer Beratungen stehen dir 3 KI-Tools zur Verfuegung: Haaranalyse (8 Parameter), Wunschfrisur-Check (Machbarkeit) und Farbcode-Berechnung (deterministisch).';
+      return 'Ich bin dein KI-Assistent fuer das Casa 2035 Dashboard. Stelle mir Fragen zu Terminen, Kasse, Lager, Beratung oder dem System — ich helfe dir gerne!';
     }
 
     // === Anfragen-Uebersicht (Bottom Sheet mit offenen Kundenanfragen) ===
@@ -6735,6 +7201,9 @@
       });
 
       renderAdminErrors();
+      renderGoLivePhases();
+      renderActivityLog();
+      renderBlockers();
     }
 
     function renderAdminErrors() {
@@ -6820,6 +7289,130 @@
       setTimeout(function() {
         showToast('Alle Checks abgeschlossen. 1 Warning, 0 Critical.', 'success', 4000);
       }, 3000);
+    }
+
+    // === Admin: Go-Live Phasen ===
+    function renderGoLivePhases() {
+      var container = document.getElementById('adminGoLivePhases');
+      if (!container) return;
+      container.textContent = '';
+      var phases = [
+        { nr: 1, label: 'Kern-System', wfs: 'WF-09 + Auth-MW + WF-01 + WF-02a', status: 'bereit', desc: 'Zuerst aktivieren — Auth + Intent + Termin' },
+        { nr: 2, label: 'Booking-Flow', wfs: 'WF-02b + WF-06a + WF-06b', status: 'bereit', desc: 'Bestaetigung + Storno' },
+        { nr: 3, label: 'Features', wfs: 'WF-03a/b/c + WF-04 + WF-05', status: 'teilweise', desc: 'Frisur-Analyse, Lager, Rechnungen' },
+        { nr: 4, label: 'Dashboard + Finanzen', wfs: 'WF-10 + WF-11 + PWA-Dash', status: 'bereit', desc: 'Kasse, Tagesabschluss, API' },
+        { nr: 5, label: 'Automatisierung', wfs: 'WF-07 + WF-08', status: 'bereit', desc: 'Cron-Trigger + Erinnerungen (zuletzt!)' }
+      ];
+      phases.forEach(function(p) {
+        var color = p.status === 'bereit' ? 'var(--success)' : p.status === 'teilweise' ? 'var(--warning)' : 'var(--text-dim)';
+        var statusText = p.status === 'bereit' ? 'Bereit' : p.status === 'teilweise' ? 'Teilweise' : 'Offen';
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px';
+        var numEl = document.createElement('div');
+        numEl.style.cssText = 'width:24px;height:24px;border-radius:50%;background:' + color + ';color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0';
+        numEl.textContent = p.nr;
+        var info = document.createElement('div');
+        info.style.cssText = 'flex:1';
+        var title = document.createElement('div');
+        title.style.cssText = 'font-size:12px;font-weight:600;color:var(--text)';
+        title.textContent = p.label;
+        var wfsEl = document.createElement('div');
+        wfsEl.style.cssText = 'font-size:10px;color:var(--text-dim)';
+        wfsEl.textContent = p.wfs;
+        info.appendChild(title);
+        info.appendChild(wfsEl);
+        var badge = document.createElement('span');
+        badge.style.cssText = 'font-size:10px;font-weight:600;color:' + color;
+        badge.textContent = statusText;
+        row.appendChild(numEl);
+        row.appendChild(info);
+        row.appendChild(badge);
+        container.appendChild(row);
+      });
+    }
+
+    // === Admin: System-Log ===
+    function renderActivityLog() {
+      var container = document.getElementById('adminActivityLog');
+      if (!container) return;
+      container.textContent = '';
+      var now = new Date();
+      var logs = [
+        { time: '28.03. 10:15', event: 'RBAC-System aktiviert', type: 'deploy', detail: '4 Rollen, System-Tab, Berechtigungen' },
+        { time: '28.03. 09:30', event: 'Dashboard Push', type: 'deploy', detail: 'Workflow-Monitor, Login-Fix, KI-Assistent' },
+        { time: '27.03. 18:00', event: 'Domain DNS konfiguriert', type: 'config', detail: 'casa2035.de + app.casa2035.de auf GitHub Pages' },
+        { time: '27.03. 14:30', event: 'Dashboard UX-Overhaul', type: 'feature', detail: 'KI-Rezepte, Anfragen-Overlay, Timeline-Limit' },
+        { time: '27.03. 11:00', event: 'PWA-Icons erstellt', type: 'fix', detail: 'Logo als 192px + 512px Icon' },
+        { time: '25.03. 16:00', event: 'Businessplan v1.16', type: 'doc', detail: '.md + .docx + .pdf fuer Gruenderzuschuss' },
+        { time: '24.03. 13:00', event: 'Produkt-Website LIVE', type: 'deploy', detail: 'casa2035.de — SaaS Landing Page' }
+      ];
+      var typeColors = { deploy: 'var(--success)', config: 'var(--info)', feature: 'var(--rose)', fix: 'var(--warning)', doc: 'var(--text-dim)' };
+      var typeIcons = { deploy: '\u{1F680}', config: '\u2699\uFE0F', feature: '\u2728', fix: '\uD83D\uDD27', doc: '\uD83D\uDCC4' };
+      logs.forEach(function(l) {
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)';
+        var timeEl = document.createElement('div');
+        timeEl.style.cssText = 'font-size:10px;color:var(--text-dim);min-width:70px;padding-top:2px';
+        timeEl.textContent = l.time;
+        var icon = document.createElement('span');
+        icon.style.cssText = 'font-size:12px';
+        icon.textContent = typeIcons[l.type] || '';
+        var body = document.createElement('div');
+        body.style.cssText = 'flex:1';
+        var eventEl = document.createElement('div');
+        eventEl.style.cssText = 'font-size:12px;font-weight:600;color:var(--text)';
+        eventEl.textContent = l.event;
+        var detailEl = document.createElement('div');
+        detailEl.style.cssText = 'font-size:10px;color:var(--text-dim);margin-top:1px';
+        detailEl.textContent = l.detail;
+        body.appendChild(eventEl);
+        body.appendChild(detailEl);
+        row.appendChild(timeEl);
+        row.appendChild(icon);
+        row.appendChild(body);
+        container.appendChild(row);
+      });
+    }
+
+    // === Admin: Blocker-Uebersicht ===
+    function renderBlockers() {
+      var container = document.getElementById('adminBlockers');
+      if (!container) return;
+      container.textContent = '';
+      var blockers = [
+        { id: 'B-01', prio: 'P0', text: 'Aktivsenioren Tragfaehigkeitsbescheinigung', status: 'wartend', detail: 'Mail gesendet 24.03 — Antwort abwarten' },
+        { id: 'B-02', prio: 'P0', text: 'Gewerbe Ab-/Neuanmeldung', status: 'wartend', detail: 'Antwort Frau Yilmaz abwarten' },
+        { id: 'B-03', prio: 'P0', text: 'HTTPS aktivieren', status: 'offen', detail: 'Sobald DNS propagiert: GitHub Pages Enforce HTTPS' },
+        { id: 'B-04', prio: 'P0', text: 'Rena Domain klaeren', status: 'offen', detail: 'Eigene Domain oder rena-rados.casa2035.de?' },
+        { id: 'B-05', prio: 'P1', text: 'Supabase-Migration', status: 'geplant', detail: 'Google Sheets zu PostgreSQL vor Go-Live' },
+        { id: 'B-06', prio: 'P1', text: 'Workflows aktivieren', status: 'geplant', detail: 'Phase 1-5 Reihenfolge beachten' }
+      ];
+      var prioColors = { P0: 'var(--danger)', P1: 'var(--warning)', P2: 'var(--info)' };
+      var statusColors = { wartend: 'var(--warning)', offen: 'var(--danger)', geplant: 'var(--text-dim)' };
+      blockers.forEach(function(b) {
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px';
+        var prio = document.createElement('span');
+        prio.style.cssText = 'font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;color:#fff;background:' + (prioColors[b.prio] || 'var(--text-dim)');
+        prio.textContent = b.prio;
+        var body = document.createElement('div');
+        body.style.cssText = 'flex:1';
+        var title = document.createElement('div');
+        title.style.cssText = 'font-size:12px;font-weight:600;color:var(--text)';
+        title.textContent = b.text;
+        var detail = document.createElement('div');
+        detail.style.cssText = 'font-size:10px;color:var(--text-dim)';
+        detail.textContent = b.detail;
+        body.appendChild(title);
+        body.appendChild(detail);
+        var status = document.createElement('span');
+        status.style.cssText = 'font-size:10px;font-weight:600;color:' + (statusColors[b.status] || 'var(--text-dim)');
+        status.textContent = b.status.charAt(0).toUpperCase() + b.status.slice(1);
+        row.appendChild(prio);
+        row.appendChild(body);
+        row.appendChild(status);
+        container.appendChild(row);
+      });
     }
 
     // === CHF: Vereinfachte Fehler-Anzeige ===
