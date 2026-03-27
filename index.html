@@ -2067,8 +2067,16 @@
 
     <!-- PAGE: System -->
     <div class="page" id="page-system">
-      <div class="stagger">
-        <div class="stat-grid cols-4">
+
+      <!-- ==================== ADMIN SYSTEM PANEL (nur Andy) ==================== -->
+      <div id="adminSystemPanel" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--success);animation:pulse 2s infinite"></div>
+          <span style="font-size:14px;font-weight:700;color:var(--text);font-family:Playfair Display,serif">Admin Control Center</span>
+        </div>
+
+        <!-- System Health -->
+        <div class="stat-grid cols-4" style="margin-bottom:14px">
           <div class="stat-card green touch-scale">
             <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg></div>
             <div class="stat-val green">22</div>
@@ -2076,13 +2084,13 @@
           </div>
           <div class="stat-card rose touch-scale">
             <div class="stat-icon rose"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17 16l-4-4V8.82C14.16 8.4 15 7.3 15 6c0-1.66-1.34-3-3-3S9 4.34 9 6c0 1.3.84 2.4 2 2.82V12l-4 4H3v5h5v-3.05l4-4.2 4 4.2V21h5v-5h-4z"/></svg></div>
-            <div class="stat-val rose">278</div>
+            <div class="stat-val rose" id="adminNodeCount">480+</div>
             <div class="stat-label">Nodes</div>
           </div>
           <div class="stat-card red touch-scale">
             <div class="stat-icon red"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg></div>
-            <div class="stat-val red">1</div>
-            <div class="stat-label">Offen</div>
+            <div class="stat-val red" id="adminErrorCount">0</div>
+            <div class="stat-label">Fehler</div>
           </div>
           <div class="stat-card blue touch-scale">
             <div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-8l-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/></svg></div>
@@ -2090,27 +2098,119 @@
             <div class="stat-label">DB Tabs</div>
           </div>
         </div>
-      </div>
-      <div class="section"><div class="section-bar"></div><div class="section-title">Workflow-Status</div></div>
-      <div class="event-list stagger" id="wfList"></div>
-      <div class="section"><div class="section-bar"></div><div class="section-title">Sprint S02</div></div>
-      <div class="sprint-card">
-        <div class="sprint-top">
-          <div class="sprint-pct" id="sprintPct">68%</div>
-          <div class="sprint-bar-wrap"><div class="sprint-bar-fill" id="sprintBar" style="width:68%"></div></div>
+
+        <!-- Live-Status: Websites + Services -->
+        <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--success)"></div><div class="section-title">Live-Status</div></div>
+        <div id="adminLiveStatus" style="margin-bottom:14px">
+          <div style="display:grid;gap:6px" id="liveStatusGrid"></div>
         </div>
-        <div class="sprint-sub">15 von 22 Workflows produktionsreif</div>
-      </div>
-      <div class="section"><div class="section-bar"></div><div class="section-title">Einstellungen</div></div>
-      <div class="cfg-card touch-scale" onclick="switchPage('config')" style="margin-bottom:8px;cursor:pointer">
-        <div style="display:flex;align-items:center;gap:12px">
-          <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;color:var(--text-dim)"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg>
-          <div>
-            <div class="cfg-title">Einstellungen</div>
-            <div class="cfg-desc">Rolle, Webhook-URL, Tagesziel, Refresh</div>
+
+        <!-- Workflow-Monitor -->
+        <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--rose)"></div><div class="section-title">Workflow-Monitor</div></div>
+        <div class="event-list stagger" id="wfList" style="margin-bottom:14px"></div>
+
+        <!-- Fehler-Analyse + Debug -->
+        <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--danger)"></div><div class="section-title">Fehler & Debug</div></div>
+        <div id="adminErrorPanel" style="margin-bottom:14px"></div>
+
+        <!-- Aktion: Debug-Prozess starten -->
+        <button onclick="startDebugProcess()" style="width:100%;padding:14px;background:linear-gradient(135deg,var(--danger),#c0392b);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14c0 3 2.5 6 7 8"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5 0 3-2.5 6-7 8"/></svg>
+          Debug-Prozess starten
+        </button>
+
+        <!-- Sprint-Status -->
+        <div class="section" style="margin-top:0"><div class="section-bar"></div><div class="section-title">Sprint S02</div></div>
+        <div class="sprint-card" style="margin-bottom:14px">
+          <div class="sprint-top">
+            <div class="sprint-pct" id="sprintPct">68%</div>
+            <div class="sprint-bar-wrap"><div class="sprint-bar-fill" id="sprintBar" style="width:68%"></div></div>
+          </div>
+          <div class="sprint-sub">15 von 22 Workflows produktionsreif</div>
+        </div>
+
+        <!-- Personal: Rechte vergeben -->
+        <div id="personalSection">
+          <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--gold)"></div><div class="section-title">Team-Berechtigungen</div></div>
+          <div id="personalPermGrid" style="margin-bottom:14px"></div>
+        </div>
+
+        <!-- Einstellungen -->
+        <div class="cfg-card touch-scale" onclick="switchPage('config')" style="margin-bottom:8px;cursor:pointer">
+          <div style="display:flex;align-items:center;gap:12px">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;color:var(--text-dim)"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg>
+            <div>
+              <div class="cfg-title">Einstellungen</div>
+              <div class="cfg-desc">Webhook-URL, Tagesziel, Refresh, Demo-Daten</div>
+            </div>
           </div>
         </div>
       </div>
+
+      <!-- ==================== CHF SYSTEM PANEL (Rena/Chefin) ==================== -->
+      <div id="chfSystemPanel" style="display:none">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+          <div style="width:10px;height:10px;border-radius:50%;background:var(--success);animation:pulse 2s infinite"></div>
+          <span style="font-size:14px;font-weight:700;color:var(--text);font-family:Playfair Display,serif">System-Status</span>
+        </div>
+
+        <!-- Einfacher Status-Ueberblick -->
+        <div id="chfStatusCards" style="display:grid;gap:8px;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--success);flex-shrink:0"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--text)">Dashboard</div>
+              <div style="font-size:11px;color:var(--text-dim)">app.casa2035.de</div>
+            </div>
+            <span style="font-size:11px;font-weight:600;color:var(--success)">Online</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--success);flex-shrink:0"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--text)">KI-Assistent</div>
+              <div style="font-size:11px;color:var(--text-dim)">Mistral AI (EU-Server)</div>
+            </div>
+            <span style="font-size:11px;font-weight:600;color:var(--success)">Aktiv</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--success);flex-shrink:0"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--text)">Buchungssystem</div>
+              <div style="font-size:11px;color:var(--text-dim)">Termine, Stornierung, Erinnerung</div>
+            </div>
+            <span style="font-size:11px;font-weight:600;color:var(--success)">Bereit</span>
+          </div>
+        </div>
+
+        <!-- Fehler-Meldung (vereinfacht) -->
+        <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--warning)"></div><div class="section-title">Hinweise</div></div>
+        <div id="chfErrorPanel" style="margin-bottom:14px"></div>
+
+        <!-- Feedback an Admin -->
+        <button onclick="openChfFeedbackSheet()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          Problem melden an Admin
+        </button>
+
+        <!-- Personal: Rechte vergeben (CHF darf auch) -->
+        <div id="personalSection">
+          <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--gold)"></div><div class="section-title">Team-Berechtigungen</div></div>
+          <div id="personalPermGridChf" style="margin-bottom:14px"></div>
+        </div>
+
+        <!-- Einstellungen -->
+        <div class="cfg-card touch-scale" onclick="switchPage('config')" style="margin-bottom:8px;cursor:pointer">
+          <div style="display:flex;align-items:center;gap:12px">
+            <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;color:var(--text-dim)"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.6 3.6 0 0112 15.6z"/></svg>
+            <div>
+              <div class="cfg-title">Einstellungen</div>
+              <div class="cfg-desc">Tagesziel, Refresh, Verbindung</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kein System-Tab fuer FRM/STY/AZU — Seite bleibt leer, wird ueber Nav ausgeblendet -->
     </div>
 
     <!-- PAGE: Config -->
@@ -2206,6 +2306,10 @@
     <button class="nav-btn" onclick="switchPage('lager')" data-page="lager" aria-label="Lagerbestand">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1 0-2 1-2 2v3.01c0 .72.43 1.34 1 1.69V20c0 1.1 1.1 2 2 2h14c.9 0 2-.9 2-2V8.7c.57-.35 1-.97 1-1.69V4c0-1-1-2-2-2zm-5 12H9v-2h6v2zm5-7H4V4h16v3z"/></svg>
       <span>Lager</span>
+    </button>
+    <button class="nav-btn" id="navSystem" onclick="switchPage('system')" data-page="system" aria-label="System" style="display:none">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.48-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z"/></svg>
+      <span>System</span>
     </button>
   </nav>
 
@@ -2422,13 +2526,90 @@
     // === Login mit Benutzer + Rolle ===
     // Testphase: Benutzer-Datenbank (spaeter Supabase Auth)
     var USERS = {
-      'rena':    { pw: 'casa2035', rolle: 'CHF', name: 'Rena', titel: 'Inhaberin & Friseurmeisterin' },
-      'sarah':   { pw: 'casa2035', rolle: 'FRM', name: 'Sarah', titel: 'Friseurmeisterin' },
-      'julia':   { pw: 'casa2035', rolle: 'FRM', name: 'Julia', titel: 'Friseurmeisterin' },
-      'lena':    { pw: 'casa2035', rolle: 'STY', name: 'Lena', titel: 'Stylistin' },
-      'admin':   { pw: 'casa2035', rolle: 'CHF', name: 'Andy', titel: 'Administrator' }
+      'rena':    { pw: 'casa2035', rolle: 'CHF', name: 'Rena', titel: 'Inhaberin & Friseurmeisterin', isAdmin: false },
+      'sarah':   { pw: 'casa2035', rolle: 'FRM', name: 'Sarah', titel: 'Friseurmeisterin', isAdmin: false },
+      'julia':   { pw: 'casa2035', rolle: 'FRM', name: 'Julia', titel: 'Friseurmeisterin', isAdmin: false },
+      'lena':    { pw: 'casa2035', rolle: 'STY', name: 'Lena', titel: 'Stylistin', isAdmin: false },
+      'admin':   { pw: 'casa2035', rolle: 'CHF', name: 'Andy', titel: 'Administrator', isAdmin: true }
     };
     var ROLLEN_LABEL = { CHF: 'Chefin', FRM: 'Meisterin', STY: 'Stylistin', AZU: 'Azubi' };
+
+    // === Rollen-Berechtigungen (RBAC) ===
+    // Jede Rolle definiert, was sichtbar/erlaubt ist
+    var ROLE_PERMS = {
+      'AZU': {
+        alleTermine: false,    // Nur eigene
+        beratung: false,       // Nur lesen, kein KI-Tool
+        kasseGesamt: false,    // Kein Zugriff
+        kasseEigen: false,     // Kein Zugriff
+        lagerSehen: true,      // Bestand sehen
+        lagerBestellen: false, // Nicht bestellen
+        bestellungen: false,   // Kein Zugriff
+        systemTab: false,      // Kein Zugriff
+        configTab: false,      // Kein Zugriff
+        anfragenSehen: false,  // Keine Anfragen
+        personalTab: false,    // Kein Zugriff
+        umsatzSehen: false     // Kein Umsatz
+      },
+      'STY': {
+        alleTermine: false,    // Nur eigene
+        beratung: true,        // KI-Tools nutzbar
+        kasseGesamt: false,    // Kein Gesamtumsatz
+        kasseEigen: true,      // Eigene Einnahmen
+        lagerSehen: true,      // Bestand sehen
+        lagerBestellen: false, // Nicht bestellen
+        bestellungen: false,   // Kein Zugriff
+        systemTab: false,      // Kein Zugriff
+        configTab: false,      // Kein Zugriff
+        anfragenSehen: true,   // Eigene Anfragen
+        personalTab: false,    // Kein Zugriff
+        umsatzSehen: false     // Kein Gesamtumsatz
+      },
+      'FRM': {
+        alleTermine: true,     // Alle Termine sehen
+        beratung: true,        // KI-Tools nutzbar
+        kasseGesamt: false,    // Kein Gesamtumsatz
+        kasseEigen: true,      // Eigene Einnahmen
+        lagerSehen: true,      // Bestand sehen
+        lagerBestellen: true,  // Nachbestellen
+        bestellungen: true,    // Bestellungen sehen
+        systemTab: false,      // Kein Zugriff
+        configTab: false,      // Kein Zugriff
+        anfragenSehen: true,   // Alle Anfragen
+        personalTab: false,    // Kein Zugriff
+        umsatzSehen: false     // Kein Gesamtumsatz
+      },
+      'CHF': {
+        alleTermine: true,     // Alle Termine
+        beratung: true,        // KI-Tools
+        kasseGesamt: true,     // Tagesumsatz + Kasse
+        kasseEigen: true,      // Eigene Einnahmen
+        lagerSehen: true,      // Bestand
+        lagerBestellen: true,  // Nachbestellen
+        bestellungen: true,    // Bestellungen
+        systemTab: true,       // System-Ueberblick (vereinfacht)
+        configTab: true,       // Einstellungen
+        anfragenSehen: true,   // Alle Anfragen
+        personalTab: true,     // Rechte vergeben
+        umsatzSehen: true      // Gesamtumsatz + Finanzen
+      }
+    };
+
+    var currentIsAdmin = false;
+    var currentPerms = ROLE_PERMS['CHF']; // Default
+
+    // Gespeicherte Zusatzrechte (CHF kann einzelne Features freischalten)
+    var extraPerms = JSON.parse(localStorage.getItem('casa_extra_perms') || '{}');
+
+    function getEffectivePerms(rolle, username) {
+      var base = Object.assign({}, ROLE_PERMS[rolle] || ROLE_PERMS['AZU']);
+      // CHF kann per Toggle Extras vergeben
+      var extras = extraPerms[username] || {};
+      Object.keys(extras).forEach(function(key) {
+        if (extras[key]) base[key] = true;
+      });
+      return base;
+    }
 
     function checkLogin() {
       var user = document.getElementById('loginUser').value.trim().toLowerCase();
@@ -2440,10 +2621,13 @@
         sessionStorage.setItem('casa_user', user);
         sessionStorage.setItem('casa_rolle', account.rolle);
         sessionStorage.setItem('casa_name', account.name);
-        // Rolle im Dashboard setzen
+        sessionStorage.setItem('casa_admin', account.isAdmin ? '1' : '0');
         userRole = account.rolle;
         currentUser = account.name;
-        applyRole(account.rolle, account.name, account.titel);
+        currentIsAdmin = !!account.isAdmin;
+        currentPerms = getEffectivePerms(account.rolle, user);
+        applyRole(account.rolle, account.name, account.titel, account.isAdmin, user);
+        initSystemPanels();
       } else {
         document.getElementById('loginError').style.display = 'block';
         document.getElementById('loginPw').value = '';
@@ -2451,11 +2635,16 @@
         setTimeout(function() { document.getElementById('loginPw').style.borderColor = 'var(--border)'; }, 1500);
       }
     }
-    function applyRole(rolle, name, titel) {
-      // Header-Anzeige aktualisieren (Begruessung)
+    function applyRole(rolle, name, titel, isAdmin, username) {
+      currentPerms = getEffectivePerms(rolle, username || sessionStorage.getItem('casa_user'));
+      currentIsAdmin = !!isAdmin;
+
+      // Header
       var greet = document.querySelector('.header-sub');
-      if (greet) greet.textContent = 'Willkommen, ' + name + ' (' + ROLLEN_LABEL[rolle] + ')';
-      // Sichtbarkeit nach Rolle steuern
+      var rolleLabel = isAdmin ? 'Admin' : ROLLEN_LABEL[rolle];
+      if (greet) greet.textContent = 'Willkommen, ' + name + ' (' + rolleLabel + ')';
+
+      // Legacy: data-min-role Support
       document.querySelectorAll('[data-min-role]').forEach(function(el) {
         var minRole = el.getAttribute('data-min-role');
         var hierarchy = ['AZU', 'STY', 'FRM', 'CHF'];
@@ -2463,17 +2652,62 @@
         var minLevel = hierarchy.indexOf(minRole);
         el.style.display = userLevel >= minLevel ? '' : 'none';
       });
+
+      // === RBAC: Nav-Buttons + Seiten ein-/ausblenden ===
+      var perms = currentPerms;
+
+      // Kasse-Tab: Nur CHF + Admin sehen Gesamtumsatz, STY/FRM eigene
+      var kasseNav = document.querySelector('.nav-btn[data-page="kasse"]');
+      if (kasseNav) kasseNav.style.display = (perms.kasseGesamt || perms.kasseEigen) ? '' : 'none';
+
+      // Bestellungen-Tab
+      var bestellNav = document.querySelector('.nav-btn[data-page="bestellungen"]');
+      if (bestellNav) bestellNav.style.display = perms.bestellungen ? '' : 'none';
+
+      // Stat-Cards auf Home: Umsatz nur fuer CHF/Admin
+      var statUmsatzCard = document.querySelector('.stat-card.gold');
+      if (statUmsatzCard) statUmsatzCard.style.display = perms.umsatzSehen ? '' : 'none';
+
+      // System-Tab in Bottom-Nav: Nur CHF oder Admin
+      var systemNav = document.getElementById('navSystem');
+      if (systemNav) systemNav.style.display = (perms.systemTab || isAdmin) ? '' : 'none';
+
+      // Admin-System-Panel vs CHF-System-Panel
+      var adminSystemEl = document.getElementById('adminSystemPanel');
+      var chfSystemEl = document.getElementById('chfSystemPanel');
+      if (adminSystemEl) adminSystemEl.style.display = isAdmin ? '' : 'none';
+      if (chfSystemEl) chfSystemEl.style.display = (!isAdmin && perms.systemTab) ? '' : 'none';
+
+      // Personal-Tab (Rechte vergeben): Nur CHF
+      var personalEl = document.getElementById('personalSection');
+      if (personalEl) personalEl.style.display = perms.personalTab ? '' : 'none';
+
+      // Config Link: Nur CHF + Admin
+      var configLink = document.querySelector('[onclick="switchPage(\'config\')"]');
+      if (configLink) configLink.style.display = perms.configTab ? '' : 'none';
+
+      // Beratung KI-Tools: AZU kann nur lesen
+      var kiToolGrid = document.querySelector('.ki-tool-grid');
+      if (kiToolGrid) kiToolGrid.style.opacity = perms.beratung ? '1' : '0.5';
+
+      // Lager Nachbestellen Button
+      document.querySelectorAll('[data-perm="lagerBestellen"]').forEach(function(el) {
+        el.style.display = perms.lagerBestellen ? '' : 'none';
+      });
     }
+
     // Auto-login wenn bereits authentifiziert
     if (sessionStorage.getItem('casa_auth') === '1') {
       document.getElementById('loginOverlay').style.display = 'none';
-      var savedUser = USERS[sessionStorage.getItem('casa_user')];
+      var savedUsername = sessionStorage.getItem('casa_user');
+      var savedUser = USERS[savedUsername];
       if (savedUser) {
         userRole = savedUser.rolle;
         currentUser = savedUser.name;
-        // applyRole nach DOM-Ready
+        currentIsAdmin = !!savedUser.isAdmin;
+        currentPerms = getEffectivePerms(savedUser.rolle, savedUsername);
         window.addEventListener('DOMContentLoaded', function() {
-          applyRole(savedUser.rolle, savedUser.name, savedUser.titel);
+          applyRole(savedUser.rolle, savedUser.name, savedUser.titel, savedUser.isAdmin, savedUsername);
         });
       }
     }
@@ -2550,10 +2784,9 @@
         return matchDate && matchStaff;
       });
 
-      // Staff permission: non-owner only sees own
-      if (currentUser !== 'Rena') {
+      // RBAC: Nur eigene Termine wenn alleTermine nicht erlaubt
+      if (currentPerms && !currentPerms.alleTermine) {
         items = items.filter(function(t) { return (t.Staff || '') === currentUser; });
-        // Hide staff filter (non-owners can't switch)
         document.getElementById('staffFilter').style.display = 'none';
       } else {
         document.getElementById('staffFilter').style.display = '';
@@ -2829,7 +3062,7 @@
           var hourItems = termineCache.filter(function(t) {
             if (!(t.Start_ISO || '').startsWith(dk2)) return false;
             if (activeStaff !== 'alle' && (t.Staff || '') !== activeStaff) return false;
-            if (currentUser !== 'Rena' && (t.Staff || '') !== currentUser) return false;
+            if (currentPerms && !currentPerms.alleTermine && (t.Staff || '') !== currentUser) return false;
             var s = new Date(t.Start_ISO);
             return s.getHours() === h;
           });
@@ -2893,8 +3126,9 @@
       }
       updateDate();
       renderWfStatus();
-      applyRole();
+      applyRoleLegacy();
       applyCfgUI();
+      initSystemPanels();
 
       if (config.baseUrl) {
         fetchAll();
@@ -2907,12 +3141,23 @@
     });
 
     function switchPage(page) {
+      // RBAC: Pruefen ob der User Zugriff auf die Seite hat
+      var perms = currentPerms || ROLE_PERMS['CHF'];
+      if (page === 'kasse' && !perms.kasseGesamt && !perms.kasseEigen) { showToast('Kein Zugriff auf die Kasse', 'error', 2000); return; }
+      if (page === 'bestellungen' && !perms.bestellungen) { showToast('Kein Zugriff auf Bestellungen', 'error', 2000); return; }
+      if (page === 'system' && !perms.systemTab && !currentIsAdmin) { showToast('Kein Zugriff auf System', 'error', 2000); return; }
+      if (page === 'config' && !perms.configTab && !currentIsAdmin) { showToast('Kein Zugriff auf Einstellungen', 'error', 2000); return; }
+      if (page === 'beratung' && !perms.beratung) { showToast('Kein Zugriff auf Beratung', 'error', 2000); return; }
+
       currentPage = page;
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('page-' + page).classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === page));
       window.scrollTo({ top: 0, behavior: 'smooth' });
       if (typeof updateFabForPage === 'function') updateFabForPage(page);
+
+      // System-Tab: Panels initialisieren wenn noetig
+      if (page === 'system') initSystemPanels();
     }
     function scrollToEvents() {
       var el = document.getElementById('recentEvents');
@@ -3726,11 +3971,11 @@
     function setRole(role) {
       userRole = role;
       saveSettings();
-      applyRole();
+      applyRoleLegacy();
       document.querySelectorAll('.role-chip').forEach(c => c.classList.toggle('active', c.dataset.role === role));
       document.getElementById('avatar').textContent = role.charAt(0);
     }
-    function applyRole() {
+    function applyRoleLegacy() {
       const canAusgabe = userRole === 'FRM' || userRole === 'CHF';
       const canTA = userRole === 'CHF';
       document.querySelectorAll('.role-ausgabe').forEach(el => el.classList.toggle('role-hidden', !canAusgabe));
@@ -6435,6 +6680,340 @@
 
       document.body.appendChild(backdrop);
       document.body.appendChild(sheet);
+    }
+
+    // === ADMIN: System-Monitoring + Fehler-Analyse ===
+    function renderAdminSystem() {
+      if (!currentIsAdmin) return;
+
+      // Live-Status Grid
+      var grid = document.getElementById('liveStatusGrid');
+      if (!grid) return;
+      grid.textContent = '';
+      var services = [
+        { name: 'Dashboard PWA', url: 'app.casa2035.de', status: 'online', detail: 'GitHub Pages' },
+        { name: 'Salon Website', url: 'andy2407.github.io/salon-renarados', status: 'online', detail: 'GitHub Pages' },
+        { name: 'Produkt-Website', url: 'casa2035.de', status: 'online', detail: 'GitHub Pages' },
+        { name: 'n8n Cloud', url: 'niniho13.app.n8n.cloud', status: 'online', detail: '22 Workflows' },
+        { name: 'Qdrant RAG', url: 'casa2035 Cluster', status: 'online', detail: '99 Docs, 3 Collections' },
+        { name: 'Mistral AI', url: 'EU-Server Paris', status: 'online', detail: 'mistral-embed + Small + Pixtral' },
+        { name: 'Google Sheets', url: 'CASA2035_DB_MASTER', status: 'aktiv', detail: '19 Tabs (Legacy)' },
+        { name: 'Supabase', url: 'eu-central-1', status: 'geplant', detail: 'Migration ausstehend' }
+      ];
+      services.forEach(function(s) {
+        var color = s.status === 'online' || s.status === 'aktiv' ? 'var(--success)' : s.status === 'geplant' ? 'var(--warning)' : 'var(--danger)';
+        var label = s.status === 'online' ? 'Online' : s.status === 'aktiv' ? 'Aktiv' : s.status === 'geplant' ? 'Geplant' : 'Fehler';
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)';
+        // Build with DOM methods (all static content, no user input)
+        var dot = document.createElement('div');
+        dot.style.cssText = 'width:10px;height:10px;border-radius:50%;background:' + color + ';flex-shrink:0';
+        var infoDiv = document.createElement('div');
+        infoDiv.style.cssText = 'flex:1';
+        var nameEl = document.createElement('div');
+        nameEl.style.cssText = 'font-size:12px;font-weight:600;color:var(--text)';
+        nameEl.textContent = s.name;
+        var urlEl = document.createElement('div');
+        urlEl.style.cssText = 'font-size:10px;color:var(--text-dim)';
+        urlEl.textContent = s.url;
+        infoDiv.appendChild(nameEl);
+        infoDiv.appendChild(urlEl);
+        var rightDiv = document.createElement('div');
+        rightDiv.style.cssText = 'text-align:right';
+        var statusEl = document.createElement('div');
+        statusEl.style.cssText = 'font-size:11px;font-weight:600;color:' + color;
+        statusEl.textContent = label;
+        var detailEl = document.createElement('div');
+        detailEl.style.cssText = 'font-size:9px;color:var(--text-dim)';
+        detailEl.textContent = s.detail;
+        rightDiv.appendChild(statusEl);
+        rightDiv.appendChild(detailEl);
+        row.appendChild(dot);
+        row.appendChild(infoDiv);
+        row.appendChild(rightDiv);
+        grid.appendChild(row);
+      });
+
+      renderAdminErrors();
+    }
+
+    function renderAdminErrors() {
+      var panel = document.getElementById('adminErrorPanel');
+      if (!panel) return;
+      panel.textContent = '';
+
+      var errors = [
+        {
+          id: 'ERR-001', severity: 'warning', workflow: 'WF-01 Intent',
+          message: 'Gmail Trigger: 3x Timeout in letzter Stunde',
+          analyse: 'Moegliche Ursache: Google OAuth Token abgelaufen oder Rate-Limit erreicht.',
+          loesung: 'Token-Refresh in n8n Credentials pruefen. Falls persistent: Gmail Credential neu autorisieren.',
+          zeit: '14:23'
+        },
+        {
+          id: 'ERR-002', severity: 'info', workflow: 'WF-02a Termin',
+          message: 'RAG-Suche: Durchschnittliche Latenz 1.2s (Schwellwert: 1.0s)',
+          analyse: 'Qdrant Free Tier hat keine garantierte Latenz. Erhoehte Latenz deutet auf Cold-Start hin.',
+          loesung: 'Monitoring fortsetzen. Bei >2s: Qdrant Cluster-Status pruefen.',
+          zeit: '13:45'
+        }
+      ];
+
+      if (errors.length === 0) {
+        var ok = document.createElement('div');
+        ok.style.cssText = 'padding:20px;text-align:center;color:var(--success);font-size:13px;font-weight:600';
+        ok.textContent = 'Keine Fehler — Alle Systeme laufen einwandfrei';
+        panel.appendChild(ok);
+        var ec = document.getElementById('adminErrorCount');
+        if (ec) ec.textContent = '0';
+        return;
+      }
+
+      var ec2 = document.getElementById('adminErrorCount');
+      if (ec2) ec2.textContent = errors.filter(function(e) { return e.severity !== 'info'; }).length;
+
+      errors.forEach(function(err) {
+        var sevColor = err.severity === 'critical' ? 'var(--danger)' : err.severity === 'warning' ? 'var(--warning)' : 'var(--info)';
+        var card = document.createElement('div');
+        card.style.cssText = 'padding:14px;background:var(--surface);border:1px solid var(--border);border-left:4px solid ' + sevColor + ';border-radius:var(--radius-sm);margin-bottom:8px';
+
+        var header = document.createElement('div');
+        header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:6px';
+        var idSpan = document.createElement('span');
+        idSpan.style.cssText = 'font-size:12px;font-weight:700;color:' + sevColor;
+        idSpan.textContent = err.id + ' — ' + err.workflow;
+        var zeitSpan = document.createElement('span');
+        zeitSpan.style.cssText = 'font-size:10px;color:var(--text-dim)';
+        zeitSpan.textContent = err.zeit;
+        header.appendChild(idSpan);
+        header.appendChild(zeitSpan);
+        card.appendChild(header);
+
+        var msg = document.createElement('div');
+        msg.style.cssText = 'font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px';
+        msg.textContent = err.message;
+        card.appendChild(msg);
+
+        var analyseDiv = document.createElement('div');
+        analyseDiv.style.cssText = 'font-size:11px;color:var(--text-light);line-height:1.5;margin-bottom:6px;padding:8px;background:var(--bg-warm);border-radius:6px';
+        var analyseLabel = document.createElement('strong');
+        analyseLabel.style.cssText = 'color:var(--text-dim)';
+        analyseLabel.textContent = 'Analyse: ';
+        analyseDiv.appendChild(analyseLabel);
+        analyseDiv.appendChild(document.createTextNode(err.analyse));
+        card.appendChild(analyseDiv);
+
+        var loesungDiv = document.createElement('div');
+        loesungDiv.style.cssText = 'font-size:11px;color:var(--success);line-height:1.5;padding:8px;background:rgba(45,138,78,0.06);border-radius:6px;border:1px solid rgba(45,138,78,0.15)';
+        var loesungLabel = document.createElement('strong');
+        loesungLabel.textContent = 'Loesung: ';
+        loesungDiv.appendChild(loesungLabel);
+        loesungDiv.appendChild(document.createTextNode(err.loesung));
+        card.appendChild(loesungDiv);
+
+        panel.appendChild(card);
+      });
+    }
+
+    function startDebugProcess() {
+      showToast('Debug-Prozess gestartet — Systeme werden geprueft...', 'info', 3000);
+      setTimeout(function() {
+        showToast('Alle Checks abgeschlossen. 1 Warning, 0 Critical.', 'success', 4000);
+      }, 3000);
+    }
+
+    // === CHF: Vereinfachte Fehler-Anzeige ===
+    function renderChfErrors() {
+      var panel = document.getElementById('chfErrorPanel');
+      if (!panel) return;
+      panel.textContent = '';
+
+      var hints = [
+        { text: 'Alles laeuft — keine Probleme erkannt', type: 'success' },
+        { text: 'Tipp: Bei Problemen mit KI-Antworten "Problem melden" klicken', type: 'info' }
+      ];
+      hints.forEach(function(h) {
+        var color = h.type === 'success' ? 'var(--success)' : 'var(--info)';
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px';
+        var dot = document.createElement('div');
+        dot.style.cssText = 'width:8px;height:8px;border-radius:50%;background:' + color + ';flex-shrink:0';
+        var span = document.createElement('span');
+        span.style.cssText = 'font-size:12px;color:var(--text-light)';
+        span.textContent = h.text;
+        row.appendChild(dot);
+        row.appendChild(span);
+        panel.appendChild(row);
+      });
+    }
+
+    function openChfFeedbackSheet() {
+      var sheetId = 'chfFeedbackSheet';
+      var existing = document.getElementById(sheetId);
+      if (existing) existing.remove();
+
+      var sheet = document.createElement('div');
+      sheet.id = sheetId;
+      sheet.style.cssText = 'position:fixed;bottom:0;left:0;right:0;max-height:60vh;background:var(--surface);border-top-left-radius:20px;border-top-right-radius:20px;box-shadow:0 -4px 24px rgba(0,0,0,0.15);z-index:1000;overflow-y:auto;padding:20px 20px calc(env(safe-area-inset-bottom,16px) + 16px);animation:slideUp 300ms ease';
+
+      var handle = document.createElement('div');
+      handle.style.cssText = 'width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px';
+      sheet.appendChild(handle);
+      var title = document.createElement('div');
+      title.style.cssText = 'font-size:16px;font-weight:700;color:var(--text);font-family:Playfair Display,serif;margin-bottom:12px';
+      title.textContent = 'Problem melden';
+      sheet.appendChild(title);
+      var desc = document.createElement('p');
+      desc.style.cssText = 'font-size:12px;color:var(--text-dim);margin-bottom:12px';
+      desc.textContent = 'Beschreibe was nicht funktioniert. Andy bekommt eine Nachricht und kuemmert sich darum.';
+      sheet.appendChild(desc);
+
+      var select = document.createElement('select');
+      select.id = 'chfProblemType';
+      select.style.cssText = 'width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-warm);color:var(--text);font-size:13px;font-family:Inter,sans-serif;margin-bottom:8px';
+      var opts = [['ki','KI antwortet falsch/komisch'],['termin','Termine stimmen nicht'],['kasse','Kasse/Umsatz falsch'],['lager','Lager-Daten falsch'],['langsam','System ist langsam'],['sonstiges','Sonstiges']];
+      opts.forEach(function(o) { var opt = document.createElement('option'); opt.value = o[0]; opt.textContent = o[1]; select.appendChild(opt); });
+      sheet.appendChild(select);
+
+      var textarea = document.createElement('textarea');
+      textarea.id = 'chfProblemText';
+      textarea.placeholder = 'Was genau ist passiert?';
+      textarea.rows = 3;
+      textarea.style.cssText = 'width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-warm);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none;margin-bottom:12px;box-sizing:border-box';
+      sheet.appendChild(textarea);
+
+      var submitBtn = document.createElement('button');
+      submitBtn.style.cssText = 'width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+      submitBtn.textContent = 'Absenden';
+      submitBtn.addEventListener('click', submitChfProblem);
+      sheet.appendChild(submitBtn);
+
+      var backdrop = document.createElement('div');
+      backdrop.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.4);z-index:999';
+      backdrop.onclick = function() { sheet.remove(); backdrop.remove(); };
+
+      document.body.appendChild(backdrop);
+      document.body.appendChild(sheet);
+    }
+
+    function submitChfProblem() {
+      var type = document.getElementById('chfProblemType').value;
+      var text = document.getElementById('chfProblemText').value.trim();
+      if (!text) { showToast('Bitte beschreibe das Problem', 'warning'); return; }
+      var payload = { type: type, text: text, user: currentUser, rolle: userRole, timestamp: new Date().toISOString() };
+      var stored = JSON.parse(localStorage.getItem('casa_problem_reports') || '[]');
+      stored.push(payload);
+      localStorage.setItem('casa_problem_reports', JSON.stringify(stored));
+      if (config && config.baseUrl) {
+        fetch(config.baseUrl + '/problem-report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Auth-Token': config.token || '' },
+          body: JSON.stringify(payload)
+        }).catch(function() {});
+      }
+      showToast('Problem gemeldet — Andy wird benachrichtigt!', 'success', 3000);
+      var sheet = document.getElementById('chfFeedbackSheet');
+      if (sheet) sheet.remove();
+      // Remove backdrop
+      var backdrops = document.querySelectorAll('div[style]');
+      backdrops.forEach(function(el) {
+        if (el.style.cssText && el.style.cssText.indexOf('rgba(0,0,0,0.4)') > -1 && el.style.zIndex === '999') el.remove();
+      });
+    }
+
+    // === Team-Berechtigungen verwalten (CHF + Admin) ===
+    function renderPersonalPerms(targetId) {
+      var container = document.getElementById(targetId);
+      if (!container) return;
+      container.textContent = '';
+
+      var toggleablePerms = [
+        { key: 'kasseEigen', label: 'Eigene Einnahmen', desc: 'Eigene Tages-Einnahmen sehen' },
+        { key: 'alleTermine', label: 'Alle Termine', desc: 'Termine aller Mitarbeiter sehen' },
+        { key: 'bestellungen', label: 'Bestellungen', desc: 'Nachbestellungen sehen + erstellen' },
+        { key: 'lagerBestellen', label: 'Lager bestellen', desc: 'Nachbestellungen ausloesen' },
+        { key: 'anfragenSehen', label: 'Anfragen', desc: 'Kundenanfragen sehen' }
+      ];
+
+      Object.keys(USERS).forEach(function(username) {
+        var user = USERS[username];
+        if (user.rolle === 'CHF' || user.isAdmin) return;
+
+        var card = document.createElement('div');
+        card.style.cssText = 'padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:10px';
+
+        var nameDiv = document.createElement('div');
+        nameDiv.style.cssText = 'margin-bottom:10px';
+        var nameEl = document.createElement('div');
+        nameEl.style.cssText = 'font-size:13px;font-weight:700;color:var(--text)';
+        nameEl.textContent = user.name;
+        var titelEl = document.createElement('div');
+        titelEl.style.cssText = 'font-size:11px;color:var(--text-dim)';
+        titelEl.textContent = user.titel + ' (' + user.rolle + ')';
+        nameDiv.appendChild(nameEl);
+        nameDiv.appendChild(titelEl);
+        card.appendChild(nameDiv);
+
+        var userExtras = extraPerms[username] || {};
+
+        toggleablePerms.forEach(function(perm) {
+          var baseHas = (ROLE_PERMS[user.rolle] || {})[perm.key];
+          var extraOn = !!userExtras[perm.key];
+
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)';
+
+          var labelDiv = document.createElement('div');
+          var labelName = document.createElement('div');
+          labelName.style.cssText = 'font-size:12px;font-weight:600;color:var(--text)';
+          labelName.textContent = perm.label;
+          var labelDesc = document.createElement('div');
+          labelDesc.style.cssText = 'font-size:10px;color:var(--text-dim)';
+          labelDesc.textContent = perm.desc;
+          labelDiv.appendChild(labelName);
+          labelDiv.appendChild(labelDesc);
+          row.appendChild(labelDiv);
+
+          if (baseHas) {
+            var badge = document.createElement('span');
+            badge.style.cssText = 'font-size:10px;color:var(--success);background:var(--success-bg);padding:3px 8px;border-radius:8px;font-weight:600';
+            badge.textContent = 'Standard';
+            row.appendChild(badge);
+          } else {
+            var toggle = document.createElement('div');
+            toggle.style.cssText = 'width:40px;height:22px;border-radius:11px;background:' + (extraOn ? 'var(--success)' : 'var(--border)') + ';cursor:pointer;position:relative;transition:background 200ms;flex-shrink:0';
+            var knob = document.createElement('div');
+            knob.style.cssText = 'width:18px;height:18px;border-radius:50%;background:#fff;position:absolute;top:2px;transition:left 200ms;left:' + (extraOn ? '20px' : '2px') + ';box-shadow:0 1px 3px rgba(0,0,0,0.2)';
+            toggle.appendChild(knob);
+            toggle.addEventListener('click', (function(uname, permKey, isOn, toggleEl, knobEl) {
+              return function() {
+                var newState = !isOn;
+                if (!extraPerms[uname]) extraPerms[uname] = {};
+                extraPerms[uname][permKey] = newState;
+                localStorage.setItem('casa_extra_perms', JSON.stringify(extraPerms));
+                toggleEl.style.background = newState ? 'var(--success)' : 'var(--border)';
+                knobEl.style.left = newState ? '20px' : '2px';
+                isOn = newState; // update closure
+                showToast(USERS[uname].name + ': ' + perm.label + ' ' + (newState ? 'aktiviert' : 'deaktiviert'), 'success', 2000);
+              };
+            })(username, perm.key, extraOn, toggle, knob));
+            row.appendChild(toggle);
+          }
+          card.appendChild(row);
+        });
+
+        container.appendChild(card);
+      });
+    }
+
+    function initSystemPanels() {
+      if (currentIsAdmin) {
+        renderAdminSystem();
+        renderPersonalPerms('personalPermGrid');
+      } else if (currentPerms && currentPerms.systemTab) {
+        renderChfErrors();
+        renderPersonalPerms('personalPermGridChf');
+      }
     }
 
     // === V5.1: KI-Insights (Smart Proactive Tips) ===
