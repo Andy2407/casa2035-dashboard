@@ -6544,5 +6544,72 @@
       document.body.appendChild(sheet);
     }
   </script>
+
+  <!-- Feedback Widget (Tester-Feedback) -->
+  <div id="dashFeedbackFab" onclick="toggleDashFeedback()" style="position:fixed;bottom:24px;left:24px;z-index:100;width:48px;height:48px;border-radius:50%;background:rgba(184,150,46,0.12);border:1px solid rgba(184,150,46,0.25);color:var(--rose);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 200ms;box-shadow:0 2px 12px rgba(184,150,46,0.15)" title="Feedback geben">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="12" y1="7" x2="12" y2="13"/></svg>
+  </div>
+  <div id="dashFeedbackPanel" style="display:none;position:fixed;bottom:82px;left:24px;z-index:101;width:320px;border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-soft);overflow:hidden;font-family:Inter,sans-serif">
+    <div style="padding:14px 18px;background:linear-gradient(135deg,var(--rose),#c9a93d);color:#fff;display:flex;align-items:center;justify-content:space-between">
+      <span style="font-weight:600;font-size:14px">Dashboard Feedback</span>
+      <button onclick="toggleDashFeedback()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:18px;padding:0;line-height:1">&times;</button>
+    </div>
+    <div style="padding:16px">
+      <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Fehler, Verbesserung oder Idee? Jedes Feedback hilft!</p>
+      <textarea id="dashFeedbackText" placeholder="Was ist Ihnen aufgefallen?" maxlength="1000" style="width:100%;min-height:80px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;font-family:Inter,sans-serif;resize:vertical;outline:none;background:var(--bg-warm);color:var(--text)"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <select id="dashFeedbackType" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:Inter,sans-serif;background:var(--bg-warm);color:var(--text)">
+          <option value="bug">Fehler</option>
+          <option value="verbesserung">Verbesserung</option>
+          <option value="idee">Idee</option>
+          <option value="design">Design</option>
+          <option value="sonstiges">Sonstiges</option>
+        </select>
+        <button onclick="submitDashFeedback()" style="padding:8px 18px;border:none;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--rose),#c9a93d);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Senden</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === Dashboard Feedback Widget ===
+    var dashFeedbackOpen = false;
+    function toggleDashFeedback() {
+      dashFeedbackOpen = !dashFeedbackOpen;
+      document.getElementById('dashFeedbackPanel').style.display = dashFeedbackOpen ? 'block' : 'none';
+    }
+    function submitDashFeedback() {
+      var text = document.getElementById('dashFeedbackText').value.trim();
+      var type = document.getElementById('dashFeedbackType').value;
+      if (!text || text.length < 5) {
+        showToast('Bitte geben Sie Ihr Feedback ein (mind. 5 Zeichen).', 'info');
+        return;
+      }
+      var payload = {
+        feedback: text,
+        type: type,
+        page: 'dashboard',
+        currentPage: document.querySelector('.bottom-nav-item.active') ? document.querySelector('.bottom-nav-item.active').textContent.trim() : '',
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        viewport: window.innerWidth + 'x' + window.innerHeight,
+        theme: document.documentElement.getAttribute('data-theme') || 'light'
+      };
+      // Lokal speichern
+      var stored = JSON.parse(localStorage.getItem('casa_dashboard_feedback') || '[]');
+      stored.push(payload);
+      localStorage.setItem('casa_dashboard_feedback', JSON.stringify(stored));
+      // An Webhook senden (wenn konfiguriert)
+      if (config && config.baseUrl) {
+        fetch(config.baseUrl + '/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Auth-Token': config.token || '', 'X-User-ID': config.userId || '' },
+          body: JSON.stringify(payload)
+        }).catch(function() {});
+      }
+      showToast('Danke fuer Ihr Feedback!', 'success');
+      document.getElementById('dashFeedbackText').value = '';
+      toggleDashFeedback();
+    }
+  </script>
 </body>
 </html>
