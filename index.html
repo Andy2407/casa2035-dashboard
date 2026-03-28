@@ -1671,11 +1671,15 @@
 
       <!-- Schnellaktionen entfernt — Bottom-Nav genuegt -->
 
-      <!-- Mein Tag Card — personalisiert fuer eingeloggten User -->
-      <div id="meinTagCard" style="background:linear-gradient(135deg, rgba(184,150,46,0.08), rgba(184,150,46,0.02));border:1px solid rgba(184,150,46,0.2);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:none">
-        <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Dein Tag</div>
-        <div id="meinTagInfo" style="font-size:14px;color:var(--text);font-weight:600"></div>
-        <div id="meinTagDetails" style="font-size:12px;color:var(--text-light);margin-top:4px"></div>
+      <!-- Mein Tag Card — kompakt, einzeilig -->
+      <div id="meinTagCard" style="background:linear-gradient(135deg, rgba(184,150,46,0.06), transparent);border:1px solid rgba(184,150,46,0.15);border-radius:var(--radius-sm);padding:8px 14px;margin-bottom:10px;display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.3px">Dein Tag</span>
+            <span id="meinTagInfo" style="font-size:13px;color:var(--text);font-weight:600"></span>
+          </div>
+          <span id="meinTagDetails" style="font-size:11px;color:var(--text-dim)"></span>
+        </div>
       </div>
 
       <!-- KI-Tagesvorschau — intelligente Hinweise basierend auf heutigen Terminen -->
@@ -1729,17 +1733,7 @@
       </div>
       </div>
 
-      <div class="dash-section dash-section-ki">
-      <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--rose-gradient)"></div><div class="section-title">KI-Assistent</div></div>
-      <!-- V4.0: KI-Status-Indikator -->
-      <div class="ki-status" id="kiStatus" role="status">
-        <div class="ki-status-dot"></div>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22l-.75-12.07A4.001 4.001 0 0 1 12 2z"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14c0 3 2.5 6 7 8"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5 0 3-2.5 6-7 8"/></svg>
-        <span id="kiStatusText">KI verarbeitet neue Anfrage...</span>
-      </div>
-      <!-- V5.1: KI-Insights -->
-      <div class="ki-insights" id="kiInsights"></div>
-      </div>
+      <!-- KI-Insights jetzt in KI-Tagesvorschau integriert -->
 
       <div class="dash-section dash-section-events">
       <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--info)"></div><div class="section-title">Letzte Aktivitaeten</div><span class="section-count" id="evCount">--</span></div>
@@ -7878,54 +7872,133 @@
       }
     }
 
-    // === V5.1: KI-Insights (Smart Proactive Tips) ===
+    // === V8: KI-Insights — situationsbezogen, aufklappbar, in Tagesvorschau integriert ===
     function renderKiInsights() {
-      var c = document.getElementById('kiInsights');
-      if (!c) return;
+      var kiVorschau = document.getElementById('kiTagesvorschau');
+      if (!kiVorschau) return;
+      // Insights werden jetzt direkt in die KI-Tagesvorschau gerendert (nach den Tages-Hints)
+      var existingInsights = kiVorschau.querySelector('.ki-insights-container');
+      if (existingInsights) existingInsights.remove();
+
       var insights = [];
-      // Insight based on time of day
-      var hour = new Date().getHours();
-      if (hour >= 8 && hour < 10) {
-        insights.push({ title: 'Guten Morgen-Tipp', text: 'Fruehe Termine haben 23% weniger No-Shows. Ideal fuer Neukunden.', action: 'Termine ansehen', page: 'termine' });
+      var now = new Date();
+      var hour = now.getHours();
+      var dayOfWeek = now.getDay(); // 0=So, 1=Mo, ..., 6=Sa
+      var dayNames = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+      var todayKey = dateKey(now);
+      var todayTermine = termineCache.filter(function(t) { return (t.Start_ISO || '').startsWith(todayKey); });
+
+      // 1. Tageszeitabhaengige Empfehlung
+      if (hour >= 6 && hour < 10) {
+        insights.push({ title: 'Guten Morgen', text: 'Fruehe Termine haben 23% weniger No-Shows. Perfekt fuer Neukunden und aufwaendige Treatments.', action: 'Termine ansehen', page: 'termine' });
+      } else if (hour >= 12 && hour < 14) {
+        insights.push({ title: 'Mittagszeit', text: 'Idealer Zeitpunkt fuer kurze Behandlungen oder Produktberatung zwischen den Terminen.', action: null, page: null });
       } else if (hour >= 17) {
-        insights.push({ title: 'Tagesabschluss', text: 'Vergiss nicht den Kassenabschluss. Heute noch ' + (finanzData.offene_buchungen || 0) + ' offene Buchungen.', action: 'Zur Kasse', page: 'kasse' });
+        insights.push({ title: 'Tagesabschluss', text: 'Kassenabschluss nicht vergessen. Noch ' + (finanzData.offene_buchungen || 0) + ' offene Buchungen heute.', action: 'Zur Kasse', page: 'kasse' });
       }
-      // Insight based on consultations
-      if (beratungenCache.length > 0) {
-        var offene = beratungenCache.filter(function(b) { return b.status === 'neu'; }).length;
+
+      // 2. Wochentagsspezifisch
+      if (dayOfWeek === 6) { // Samstag
+        insights.push({ title: dayNames[dayOfWeek] + '-Tipp', text: 'Samstag ist der staerkste Umsatztag. Produktempfehlungen am Platz erhoehen den Umsatz um bis zu 25%.', action: null, page: null });
+      } else if (dayOfWeek === 1) { // Montag
+        var yesterdaySa = new Date(now); yesterdaySa.setDate(yesterdaySa.getDate() - 2);
+        insights.push({ title: 'Wochenstart', text: 'Guter Zeitpunkt fuer Nachbestellungen und Lager-Check. Wochenendverbrauch pruefen.', action: 'Lager pruefen', page: 'lager' });
+      } else if (dayOfWeek >= 2 && dayOfWeek <= 3) { // Di/Mi
+        insights.push({ title: dayNames[dayOfWeek] + '-Tipp', text: 'Unter der Woche buchen Kunden +18% mehr bei gezielten Farb-Specials oder Pflege-Aktionen.', action: null, page: null });
+      }
+
+      // 3. Offene Beratungen
+      if (beratungenCache && beratungenCache.length > 0) {
+        var offene = beratungenCache.filter(function(b) { return b.status === 'neu' || b.Status === 'neu'; }).length;
         if (offene > 0) {
-          insights.push({ title: 'Offene Beratungen', text: offene + ' Kundenanfrage' + (offene > 1 ? 'n warten' : ' wartet') + ' auf Antwort. Schnelle Reaktion steigert die Buchungsrate um 40%.', action: 'Jetzt beantworten', page: 'beratung' });
+          insights.push({ title: 'Offene Anfragen', text: offene + ' Kundenanfrage' + (offene > 1 ? 'n warten' : ' wartet') + ' auf Antwort. Schnelle Reaktion steigert die Buchungsrate um 40%.', action: 'Jetzt beantworten', page: 'beratung' });
         }
       }
-      // General KI insight
-      insights.push({ title: 'KI-Empfehlung', text: 'Dienstag und Mittwoch sind ideal fuer Farb-Specials. Kunden buchen +18% mehr bei gezielten Angeboten.', action: null, page: null });
 
-      c.textContent = '';
-      insights.slice(0, 3).forEach(function(ins) {
+      // 4. Lager-Warnung
+      if (lagerCache && lagerCache.length > 0) {
+        var lowStock = lagerCache.filter(function(p) { return (parseInt(p.Bestand) || 0) <= (parseInt(p.Min_Bestand) || 3); });
+        if (lowStock.length > 0) {
+          var namen = lowStock.slice(0, 2).map(function(p) { return p.Produkt; }).join(', ');
+          insights.push({ title: 'Nachbestellen', text: lowStock.length + ' Produkt' + (lowStock.length > 1 ? 'e' : '') + ' unter Mindestbestand: ' + namen + (lowStock.length > 2 ? ' +' + (lowStock.length - 2) + ' weitere' : ''), action: 'Zum Lager', page: 'lager' });
+        }
+      }
+
+      // 5. Auslastung heute
+      if (todayTermine.length > 0) {
+        var totalMin = 0; todayTermine.forEach(function(t) { totalMin += (parseInt(t.Duration_Min) || 30); });
+        var teamMinAvail = 3 * 8 * 60; // 3 Stylisten x 8h
+        var auslPct = Math.round(totalMin / teamMinAvail * 100);
+        if (auslPct >= 90) {
+          insights.push({ title: 'Voller Tag', text: auslPct + '% Teamauslastung \u2014 Pausen einplanen und bei Walk-Ins freundlich auf naechsten freien Slot verweisen.', action: null, page: null });
+        } else if (auslPct < 50 && todayTermine.length > 0) {
+          insights.push({ title: 'Kapazitaet frei', text: 'Noch ' + (100 - auslPct) + '% Kapazitaet heute. Ideal fuer spontane Termine oder Social-Media-Posts.', action: null, page: null });
+        }
+      }
+
+      // 6. Umsatz-Trend (wenn Finanz-Daten vorhanden)
+      if (finanzData && finanzData.umsatz_gesamt) {
+        var umsatz = parseFloat(finanzData.umsatz_gesamt) || 0;
+        var tagesziel = parseFloat(finanzData.tages_ziel) || 800;
+        var pct = Math.round(umsatz / tagesziel * 100);
+        if (pct >= 80) {
+          insights.push({ title: 'Umsatz-Ziel', text: pct + '% des Tagesziels erreicht (' + umsatz.toFixed(0) + ' / ' + tagesziel.toFixed(0) + ' EUR). Weiter so!', action: null, page: null });
+        } else if (hour >= 14 && pct < 50) {
+          insights.push({ title: 'Umsatz-Hinweis', text: 'Erst ' + pct + '% des Tagesziels. Nachmittags-Termine fuer Zusatzbehandlungen nutzen.', action: 'Zur Kasse', page: 'kasse' });
+        }
+      }
+
+      if (insights.length === 0) return;
+
+      // Container erstellen
+      var container = document.createElement('div');
+      container.className = 'ki-insights-container';
+      container.style.cssText = 'margin-top:10px';
+
+      var VISIBLE_COUNT = 2;
+      insights.forEach(function(ins, idx) {
         var card = document.createElement('div');
         card.className = 'ki-insight';
+        if (idx >= VISIBLE_COUNT) card.style.display = 'none';
+        card.setAttribute('data-ki-insight-idx', idx);
+
         var iconDiv = document.createElement('div');
         iconDiv.className = 'ki-insight-icon';
-        iconDiv.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/><path d="M9 6.5C7.33 7.83 5 10.6 5 14"/><path d="M15 6.5c1.67 1.33 4 4.1 4 7.5"/></svg>';
+        var iconSvgNs = 'http://www.w3.org/2000/svg';
+        var iconSvg = document.createElementNS(iconSvgNs, 'svg');
+        iconSvg.setAttribute('viewBox', '0 0 24 24');
+        iconSvg.setAttribute('fill', 'none');
+        iconSvg.setAttribute('stroke', 'currentColor');
+        iconSvg.setAttribute('stroke-width', '2');
+        var p1 = document.createElementNS(iconSvgNs, 'path');
+        p1.setAttribute('d', 'M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22');
+        var p2 = document.createElementNS(iconSvgNs, 'path');
+        p2.setAttribute('d', 'M9 6.5C7.33 7.83 5 10.6 5 14');
+        var p3 = document.createElementNS(iconSvgNs, 'path');
+        p3.setAttribute('d', 'M15 6.5c1.67 1.33 4 4.1 4 7.5');
+        iconSvg.appendChild(p1); iconSvg.appendChild(p2); iconSvg.appendChild(p3);
+        iconDiv.appendChild(iconSvg);
         card.appendChild(iconDiv);
+
         var body = document.createElement('div');
         body.className = 'ki-insight-body';
-        var title = document.createElement('div');
-        title.className = 'ki-insight-title';
-        title.textContent = ins.title;
-        body.appendChild(title);
-        var text = document.createElement('div');
-        text.className = 'ki-insight-text';
-        text.textContent = ins.text;
-        body.appendChild(text);
-        if (ins.action) {
-          var action = document.createElement('span');
-          action.className = 'ki-insight-action';
-          action.textContent = ins.action + ' \u2192';
-          action.addEventListener('click', function() { switchPage(ins.page); });
-          body.appendChild(action);
+        var titleEl = document.createElement('div');
+        titleEl.className = 'ki-insight-title';
+        titleEl.textContent = ins.title;
+        body.appendChild(titleEl);
+        var textEl = document.createElement('div');
+        textEl.className = 'ki-insight-text';
+        textEl.textContent = ins.text;
+        body.appendChild(textEl);
+        if (ins.action && ins.page) {
+          var actionEl = document.createElement('span');
+          actionEl.className = 'ki-insight-action';
+          actionEl.textContent = ins.action + ' \u2192';
+          actionEl.addEventListener('click', function() { switchPage(ins.page); });
+          body.appendChild(actionEl);
         }
         card.appendChild(body);
+
         var dismiss = document.createElement('button');
         dismiss.className = 'ki-insight-dismiss';
         dismiss.textContent = '\u2715';
@@ -7937,8 +8010,28 @@
           setTimeout(function() { card.remove(); }, 250);
         });
         card.appendChild(dismiss);
-        c.appendChild(card);
+        container.appendChild(card);
       });
+
+      // "Mehr anzeigen" Button wenn mehr als VISIBLE_COUNT
+      if (insights.length > VISIBLE_COUNT) {
+        var moreBtn = document.createElement('button');
+        moreBtn.style.cssText = 'width:100%;padding:8px;background:none;border:1px solid var(--border-accent);border-radius:var(--radius-sm);font-size:11px;font-weight:600;color:var(--gold);cursor:pointer;font-family:Inter,sans-serif;margin-top:4px;transition:all 200ms ease';
+        moreBtn.textContent = (insights.length - VISIBLE_COUNT) + ' weitere Empfehlungen anzeigen';
+        var expanded = false;
+        moreBtn.addEventListener('click', function() {
+          expanded = !expanded;
+          var cards = container.querySelectorAll('[data-ki-insight-idx]');
+          cards.forEach(function(c) {
+            var idx = parseInt(c.getAttribute('data-ki-insight-idx'));
+            if (idx >= VISIBLE_COUNT) c.style.display = expanded ? '' : 'none';
+          });
+          moreBtn.textContent = expanded ? 'Weniger anzeigen' : (insights.length - VISIBLE_COUNT) + ' weitere Empfehlungen anzeigen';
+        });
+        container.appendChild(moreBtn);
+      }
+
+      kiVorschau.appendChild(container);
     }
 
     // === V5.1: Beratung Filter & Search ===
