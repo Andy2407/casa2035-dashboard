@@ -265,7 +265,7 @@
     .trend-badge.down { background: var(--danger-bg); color: var(--danger); }
 
     /* === Stat Grid === */
-    .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
     .stat-grid.cols-2 { grid-template-columns: 1fr 1fr; }
     .stat-grid.cols-4 { grid-template-columns: 1fr 1fr; }
     .stat-card {
@@ -1450,9 +1450,9 @@
       .hero-icon-wrap svg { width: 22px; height: 22px; }
       .hero-inner { gap: 14px; }
       .stat-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-      .stat-val { font-size: 22px; }
+      .stat-val { font-size: 20px; }
       .stat-label { font-size: 9px; }
-      .stat-icon { width: 32px; height: 32px; border-radius: 9px; }
+      .stat-icon { width: 30px; height: 30px; border-radius: 9px; }
       .stat-icon svg { width: 16px; height: 16px; }
       .stat-card { padding: 12px 10px; }
       .beratung-stats { grid-template-columns: 1fr 1fr; gap: 6px; }
@@ -1534,9 +1534,9 @@
       .header { padding: 14px 24px 12px; }
       .hero-card { padding: 28px; }
       .hero-value { font-size: 40px; }
-      .stat-grid { grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-      .stat-val { font-size: 28px; }
-      .stat-card { padding: 18px 14px; }
+      .stat-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .stat-val { font-size: 26px; }
+      .stat-card { padding: 16px 14px; }
       .sheet { max-width: 480px; }
       .kasse-hero { padding: 28px; }
       .kasse-hero-val { font-size: 38px; }
@@ -1669,25 +1669,7 @@
         </div>
       </div>
 
-      <!-- Schnellaktionen 4er Grid -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px">
-        <button class="fab touch-scale" onclick="switchPage('termine')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Termine
-        </button>
-        <button class="fab touch-scale" onclick="switchPage('kasse')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          Kasse
-        </button>
-        <button class="fab touch-scale" onclick="switchPage('beratung')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M12 2a4 4 0 0 1 4 4c0 1.95-1.4 3.58-3.25 3.93L12 22"/></svg>
-          Beratung
-        </button>
-        <button class="fab touch-scale" onclick="switchPage('bestellungen')" style="margin:0;padding:10px 6px;font-size:10px;border-radius:var(--radius-sm);flex-direction:column;gap:4px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-          Bestell.
-        </button>
-      </div>
+      <!-- Schnellaktionen entfernt — Bottom-Nav genuegt -->
 
       <!-- Mein Tag Card — personalisiert fuer eingeloggten User -->
       <div id="meinTagCard" style="background:linear-gradient(135deg, rgba(184,150,46,0.08), rgba(184,150,46,0.02));border:1px solid rgba(184,150,46,0.2);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:none">
@@ -1701,7 +1683,7 @@
 
       <div class="dash-section dash-section-stats">
       <div class="section" style="margin-top:0"><div class="section-bar"></div><div class="section-title">Tages-Ueberblick</div></div>
-      <!-- V6.1: Kompakte Stats — 3-Spalten Grid -->
+      <!-- V7: 4-Kacheln Tagesueberblick — 2x2 Grid, keine Duplikate zur Bottom-Nav -->
       <div class="stat-grid" style="margin-bottom:0">
         <div class="stat-card gold touch-scale" onclick="switchPage('kasse')" style="cursor:pointer">
           <div class="stat-icon gold">
@@ -1711,14 +1693,6 @@
           <div class="stat-label">Umsatz</div>
           <div class="stat-sub" id="statUmsatzSub">brutto heute</div>
         </div>
-        <div class="stat-card green touch-scale" onclick="switchPage('termine')" style="cursor:pointer">
-          <div class="stat-icon green">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
-          </div>
-          <div class="stat-val tabular green" id="statTermine">--</div>
-          <div class="stat-label">Termine</div>
-          <div class="stat-sub" id="statTermineSub"></div>
-        </div>
         <div class="stat-card blue touch-scale" onclick="openAnfragenOverview()" style="cursor:pointer">
           <div class="stat-icon blue">
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>
@@ -1726,6 +1700,22 @@
           <div class="stat-val tabular blue" id="statAnfragen">--</div>
           <div class="stat-label">Anfragen</div>
           <div class="stat-sub" id="statAnfragenSub">ungelesen</div>
+        </div>
+        <div class="stat-card green touch-scale" id="statAuslastungCard" style="cursor:pointer" onclick="switchPage('termine')">
+          <div class="stat-icon green">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/><path d="M12 6v6l4 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div class="stat-val tabular green" id="statAuslastung">--%</div>
+          <div class="stat-label">Auslastung</div>
+          <div class="stat-sub" id="statAuslastungSub">heute</div>
+        </div>
+        <div class="stat-card rose touch-scale">
+          <div class="stat-icon" style="background:var(--rose-glow);color:var(--rose)">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <div class="stat-val tabular" style="color:var(--rose)" id="statNeukunden">--</div>
+          <div class="stat-label">Neukunden</div>
+          <div class="stat-sub" id="statNeukundenSub">diese Woche</div>
         </div>
       </div>
       </div>
@@ -3506,9 +3496,16 @@
       var now2 = new Date();
       var today = dateKey(now2);
       var todayItems = items.filter(function(t) { return (t.Start_ISO || '').startsWith(today); });
-      document.getElementById('statTermine').textContent = todayItems.length;
-      var confirmed = todayItems.filter(function(t) { return t.Status === 'confirmed'; }).length;
-      document.getElementById('statTermineSub').textContent = confirmed + ' bestaetigt';
+
+      // Auslastung berechnen: gebuchte Minuten vs verfuegbare Stunden (8h = 480 Min)
+      var totalBookedMin = 0;
+      todayItems.forEach(function(t) { totalBookedMin += (parseInt(t.Duration_Min) || 60); });
+      var availableMin = 480; // 8 Stunden Arbeitstag
+      var auslastungPct = Math.min(100, Math.round((totalBookedMin / availableMin) * 100));
+      var auslEl = document.getElementById('statAuslastung');
+      if (auslEl) auslEl.textContent = auslastungPct + '%';
+      var auslSubEl = document.getElementById('statAuslastungSub');
+      if (auslSubEl) auslSubEl.textContent = todayItems.length + ' Termine heute';
 
       // Render for selected day
       renderDayForDate();
@@ -5019,6 +5016,21 @@
 
       renderTermine(demoTermine);
 
+      // Neukunden diese Woche berechnen (Demo: ca. 15-20% der Kunden sind "neu")
+      var weekStart = new Date(now);
+      weekStart.setDate(weekStart.getDate() - weekStart.getDay() + 1); // Montag
+      var weekKey = dateKey(weekStart);
+      var weekTermine = demoTermine.filter(function(t) {
+        return (t.Start_ISO || '') >= weekKey && (t.Start_ISO || '').startsWith(dateKey(now).substring(0,7));
+      });
+      var uniqueKunden = {};
+      weekTermine.forEach(function(t) { if (t.Customer_Name) uniqueKunden[t.Customer_Name] = true; });
+      var neukundenCount = Math.max(1, Math.round(Object.keys(uniqueKunden).length * 0.18));
+      var nkEl = document.getElementById('statNeukunden');
+      if (nkEl) nkEl.textContent = neukundenCount;
+      var nkSubEl = document.getElementById('statNeukundenSub');
+      if (nkSubEl) nkSubEl.textContent = 'diese Woche';
+
       // Realistische Kassen-Buchungen aus heutigen Terminen generieren
       var todayKeyK = dateKey(now);
       var todayTermineK = demoTermine.filter(function(t) {
@@ -5900,6 +5912,26 @@
         hint.textContent = 'Produkte vor dem Termin vorbereiten \u2014 Lagerbestand pruefen';
         prodSection.appendChild(hint);
         container.appendChild(prodSection);
+
+        // Upgrade-Hint fuer Starter-Paket: subtiler Hinweis auf erweiterte Features
+        if (salonPaket === 'starter') {
+          var upgradeHint = document.createElement('div');
+          upgradeHint.style.cssText = 'margin-top:10px;padding:10px 14px;background:linear-gradient(135deg, rgba(184,150,46,0.05), transparent);border:1px dashed rgba(184,150,46,0.25);border-radius:var(--radius-sm);display:flex;align-items:center;gap:8px;cursor:pointer';
+          var plusCircle = document.createElement('span');
+          plusCircle.style.cssText = 'display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:rgba(184,150,46,0.12);color:var(--gold);font-size:13px;font-weight:700;flex-shrink:0';
+          plusCircle.textContent = '+';
+          var hintText = document.createElement('span');
+          hintText.style.cssText = 'font-size:11px;color:var(--text-dim)';
+          hintText.textContent = 'Detaillierte Rezeptur, Mischverhaeltnisse & Einwirkzeiten \u2014 ';
+          var hintLink = document.createElement('span');
+          hintLink.style.cssText = 'color:var(--gold);font-weight:600';
+          hintLink.textContent = 'Mehr erfahren';
+          hintText.appendChild(hintLink);
+          upgradeHint.appendChild(plusCircle);
+          upgradeHint.appendChild(hintText);
+          upgradeHint.addEventListener('click', function() { showToast('Kontaktieren Sie uns fuer ein Upgrade auf Salon Pro', 'info', 3000); });
+          container.appendChild(upgradeHint);
+        }
       }
 
       // Actions
@@ -8251,6 +8283,19 @@
       document.getElementById('lagerOk').textContent = ok;
       document.getElementById('lagerLow').textContent = low;
       document.getElementById('lagerCount').textContent = items.length + ' Produkte';
+      // Home-Kachel: Lager-Alarm aktualisieren
+      var lagerAlarmEl = document.getElementById('statLagerAlarm');
+      if (lagerAlarmEl) {
+        lagerAlarmEl.textContent = low;
+        lagerAlarmEl.style.color = low > 0 ? '#f5a623' : 'var(--success)';
+      }
+      var lagerAlarmSubEl = document.getElementById('statLagerAlarmSub');
+      if (lagerAlarmSubEl) lagerAlarmSubEl.textContent = low > 0 ? 'nachbestellen' : 'alles ok';
+      var lagerAlarmIcon = document.querySelector('#statLagerCard .stat-icon');
+      if (lagerAlarmIcon) {
+        lagerAlarmIcon.style.background = low > 0 ? 'rgba(245,166,35,0.1)' : 'var(--success-bg)';
+        lagerAlarmIcon.style.color = low > 0 ? '#f5a623' : 'var(--success)';
+      }
       filterLager();
     }
 
