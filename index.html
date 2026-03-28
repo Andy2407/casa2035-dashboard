@@ -1842,7 +1842,7 @@
       <!-- MwSt-Aufschluesselung -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px">
-          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px">MwSt 7% (Dienstleist.)</div>
+          <div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px">MwSt 19% (Dienstleist.)</div>
           <div style="font-size:16px;font-weight:700;color:var(--text);font-family:'Playfair Display',serif;margin-top:2px" id="kasseMwst7">-- EUR</div>
         </div>
         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px">
@@ -1856,7 +1856,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:20px;height:20px;color:var(--gold);flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         <div>
           <div style="font-size:12px;font-weight:600;color:var(--text)">Digitales Kassenbuch</div>
-          <div style="font-size:10px;color:var(--text-dim)">GoBD-konform &middot; 10 Jahre Aufbewahrung &middot; MwSt 7%/19% getrennt</div>
+          <div style="font-size:10px;color:var(--text-dim)">GoBD-konform &middot; 10 Jahre Aufbewahrung &middot; MwSt 19% (einheitlich)</div>
         </div>
       </div>
 
@@ -2513,7 +2513,7 @@
           <label>MwSt-Satz</label>
           <select id="ausgabeMwst" onchange="calcBrutto()">
             <option value="0.19">19% (Produkte)</option>
-            <option value="0.07">7% (Dienstleist.)</option>
+            <option value="0.19">19% (Dienstleist.)</option>
             <option value="0">0% (Keine)</option>
           </select>
         </div>
@@ -2550,7 +2550,7 @@
         <div class="ta-row"><span class="ta-label">Einnahmen Karte</span><span id="taEinKarte">--</span></div>
         <div class="ta-row"><span class="ta-label">Ausgaben Bar</span><span id="taAusgBar">--</span></div>
         <div class="ta-row"><span class="ta-label">Trinkgeld</span><span id="taTrink">--</span></div>
-        <div class="ta-row"><span class="ta-label">MwSt 7%</span><span id="taMwst7">--</span></div>
+        <div class="ta-row"><span class="ta-label">MwSt 19% (DL)</span><span id="taMwst7">--</span></div>
         <div class="ta-row"><span class="ta-label">MwSt 19%</span><span id="taMwst19">--</span></div>
         <div class="ta-row total"><span class="ta-label">Kasse SOLL</span><span id="taSoll">--</span></div>
       </div>
@@ -2593,10 +2593,10 @@
       <label style="margin-top:8px">Zusatzleistung (optional)</label>
       <select id="reZusatz">
         <option value="">Keine</option>
-        <option value="olaplex" data-preis="15.00" data-mwst="0.07">Olaplex Treatment (+15,00 EUR)</option>
-        <option value="ansatzfarbe" data-preis="25.00" data-mwst="0.07">Ansatzfarbe (+25,00 EUR)</option>
-        <option value="glossing" data-preis="20.00" data-mwst="0.07">Glossing (+20,00 EUR)</option>
-        <option value="kopfhaut" data-preis="15.00" data-mwst="0.07">Kopfhaut-Peeling (+15,00 EUR)</option>
+        <option value="olaplex" data-preis="15.00" data-mwst="0.19">Olaplex Treatment (+15,00 EUR)</option>
+        <option value="ansatzfarbe" data-preis="25.00" data-mwst="0.19">Ansatzfarbe (+25,00 EUR)</option>
+        <option value="glossing" data-preis="20.00" data-mwst="0.19">Glossing (+20,00 EUR)</option>
+        <option value="kopfhaut" data-preis="15.00" data-mwst="0.19">Kopfhaut-Peeling (+15,00 EUR)</option>
       </select>
 
       <!-- Produkt (optional) -->
@@ -2629,7 +2629,7 @@
         <button class="btn btn-secondary" onclick="closeSheet('rechnungSheet')">Abbrechen</button>
         <button class="btn btn-primary" onclick="submitRechnung()">Rechnung erstellen</button>
       </div>
-      <div style="font-size:9px;color:var(--text-micro);text-align:center;margin-top:8px">Rechnungen nach &sect;14 UStG &middot; MwSt 7% Dienstleist. / 19% Produkte &middot; GoBD-konform</div>
+      <div style="font-size:9px;color:var(--text-micro);text-align:center;margin-top:8px">Rechnungen nach &sect;14 UStG &middot; MwSt 19% (Dienstleist. + Produkte) &middot; GoBD-konform</div>
     </div>
   </div>
 
@@ -2822,22 +2822,6 @@
       });
     }
 
-    // Auto-login wenn bereits authentifiziert
-    if (sessionStorage.getItem('casa_auth') === '1') {
-      document.getElementById('loginOverlay').style.display = 'none';
-      var savedUsername = sessionStorage.getItem('casa_user');
-      var savedUser = USERS[savedUsername];
-      if (savedUser) {
-        userRole = savedUser.rolle;
-        currentUser = savedUser.name;
-        currentIsAdmin = !!savedUser.isAdmin;
-        currentPerms = getEffectivePerms(savedUser.rolle, savedUsername);
-        window.addEventListener('DOMContentLoaded', function() {
-          applyRole(savedUser.rolle, savedUser.name, savedUser.titel, savedUser.isAdmin, savedUsername);
-        });
-      }
-    }
-
     // =============================================================
     // Casa 2035 — PWA Dashboard v4.0 Luxury Edition
     // Goldpartikel + Glasmorphismus + Premium-Effekte
@@ -2855,6 +2839,22 @@
     var selectedDay = new Date(); // currently viewed day
     var activeStaff = 'alle'; // staff filter
     var currentUser = 'Rena'; // logged-in user (Rena = owner, sees all)
+
+    // Auto-login wenn bereits authentifiziert (NACH let-Deklarationen wegen TDZ)
+    if (sessionStorage.getItem('casa_auth') === '1') {
+      document.getElementById('loginOverlay').style.display = 'none';
+      var savedUsername = sessionStorage.getItem('casa_user');
+      var savedUser = USERS[savedUsername];
+      if (savedUser) {
+        userRole = savedUser.rolle;
+        currentUser = savedUser.name;
+        currentIsAdmin = !!savedUser.isAdmin;
+        currentPerms = getEffectivePerms(savedUser.rolle, savedUsername);
+        window.addEventListener('DOMContentLoaded', function() {
+          applyRole(savedUser.rolle, savedUser.name, savedUser.titel, savedUser.isAdmin, savedUsername);
+        });
+      }
+    }
 
     // Day navigation
     function changeDay(offset) {
@@ -3241,6 +3241,30 @@
     // === Appetit-Modell: Salon-Paket bestimmt KI-Feature-Tiefe ===
     // "starter" = Smart Start (EUR 49), "pro" = Salon Pro (EUR 79), "fullsuite" = Full Suite (EUR 199)
     var salonPaket = localStorage.getItem('casa2035_paket') || 'starter'; // Demo: starter zeigt Upgrade-Teaser
+
+    // === Farbcode-Datenbank: Professionelle Haarfarben-Skala (global, vor DOMContentLoaded) ===
+    var HAAR_FARBEN = [
+      { code: '1/0', name: 'Schwarz', hex: '#0a0a0a', textLight: true },
+      { code: '2/0', name: 'Schwarzbraun', hex: '#1c1209', textLight: true },
+      { code: '3/0', name: 'Dunkelbraun', hex: '#3b2314', textLight: true },
+      { code: '4/0', name: 'Mittelbraun', hex: '#5a3825', textLight: true },
+      { code: '5/0', name: 'Hellbraun', hex: '#7a5035', textLight: true },
+      { code: '5/3', name: 'Hellbraun Gold', hex: '#8a6530', textLight: true },
+      { code: '6/0', name: 'Dunkelblond', hex: '#8c6a45', textLight: false },
+      { code: '6/3', name: 'Dunkelblond Gold', hex: '#9a7a3d', textLight: false },
+      { code: '6/1', name: 'Dunkelblond Asch', hex: '#7a6b55', textLight: true },
+      { code: '7/0', name: 'Mittelblond', hex: '#b08a55', textLight: false },
+      { code: '7/1', name: 'Mittelblond Asch', hex: '#9e8a6e', textLight: false },
+      { code: '7/3', name: 'Mittelblond Gold', hex: '#c09540', textLight: false },
+      { code: '8/0', name: 'Hellblond', hex: '#cca96a', textLight: false },
+      { code: '8/1', name: 'Hellblond Asch', hex: '#b8a580', textLight: false },
+      { code: '9/0', name: 'Lichtblond', hex: '#e0c88a', textLight: false },
+      { code: '9/1', name: 'Lichtblond Asch', hex: '#d0c0a0', textLight: false },
+      { code: '10/0', name: 'Platinblond', hex: '#f0e0b0', textLight: false },
+      { code: '10/1', name: 'Platinblond Asch', hex: '#e8dcc0', textLight: false }
+    ];
+    var selectedIstFarbe = null;
+    var selectedZielFarbe = null;
 
     document.addEventListener('DOMContentLoaded', () => {
       const saved = localStorage.getItem('casa2035_settings');
@@ -3818,7 +3842,7 @@
         opt.textContent = s.Name + ' — ' + Number(s.Preis_Brutto || 0).toFixed(2).replace('.', ',') + ' EUR';
         opt.setAttribute('data-preis', s.Preis_Brutto || 0);
         opt.setAttribute('data-dauer', s.Dauer_Min || 0);
-        opt.setAttribute('data-mwst', s.MwSt_Satz || 0.07);
+        opt.setAttribute('data-mwst', s.MwSt_Satz || 0.19);
         select.appendChild(opt);
       });
 
@@ -3900,13 +3924,13 @@
 
       if (!opt || !opt.value) { preview.textContent = ''; return; }
 
-      // Dienstleistung (7% MwSt)
+      // Dienstleistung (19% MwSt)
       var dlPreis = parseFloat(opt.getAttribute('data-preis')) || 0;
-      var dlMwstSatz = parseFloat(opt.getAttribute('data-mwst')) || 0.07;
+      var dlMwstSatz = parseFloat(opt.getAttribute('data-mwst')) || 0.19;
       var dlNetto = Math.round(dlPreis / (1 + dlMwstSatz) * 100) / 100;
       var dlMwst = Math.round((dlPreis - dlNetto) * 100) / 100;
 
-      // Zusatzleistung (7%)
+      // Zusatzleistung (19%)
       var zusatzSel = document.getElementById('reZusatz');
       var zusatzPreis = 0;
       var zusatzMwst = 0;
@@ -3914,7 +3938,7 @@
       if (zusatzSel && zusatzSel.selectedIndex > 0) {
         var zOpt = zusatzSel.options[zusatzSel.selectedIndex];
         zusatzPreis = parseFloat(zOpt.getAttribute('data-preis')) || 0;
-        var zSatz = parseFloat(zOpt.getAttribute('data-mwst')) || 0.07;
+        var zSatz = parseFloat(zOpt.getAttribute('data-mwst')) || 0.19;
         var zNetto = Math.round(zusatzPreis / (1 + zSatz) * 100) / 100;
         zusatzMwst = Math.round((zusatzPreis - zNetto) * 100) / 100;
         zusatzName = zOpt.textContent.split('(')[0].trim();
@@ -3940,8 +3964,8 @@
       preview.style.display = gesamt > 0 ? 'block' : 'none';
 
       var lines = [];
-      lines.push({ label: opt.textContent.split('(')[0].trim(), val: dlPreis, hint: '7% MwSt' });
-      if (zusatzPreis > 0) lines.push({ label: zusatzName, val: zusatzPreis, hint: '7% MwSt' });
+      lines.push({ label: opt.textContent.split('(')[0].trim(), val: dlPreis, hint: '19% MwSt' });
+      if (zusatzPreis > 0) lines.push({ label: zusatzName, val: zusatzPreis, hint: '19% MwSt' });
       if (produktPreis > 0) lines.push({ label: produktName || 'Produkt', val: produktPreis, hint: '19% MwSt' });
       if (trinkgeld > 0) lines.push({ label: 'Trinkgeld', val: trinkgeld, hint: '' });
 
@@ -3969,7 +3993,7 @@
         var m7 = document.createElement('div');
         m7.style.cssText = 'display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim)';
         var m7l = document.createElement('span');
-        m7l.textContent = 'davon MwSt 7%';
+        m7l.textContent = 'davon MwSt 19% (DL)';
         var m7r = document.createElement('span');
         m7r.textContent = mwst7total.toFixed(2).replace('.', ',') + ' EUR';
         m7.appendChild(m7l);
@@ -4033,7 +4057,7 @@
         leistungsdatum: (document.getElementById('reLeistungsDatum') || {}).value || new Date().toISOString().split('T')[0],
         trinkgeld: parseFloat(document.getElementById('reTrinkgeld').value) || 0,
         preis_brutto_dl: parseFloat(opt.getAttribute('data-preis')) || 0,
-        mwst_satz_dl: parseFloat(opt.getAttribute('data-mwst')) || 0.07,
+        mwst_satz_dl: parseFloat(opt.getAttribute('data-mwst')) || 0.19,
         preis_brutto_produkt: produktPreis,
         mwst_satz_produkt: produktPreis > 0 ? 0.19 : 0,
         timestamp: new Date().toISOString()
@@ -4099,8 +4123,8 @@
           desc: 'Lagerbestandsabfrage per Keyword. Deterministisch — kein LLM. Liefert Produktname, Menge, Nachbestellstatus.',
           tech: ['Deterministisch', 'Google Sheets'] },
         { id: 'WF-05', n: 'Rechnungen', s: 'clean', l: 'MwSt OK', t: 'tested', phase: 3, nodes: 12,
-          desc: 'Rechnungserstellung mit differenzierter MwSt: 7% Dienstleistungen, 19% Produktverkauf. GoBD-konform, 10 Jahre Aufbewahrung.',
-          tech: ['Code-Calc', 'MwSt 7%/19%', 'GoBD'] },
+          desc: 'Rechnungserstellung mit 19% MwSt fuer Dienstleistungen und Produktverkauf. GoBD-konform, 10 Jahre Aufbewahrung.',
+          tech: ['Code-Calc', 'MwSt 19%', 'GoBD'] },
 
         // Phase 4: Dashboard + Finanzen
         { id: 'WF-10', n: 'Finanzen', s: 'clean', l: 'OK', t: 'tested', phase: 4, nodes: 11,
@@ -5030,7 +5054,7 @@
       var todayTermineK = demoTermine.filter(function(t) {
         return (t.Start_ISO || '').startsWith(todayKeyK) && t.Status === 'confirmed';
       }).sort(function(a, b) { return a.Start_ISO.localeCompare(b.Start_ISO); });
-      // Preise pro Service (Brutto, 7% MwSt)
+      // Preise pro Service (Brutto, 19% MwSt)
       var servicePreise = {
         'Haarschnitt Feminin': 45, 'Damenhaarschnitt + Foehn': 55, 'Herrenschnitt': 35,
         'Herrenschnitt + Bartpflege': 50, 'Balayage + Schnitt': 165, 'Farbbehandlung Komplett': 100,
@@ -5052,7 +5076,7 @@
         var trinkgeld = seededRand() < 0.4 ? Math.round(seededRand() * 8 + 2) : 0;
         umsatzGesamt += preis;
         if (isBar) barGesamt += preis; else karteGesamt += preis;
-        mwst7 += preis - (preis / 1.07);
+        mwst7 += preis - (preis / 1.19);
         var staff = t.Staff || 'Rena';
         if (umsatzProMA[staff] !== undefined) umsatzProMA[staff] += preis;
         if (trinkgeldProMA[staff] !== undefined) trinkgeldProMA[staff] += trinkgeld;
@@ -5172,11 +5196,11 @@
       });
 
       renderServices({ data: { services: [
-        { Service_ID: 'S001', Name: 'Haarschnitt Feminin', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 60, Preis_Netto: 42.06, Preis_Brutto: 45.00, MwSt_Satz: 0.07 },
-        { Service_ID: 'S002', Name: 'Maskulin Schnitt', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 30, Preis_Netto: 32.71, Preis_Brutto: 35.00, MwSt_Satz: 0.07 },
-        { Service_ID: 'S003', Name: 'Balayage + Schnitt', Kategorie: 'Farbe', Typ: 'dienstleistung', Dauer_Min: 120, Preis_Netto: 154.21, Preis_Brutto: 165.00, MwSt_Satz: 0.07 },
-        { Service_ID: 'S004', Name: 'Farbbehandlung', Kategorie: 'Farbe', Typ: 'dienstleistung', Dauer_Min: 90, Preis_Netto: 93.46, Preis_Brutto: 100.00, MwSt_Satz: 0.07 },
-        { Service_ID: 'S005', Name: 'Maskulin Schnitt + Bart', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 45, Preis_Netto: 46.73, Preis_Brutto: 50.00, MwSt_Satz: 0.07 },
+        { Service_ID: 'S001', Name: 'Haarschnitt Feminin', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 60, Preis_Netto: 37.82, Preis_Brutto: 45.00, MwSt_Satz: 0.19 },
+        { Service_ID: 'S002', Name: 'Maskulin Schnitt', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 30, Preis_Netto: 29.41, Preis_Brutto: 35.00, MwSt_Satz: 0.19 },
+        { Service_ID: 'S003', Name: 'Balayage + Schnitt', Kategorie: 'Farbe', Typ: 'dienstleistung', Dauer_Min: 120, Preis_Netto: 138.66, Preis_Brutto: 165.00, MwSt_Satz: 0.19 },
+        { Service_ID: 'S004', Name: 'Farbbehandlung', Kategorie: 'Farbe', Typ: 'dienstleistung', Dauer_Min: 90, Preis_Netto: 84.03, Preis_Brutto: 100.00, MwSt_Satz: 0.19 },
+        { Service_ID: 'S005', Name: 'Maskulin Schnitt + Bart', Kategorie: 'Schnitt', Typ: 'dienstleistung', Dauer_Min: 45, Preis_Netto: 42.02, Preis_Brutto: 50.00, MwSt_Satz: 0.19 },
         { Service_ID: 'S006', Name: 'Shampoo Vital', Kategorie: 'Pflege', Typ: 'produkt', Dauer_Min: 0, Preis_Netto: 15.88, Preis_Brutto: 18.90, MwSt_Satz: 0.19 },
         { Service_ID: 'S007', Name: 'Haarkur Repair', Kategorie: 'Pflege', Typ: 'produkt', Dauer_Min: 0, Preis_Netto: 21.01, Preis_Brutto: 24.99, MwSt_Satz: 0.19 },
       ]}});
@@ -6296,32 +6320,8 @@
       // NOTE: All insertAdjacentHTML content below is hardcoded static strings (no user input), safe from XSS
       if (tool === 'farbcode') {
         title.textContent = 'Farbcode & Mischungsformel';
-        wrapper.insertAdjacentHTML('beforeend',
-          '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary)">Fotografiere das Haar — die KI erkennt den Ist-Farbton und berechnet die Mischungsformel fuer den Zielton.</div>'
-          + '<div style="background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;margin-bottom:14px" onclick="document.getElementById(\'farbcodeUpload\').click()">'
-          + '<input type="file" id="farbcodeUpload" accept="image/*" capture="environment" style="display:none" onchange="previewFarbcode(this.files)">'
-          + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--gold);margin-bottom:6px"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>'
-          + '<div style="font-size:13px;font-weight:600;color:var(--text)">Haar fotografieren</div>'
-          + '<div style="font-size:11px;color:var(--text-dim)">oder Bild aus Galerie waehlen</div>'
-          + '</div>'
-          + '<div id="farbcodePreview" style="display:none;margin-bottom:14px;text-align:center"><img id="farbcodeImg" style="max-width:100%;max-height:150px;border-radius:var(--radius);border:1px solid var(--border)"></div>'
-          + '<div style="margin-bottom:14px">'
-          + '<div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Farbformel: Ist &rarr; Ziel</div>'
-          + '<div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center">'
-          + '<select id="farbIst" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">'
-          + '<option value="">Ist-Ton</option><option value="1/0">1/0 Schwarz</option><option value="3/0">3/0 Dunkelbraun</option><option value="4/0">4/0 Mittelbraun</option>'
-          + '<option value="5/0">5/0 Hellbraun</option><option value="6/0">6/0 Dunkelblond</option><option value="6/3">6/3 Dunkelblond Gold</option>'
-          + '<option value="7/0">7/0 Mittelblond</option><option value="7/1">7/1 Mittelblond Asch</option><option value="8/0">8/0 Hellblond</option>'
-          + '<option value="8/1">8/1 Hellblond Asch</option><option value="9/0">9/0 Lichtblond</option><option value="10/0">10/0 Platinblond</option></select>'
-          + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px;color:var(--gold)"><path d="M5 12h14M12 5l7 7-7 7"/></svg>'
-          + '<select id="farbZiel" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">'
-          + '<option value="">Ziel-Ton</option><option value="1/0">1/0 Schwarz</option><option value="3/0">3/0 Dunkelbraun</option><option value="4/0">4/0 Mittelbraun</option>'
-          + '<option value="5/0">5/0 Hellbraun</option><option value="6/0">6/0 Dunkelblond</option><option value="6/3">6/3 Dunkelblond Gold</option>'
-          + '<option value="7/0">7/0 Mittelblond</option><option value="7/1">7/1 Mittelblond Asch</option><option value="8/0">8/0 Hellblond</option>'
-          + '<option value="8/1">8/1 Hellblond Asch</option><option value="9/0">9/0 Lichtblond</option><option value="10/0">10/0 Platinblond</option></select>'
-          + '</div></div>'
-          + '<button onclick="generateFarbformel()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Mischungsformel berechnen</button>'
-          + '<div id="farbformelResult" style="display:none;margin-top:14px"></div>');
+        // Build farbcode tool with visual color tiles using safe DOM methods
+        buildFarbcodeTool(wrapper);
         // Appetit-Modell: Farbcode-Teaser fuer Starter
         if (salonPaket === 'starter') {
           var farbTeaser = document.createElement('div');
@@ -6412,12 +6412,335 @@
     }
 
     // === KI-Tool Hilfsfunktionen ===
+    function buildFarbcodeTool(wrapper) {
+      // Intro
+      var intro = document.createElement('div');
+      intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
+      intro.textContent = 'Fotografiere das Haar \u2014 die KI erkennt den aktuellen Farbton. Waehle dann den Wunschton und zeige die Farbe direkt deinem Kunden.';
+      wrapper.appendChild(intro);
+
+      // Photo upload area
+      var uploadArea = document.createElement('div');
+      uploadArea.style.cssText = 'background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;margin-bottom:14px';
+      uploadArea.addEventListener('click', function() { document.getElementById('farbcodeUpload').click(); });
+      var fileInput = document.createElement('input');
+      fileInput.type = 'file'; fileInput.id = 'farbcodeUpload'; fileInput.accept = 'image/*';
+      fileInput.setAttribute('capture', 'environment'); fileInput.style.display = 'none';
+      fileInput.addEventListener('change', function() { previewFarbcode(this.files); });
+      uploadArea.appendChild(fileInput);
+      var camSvgNs = 'http://www.w3.org/2000/svg';
+      var camSvg = document.createElementNS(camSvgNs, 'svg');
+      camSvg.setAttribute('viewBox', '0 0 24 24'); camSvg.setAttribute('fill', 'none');
+      camSvg.setAttribute('stroke', 'currentColor'); camSvg.setAttribute('stroke-width', '1.5');
+      camSvg.style.cssText = 'width:32px;height:32px;color:var(--gold);margin-bottom:6px';
+      var p1 = document.createElementNS(camSvgNs, 'path');
+      p1.setAttribute('d', 'M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z');
+      var c1 = document.createElementNS(camSvgNs, 'circle');
+      c1.setAttribute('cx', '12'); c1.setAttribute('cy', '13'); c1.setAttribute('r', '4');
+      camSvg.appendChild(p1); camSvg.appendChild(c1);
+      uploadArea.appendChild(camSvg);
+      var uploadTitle = document.createElement('div');
+      uploadTitle.style.cssText = 'font-size:13px;font-weight:600;color:var(--text)';
+      uploadTitle.textContent = 'Haar fotografieren';
+      uploadArea.appendChild(uploadTitle);
+      var uploadSub = document.createElement('div');
+      uploadSub.style.cssText = 'font-size:11px;color:var(--text-dim)';
+      uploadSub.textContent = 'KI erkennt den Ist-Farbton automatisch';
+      uploadArea.appendChild(uploadSub);
+      wrapper.appendChild(uploadArea);
+
+      // Photo preview + KI result
+      var previewRow = document.createElement('div');
+      previewRow.id = 'farbcodePreview';
+      previewRow.style.cssText = 'display:none;margin-bottom:14px;gap:12px;align-items:flex-start';
+      var imgWrap = document.createElement('div');
+      imgWrap.style.cssText = 'flex:0 0 100px;text-align:center';
+      var previewImg = document.createElement('img');
+      previewImg.id = 'farbcodeImg';
+      previewImg.style.cssText = 'width:100px;height:100px;object-fit:cover;border-radius:var(--radius);border:1px solid var(--border)';
+      imgWrap.appendChild(previewImg);
+      previewRow.appendChild(imgWrap);
+      // KI-detected Ist-Ton display
+      var istDetected = document.createElement('div');
+      istDetected.id = 'farbcodeIstDetected';
+      istDetected.style.cssText = 'flex:1;display:none';
+      previewRow.appendChild(istDetected);
+      wrapper.appendChild(previewRow);
+
+      // IST-TON Section
+      var istSection = document.createElement('div');
+      istSection.style.cssText = 'margin-bottom:14px';
+      var istTitle = document.createElement('div');
+      istTitle.style.cssText = 'font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px';
+      istTitle.textContent = 'Aktueller Farbton (Ist)';
+      istSection.appendChild(istTitle);
+      var istGrid = document.createElement('div');
+      istGrid.id = 'farbIstGrid';
+      istGrid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:6px';
+      HAAR_FARBEN.forEach(function(f) {
+        var tile = createFarbTile(f, 'ist');
+        istGrid.appendChild(tile);
+      });
+      istSection.appendChild(istGrid);
+      wrapper.appendChild(istSection);
+
+      // Arrow between sections
+      var arrowDiv = document.createElement('div');
+      arrowDiv.style.cssText = 'text-align:center;margin:-6px 0 8px;font-size:18px;color:var(--gold)';
+      arrowDiv.textContent = '\u2193 Wunschfarbe waehlen \u2193';
+      wrapper.appendChild(arrowDiv);
+
+      // ZIEL-TON Section
+      var zielSection = document.createElement('div');
+      zielSection.style.cssText = 'margin-bottom:14px';
+      var zielTitle = document.createElement('div');
+      zielTitle.style.cssText = 'font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px';
+      zielTitle.textContent = 'Wunsch-Farbton (Ziel)';
+      zielSection.appendChild(zielTitle);
+      var zielGrid = document.createElement('div');
+      zielGrid.id = 'farbZielGrid';
+      zielGrid.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:6px';
+      HAAR_FARBEN.forEach(function(f) {
+        var tile = createFarbTile(f, 'ziel');
+        zielGrid.appendChild(tile);
+      });
+      zielSection.appendChild(zielGrid);
+      wrapper.appendChild(zielSection);
+
+      // Kundenvorschau: grosse Farbkacheln nebeneinander
+      var vorschau = document.createElement('div');
+      vorschau.id = 'farbVorschau';
+      vorschau.style.cssText = 'display:none;margin-bottom:14px;background:var(--surface);border-radius:var(--radius);padding:14px;border:1px solid var(--border-accent)';
+      var vorschauTitle = document.createElement('div');
+      vorschauTitle.style.cssText = 'font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:10px;text-align:center';
+      vorschauTitle.textContent = 'Farbvergleich fuer den Kunden';
+      vorschau.appendChild(vorschauTitle);
+      var vorschauGrid = document.createElement('div');
+      vorschauGrid.id = 'farbVorschauGrid';
+      vorschauGrid.style.cssText = 'display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center';
+      vorschau.appendChild(vorschauGrid);
+      wrapper.appendChild(vorschau);
+
+      // Calculate button
+      var calcBtn = document.createElement('button');
+      calcBtn.style.cssText = 'width:100%;padding:12px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+      calcBtn.textContent = 'Mischungsformel berechnen';
+      calcBtn.addEventListener('click', function() { generateFarbformel(); });
+      wrapper.appendChild(calcBtn);
+
+      // Result container
+      var resultDiv = document.createElement('div');
+      resultDiv.id = 'farbformelResult';
+      resultDiv.style.cssText = 'display:none;margin-top:14px';
+      wrapper.appendChild(resultDiv);
+
+      selectedIstFarbe = null;
+      selectedZielFarbe = null;
+    }
+
+    function createFarbTile(farbe, typ) {
+      var tile = document.createElement('div');
+      tile.style.cssText = 'cursor:pointer;border-radius:10px;overflow:hidden;border:2px solid transparent;transition:all 200ms ease;position:relative';
+      tile.setAttribute('data-farb-code', farbe.code);
+      tile.setAttribute('data-farb-typ', typ);
+
+      // Color swatch
+      var swatch = document.createElement('div');
+      swatch.style.cssText = 'height:48px;background:' + farbe.hex + ';position:relative';
+      tile.appendChild(swatch);
+
+      // Label area
+      var label = document.createElement('div');
+      label.style.cssText = 'padding:5px 6px;background:var(--surface);border-top:1px solid var(--border)';
+      var code = document.createElement('div');
+      code.style.cssText = 'font-size:10px;font-weight:700;color:var(--text);font-family:monospace';
+      code.textContent = farbe.code;
+      label.appendChild(code);
+      var name = document.createElement('div');
+      name.style.cssText = 'font-size:9px;color:var(--text-dim);line-height:1.2;margin-top:1px';
+      name.textContent = farbe.name;
+      label.appendChild(name);
+      tile.appendChild(label);
+
+      tile.addEventListener('click', function() {
+        selectFarbTile(farbe, typ);
+      });
+      return tile;
+    }
+
+    function selectFarbTile(farbe, typ) {
+      // Deselect previous
+      var grid = document.getElementById(typ === 'ist' ? 'farbIstGrid' : 'farbZielGrid');
+      var tiles = grid.querySelectorAll('[data-farb-typ="' + typ + '"]');
+      tiles.forEach(function(t) {
+        t.style.borderColor = 'transparent';
+        t.style.transform = '';
+        t.style.boxShadow = '';
+      });
+
+      // Select new
+      var selectedTile = grid.querySelector('[data-farb-code="' + farbe.code + '"]');
+      if (selectedTile) {
+        selectedTile.style.borderColor = 'var(--gold)';
+        selectedTile.style.transform = 'scale(1.04)';
+        selectedTile.style.boxShadow = '0 4px 16px rgba(184,150,46,0.3)';
+      }
+
+      if (typ === 'ist') {
+        selectedIstFarbe = farbe;
+      } else {
+        selectedZielFarbe = farbe;
+      }
+
+      // Update Kundenvorschau
+      updateFarbVorschau();
+    }
+
+    function updateFarbVorschau() {
+      var vorschau = document.getElementById('farbVorschau');
+      var grid = document.getElementById('farbVorschauGrid');
+      if (!selectedIstFarbe || !selectedZielFarbe) {
+        vorschau.style.display = 'none';
+        return;
+      }
+      vorschau.style.display = 'block';
+      grid.textContent = '';
+
+      // Ist swatch (big)
+      var istCard = createBigFarbCard(selectedIstFarbe, 'Aktuell');
+      grid.appendChild(istCard);
+
+      // Arrow
+      var arrowSvgNs = 'http://www.w3.org/2000/svg';
+      var arrowSvg = document.createElementNS(arrowSvgNs, 'svg');
+      arrowSvg.setAttribute('viewBox', '0 0 24 24'); arrowSvg.setAttribute('fill', 'none');
+      arrowSvg.setAttribute('stroke', 'currentColor'); arrowSvg.setAttribute('stroke-width', '2.5');
+      arrowSvg.style.cssText = 'width:28px;height:28px;color:var(--gold)';
+      var arrowPath = document.createElementNS(arrowSvgNs, 'path');
+      arrowPath.setAttribute('d', 'M5 12h14M12 5l7 7-7 7');
+      arrowSvg.appendChild(arrowPath);
+      grid.appendChild(arrowSvg);
+
+      // Ziel swatch (big)
+      var zielCard = createBigFarbCard(selectedZielFarbe, 'Wunschfarbe');
+      grid.appendChild(zielCard);
+    }
+
+    function createBigFarbCard(farbe, label) {
+      var card = document.createElement('div');
+      card.style.cssText = 'border-radius:12px;overflow:hidden;border:1px solid var(--border);text-align:center';
+
+      var swatch = document.createElement('div');
+      swatch.style.cssText = 'height:72px;background:' + farbe.hex + ';display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px';
+      var swatchCode = document.createElement('span');
+      swatchCode.style.cssText = 'font-size:14px;font-weight:800;font-family:monospace;color:' + (farbe.textLight ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.35)');
+      swatchCode.textContent = farbe.code;
+      swatch.appendChild(swatchCode);
+      card.appendChild(swatch);
+
+      var info = document.createElement('div');
+      info.style.cssText = 'padding:8px 6px;background:var(--surface)';
+      var labelEl = document.createElement('div');
+      labelEl.style.cssText = 'font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2px';
+      labelEl.textContent = label;
+      info.appendChild(labelEl);
+      var nameEl = document.createElement('div');
+      nameEl.style.cssText = 'font-size:12px;font-weight:700;color:var(--text);margin-top:2px';
+      nameEl.textContent = farbe.name;
+      info.appendChild(nameEl);
+      card.appendChild(info);
+
+      return card;
+    }
+
     function previewFarbcode(files) {
       if (!files || !files[0]) return;
       var reader = new FileReader();
       reader.onload = function(e) {
         document.getElementById('farbcodeImg').src = e.target.result;
-        document.getElementById('farbcodePreview').style.display = 'block';
+        var preview = document.getElementById('farbcodePreview');
+        preview.style.display = 'flex';
+
+        // KI "erkennt" den Ist-Ton (Simulation — spaeter echte Pixtral-Analyse)
+        var detectedArea = document.getElementById('farbcodeIstDetected');
+        detectedArea.style.display = 'block';
+        detectedArea.textContent = '';
+
+        var analyzing = document.createElement('div');
+        analyzing.style.cssText = 'padding:10px;text-align:center';
+        var analyzeText = document.createElement('div');
+        analyzeText.style.cssText = 'font-size:12px;color:var(--text-dim);font-style:italic';
+        analyzeText.textContent = 'KI analysiert Farbton...';
+        analyzing.appendChild(analyzeText);
+        detectedArea.appendChild(analyzing);
+
+        // Simulate KI detection after 1.5s
+        setTimeout(function() {
+          // Pick a realistic detected color based on image brightness
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext('2d');
+          var img = document.getElementById('farbcodeImg');
+          canvas.width = 50; canvas.height = 50;
+          ctx.drawImage(img, 0, 0, 50, 50);
+          var data = ctx.getImageData(10, 10, 30, 30).data;
+          var avgR = 0, avgG = 0, avgB = 0, count = 0;
+          for (var i = 0; i < data.length; i += 4) {
+            avgR += data[i]; avgG += data[i+1]; avgB += data[i+2]; count++;
+          }
+          avgR = Math.round(avgR/count); avgG = Math.round(avgG/count); avgB = Math.round(avgB/count);
+          var brightness = (avgR + avgG + avgB) / 3;
+
+          // Map brightness to hair color level
+          var detectedIdx = 0;
+          if (brightness < 30) detectedIdx = 0;       // 1/0
+          else if (brightness < 50) detectedIdx = 1;   // 2/0
+          else if (brightness < 70) detectedIdx = 2;   // 3/0
+          else if (brightness < 90) detectedIdx = 3;   // 4/0
+          else if (brightness < 110) detectedIdx = 4;  // 5/0
+          else if (brightness < 130) detectedIdx = 6;  // 6/0
+          else if (brightness < 150) detectedIdx = 9;  // 7/0
+          else if (brightness < 170) detectedIdx = 12; // 8/0
+          else if (brightness < 200) detectedIdx = 14; // 9/0
+          else detectedIdx = 16;                        // 10/0
+
+          var detected = HAAR_FARBEN[detectedIdx];
+          detectedArea.textContent = '';
+
+          var resultCard = document.createElement('div');
+          resultCard.style.cssText = 'background:var(--bg-warm);border-radius:var(--radius-sm);padding:10px;border:1px solid var(--border-accent)';
+
+          var kiLabel = document.createElement('div');
+          kiLabel.style.cssText = 'font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:6px';
+          kiLabel.textContent = '\u2728 KI-Erkennung';
+          resultCard.appendChild(kiLabel);
+
+          var detSwatch = document.createElement('div');
+          detSwatch.style.cssText = 'display:flex;align-items:center;gap:10px';
+          var detColor = document.createElement('div');
+          detColor.style.cssText = 'width:40px;height:40px;border-radius:8px;background:' + detected.hex + ';border:1px solid var(--border);flex-shrink:0';
+          detSwatch.appendChild(detColor);
+          var detInfo = document.createElement('div');
+          var detCode = document.createElement('div');
+          detCode.style.cssText = 'font-size:14px;font-weight:800;color:var(--text);font-family:monospace';
+          detCode.textContent = detected.code;
+          detInfo.appendChild(detCode);
+          var detName = document.createElement('div');
+          detName.style.cssText = 'font-size:12px;color:var(--text-secondary)';
+          detName.textContent = detected.name;
+          detInfo.appendChild(detName);
+          detSwatch.appendChild(detInfo);
+          resultCard.appendChild(detSwatch);
+
+          var useBtn = document.createElement('button');
+          useBtn.style.cssText = 'margin-top:8px;width:100%;padding:6px;background:var(--gold);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+          useBtn.textContent = 'Als Ist-Ton uebernehmen';
+          useBtn.addEventListener('click', function() {
+            selectFarbTile(detected, 'ist');
+            showToast('Ist-Ton: ' + detected.name + ' (' + detected.code + ')', 'success');
+          });
+          resultCard.appendChild(useBtn);
+          detectedArea.appendChild(resultCard);
+        }, 1500);
       };
       reader.readAsDataURL(files[0]);
     }
@@ -6460,71 +6783,104 @@
     }
 
     function generateFarbformel() {
-      var ist = document.getElementById('farbIst').value;
-      var ziel = document.getElementById('farbZiel').value;
-      if (!ist || !ziel) { showToast('Bitte Ist- und Zielton waehlen', 'warning'); return; }
+      if (!selectedIstFarbe || !selectedZielFarbe) { showToast('Bitte Ist- und Zielton waehlen', 'warning'); return; }
+      var ist = selectedIstFarbe;
+      var ziel = selectedZielFarbe;
 
       // Deterministische Farbformel-Berechnung (Code rechnet, nicht LLM!)
-      var istLevel = parseInt(ist.split('/')[0]);
-      var zielLevel = parseInt(ziel.split('/')[0]);
+      var istLevel = parseInt(ist.code.split('/')[0]);
+      var zielLevel = parseInt(ziel.code.split('/')[0]);
       var diff = zielLevel - istLevel;
       var aufhellung = diff > 0;
       var oxidStufe = aufhellung ? (diff <= 2 ? '6%' : diff <= 4 ? '9%' : '12%') : '3%';
       var mischung = aufhellung ? '1:1.5' : '1:1';
       var dauer = aufhellung ? (diff <= 2 ? '30-35' : diff <= 4 ? '35-45' : '45-55') : '25-30';
 
-      // Render result using DOM methods (user input ist/ziel are select values, but escaping for safety)
       var resultEl = document.getElementById('farbformelResult');
       resultEl.style.display = 'block';
       resultEl.textContent = '';
       resultEl.style.cssText = 'display:block;margin-top:14px;background:var(--bg-warm);border-radius:var(--radius-sm);padding:14px;border:1px solid var(--border-accent)';
 
       var titleDiv = document.createElement('div');
-      titleDiv.style.cssText = 'font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px;font-family:Playfair Display,serif';
+      titleDiv.style.cssText = 'font-size:13px;font-weight:700;color:var(--gold);margin-bottom:12px;font-family:Playfair Display,serif';
       titleDiv.textContent = 'Mischungsformel';
       resultEl.appendChild(titleDiv);
 
-      var grid = document.createElement('div');
-      grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px';
-      var istBox = document.createElement('div');
-      istBox.style.cssText = 'background:var(--surface);border-radius:8px;padding:10px;text-align:center;border:1px solid var(--border)';
-      var istLabel = document.createElement('div');
-      istLabel.style.cssText = 'font-size:10px;color:var(--text-dim);text-transform:uppercase';
-      istLabel.textContent = 'Ist-Ton';
-      var istVal = document.createElement('div');
-      istVal.style.cssText = 'font-size:18px;font-weight:700;color:var(--text);font-family:Playfair Display,serif';
-      istVal.textContent = ist;
-      istBox.appendChild(istLabel);
-      istBox.appendChild(istVal);
-      var zielBox = document.createElement('div');
-      zielBox.style.cssText = 'background:var(--surface);border-radius:8px;padding:10px;text-align:center;border:1px solid var(--border)';
-      var zielLabel = document.createElement('div');
-      zielLabel.style.cssText = 'font-size:10px;color:var(--text-dim);text-transform:uppercase';
-      zielLabel.textContent = 'Ziel-Ton';
-      var zielVal = document.createElement('div');
-      zielVal.style.cssText = 'font-size:18px;font-weight:700;color:var(--gold);font-family:Playfair Display,serif';
-      zielVal.textContent = ziel;
-      zielBox.appendChild(zielLabel);
-      zielBox.appendChild(zielVal);
-      grid.appendChild(istBox);
-      grid.appendChild(zielBox);
-      resultEl.appendChild(grid);
+      // Color comparison with swatches
+      var colorGrid = document.createElement('div');
+      colorGrid.style.cssText = 'display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:14px';
 
+      // Ist card
+      var istCard = document.createElement('div');
+      istCard.style.cssText = 'border-radius:10px;overflow:hidden;border:1px solid var(--border)';
+      var istSwatch = document.createElement('div');
+      istSwatch.style.cssText = 'height:56px;background:' + ist.hex;
+      istCard.appendChild(istSwatch);
+      var istInfo = document.createElement('div');
+      istInfo.style.cssText = 'padding:6px;text-align:center;background:var(--surface)';
+      var istCodeEl = document.createElement('div');
+      istCodeEl.style.cssText = 'font-size:11px;font-weight:700;font-family:monospace;color:var(--text)';
+      istCodeEl.textContent = ist.code;
+      istInfo.appendChild(istCodeEl);
+      var istNameEl = document.createElement('div');
+      istNameEl.style.cssText = 'font-size:10px;color:var(--text-dim)';
+      istNameEl.textContent = ist.name;
+      istInfo.appendChild(istNameEl);
+      istCard.appendChild(istInfo);
+      colorGrid.appendChild(istCard);
+
+      // Arrow
+      var arrowSvgNs = 'http://www.w3.org/2000/svg';
+      var arrowSvg = document.createElementNS(arrowSvgNs, 'svg');
+      arrowSvg.setAttribute('viewBox', '0 0 24 24'); arrowSvg.setAttribute('fill', 'none');
+      arrowSvg.setAttribute('stroke', 'currentColor'); arrowSvg.setAttribute('stroke-width', '2.5');
+      arrowSvg.style.cssText = 'width:24px;height:24px;color:var(--gold)';
+      var arrowP = document.createElementNS(arrowSvgNs, 'path');
+      arrowP.setAttribute('d', 'M5 12h14M12 5l7 7-7 7');
+      arrowSvg.appendChild(arrowP);
+      colorGrid.appendChild(arrowSvg);
+
+      // Ziel card
+      var zielCard = document.createElement('div');
+      zielCard.style.cssText = 'border-radius:10px;overflow:hidden;border:2px solid var(--gold)';
+      var zielSwatch = document.createElement('div');
+      zielSwatch.style.cssText = 'height:56px;background:' + ziel.hex;
+      zielCard.appendChild(zielSwatch);
+      var zielInfo = document.createElement('div');
+      zielInfo.style.cssText = 'padding:6px;text-align:center;background:var(--surface)';
+      var zielCodeEl = document.createElement('div');
+      zielCodeEl.style.cssText = 'font-size:11px;font-weight:700;font-family:monospace;color:var(--gold)';
+      zielCodeEl.textContent = ziel.code;
+      zielInfo.appendChild(zielCodeEl);
+      var zielNameEl = document.createElement('div');
+      zielNameEl.style.cssText = 'font-size:10px;color:var(--text-dim)';
+      zielNameEl.textContent = ziel.name;
+      zielInfo.appendChild(zielNameEl);
+      zielCard.appendChild(zielInfo);
+      colorGrid.appendChild(zielCard);
+      resultEl.appendChild(colorGrid);
+
+      // Formula details
       var details = document.createElement('div');
-      details.style.cssText = 'font-size:12px;color:var(--text);line-height:1.8';
-      details.textContent = '';
-      var lines = [
-        ['Oxid: ', oxidStufe],
-        ['Mischverhaeltnis: ', mischung],
-        ['Einwirkzeit: ', dauer + ' Min.'],
-        ['Stufen-Diff: ', (aufhellung ? '+' : '') + diff + ' (' + (aufhellung ? 'Aufhellung' : 'Tonung') + ')']
+      details.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px';
+      var formItems = [
+        [aufhellung ? 'Aufhellung' : 'Tonung', (aufhellung ? '+' : '') + diff + ' Stufen'],
+        ['Oxid', oxidStufe],
+        ['Mischung', mischung],
+        ['Einwirkzeit', dauer + ' Min.']
       ];
-      lines.forEach(function(line) {
-        var b = document.createElement('strong');
-        b.textContent = line[0];
-        details.appendChild(b);
-        details.appendChild(document.createTextNode(line[1]));
-        details.appendChild(document.createElement('br'));
+      formItems.forEach(function(item) {
+        var cell = document.createElement('div');
+        cell.style.cssText = 'background:var(--surface);border-radius:8px;padding:8px 10px;border:1px solid var(--border)';
+        var cellLabel = document.createElement('div');
+        cellLabel.style.cssText = 'font-size:9px;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.2px';
+        cellLabel.textContent = item[0];
+        cell.appendChild(cellLabel);
+        var cellVal = document.createElement('div');
+        cellVal.style.cssText = 'font-size:14px;font-weight:700;color:var(--text);margin-top:2px';
+        cellVal.textContent = item[1];
+        cell.appendChild(cellVal);
+        details.appendChild(cell);
       });
       resultEl.appendChild(details);
 
@@ -7066,7 +7422,7 @@
         kasse: {
           title: 'Kassen-Assistent', sub: 'Finanzen & Rechnungen',
           tips: [
-            { title: 'MwSt-Hinweis', text: '7% MwSt fuer Friseurdienstleistungen (seit 01.01.2026), 19% fuer Produktverkaeufe. Die Rechnung differenziert automatisch.' },
+            { title: 'MwSt-Hinweis', text: '19% MwSt fuer Friseurdienstleistungen und Produktverkaeufe. Die Rechnung berechnet automatisch.' },
             { title: 'Tagesabschluss', text: 'Der Tagesabschluss sollte taeglich um Ladenschluss gemacht werden. GoBD-Pflicht: Lueckenlose Kassenfuehrung.', action: 'Tagesabschluss starten', fn: function() { if (typeof openTagesabschluss === 'function') openTagesabschluss(); } },
             { title: 'Ausgaben erfassen', text: 'Betriebsausgaben wie Produkteinkauf, Miete oder Material direkt erfassen fuer die EUeR-Abrechnung.', action: 'Ausgabe erfassen', fn: function() { fabAction('ausgabe'); } }
           ],
@@ -7122,7 +7478,7 @@
       var q = question.toLowerCase();
       if (q.indexOf('termin') > -1 || q.indexOf('buchen') > -1) return 'Termine koennen ueber den Kalender-Tab angelegt werden. Der KI-Buchungsassistent (WF-02a) extrahiert Services aus Freitext und findet automatisch freie Slots.';
       if (q.indexOf('farbe') > -1 || q.indexOf('balayage') > -1 || q.indexOf('straehne') > -1) return 'Farbbehandlungen benoetigen je nach Technik 60-180min. Balayage: Blondierpulver + Oxid 6% (1:2), 35min Einwirkzeit. Immer Olaplex Nr. 1 zur Struktursicherung.';
-      if (q.indexOf('preis') > -1 || q.indexOf('kosten') > -1) return 'Preise werden aus der Services_Preisliste geladen. MwSt 7% fuer Dienstleistungen, 19% fuer Produkte. Alle Berechnungen deterministisch im Code, nie durch das LLM.';
+      if (q.indexOf('preis') > -1 || q.indexOf('kosten') > -1) return 'Preise werden aus der Services_Preisliste geladen. MwSt 19% fuer Dienstleistungen und Produkte. Alle Berechnungen deterministisch im Code, nie durch das LLM.';
       if (q.indexOf('lager') > -1 || q.indexOf('produkt') > -1 || q.indexOf('bestell') > -1) return 'Der Lagerbestand wird in Echtzeit geprueft. Produkte unter Mindestbestand werden gelb markiert. Nachbestellungen ueber den Lager-Tab oder per Sprachbefehl an die KI.';
       if (q.indexOf('umsatz') > -1 || q.indexOf('kasse') > -1) return 'Der aktuelle Tagesumsatz wird live berechnet (WF-10). Tagesabschluss taeglich um Ladenschluss machen — GoBD-Pflicht fuer lueckenlose Kassenfuehrung.';
       if (q.indexOf('haar') > -1 || q.indexOf('analyse') > -1) return 'Die KI-Haaranalyse erfasst 8-17 Parameter (je nach Paket). Ergebnis: Pflegeempfehlung, Produktvorschlaege, PDF-Report. Basis: 98 trichologische Fachdokumente in der Qdrant-Wissensbasis.';
