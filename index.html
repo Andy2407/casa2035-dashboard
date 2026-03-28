@@ -8283,19 +8283,7 @@
       document.getElementById('lagerOk').textContent = ok;
       document.getElementById('lagerLow').textContent = low;
       document.getElementById('lagerCount').textContent = items.length + ' Produkte';
-      // Home-Kachel: Lager-Alarm aktualisieren
-      var lagerAlarmEl = document.getElementById('statLagerAlarm');
-      if (lagerAlarmEl) {
-        lagerAlarmEl.textContent = low;
-        lagerAlarmEl.style.color = low > 0 ? '#f5a623' : 'var(--success)';
-      }
-      var lagerAlarmSubEl = document.getElementById('statLagerAlarmSub');
-      if (lagerAlarmSubEl) lagerAlarmSubEl.textContent = low > 0 ? 'nachbestellen' : 'alles ok';
-      var lagerAlarmIcon = document.querySelector('#statLagerCard .stat-icon');
-      if (lagerAlarmIcon) {
-        lagerAlarmIcon.style.background = low > 0 ? 'rgba(245,166,35,0.1)' : 'var(--success-bg)';
-        lagerAlarmIcon.style.color = low > 0 ? '#f5a623' : 'var(--success)';
-      }
+      // (Lager-Alarm Kachel entfernt — ersetzt durch Neukunden auf Home)
       filterLager();
     }
 
