@@ -1709,13 +1709,13 @@
           <div class="stat-label">Auslastung</div>
           <div class="stat-sub" id="statAuslastungSub">heute</div>
         </div>
-        <div class="stat-card rose touch-scale">
-          <div class="stat-icon" style="background:var(--rose-glow);color:var(--rose)">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <div class="stat-card touch-scale" id="statLagerCard" style="cursor:pointer" onclick="switchPage('lager')">
+          <div class="stat-icon" style="background:rgba(245,166,35,0.1);color:#f5a623">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3zm-1 14.5v-2h2v2h-2zm0-4V7h2v5.5h-2z"/></svg>
           </div>
-          <div class="stat-val tabular" style="color:var(--rose)" id="statNeukunden">--</div>
-          <div class="stat-label">Neukunden</div>
-          <div class="stat-sub" id="statNeukundenSub">diese Woche</div>
+          <div class="stat-val tabular" id="statLagerAlarm" style="color:#f5a623">--</div>
+          <div class="stat-label">Lager-Alarm</div>
+          <div class="stat-sub" id="statLagerAlarmSub">nachbestellen</div>
         </div>
       </div>
       </div>
@@ -8283,7 +8283,19 @@
       document.getElementById('lagerOk').textContent = ok;
       document.getElementById('lagerLow').textContent = low;
       document.getElementById('lagerCount').textContent = items.length + ' Produkte';
-      // (Lager-Alarm Kachel entfernt — ersetzt durch Neukunden auf Home)
+      // Home-Kachel: Lager-Alarm aktualisieren
+      var lagerAlarmEl = document.getElementById('statLagerAlarm');
+      if (lagerAlarmEl) {
+        lagerAlarmEl.textContent = low;
+        lagerAlarmEl.style.color = low > 0 ? '#f5a623' : 'var(--success)';
+      }
+      var lagerAlarmSubEl = document.getElementById('statLagerAlarmSub');
+      if (lagerAlarmSubEl) lagerAlarmSubEl.textContent = low > 0 ? 'nachbestellen' : 'alles ok';
+      var lagerAlarmIcon = document.querySelector('#statLagerCard .stat-icon');
+      if (lagerAlarmIcon) {
+        lagerAlarmIcon.style.background = low > 0 ? 'rgba(245,166,35,0.1)' : 'var(--success-bg)';
+        lagerAlarmIcon.style.color = low > 0 ? '#f5a623' : 'var(--success)';
+      }
       filterLager();
     }
 
