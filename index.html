@@ -2084,7 +2084,7 @@
           <button class="staff-filter-btn" onclick="setLagerKategorie('Farbe')" style="white-space:nowrap;font-size:11px">Farbe</button>
           <button class="staff-filter-btn" onclick="setLagerKategorie('Styling')" style="white-space:nowrap;font-size:11px">Styling</button>
           <button class="staff-filter-btn" onclick="setLagerKategorie('Treatment')" style="white-space:nowrap;font-size:11px">Treatment</button>
-          <button class="staff-filter-btn" onclick="setLagerKategorie('Zubehoer')" style="white-space:nowrap;font-size:11px">Zubehoer</button>
+          <button class="staff-filter-btn" onclick="setLagerKategorie('Zubehoer')" style="white-space:nowrap;font-size:11px">Zubehör</button>
         </div>
       </div>
 
@@ -3067,7 +3067,7 @@
 
         var dur = parseInt(t.Duration_Min) || 30;
         var st = (t.Status || 'proposed').toLowerCase();
-        var stLabel = st === 'confirmed' ? 'Bestaetigt' : st === 'pending_approval' ? 'Vorgemerkt' : st === 'cancelled' ? 'Storniert' : 'Offen';
+        var stLabel = st === 'confirmed' ? 'Bestätigt' : st === 'pending_approval' ? 'Vorgemerkt' : st === 'cancelled' ? 'Storniert' : 'Offen';
 
         var topPx = ((tH - startHour) * 60 + tM) / slotMin * slotHeight;
         var heightPx = Math.max((dur / slotMin) * slotHeight, slotHeight);
@@ -3395,7 +3395,7 @@
 
       var c = document.getElementById('recentEvents');
       c.textContent = '';
-      if (!items.length) { c.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7"/><path d="M2 17a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4H2v4z"/></svg><br>Keine Aktivitaeten</div>'; return; }
+      if (!items.length) { c.innerHTML = '<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 13V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7"/><path d="M2 17a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4H2v4z"/></svg><br>Keine Aktivitäten</div>'; return; }
 
       var iconSvgMap = {
         termin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
@@ -4689,11 +4689,11 @@
       // === Produkt-Zuordnung pro Service (fuer Termin-Detail) ===
       // Erweitert: aufgaben mit dauer_min, produkte mit menge + mischung, einwirkzeiten
       var serviceProdukte = {
-        'Damenhaarschnitt + Foehn': {
+        'Damenhaarschnitt + Föhn': {
           aufgaben: [
             { schritt: 'Waschen', dauer_min: 5 },
             { schritt: 'Schneiden', dauer_min: 25 },
-            { schritt: 'Foehnen + Styling', dauer_min: 15 }
+            { schritt: 'Föhnen + Styling', dauer_min: 15 }
           ],
           produkte: [
             { name: 'Shampoo Vital', menge: '10 ml' },
@@ -4705,7 +4705,7 @@
           aufgaben: [
             { schritt: 'Waschen', dauer_min: 5 },
             { schritt: 'Schneiden', dauer_min: 25 },
-            { schritt: 'Foehnen', dauer_min: 10 }
+            { schritt: 'Föhnen', dauer_min: 10 }
           ],
           produkte: [
             { name: 'Shampoo Vital', menge: '10 ml' },
@@ -4715,11 +4715,11 @@
         'Balayage + Schnitt': {
           aufgaben: [
             { schritt: 'Farbanalyse + Beratung', dauer_min: 10 },
-            { schritt: 'Straehnen setzen (Freihand)', dauer_min: 45 },
+            { schritt: 'Strähnen setzen (Freihand)', dauer_min: 45 },
             { schritt: 'Einwirkzeit', dauer_min: 35, einwirkzeit: true },
             { schritt: 'Auswaschen + Pflege', dauer_min: 10 },
             { schritt: 'Schneiden', dauer_min: 20 },
-            { schritt: 'Foehnen + Styling', dauer_min: 15 }
+            { schritt: 'Föhnen + Styling', dauer_min: 15 }
           ],
           produkte: [
             { name: 'Blondierpulver', menge: '30 g' },
@@ -4738,7 +4738,7 @@
             { schritt: 'Auftragen (Ansatz + Laengen)', dauer_min: 20 },
             { schritt: 'Einwirkzeit', dauer_min: 30, einwirkzeit: true },
             { schritt: 'Auswaschen + Emulgieren', dauer_min: 8 },
-            { schritt: 'Pflege + Foehnen', dauer_min: 15 }
+            { schritt: 'Pflege + Föhnen', dauer_min: 15 }
           ],
           produkte: [
             { name: 'Haarfarbe (lt. Farbcode)', menge: '60 ml', mischung: '1:1 mit Oxid' },
@@ -4755,7 +4755,7 @@
             { schritt: 'Auftragen', dauer_min: 15 },
             { schritt: 'Einwirkzeit', dauer_min: 30, einwirkzeit: true },
             { schritt: 'Auswaschen', dauer_min: 5 },
-            { schritt: 'Pflege + Foehnen', dauer_min: 15 }
+            { schritt: 'Pflege + Föhnen', dauer_min: 15 }
           ],
           produkte: [
             { name: 'Haarfarbe (lt. Farbcode)', menge: '60 ml', mischung: '1:1 mit Oxid' },
@@ -4796,7 +4796,7 @@
             { schritt: 'Olaplex No. 2 auftragen', dauer_min: 3 },
             { schritt: 'Einwirkzeit No. 2', dauer_min: 20, einwirkzeit: true },
             { schritt: 'Auswaschen + Pflege', dauer_min: 5 },
-            { schritt: 'Foehnen', dauer_min: 10 }
+            { schritt: 'Föhnen', dauer_min: 10 }
           ],
           produkte: [
             { name: 'Olaplex No. 1', menge: '3.75 ml', mischung: 'Pur auftragen, Scheitel bis Spitzen' },
@@ -4871,7 +4871,7 @@
             { schritt: 'Fixierung auftragen', dauer_min: 5 },
             { schritt: 'Einwirkzeit Fixierung', dauer_min: 10, einwirkzeit: true },
             { schritt: 'Auswaschen + Pflege', dauer_min: 5 },
-            { schritt: 'Foehnen', dauer_min: 10 }
+            { schritt: 'Föhnen', dauer_min: 10 }
           ],
           produkte: [
             { name: 'Dauerwellmittel', menge: '80 ml' },
@@ -4887,7 +4887,7 @@
             { schritt: 'Auftragen am Ansatz', dauer_min: 15 },
             { schritt: 'Einwirkzeit', dauer_min: 25, einwirkzeit: true },
             { schritt: 'Auswaschen + Emulgieren', dauer_min: 5 },
-            { schritt: 'Pflege + Foehnen', dauer_min: 12 }
+            { schritt: 'Pflege + Föhnen', dauer_min: 12 }
           ],
           produkte: [
             { name: 'Haarfarbe (lt. Farbcode)', menge: '40 ml', mischung: '1:1 mit Oxid' },
@@ -4896,14 +4896,14 @@
             { name: 'Pflegekur Color', menge: '15 ml' }
           ]
         },
-        'Straehnen + Schnitt': {
+        'Strähnen + Schnitt': {
           aufgaben: [
-            { schritt: 'Straehnen-Beratung', dauer_min: 5 },
-            { schritt: 'Folienstraehnen setzen', dauer_min: 35 },
+            { schritt: 'Strähnen-Beratung', dauer_min: 5 },
+            { schritt: 'Foliensträhnen setzen', dauer_min: 35 },
             { schritt: 'Einwirkzeit', dauer_min: 30, einwirkzeit: true },
             { schritt: 'Auswaschen + Pflege', dauer_min: 8 },
             { schritt: 'Schneiden', dauer_min: 20 },
-            { schritt: 'Foehnen', dauer_min: 12 }
+            { schritt: 'Föhnen', dauer_min: 12 }
           ],
           produkte: [
             { name: 'Blondierpulver', menge: '25 g' },
@@ -4920,7 +4920,7 @@
             { schritt: 'Pflegekur einarbeiten', dauer_min: 5 },
             { schritt: 'Einwirkzeit unter Waerme', dauer_min: 15, einwirkzeit: true },
             { schritt: 'Auswaschen', dauer_min: 5 },
-            { schritt: 'Foehnen', dauer_min: 10 }
+            { schritt: 'Föhnen', dauer_min: 10 }
           ],
           produkte: [
             { name: 'Shampoo Vital', menge: '10 ml' },
@@ -4935,7 +4935,7 @@
             { schritt: 'Auftragen', dauer_min: 10 },
             { schritt: 'Einwirkzeit', dauer_min: 10, einwirkzeit: true },
             { schritt: 'Auswaschen', dauer_min: 5 },
-            { schritt: 'Foehnen', dauer_min: 10 }
+            { schritt: 'Föhnen', dauer_min: 10 }
           ],
           produkte: [
             { name: 'Glossing-Farbe', menge: '30 ml', mischung: '1:1 mit Aktivator' },
@@ -4953,9 +4953,9 @@
       var renaServices = [
         { s: 'Balayage + Schnitt', d: 120 }, { s: 'Balayage + Schnitt', d: 120 },
         { s: 'Farbbehandlung Komplett', d: 90 }, { s: 'Farbbehandlung Komplett', d: 90 },
-        { s: 'Straehnen + Schnitt', d: 120 }, { s: 'Brautstyling Probe', d: 90 },
+        { s: 'Strähnen + Schnitt', d: 120 }, { s: 'Brautstyling Probe', d: 90 },
         { s: 'Brautstyling', d: 90 }, { s: 'Dauerwelle', d: 90 },
-        { s: 'Haarschnitt Feminin', d: 60 }, { s: 'Damenhaarschnitt + Foehn', d: 60 },
+        { s: 'Haarschnitt Feminin', d: 60 }, { s: 'Damenhaarschnitt + Föhn', d: 60 },
         { s: 'Haarpflege + Olaplex', d: 45 }, { s: 'Glossing', d: 40 },
         { s: 'Ansatzfarbe', d: 75 }
       ];
@@ -4965,8 +4965,8 @@
         { s: 'Herrenschnitt + Bartpflege', d: 45 }, { s: 'Kinderhaarschnitt', d: 30 },
         { s: 'Farbbehandlung Komplett', d: 90 }, { s: 'Ansatzfarbe', d: 75 },
         { s: 'Grooming Paket', d: 45 }, { s: 'Haarpflege Intensiv', d: 45 },
-        { s: 'Damenhaarschnitt + Foehn', d: 60 }, { s: 'Glossing', d: 40 },
-        { s: 'Balayage + Schnitt', d: 120 }, { s: 'Straehnen + Schnitt', d: 120 }
+        { s: 'Damenhaarschnitt + Föhn', d: 60 }, { s: 'Glossing', d: 40 },
+        { s: 'Balayage + Schnitt', d: 120 }, { s: 'Strähnen + Schnitt', d: 120 }
       ];
       var kundenNamen = [
         'Anna Müller', 'Lisa Kramer', 'Thomas Weber', 'Sandra Fischer', 'Julia Berger',
@@ -5056,9 +5056,9 @@
       }).sort(function(a, b) { return a.Start_ISO.localeCompare(b.Start_ISO); });
       // Preise pro Service (Brutto, 19% MwSt)
       var servicePreise = {
-        'Haarschnitt Feminin': 45, 'Damenhaarschnitt + Foehn': 55, 'Herrenschnitt': 35,
+        'Haarschnitt Feminin': 45, 'Damenhaarschnitt + Föhn': 55, 'Herrenschnitt': 35,
         'Herrenschnitt + Bartpflege': 50, 'Balayage + Schnitt': 165, 'Farbbehandlung Komplett': 100,
-        'Farbbehandlung': 85, 'Ansatzfarbe': 65, 'Straehnen + Schnitt': 145,
+        'Farbbehandlung': 85, 'Ansatzfarbe': 65, 'Strähnen + Schnitt': 145,
         'Haarpflege + Olaplex': 60, 'Haarpflege Intensiv': 45, 'Brautstyling Probe': 95,
         'Brautstyling': 120, 'Dauerwelle': 90, 'Kinderhaarschnitt': 25,
         'Grooming Paket': 55, 'Glossing': 50
@@ -5216,16 +5216,16 @@
         {
           Kunde: 'Sabine Meier', Timestamp: iso(9, 30), Kanal: 'whatsapp', Typ: 'Wunschfrisur',
           Status: 'analyse',
-          Frage: 'Ich moechte gerne so eine Frisur wie auf dem Bild. Geht das bei meiner Haarlaenge? Meine Haare sind schulterlang und eher duenn.',
+          Frage: 'Ich möchte gerne so eine Frisur wie auf dem Bild. Geht das bei meiner Haarlänge? Meine Haare sind schulterlang und eher dünn.',
           Bilder: ['Wunschfrisur.jpg', 'Meine Haare.jpg'],
           Bild_URLs: ['https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=200&h=200&fit=crop', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=200&h=200&fit=crop'],
           KI_Analyse: 'Basierend auf dem Referenzbild handelt es sich um einen gestuften Long Bob mit leichten Beach Waves. Bei schulterlangem, dünnem Haar ist dieser Schnitt sehr gut machbar. Empfehlung: Volumenschnitt mit leichter Stufung, dazu Texturspray für mehr Fülle. Geschätzte Dauer: 75 Minuten.',
-          Empfehlungen: ['Volumenschnitt', 'Texturspray Wella', 'Pflegekur duennes Haar']
+          Empfehlungen: ['Volumenschnitt', 'Texturspray Wella', 'Pflegekur dünnes Haar']
         },
         {
           Kunde: 'Markus Hoffmann', Timestamp: iso(8, 50), Kanal: 'instagram', Typ: 'Produktberatung',
           Status: 'neu',
-          Frage: 'Welches Styling-Produkt koennt ihr mir empfehlen? Ich will so einen matten, strukturierten Look haben. Habe kurze Haare.',
+          Frage: 'Welches Styling-Produkt könnt ihr mir empfehlen? Ich will so einen matten, strukturierten Look haben. Habe kurze Haare.',
           Bilder: ['Style-Referenz.jpg'],
           Bild_URLs: ['https://images.unsplash.com/photo-1621605815971-fbc98d665033?w=200&h=200&fit=crop'],
           KI_Analyse: null,
@@ -5234,7 +5234,7 @@
         {
           Kunde: 'Elena Fischer', Timestamp: iso(8, 20), Kanal: 'email', Typ: 'Farbberatung',
           Status: 'fertig',
-          Frage: 'Kann ich von Dunkelbraun auf Blond wechseln? Wie lange dauert das und schadet das meinen Haaren? Habe noch nie gefaerbt.',
+          Frage: 'Kann ich von Dunkelbraun auf Blond wechseln? Wie lange dauert das und schadet das meinen Haaren? Habe noch nie gefärbt.',
           Bilder: ['Aktuelle Farbe.jpg', 'Wunschfarbe.jpg', 'Inspiration.jpg'],
           Bild_URLs: ['https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=200&h=200&fit=crop', 'https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=200&h=200&fit=crop', 'https://images.unsplash.com/photo-1595959183082-7b570b7e1f04?w=200&h=200&fit=crop'],
           KI_Analyse: 'Ein Wechsel von Dunkelbraun zu Blond erfordert mehrere Sitzungen (2-3 Termine im Abstand von 4-6 Wochen). Sofort-Blondierung würde das Haar stark schädigen. Empfehlung: Schrittweise Aufhellung mit Balayage-Technik für einen natürlichen Übergang. Erste Sitzung ca. 150 Minuten, Folgesitzungen ca. 90 Minuten.',
@@ -5243,7 +5243,7 @@
         {
           Kunde: 'Thomas Berger', Timestamp: iso(7, 45), Kanal: 'homepage', Typ: 'Stilberatung',
           Status: 'beantwortet',
-          Frage: 'Ich verliere langsam meine Haare oben. Was wuerdet ihr empfehlen — kurz schneiden oder gibt es andere Moeglichkeiten?',
+          Frage: 'Ich verliere langsam meine Haare oben. Was würdet ihr empfehlen — kurz schneiden oder gibt es andere Möglichkeiten?',
           Bilder: ['Aktuelles Haar.jpg'],
           Bild_URLs: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'],
           KI_Analyse: 'Bei beginnendem Haarausfall am Oberkopf empfehlen wir einen modernen kurzen Schnitt (Fade/Undercut), der die dünneren Stellen kaschiert. Alternativ: Haarverdichtungs-Spray für optisch mehr Fülle. Ein längerer Schnitt würde die Stellen stärker betonen.',
@@ -5684,7 +5684,7 @@
       } else if (typ.includes('storno')) {
         return [
           'Schade, dass Sie Ihren Termin absagen muessen. Wir haben die Stornierung vorgemerkt. Moechten Sie direkt einen neuen Termin vereinbaren? Wir haben diese Woche noch freie Plaetze.',
-          'Kein Problem, der Termin ist storniert. Melden Sie sich gerne, wenn Sie einen neuen Termin moechten!'
+          'Kein Problem, der Termin ist storniert. Melden Sie sich gerne, wenn Sie einen neuen Termin möchten!'
         ];
       } else if (typ.includes('nachbestellung')) {
         return [
@@ -6958,7 +6958,7 @@
         empfTitle.style.cssText = 'font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px';
         empfTitle.textContent = 'Pflegeempfehlung';
         resultEl.appendChild(empfTitle);
-        var empfs = ['Feuchtigkeitspflege 1x/Woche (Intensiv-Kur)', 'Hitzeschutz vor jedem Foehnen', 'Glossing-Auffrischung alle 6-8 Wochen', 'La Biosthetique Shampoo Vital + Conditioner'];
+        var empfs = ['Feuchtigkeitspflege 1x/Woche (Intensiv-Kur)', 'Hitzeschutz vor jedem Föhnen', 'Glossing-Auffrischung alle 6-8 Wochen', 'La Biosthetique Shampoo Vital + Conditioner'];
         empfs.forEach(function(e) {
           var eRow = document.createElement('div');
           eRow.style.cssText = 'font-size:12px;color:var(--text-light);padding:3px 0;display:flex;gap:6px';
@@ -8574,7 +8574,7 @@
 
         var msg = document.createElement('div');
         msg.className = 'ev-msg';
-        msg.textContent = (b.Menge || '') + ' Stueck — ' + (b.Lieferant || 'La Biosthetique');
+        msg.textContent = (b.Menge || '') + ' Stück — ' + (b.Lieferant || 'La Biosthetique');
 
         var meta = document.createElement('div');
         meta.className = 'ev-meta';
@@ -8693,7 +8693,7 @@
 
         var msg = document.createElement('div');
         msg.className = 'ev-msg';
-        msg.textContent = (b.Menge || '') + ' Stueck — ' + (b.Lieferant || 'La Biosthetique');
+        msg.textContent = (b.Menge || '') + ' Stück — ' + (b.Lieferant || 'La Biosthetique');
 
         var meta = document.createElement('div');
         meta.className = 'ev-meta';
