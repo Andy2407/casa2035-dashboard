@@ -1658,7 +1658,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--success)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
           <div class="hero-data">
-            <div class="hero-label" style="color:var(--success)">Naechster Termin</div>
+            <div class="hero-label" style="color:var(--success)">Nächster Termin</div>
             <div class="hero-value tabular" id="nextTerminTime" style="font-size:28px">--:--</div>
             <div class="hero-sub" id="nextTerminInfo">Lade Termine...</div>
           </div>
@@ -1686,7 +1686,7 @@
       <div id="kiTagesvorschau" style="display:none;margin-bottom:14px"></div>
 
       <div class="dash-section dash-section-stats">
-      <div class="section" style="margin-top:0"><div class="section-bar"></div><div class="section-title">Tages-Ueberblick</div></div>
+      <div class="section" style="margin-top:0"><div class="section-bar"></div><div class="section-title">Tages-Überblick</div></div>
       <!-- V7: 4-Kacheln Tagesueberblick — 2x2 Grid, keine Duplikate zur Bottom-Nav -->
       <div class="stat-grid" style="margin-bottom:0">
         <div class="stat-card gold touch-scale" onclick="switchPage('kasse')" style="cursor:pointer">
@@ -1736,7 +1736,7 @@
       <!-- KI-Insights jetzt in KI-Tagesvorschau integriert -->
 
       <div class="dash-section dash-section-events">
-      <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--info)"></div><div class="section-title">Letzte Aktivitaeten</div><span class="section-count" id="evCount">--</span></div>
+      <div class="section" style="margin-top:0"><div class="section-bar" style="background:var(--info)"></div><div class="section-title">Letzte Aktivitäten</div><span class="section-count" id="evCount">--</span></div>
       <div class="event-list stagger" id="recentEvents">
         <div class="skeleton" style="height:80px"></div>
         <div class="skeleton" style="height:80px"></div>
@@ -1749,7 +1749,7 @@
     <div class="page" id="page-termine">
       <div class="termin-stats" id="terminStats">
         <div class="termin-stat"><div class="termin-stat-val" id="tsGesamt">--</div><div class="termin-stat-label">Termine</div></div>
-        <div class="termin-stat"><div class="termin-stat-val" id="tsBestaetigt">--</div><div class="termin-stat-label">Bestaetigt</div></div>
+        <div class="termin-stat"><div class="termin-stat-val" id="tsBestaetigt">--</div><div class="termin-stat-label">Bestätigt</div></div>
         <div class="termin-stat"><div class="termin-stat-val" id="tsOffen">--</div><div class="termin-stat-label">Offen</div></div>
         <div class="termin-stat"><div class="termin-stat-val" id="tsStunden">--</div><div class="termin-stat-label">Stunden</div></div>
         <div class="termin-stat"><div class="termin-stat-val" id="tsAuslastung" style="font-size:16px">--%</div><div class="termin-stat-label">Woche</div></div>
@@ -1763,7 +1763,7 @@
           <div class="day-nav-date" id="dayNavDate">Heute</div>
           <div class="day-nav-weekday" id="dayNavWeekday"></div>
         </div>
-        <button class="day-nav-btn" id="dayNext" onclick="changeDay(1)" aria-label="Naechster Tag">
+        <button class="day-nav-btn" id="dayNext" onclick="changeDay(1)" aria-label="Nächster Tag">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 6 15 12 9 18"/></svg>
         </button>
       </div>
@@ -2273,13 +2273,13 @@
           <span class="section-count" id="salonRegelnCount">0</span>
         </div>
         <div style="font-size:11px;color:var(--text-dim);margin-bottom:10px;line-height:1.5">
-          Definiere Regeln fuer deinen Salon. Die KI beachtet diese bei jeder Kundeninteraktion. Deine Regeln bleiben <strong>strikt getrennt</strong> von der allgemeinen Wissensbasis.
+          Definiere Regeln für deinen Salon. Die KI beachtet diese bei jeder Kundeninteraktion. Deine Regeln bleiben <strong>strikt getrennt</strong> von der allgemeinen Wissensbasis.
         </div>
         <div id="salonRegelnList" style="margin-bottom:10px"></div>
 
         <!-- Neue Regel hinzufuegen -->
         <div id="salonRegelForm" style="background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius);padding:14px;margin-bottom:14px">
-          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Neue Regel hinzufuegen</div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px">Neue Regel hinzufügen</div>
           <div style="display:flex;gap:8px;margin-bottom:8px">
             <select id="regelKategorie" style="flex:0 0 auto;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:Inter,sans-serif;background:var(--bg-warm);color:var(--text);-webkit-appearance:none">
               <option value="service">Service</option>
@@ -2327,7 +2327,7 @@
     <div class="page" id="page-config">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;cursor:pointer" onclick="switchPage('system')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--text-dim)"><polyline points="15 18 9 12 15 6"/></svg>
-        <span style="font-size:13px;font-weight:500;color:var(--text-dim)">Zurueck zu System</span>
+        <span style="font-size:13px;font-weight:500;color:var(--text-dim)">Zurück zu System</span>
       </div>
       <div class="section"><div class="section-bar"></div><div class="section-title">Rolle</div></div>
       <div class="cfg-grid stagger" id="roleGrid">
@@ -2525,7 +2525,7 @@
           <select id="ausgabeZahl">
             <option value="bar">Bar</option>
             <option value="karte">Karte</option>
-            <option value="ueberweisung">Ueberweisung</option>
+            <option value="ueberweisung">Überweisung</option>
           </select>
         </div>
         <div>
@@ -2588,7 +2588,7 @@
 
       <!-- Positionen -->
       <label>Dienstleistung *</label>
-      <select id="reService"><option value="">Bitte waehlen...</option></select>
+      <select id="reService"><option value="">Bitte wählen...</option></select>
 
       <label style="margin-top:8px">Zusatzleistung (optional)</label>
       <select id="reZusatz">
@@ -3388,7 +3388,7 @@
       const unread = items.filter(e => e.Is_Read === 0 || e.Is_Read === '0' || e.Gelesen === 0 || e.Gelesen === '0' || e.Status === 'ungelesen').length;
       document.getElementById('statAnfragen').textContent = unread;
       document.getElementById('statAnfragenSub').textContent = 'ungelesen';
-      document.getElementById('evCount').textContent = items.length + ' Eintraege';
+      document.getElementById('evCount').textContent = items.length + ' Einträge';
 
       const badge = document.getElementById('navBadge');
       if (unread > 0) { badge.style.display = 'flex'; badge.textContent = unread; } else { badge.style.display = 'none'; }
@@ -3483,7 +3483,7 @@
         if (list.length > EVENTS_INITIAL) {
           var toggleBtn = document.createElement('button');
           toggleBtn.style.cssText = 'display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;margin-top:6px;background:var(--bg-warm);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-light);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;transition:all 150ms';
-          toggleBtn.textContent = limit ? 'Alle ' + list.length + ' Aktivitaeten anzeigen' : 'Weniger anzeigen';
+          toggleBtn.textContent = limit ? 'Alle ' + list.length + ' Aktivitäten anzeigen' : 'Weniger anzeigen';
           toggleBtn.addEventListener('click', function() {
             eventsExpanded = !eventsExpanded;
             renderEventRows(list, eventsExpanded ? null : EVENTS_INITIAL);
@@ -3627,7 +3627,7 @@
         // Farb-Termine zaehlen
         var farbTermine = todayTermineK.filter(function(t) { return (t.Service || '').match(/farb|balayage|straehnen|ansatz|glossing/i); });
         if (farbTermine.length >= 2) {
-          hints.push({ icon: '\uD83C\uDFA8', text: farbTermine.length + ' Farbtermine heute \u2014 Farbvorrat und Oxid pruefen', color: '#a07000' });
+          hints.push({ icon: '\uD83C\uDFA8', text: farbTermine.length + ' Farbtermine heute \u2014 Farbvorrat und Oxid prüfen', color: '#a07000' });
         }
         // VIP zaehlen
         var vipCount = todayTermineK.filter(function(t) { return t.VIP; }).length;
@@ -3645,7 +3645,7 @@
         if (auslastung > 85) {
           hints.push({ icon: '\uD83D\uDD25', text: 'Voller Tag! ' + auslastung + '% Teamauslastung \u2014 Pausen einplanen', color: 'var(--success)' });
         } else if (auslastung < 50) {
-          hints.push({ icon: '\uD83D\uDCC8', text: auslastung + '% Auslastung \u2014 noch Kapazitaet fuer Walk-Ins oder Nachholtermine', color: 'var(--info)' });
+          hints.push({ icon: '\uD83D\uDCC8', text: auslastung + '% Auslastung \u2014 noch Kapazität für Walk-Ins oder Nachholtermine', color: 'var(--info)' });
         }
 
         if (hints.length > 0) {
@@ -3834,7 +3834,7 @@
       select.textContent = '';
       var defaultOpt = document.createElement('option');
       defaultOpt.value = '';
-      defaultOpt.textContent = 'Bitte waehlen...';
+      defaultOpt.textContent = 'Bitte wählen...';
       select.appendChild(defaultOpt);
       items.forEach(function(s) {
         var opt = document.createElement('option');
@@ -4029,7 +4029,7 @@
       if (!kunde) { showToast('Bitte Kundennamen eingeben', 'warning', 2000); return; }
       var sel = document.getElementById('reService');
       var opt = sel.options[sel.selectedIndex];
-      if (!opt || !opt.value) { showToast('Bitte Service waehlen', 'warning', 2000); return; }
+      if (!opt || !opt.value) { showToast('Bitte Service wählen', 'warning', 2000); return; }
 
       var zusatzSel = document.getElementById('reZusatz');
       var zusatzPreis = 0;
@@ -4078,7 +4078,7 @@
         }
       } else {
         closeSheet('rechnungSheet');
-        showToast('Demo: ' + payload.rechnung_nr + ' fuer ' + esc(kunde) + ' erstellt', 'info', 3000);
+        showToast('Demo: ' + payload.rechnung_nr + ' für ' + esc(kunde) + ' erstellt', 'info', 3000);
       }
     }
 
@@ -4086,27 +4086,27 @@
       var wfs = [
         // Phase 1: Kern-System
         { id: 'WF-01', n: 'Eingangskanal', s: 'clean', l: 'V15', t: 'tested', phase: 1, nodes: 45,
-          desc: 'Empfaengt Nachrichten aus allen 5 Kanaelen (WhatsApp, Instagram, Facebook, E-Mail, Homepage). Klassifiziert den Intent per Keyword-Whitelist und routet an den richtigen Folge-Workflow.',
+          desc: 'Empfängt Nachrichten aus allen 5 Kanälen (WhatsApp, Instagram, Facebook, E-Mail, Homepage). Klassifiziert den Intent per Keyword-Whitelist und routet an den richtigen Folge-Workflow.',
           tech: ['Gmail Trigger', 'Mistral AI', 'Whitelist'] },
         { id: 'WF-09', n: 'Authentifizierung', s: 'clean', l: 'OK', t: 'tested', phase: 1, nodes: 12,
-          desc: 'SHA-256 Token-basierte Authentifizierung fuer Dashboard und API-Zugriffe. Prueft Mitarbeiter-Credentials gegen die DB.',
+          desc: 'SHA-256 Token-basierte Authentifizierung für Dashboard und API-Zugriffe. Prüft Mitarbeiter-Credentials gegen die DB.',
           tech: ['SHA-256', 'Header Auth'] },
         { id: 'Auth-MW', n: 'Auth Middleware', s: 'clean', l: 'OK', t: 'tested', phase: 1, nodes: 13,
-          desc: 'Zentrale Middleware die bei jedem API-Call Token + Rolle prueft. Schuetzt alle internen Endpunkte.',
+          desc: 'Zentrale Middleware die bei jedem API-Call Token + Rolle prüft. Schützt alle internen Endpunkte.',
           tech: ['Middleware', 'RBAC'] },
 
         // Phase 2: Booking-Flow
         { id: 'WF-02a', n: 'Terminbuchung', s: 'clean', l: 'OK', t: 'tested', phase: 2, nodes: 28,
-          desc: 'Extrahiert Service-Namen aus Freitext per LLM+RAG. Berechnet Gesamtdauer deterministisch, sucht freie Slots in Google Calendar und schlaegt 3 Optionen vor.',
+          desc: 'Extrahiert Service-Namen aus Freitext per LLM+RAG. Berechnet Gesamtdauer deterministisch, sucht freie Slots in Google Calendar und schlägt 3 Optionen vor.',
           tech: ['Mistral AI', 'Qdrant RAG', 'Google Calendar', 'Code-Calc'] },
-        { id: 'WF-02b', n: 'Buchungsbestaetigung', s: 'clean', l: 'OK', t: 'tested', phase: 2, nodes: 34,
-          desc: 'Verarbeitet die Kundenauswahl, erstellt den Calendar-Eintrag und sendet die personalisierte Bestaetigungsnachricht ueber den gleichen Kanal zurueck.',
+        { id: 'WF-02b', n: 'Buchungsbestätigung', s: 'clean', l: 'OK', t: 'tested', phase: 2, nodes: 34,
+          desc: 'Verarbeitet die Kundenauswahl, erstellt den Calendar-Eintrag und sendet die personalisierte Bestätigungsnachricht über den gleichen Kanal zurück.',
           tech: ['Mistral AI', 'Qdrant RAG', 'Kanal-Router'] },
         { id: 'WF-06a', n: 'Stornierung', s: 'clean', l: 'OK', t: 'tested', phase: 2, nodes: 15,
-          desc: 'Verarbeitet Stornierungsanfragen. Deterministisch — kein LLM. Prueft Storno-Frist (24h) und loescht den Calendar-Eintrag.',
+          desc: 'Verarbeitet Stornierungsanfragen. Deterministisch — kein LLM. Prüft Storno-Frist (24h) und löscht den Calendar-Eintrag.',
           tech: ['Deterministisch', 'Google Calendar'] },
-        { id: 'WF-06b', n: 'Storno-Bestaetigung', s: 'clean', l: 'OK', t: 'tested', phase: 2, nodes: 28,
-          desc: 'Sendet die Storno-Bestaetigung und optional Umbuchungsvorschlaege. Loggt in Stornierungen-Tab.',
+        { id: 'WF-06b', n: 'Storno-Bestätigung', s: 'clean', l: 'OK', t: 'tested', phase: 2, nodes: 28,
+          desc: 'Sendet die Storno-Bestätigung und optional Umbuchungsvorschläge. Loggt in Stornierungen-Tab.',
           tech: ['Kanal-Router', 'Google Sheets'] },
 
         // Phase 3: Features
@@ -4114,16 +4114,16 @@
           desc: 'Pixtral Large analysiert Kundenfotos: Machbarkeits-Score, Technik, Dauer, Aufhellungsbedarf, Pflegebedarf, Preisrahmen. Consent-Tracking integriert.',
           tech: ['Pixtral Large', 'Qdrant RAG', 'DSGVO Consent'] },
         { id: 'WF-03b', n: 'KI-Haaranalyse Profi', s: 'new', l: 'Geplant', t: 'untested', phase: 3, nodes: 0,
-          desc: '17-Parameter Haaranalyse im Salon: Haartyp, Schaedigung, Kopfhaut, Porositaet, Farbhistorie, Elastizitaet, Dichte, Glanz etc. PDF-Report fuer Kunden.',
+          desc: '17-Parameter Haaranalyse im Salon: Haartyp, Schädigung, Kopfhaut, Porosität, Farbhistorie, Elastizität, Dichte, Glanz etc. PDF-Report für Kunden.',
           tech: ['Pixtral Large', 'haaranalyse_wissen RAG', '17 Parameter'] },
         { id: 'WF-03c', n: 'Haar-Check Homepage', s: 'new', l: 'Geplant', t: 'untested', phase: 3, nodes: 0,
-          desc: 'Kostenloser Schnell-Check auf der Homepage: 2-3 Saetze Teaser-Ergebnis. Volle Analyse nur im Salon (Lead-Generierung).',
+          desc: 'Kostenloser Schnell-Check auf der Homepage: 2-3 Sätze Teaser-Ergebnis. Volle Analyse nur im Salon (Lead-Generierung).',
           tech: ['Pixtral Large', 'Lead-Gen', 'Teaser'] },
         { id: 'WF-04', n: 'Lagerbestand', s: 'clean', l: 'OK', t: 'tested', phase: 3, nodes: 11,
           desc: 'Lagerbestandsabfrage per Keyword. Deterministisch — kein LLM. Liefert Produktname, Menge, Nachbestellstatus.',
           tech: ['Deterministisch', 'Google Sheets'] },
         { id: 'WF-05', n: 'Rechnungen', s: 'clean', l: 'MwSt OK', t: 'tested', phase: 3, nodes: 12,
-          desc: 'Rechnungserstellung mit 19% MwSt fuer Dienstleistungen und Produktverkauf. GoBD-konform, 10 Jahre Aufbewahrung.',
+          desc: 'Rechnungserstellung mit 19% MwSt für Dienstleistungen und Produktverkauf. GoBD-konform, 10 Jahre Aufbewahrung.',
           tech: ['Code-Calc', 'MwSt 19%', 'GoBD'] },
 
         // Phase 4: Dashboard + Finanzen
@@ -4131,15 +4131,15 @@
           desc: '100% deterministisch: Tagesumsatz, Wochenumsatz, offene Posten, Kassenbestand. Kein LLM — reine Berechnungen.',
           tech: ['Deterministisch', 'Code-Calc'] },
         { id: 'WF-11', n: 'Tagesabschluss', s: 'clean', l: 'OK', t: 'tested', phase: 4, nodes: 27,
-          desc: 'Automatischer Tagesabschluss: Umsatz-Reconciliation, Kassendifferenz, Bar/Karte Split, MA-Umsaetze. GoBD-Pflicht.',
+          desc: 'Automatischer Tagesabschluss: Umsatz-Reconciliation, Kassendifferenz, Bar/Karte Split, MA-Umsätze. GoBD-Pflicht.',
           tech: ['Deterministisch', 'GoBD', '22 Spalten'] },
         { id: 'WF-12', n: 'DSGVO-Bereinigung', s: 'clean', l: 'OK', t: 'partial', phase: 4, nodes: 41,
-          desc: 'Automatische Loeschung personenbezogener Daten nach Ablauf der Aufbewahrungsfrist. Art. 17 DSGVO + Art. 5 Speicherbegrenzung.',
-          tech: ['DSGVO Art. 17', 'Cron', 'Loeschkonzept'] },
+          desc: 'Automatische Löschung personenbezogener Daten nach Ablauf der Aufbewahrungsfrist. Art. 17 DSGVO + Art. 5 Speicherbegrenzung.',
+          tech: ['DSGVO Art. 17', 'Cron', 'Löschkonzept'] },
 
         // Phase 5: Automatisierung
         { id: 'WF-07', n: 'Tages-Trigger', s: 'clean', l: 'OK', t: 'tested', phase: 5, nodes: 8,
-          desc: 'Cron-basierter Trigger: Startet taeglich um 07:00 die Erinnerungs- und Follow-Up Workflows.',
+          desc: 'Cron-basierter Trigger: Startet täglich um 07:00 die Erinnerungs- und Follow-Up Workflows.',
           tech: ['Cron', 'Schedule Trigger'] },
         { id: 'WF-08', n: 'Erinnerung', s: 'clean', l: 'OK', t: 'tested', phase: 5, nodes: 32,
           desc: 'Sendet personalisierte Terminerinnerungen 24h vorher. LLM formuliert die Nachricht, Code berechnet den Zeitpunkt.',
@@ -4147,27 +4147,27 @@
 
         // Infrastruktur
         { id: 'WF-SEND', n: 'Universal-Antwort', s: 'clean', l: 'V3', t: 'tested', phase: 0, nodes: 17,
-          desc: 'Zentraler Kanal-Router: Sendet Antworten ueber den richtigen Kanal (WhatsApp, Instagram, Facebook, E-Mail). respondToWebhook fuer alle Workflows.',
+          desc: 'Zentraler Kanal-Router: Sendet Antworten über den richtigen Kanal (WhatsApp, Instagram, Facebook, E-Mail). respondToWebhook für alle Workflows.',
           tech: ['Multi-Channel', 'respondToWebhook'] },
         { id: 'WF-ERR', n: 'Error-Handler', s: 'clean', l: 'OK', t: 'tested', phase: 0, nodes: 4,
-          desc: 'Faengt Fehler aus allen Workflows ab. Loggt in Ereignis_Protokoll, benachrichtigt Admin bei kritischen Fehlern.',
+          desc: 'Fängt Fehler aus allen Workflows ab. Loggt in Ereignis_Protokoll, benachrichtigt Admin bei kritischen Fehlern.',
           tech: ['Error Catch', 'Alerting'] },
         { id: 'WF-MIGR', n: 'Token-Migration', s: 'new', l: 'Einmalig', t: 'untested', phase: 0, nodes: 7,
-          desc: 'Einmalige Migration: Konvertiert Klartext-Passwoerter in SHA-256 Hashes. Wird nur einmal ausgefuehrt.',
+          desc: 'Einmalige Migration: Konvertiert Klartext-Passwörter in SHA-256 Hashes. Wird nur einmal ausgeführt.',
           tech: ['SHA-256', 'Migration'] },
 
         // PWA-Workflows
         { id: 'PWA-Dash', n: 'Dashboard API', s: 'clean', l: 'OK', t: 'tested', phase: 4, nodes: 59,
-          desc: 'Haupt-API fuer das Dashboard: Liefert Termine, Events, Beratungen, Lager, Kasse, Tagesabschluss an die PWA.',
+          desc: 'Haupt-API für das Dashboard: Liefert Termine, Events, Beratungen, Lager, Kasse, Tagesabschluss an die PWA.',
           tech: ['REST API', 'Auth-MW', '59 Nodes'] },
-        { id: 'PWA-Reply', n: 'Antwortvorschlaege', s: 'clean', l: 'OK', t: 'tested', phase: 4, nodes: 16,
-          desc: 'Generiert KI-Antwortvorschlaege fuer eingehende Anfragen. 2x LLM + alle 3 RAG-Collections.',
+        { id: 'PWA-Reply', n: 'Antwortvorschläge', s: 'clean', l: 'OK', t: 'tested', phase: 4, nodes: 16,
+          desc: 'Generiert KI-Antwortvorschläge für eingehende Anfragen. 2x LLM + alle 3 RAG-Collections.',
           tech: ['Mistral AI', 'Qdrant RAG', '2x LLM'] },
         { id: 'PWA-Reord', n: 'Nachbestellungen', s: 'clean', l: 'OK', t: 'tested', phase: 4, nodes: 12,
           desc: 'Verarbeitet Nachbestellungen aus dem Dashboard. Schreibt in Nachbestellungen-Tab, aktualisiert Lager.',
           tech: ['Google Sheets', 'Lager-Update'] },
         { id: 'Ingest', n: 'Qdrant Ingest', s: 'clean', l: 'V11', t: 'tested', phase: 0, nodes: 17,
-          desc: 'RAG-Dokumente in Qdrant einlesen: Mistral-Embed (1024 dims) fuer alle 4 Collections. Aktuell 99 Docs, 98 weitere geplant.',
+          desc: 'RAG-Dokumente in Qdrant einlesen: Mistral-Embed (1024 dims) für alle 4 Collections. Aktuell 99 Docs, 98 weitere geplant.',
           tech: ['mistral-embed', '1024 dims', '4 Collections'] }
       ];
 
@@ -4653,7 +4653,7 @@
       renderEvents([
         { Timestamp: iso(9, 30), Typ: 'termin_vorschlag', Status: 'ungelesen', Is_Read: 0,
           Titel: 'Terminvorschlag: Haarschnitt & Styling Damen M',
-          Nachricht: 'Maria Testkundin moechte einen Termin fuer Haarschnitt & Styling Damen M (60 Min, 75 EUR)',
+          Nachricht: 'Maria Testkundin möchte einen Termin für Haarschnitt & Styling Damen M (60 Min, 75 EUR)',
           Kanal: 'email', Anfrage_ID: 'EVT-1773613183602-4wui', Kontakt: 'maria@test.de',
           Kundenname: 'Maria Testkundin',
           Proposal_ID: 'PROP-1773613184974',
@@ -4667,17 +4667,17 @@
             { tag: 'Di 17.03.', zeit: '14:00', ende: '15:00' }
           ],
           Antwortvorschlaege: [
-            'Liebe Maria, vielen Dank fuer Ihre Anfrage! Ich habe folgende Termine fuer Sie reserviert: Mo 16.03. um 10:00 Uhr — Haarschnitt & Styling (60 Min, 75 EUR). Passt Ihnen dieser Termin? Herzliche Gruesse, Rena Rados',
-            'Hallo Maria! Schoen, dass Sie sich fuer einen Termin interessieren. Ich haette am Montag ab 10 Uhr Zeit fuer Sie — Haarschnitt & Styling fuer 75 EUR. Soll ich den Termin fuer Sie eintragen? Liebe Gruesse, Rena',
-            'Hi Maria! Freie Plaetze habe ich am Mo 16.03. (10:00, 10:30, 11:00) und Di 17.03. (09:00, 14:00). Welcher Termin passt Ihnen am besten? Preis: 75 EUR fuer 60 Min. LG Rena'
+            'Liebe Maria, vielen Dank für Ihre Anfrage! Ich habe folgende Termine für Sie reserviert: Mo 16.03. um 10:00 Uhr — Haarschnitt & Styling (60 Min, 75 EUR). Passt Ihnen dieser Termin? Herzliche Grüße, Rena Rados',
+            'Hallo Maria! Schön, dass Sie sich für einen Termin interessieren. Ich hätte am Montag ab 10 Uhr Zeit für Sie — Haarschnitt & Styling für 75 EUR. Soll ich den Termin für Sie eintragen? Liebe Grüße, Rena',
+            'Hi Maria! Freie Plätze habe ich am Mo 16.03. (10:00, 10:30, 11:00) und Di 17.03. (09:00, 14:00). Welcher Termin passt Ihnen am besten? Preis: 75 EUR für 60 Min. LG Rena'
           ]
         },
-        { Timestamp: iso(9, 15), Typ: 'termin_bestaetigt', Status: 'ungelesen', Is_Read: 0, Titel: 'Termin bestaetigt', Nachricht: 'Maria Mueller \u2014 Haarschnitt Feminin, 14:00', Kanal: 'whatsapp', Anfrage_ID: 'ANF-2026-042' },
+        { Timestamp: iso(9, 15), Typ: 'termin_bestaetigt', Status: 'ungelesen', Is_Read: 0, Titel: 'Termin bestätigt', Nachricht: 'Maria Müller \u2014 Haarschnitt Feminin, 14:00', Kanal: 'whatsapp', Anfrage_ID: 'ANF-2026-042' },
         { Timestamp: iso(9, 2), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Neue Anfrage', Nachricht: 'Stefan Braun fragt nach Maskulin Schnitt + Bart', Kanal: 'instagram', Anfrage_ID: 'ANF-2026-043' },
-        { Timestamp: iso(8, 45), Typ: 'nachbestellung', Status: 'gelesen', Is_Read: 1, Titel: 'Lagerbestand niedrig', Nachricht: 'Shampoo Vital: nur noch 3 Stueck (Min: 5)', Kanal: 'system' },
+        { Timestamp: iso(8, 45), Typ: 'nachbestellung', Status: 'gelesen', Is_Read: 1, Titel: 'Lagerbestand niedrig', Nachricht: 'Shampoo Vital: nur noch 3 Stück (Min: 5)', Kanal: 'system' },
         { Timestamp: iso(8, 30), Typ: 'storno', Status: 'erledigt', Is_Read: 1, Titel: 'Stornierung', Nachricht: 'Lisa Wagner hat Termin am 04.03. storniert', Kanal: 'whatsapp', Anfrage_ID: 'ANF-2026-040' },
-        { Timestamp: iso(8, 10), Typ: 'termin_bestaetigt', Status: 'gelesen', Is_Read: 1, Titel: 'Termin bestaetigt', Nachricht: 'Anna Schmidt \u2014 Balayage, 10:00', Kanal: 'email', Anfrage_ID: 'ANF-2026-039' },
-        { Timestamp: iso(7, 50), Typ: 'antwort', Status: 'gelesen', Is_Read: 1, Titel: 'Kundenantwort', Nachricht: 'Danke fuer die Info! Komme gerne.', Kanal: 'facebook', Anfrage_ID: 'ANF-2026-038' },
+        { Timestamp: iso(8, 10), Typ: 'termin_bestaetigt', Status: 'gelesen', Is_Read: 1, Titel: 'Termin bestätigt', Nachricht: 'Anna Schmidt \u2014 Balayage, 10:00', Kanal: 'email', Anfrage_ID: 'ANF-2026-039' },
+        { Timestamp: iso(7, 50), Typ: 'antwort', Status: 'gelesen', Is_Read: 1, Titel: 'Kundenantwort', Nachricht: 'Danke für die Info! Komme gerne.', Kanal: 'facebook', Anfrage_ID: 'ANF-2026-038' },
       ]);
 
       // Helper for other days
@@ -4969,9 +4969,9 @@
         { s: 'Balayage + Schnitt', d: 120 }, { s: 'Straehnen + Schnitt', d: 120 }
       ];
       var kundenNamen = [
-        'Anna Mueller', 'Lisa Kramer', 'Thomas Weber', 'Sandra Fischer', 'Julia Berger',
+        'Anna Müller', 'Lisa Kramer', 'Thomas Weber', 'Sandra Fischer', 'Julia Berger',
         'Sophie Lang', 'Markus Huber', 'Petra Maier', 'Klaus Fischer', 'Sophie Wagner',
-        'Michael Braun', 'Laura Berger', 'David Klein', 'Nina Hofmann', 'Eva Mueller',
+        'Michael Braun', 'Laura Berger', 'David Klein', 'Nina Hofmann', 'Eva Müller',
         'Tobias Richter', 'Hannah Schneider', 'Leon Becker', 'Emma Schulz', 'Paul Hoffmann',
         'Marie Wagner', 'Jan Richter', 'Lena Koch', 'Felix Wolf', 'Sarah Bauer',
         'Lukas Schreiber', 'Mia Hartmann', 'Tim Lange', 'Clara Frank', 'Max Zimmermann',
@@ -5219,7 +5219,7 @@
           Frage: 'Ich moechte gerne so eine Frisur wie auf dem Bild. Geht das bei meiner Haarlaenge? Meine Haare sind schulterlang und eher duenn.',
           Bilder: ['Wunschfrisur.jpg', 'Meine Haare.jpg'],
           Bild_URLs: ['https://images.unsplash.com/photo-1605497788044-5a32c7078486?w=200&h=200&fit=crop', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=200&h=200&fit=crop'],
-          KI_Analyse: 'Basierend auf dem Referenzbild handelt es sich um einen gestuften Long Bob mit leichten Beach Waves. Bei schulterlagnem, duennem Haar ist dieser Schnitt sehr gut machbar. Empfehlung: Volumenschnitt mit leichter Stufung, dazu Texturspray fuer mehr Fuelle. Geschaetzte Dauer: 75 Minuten.',
+          KI_Analyse: 'Basierend auf dem Referenzbild handelt es sich um einen gestuften Long Bob mit leichten Beach Waves. Bei schulterlangem, dünnem Haar ist dieser Schnitt sehr gut machbar. Empfehlung: Volumenschnitt mit leichter Stufung, dazu Texturspray für mehr Fülle. Geschätzte Dauer: 75 Minuten.',
           Empfehlungen: ['Volumenschnitt', 'Texturspray Wella', 'Pflegekur duennes Haar']
         },
         {
@@ -5237,7 +5237,7 @@
           Frage: 'Kann ich von Dunkelbraun auf Blond wechseln? Wie lange dauert das und schadet das meinen Haaren? Habe noch nie gefaerbt.',
           Bilder: ['Aktuelle Farbe.jpg', 'Wunschfarbe.jpg', 'Inspiration.jpg'],
           Bild_URLs: ['https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=200&h=200&fit=crop', 'https://images.unsplash.com/photo-1492106087820-71f1a00d2b11?w=200&h=200&fit=crop', 'https://images.unsplash.com/photo-1595959183082-7b570b7e1f04?w=200&h=200&fit=crop'],
-          KI_Analyse: 'Ein Wechsel von Dunkelbraun zu Blond erfordert mehrere Sitzungen (2-3 Termine im Abstand von 4-6 Wochen). Sofort-Blondierung wuerde das Haar stark schaedigen. Empfehlung: Schrittweise Aufhellung mit Balayage-Technik fuer einen natuerlichen Uebergang. Erste Sitzung ca. 150 Minuten, Folgesitzungen ca. 90 Minuten.',
+          KI_Analyse: 'Ein Wechsel von Dunkelbraun zu Blond erfordert mehrere Sitzungen (2-3 Termine im Abstand von 4-6 Wochen). Sofort-Blondierung würde das Haar stark schädigen. Empfehlung: Schrittweise Aufhellung mit Balayage-Technik für einen natürlichen Übergang. Erste Sitzung ca. 150 Minuten, Folgesitzungen ca. 90 Minuten.',
           Empfehlungen: ['Balayage stufenweise', 'Olaplex Behandlung', 'Pflegeshampoo blondiertes Haar', 'Hitzeschutz']
         },
         {
@@ -5246,7 +5246,7 @@
           Frage: 'Ich verliere langsam meine Haare oben. Was wuerdet ihr empfehlen — kurz schneiden oder gibt es andere Moeglichkeiten?',
           Bilder: ['Aktuelles Haar.jpg'],
           Bild_URLs: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop'],
-          KI_Analyse: 'Bei beginnendem Haarausfall am Oberkopf empfehlen wir einen modernen kurzen Schnitt (Fade/Undercut), der die duenneren Stellen kaschiert. Alternativ: Haarverdichtungs-Spray fuer optisch mehr Fuelle. Ein laengerer Schnitt wuerde die Stellen staerker betonen.',
+          KI_Analyse: 'Bei beginnendem Haarausfall am Oberkopf empfehlen wir einen modernen kurzen Schnitt (Fade/Undercut), der die dünneren Stellen kaschiert. Alternativ: Haarverdichtungs-Spray für optisch mehr Fülle. Ein längerer Schnitt würde die Stellen stärker betonen.',
           Empfehlungen: ['Fade-Schnitt', 'Haarverdichtungs-Spray', 'Kopfhaut-Serum']
         }
       ]);
@@ -5327,7 +5327,7 @@
       // Body / Nachricht
       var body = document.createElement('div');
       body.className = 'detail-body';
-      body.textContent = e.Nachricht || 'Keine Details verfuegbar';
+      body.textContent = e.Nachricht || 'Keine Details verfügbar';
       container.appendChild(body);
 
       // Meta Grid
@@ -5534,7 +5534,7 @@
       if (e.Slots && e.Slots.length) {
         var slotTitle = document.createElement('div');
         slotTitle.className = 'slot-section-title';
-        slotTitle.textContent = 'Verfuegbare Termine (' + e.Slots.length + ' Vorschlaege)';
+        slotTitle.textContent = 'Verfügbare Termine (' + e.Slots.length + ' Vorschläge)';
         container.appendChild(slotTitle);
 
         var slotGrid = document.createElement('div');
@@ -5559,7 +5559,7 @@
       if (e.Antwortvorschlaege && e.Antwortvorschlaege.length) {
         var respTitle = document.createElement('div');
         respTitle.className = 'slot-section-title';
-        respTitle.textContent = 'KI-Antwortvorschlaege (' + e.Antwortvorschlaege.length + ')';
+        respTitle.textContent = 'KI-Antwortvorschläge (' + e.Antwortvorschlaege.length + ')';
         container.appendChild(respTitle);
 
         var respCards = [];
@@ -5646,7 +5646,7 @@
         var slot = e.Slots ? e.Slots[selectedSlotIdx] : null;
         closeSheet('detailSheet');
         var slotText = slot ? slot.tag + ' ' + slot.zeit : '';
-        showToast('Demo: Termin fuer ' + (e.Kundenname || 'Kundin') + ' eingetragen (' + slotText + ', ' + (e.Service || '') + ')', 'success', 4000);
+        showToast('Demo: Termin für ' + (e.Kundenname || 'Kundin') + ' eingetragen (' + slotText + ', ' + (e.Service || '') + ')', 'success', 4000);
       });
       actions.appendChild(btnBook);
 
@@ -5678,7 +5678,7 @@
       }
       if (typ.includes('termin_bestaetigt')) {
         return [
-          'Vielen Dank fuer Ihre Terminbestaetigung! Wir freuen uns auf Ihren Besuch bei Rena Rados Friseure. Bitte kommen Sie ca. 5 Minuten vor Ihrem Termin. Bei Fragen erreichen Sie uns jederzeit.',
+          'Vielen Dank für Ihre Terminbestätigung! Wir freuen uns auf Ihren Besuch bei Rena Rados Friseure. Bitte kommen Sie ca. 5 Minuten vor Ihrem Termin. Bei Fragen erreichen Sie uns jederzeit.',
           'Super, Ihr Termin ist bestaetigt! Wir freuen uns auf Sie. Bis bald bei Rena Rados!'
         ];
       } else if (typ.includes('storno')) {
@@ -5688,23 +5688,23 @@
         ];
       } else if (typ.includes('nachbestellung')) {
         return [
-          'Der Lagerbestand wurde geprueft. Eine automatische Nachbestellung wird vorbereitet. Sie erhalten eine Bestaetigung, sobald die Bestellung beim Lieferanten eingegangen ist.',
+          'Der Lagerbestand wurde geprüft. Eine automatische Nachbestellung wird vorbereitet. Sie erhalten eine Bestätigung, sobald die Bestellung beim Lieferanten eingegangen ist.',
           'Nachbestellung ist raus! Wir informieren Sie, sobald die Ware da ist.'
         ];
       } else if (typ === 'event' || typ === 'anfrage') {
         return [
-          'Vielen Dank fuer Ihre Anfrage! Gerne schaue ich nach einem passenden Termin fuer Sie. Haben Sie einen Wunschtermin oder bevorzugen Sie einen bestimmten Stylisten? Wir melden uns in Kuerze zurueck.',
-          'Danke fuer Ihre Nachricht! Wir haben freie Plaetze — wann passt es Ihnen am besten? Rena und Lena freuen sich auf Sie!'
+          'Vielen Dank für Ihre Anfrage! Gerne schaue ich nach einem passenden Termin für Sie. Haben Sie einen Wunschtermin oder bevorzugen Sie einen bestimmten Stylisten? Wir melden uns in Kürze zurück.',
+          'Danke für Ihre Nachricht! Wir haben freie Plätze — wann passt es Ihnen am besten? Rena und Lena freuen sich auf Sie!'
         ];
       } else if (typ.includes('antwort')) {
         return [
-          'Vielen Dank fuer Ihre Rueckmeldung! Wir freuen uns, dass wir Ihnen weiterhelfen konnten. Bei weiteren Fragen stehen wir Ihnen gerne zur Verfuegung.',
-          'Danke fuer die Rueckmeldung! Schoen, dass alles passt. Bis zum naechsten Mal!'
+          'Vielen Dank für Ihre Rückmeldung! Wir freuen uns, dass wir Ihnen weiterhelfen konnten. Bei weiteren Fragen stehen wir Ihnen gerne zur Verfügung.',
+          'Danke für die Rückmeldung! Schön, dass alles passt. Bis zum nächsten Mal!'
         ];
       }
       return [
-        'Vielen Dank fuer Ihre Nachricht. Wir haben Ihre Anfrage erhalten und melden uns in Kuerze bei Ihnen zurueck. Ihr Team von Rena Rados Friseure.',
-        'Danke fuer Ihre Nachricht! Wir kuemmern uns darum und melden uns schnellstmoeglich bei Ihnen.'
+        'Vielen Dank für Ihre Nachricht. Wir haben Ihre Anfrage erhalten und melden uns in Kürze bei Ihnen zurück. Ihr Team von Rena Rados Friseure.',
+        'Danke für Ihre Nachricht! Wir kümmern uns darum und melden uns schnellstmöglich bei Ihnen.'
       ];
     }
 
@@ -5728,7 +5728,7 @@
         });
       } else {
         closeSheet('detailSheet');
-        showToast('Demo: Antwort wuerde ueber ' + (e.Kanal || 'E-Mail') + ' gesendet', 'info', 3000);
+        showToast('Demo: Antwort würde über ' + (e.Kanal || 'E-Mail') + ' gesendet', 'info', 3000);
       }
     }
 
@@ -5849,7 +5849,7 @@
         if (einwirkMin > 0) {
           var ewInfo = document.createElement('div');
           ewInfo.style.cssText = 'font-size:11px;color:var(--warning);background:rgba(245,166,35,0.08);padding:6px 10px;border-radius:var(--radius-sm);margin-bottom:10px;display:flex;align-items:center;gap:6px';
-          ewInfo.textContent = 'Davon ' + einwirkMin + ' Min Einwirkzeit — Parallelarbeiten moeglich';
+          ewInfo.textContent = 'Davon ' + einwirkMin + ' Min Einwirkzeit — Parallelarbeiten möglich';
           taskSection.appendChild(ewInfo);
         }
 
@@ -5927,7 +5927,7 @@
         });
         var hint = document.createElement('div');
         hint.style.cssText = 'margin-top:10px;font-size:11px;color:var(--text-dim);font-style:italic';
-        hint.textContent = 'Produkte vor dem Termin vorbereiten \u2014 Lagerbestand pruefen';
+        hint.textContent = 'Produkte vor dem Termin vorbereiten \u2014 Lagerbestand prüfen';
         prodSection.appendChild(hint);
         container.appendChild(prodSection);
 
@@ -5940,14 +5940,14 @@
           plusCircle.textContent = '+';
           var hintText = document.createElement('span');
           hintText.style.cssText = 'font-size:11px;color:var(--text-dim)';
-          hintText.textContent = 'Detaillierte Rezeptur, Mischverhaeltnisse & Einwirkzeiten \u2014 ';
+          hintText.textContent = 'Detaillierte Rezeptur, Mischverhältnisse & Einwirkzeiten \u2014 ';
           var hintLink = document.createElement('span');
           hintLink.style.cssText = 'color:var(--gold);font-weight:600';
           hintLink.textContent = 'Mehr erfahren';
           hintText.appendChild(hintLink);
           upgradeHint.appendChild(plusCircle);
           upgradeHint.appendChild(hintText);
-          upgradeHint.addEventListener('click', function() { showToast('Kontaktieren Sie uns fuer ein Upgrade auf Salon Pro', 'info', 3000); });
+          upgradeHint.addEventListener('click', function() { showToast('Kontaktieren Sie uns für ein Upgrade auf Salon Pro', 'info', 3000); });
           container.appendChild(upgradeHint);
         }
       }
@@ -5976,12 +5976,12 @@
           if (config.baseUrl) {
             apiPost('/pwa-termin-confirm', { termin: t, action: 'confirm' }).then(function() {
               closeSheet('detailSheet');
-              showToast('Termin bestaetigt', 'success', 2500);
+              showToast('Termin bestätigt', 'success', 2500);
               fetchAll();
             });
           } else {
             closeSheet('detailSheet');
-            showToast('Demo: Termin wuerde bestaetigt', 'success', 2500);
+            showToast('Demo: Termin würde bestätigt', 'success', 2500);
           }
         });
         actions.appendChild(btnConfirm);
@@ -6087,7 +6087,7 @@
       produktSelect.style.cssText = 'width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:Inter,sans-serif;color:var(--text);background:var(--surface);margin-bottom:10px;box-sizing:border-box';
       var defOpt = document.createElement('option');
       defOpt.value = '';
-      defOpt.textContent = 'Produkt waehlen...';
+      defOpt.textContent = 'Produkt wählen...';
       produktSelect.appendChild(defOpt);
       if (typeof lagerCache !== 'undefined' && lagerCache.length) {
         lagerCache.forEach(function(p) {
@@ -6132,7 +6132,7 @@
       sendBtn.onclick = async function() {
         var produkt = document.getElementById('nbProdukt').value;
         var menge = document.getElementById('nbMenge').value;
-        if (!produkt) { showToast('Bitte Produkt waehlen', 'warning'); return; }
+        if (!produkt) { showToast('Bitte Produkt wählen', 'warning'); return; }
         if (!menge || menge < 1) { showToast('Bitte Menge angeben', 'warning'); return; }
 
         if (config.baseUrl) {
@@ -6204,7 +6204,7 @@
       textarea.style.cssText = 'width:100%;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:Inter,sans-serif;color:var(--text);background:var(--surface);resize:none;box-sizing:border-box;margin-bottom:12px';
       // Vorschlag generieren basierend auf KI-Analyse
       if (b.KI_Analyse) {
-        textarea.value = 'Hallo ' + (b.Kunde || '').split(' ')[0] + ', vielen Dank fuer Ihre Anfrage!\n\n' + b.KI_Analyse.substring(0, 150) + '...\n\nKommen Sie gerne vorbei fuer eine persoenliche Beratung. Wir freuen uns auf Sie!\n\nIhr Team von Rena Rados Friseure';
+        textarea.value = 'Hallo ' + (b.Kunde || '').split(' ')[0] + ', vielen Dank für Ihre Anfrage!\n\n' + b.KI_Analyse.substring(0, 150) + '...\n\nKommen Sie gerne vorbei für eine persönliche Beratung. Wir freuen uns auf Sie!\n\nIhr Team von Rena Rados Friseure';
       }
       sheet.appendChild(textarea);
 
@@ -6244,7 +6244,7 @@
       header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:14px';
       var title = document.createElement('div');
       title.style.cssText = 'font-size:16px;font-weight:700;color:var(--text);font-family:Playfair Display,serif';
-      title.textContent = 'Termin fuer ' + esc(b.Kunde);
+      title.textContent = 'Termin für ' + esc(b.Kunde);
       var closeBtn = document.createElement('button');
       closeBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:20px;color:var(--text-dim);padding:4px';
       closeBtn.textContent = '\u00D7';
@@ -6332,19 +6332,19 @@
           farbTeaser.appendChild(farbTeaserTitle);
           var farbTeaserDesc = document.createElement('div');
           farbTeaserDesc.style.cssText = 'font-size:12px;color:var(--text-light);margin-bottom:10px;line-height:1.5';
-          farbTeaserDesc.textContent = 'Sie sehen Farbrichtung + Empfehlung. Mit Salon Pro erhalten Sie: Exakter Farbcode, Mischverhaeltnis, Oxid-Stufe + Einwirkzeit.';
+          farbTeaserDesc.textContent = 'Sie sehen Farbrichtung + Empfehlung. Mit Salon Pro erhalten Sie: Exakter Farbcode, Mischverhältnis, Oxid-Stufe + Einwirkzeit.';
           farbTeaser.appendChild(farbTeaserDesc);
           var farbUpgrade = document.createElement('button');
           farbUpgrade.style.cssText = 'width:100%;padding:10px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
           farbUpgrade.textContent = 'Upgrade auf Salon Pro \u2192';
-          farbUpgrade.addEventListener('click', function() { showToast('Kontaktieren Sie uns fuer ein Upgrade auf Salon Pro', 'info', 3000); });
+          farbUpgrade.addEventListener('click', function() { showToast('Kontaktieren Sie uns für ein Upgrade auf Salon Pro', 'info', 3000); });
           farbTeaser.appendChild(farbUpgrade);
           wrapper.appendChild(farbTeaser);
         }
       } else if (tool === 'haaranalyse') {
         title.textContent = 'Profi-Haaranalyse im Salon';
         wrapper.insertAdjacentHTML('beforeend',
-          '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary)">3-5 Fotos vom Haar aufnehmen — KI analysiert Struktur, Schaedigung, Porostitaet und gibt Pflegeempfehlung.</div>'
+          '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary)">3-5 Fotos vom Haar aufnehmen — KI analysiert Struktur, Schädigung, Porosität und gibt Pflegeempfehlung.</div>'
           + '<div style="background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;margin-bottom:10px" onclick="document.getElementById(\'haaranalyseUpload\').click()">'
           + '<input type="file" id="haaranalyseUpload" accept="image/*" capture="environment" multiple style="display:none" onchange="previewHaaranalysePhotos(this.files)">'
           + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:32px;height:32px;color:var(--info);margin-bottom:6px"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>'
@@ -6353,7 +6353,7 @@
           + '<div id="haaranalyseGallery" style="display:none;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px"></div>'
           + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
           + '<input type="text" id="haKundeName" placeholder="Kundenname" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif">'
-          + '<input type="email" id="haKundeEmail" placeholder="E-Mail (fuer PDF)" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div>'
+          + '<input type="email" id="haKundeEmail" placeholder="E-Mail (für PDF)" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div>'
           + '<button onclick="startProfiAnalyse()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--info),#2a6faa);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">KI-Analyse starten</button>'
           + '<div id="haaranalyseResult" style="display:none;margin-top:14px"></div>'
           + '<div style="font-size:10px;color:var(--text-dim);margin-top:8px;text-align:center">Profi-Analyse im Termin inklusive &middot; Premium-PDF-Report: 19 EUR</div>');
@@ -6367,19 +6367,19 @@
           teaser.appendChild(teaserTitle);
           var teaserDesc = document.createElement('div');
           teaserDesc.style.cssText = 'font-size:12px;color:var(--text-light);margin-bottom:10px;line-height:1.5';
-          teaserDesc.textContent = 'Ihr Paket zeigt: Haartyp, Schaedigung, Kopfhaut, Porenstruktur, Farbhistorie. Mit Salon Pro erhalten Sie alle 17 Parameter + Scoring + Pflegeempfehlung + Produkt-Matching.';
+          teaserDesc.textContent = 'Ihr Paket zeigt: Haartyp, Schädigung, Kopfhaut, Porenstruktur, Farbhistorie. Mit Salon Pro erhalten Sie alle 17 Parameter + Scoring + Pflegeempfehlung + Produkt-Matching.';
           teaser.appendChild(teaserDesc);
           var upgradeBtn = document.createElement('button');
           upgradeBtn.style.cssText = 'width:100%;padding:10px;background:linear-gradient(135deg,var(--gold),#c9a93d);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
           upgradeBtn.textContent = 'Upgrade auf Salon Pro \u2192';
-          upgradeBtn.addEventListener('click', function() { showToast('Kontaktieren Sie uns fuer ein Upgrade auf Salon Pro', 'info', 3000); });
+          upgradeBtn.addEventListener('click', function() { showToast('Kontaktieren Sie uns für ein Upgrade auf Salon Pro', 'info', 3000); });
           teaser.appendChild(upgradeBtn);
           wrapper.appendChild(teaser);
         }
       } else if (tool === 'wunschfrisur') {
         title.textContent = 'Wunschfrisur analysieren';
         wrapper.insertAdjacentHTML('beforeend',
-          '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary)">Wunschbild + aktuelle Frisur hochladen — KI prueft Machbarkeit und empfiehlt passende Techniken.</div>'
+          '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary)">Wunschbild + aktuelle Frisur hochladen — KI prüft Machbarkeit und empfiehlt passende Techniken.</div>'
           + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
           // Wunschbild
           + '<div style="background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 10px;text-align:center;cursor:pointer" onclick="document.getElementById(\'wunschUploadTool\').click()">'
@@ -6416,7 +6416,7 @@
       // Intro
       var intro = document.createElement('div');
       intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
-      intro.textContent = 'Fotografiere das Haar \u2014 die KI erkennt den aktuellen Farbton. Waehle dann den Wunschton und zeige die Farbe direkt deinem Kunden.';
+      intro.textContent = 'Fotografiere das Haar \u2014 die KI erkennt den aktuellen Farbton. Wähle dann den Wunschton und zeige die Farbe direkt deinem Kunden.';
       wrapper.appendChild(intro);
 
       // Photo upload area
@@ -6487,7 +6487,7 @@
       // Arrow between sections
       var arrowDiv = document.createElement('div');
       arrowDiv.style.cssText = 'text-align:center;margin:-6px 0 8px;font-size:18px;color:var(--gold)';
-      arrowDiv.textContent = '\u2193 Wunschfarbe waehlen \u2193';
+      arrowDiv.textContent = '\u2193 Wunschfarbe wählen \u2193';
       wrapper.appendChild(arrowDiv);
 
       // ZIEL-TON Section
@@ -6513,7 +6513,7 @@
       vorschau.style.cssText = 'display:none;margin-bottom:14px;background:var(--surface);border-radius:var(--radius);padding:14px;border:1px solid var(--border-accent)';
       var vorschauTitle = document.createElement('div');
       vorschauTitle.style.cssText = 'font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:10px;text-align:center';
-      vorschauTitle.textContent = 'Farbvergleich fuer den Kunden';
+      vorschauTitle.textContent = 'Farbvergleich für den Kunden';
       vorschau.appendChild(vorschauTitle);
       var vorschauGrid = document.createElement('div');
       vorschauGrid.id = 'farbVorschauGrid';
@@ -6733,7 +6733,7 @@
 
           var useBtn = document.createElement('button');
           useBtn.style.cssText = 'margin-top:8px;width:100%;padding:6px;background:var(--gold);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
-          useBtn.textContent = 'Als Ist-Ton uebernehmen';
+          useBtn.textContent = 'Als Ist-Ton übernehmen';
           useBtn.addEventListener('click', function() {
             selectFarbTile(detected, 'ist');
             showToast('Ist-Ton: ' + detected.name + ' (' + detected.code + ')', 'success');
@@ -6783,7 +6783,7 @@
     }
 
     function generateFarbformel() {
-      if (!selectedIstFarbe || !selectedZielFarbe) { showToast('Bitte Ist- und Zielton waehlen', 'warning'); return; }
+      if (!selectedIstFarbe || !selectedZielFarbe) { showToast('Bitte Ist- und Zielton wählen', 'warning'); return; }
       var ist = selectedIstFarbe;
       var ziel = selectedZielFarbe;
 
@@ -6886,7 +6886,7 @@
 
       var hint = document.createElement('div');
       hint.style.cssText = 'font-size:10px;color:var(--text-dim);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)';
-      hint.textContent = 'Hinweis: Formel ist Richtwert. Immer Probestraehne empfohlen. Powered by Casa 2035 KI.';
+      hint.textContent = 'Hinweis: Formel ist Richtwert. Immer Probesträhne empfohlen. Powered by Casa 2035 KI.';
       resultEl.appendChild(hint);
     }
 
@@ -6925,11 +6925,11 @@
         // Ergebnis-Grid
         var params = [
           { label: 'Haartyp', wert: '2A — Fein, leicht wellig', score: 'normal' },
-          { label: 'Schaedigung', wert: 'Stufe 2/5 — Leichte Trockenheit', score: 'gut' },
+          { label: 'Schädigung', wert: 'Stufe 2/5 — Leichte Trockenheit', score: 'gut' },
           { label: 'Kopfhaut', wert: 'Leicht trocken, keine Schuppen', score: 'normal' },
-          { label: 'Porenstruktur', wert: 'Mittlere Porositaet', score: 'gut' },
+          { label: 'Porenstruktur', wert: 'Mittlere Porosität', score: 'gut' },
           { label: 'Farbhistorie', wert: 'Natuerlich dunkelblond, 1x Balayage (6 Mo.)', score: 'normal' },
-          { label: 'Elastizitaet', wert: 'Gut — normaler Ruecksprung', score: 'gut' },
+          { label: 'Elastizität', wert: 'Gut — normaler Rücksprung', score: 'gut' },
           { label: 'Dichte', wert: 'Mitteldicht (~100 Haare/cm\u00B2)', score: 'normal' },
           { label: 'Glanz', wert: 'Leicht matt — Pflege empfohlen', score: 'warnung' }
         ];
@@ -7059,12 +7059,12 @@
         // Hinweise
         var hinweisTitle = document.createElement('div');
         hinweisTitle.style.cssText = 'font-size:12px;font-weight:700;color:var(--warning);margin:12px 0 6px';
-        hinweisTitle.textContent = 'Hinweise fuer den Termin';
+        hinweisTitle.textContent = 'Hinweise für den Termin';
         resultEl.appendChild(hinweisTitle);
         var hinweise = [
           'Haare 2 Tage vor dem Termin nicht waschen',
           'Vorbehandlung (Olaplex No.0) empfohlen',
-          'Silbershampoo fuer zuhause mitgeben'
+          'Silbershampoo für zuhause mitgeben'
         ];
         hinweise.forEach(function(h) {
           var hRow = document.createElement('div');
@@ -7080,7 +7080,7 @@
 
         var bookBtn = document.createElement('button');
         bookBtn.style.cssText = 'margin-top:10px;width:100%;padding:10px;background:linear-gradient(135deg,var(--success),#2a9d63);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
-        bookBtn.textContent = 'Termin buchen fuer diesen Look';
+        bookBtn.textContent = 'Termin buchen für diesen Look';
         bookBtn.addEventListener('click', function() { showToast('Terminvorschlag wird erstellt...', 'success', 3000); });
         resultEl.appendChild(bookBtn);
 
@@ -7394,11 +7394,11 @@
     function getKiAssistConfig(page) {
       var configs = {
         dashboard: {
-          title: 'KI-Assistent', sub: 'Home-Ueberblick',
+          title: 'KI-Assistent', sub: 'Home-Überblick',
           tips: [
-            { title: 'Tagesplanung optimieren', text: 'Basierend auf den heutigen Terminen empfehle ich, Farbbehandlungen morgens zu legen — Einwirkzeiten koennen fuer Beratung genutzt werden.', action: 'Termine ansehen', page: 'termine' },
-            { title: 'Umsatz-Prognose', text: 'Aktueller Tagesumsatz liegt ' + (finanzData.tages_umsatz > dailyGoal ? 'ueber' : 'unter') + ' dem Tagesziel. ' + (termineCache.length > 0 ? termineCache.length + ' Termine heute.' : 'Keine Termine geladen.') },
-            { title: 'Lager-Tipp', text: 'Pruefe regelmaessig den Lagerbestand — Nachbestellungen fuer beliebte Produkte koennten bald faellig sein.', action: 'Lager pruefen', page: 'lager' }
+            { title: 'Tagesplanung optimieren', text: 'Basierend auf den heutigen Terminen empfehle ich, Farbbehandlungen morgens zu legen — Einwirkzeiten können für Beratung genutzt werden.', action: 'Termine ansehen', page: 'termine' },
+            { title: 'Umsatz-Prognose', text: 'Aktueller Tagesumsatz liegt ' + (finanzData.tages_umsatz > dailyGoal ? 'über' : 'unter') + ' dem Tagesziel. ' + (termineCache.length > 0 ? termineCache.length + ' Termine heute.' : 'Keine Termine geladen.') },
+            { title: 'Lager-Tipp', text: 'Prüfe regelmäßig den Lagerbestand — Nachbestellungen für beliebte Produkte könnten bald fällig sein.', action: 'Lager prüfen', page: 'lager' }
           ],
           actions: [
             { label: 'Rechnung erstellen', fn: function() { fabAction('rechnung'); } },
@@ -7410,21 +7410,21 @@
         termine: {
           title: 'Termin-Assistent', sub: 'Kalender & Planung',
           tips: [
-            { title: 'Lucken erkennen', text: 'Suche nach freien Slots zwischen Terminen. Kurze Services (Herrenschnitt 30min) koennen Lucken fuellen und den Umsatz steigern.' },
+            { title: 'Lücken erkennen', text: 'Suche nach freien Slots zwischen Terminen. Kurze Services (Herrenschnitt 30min) können Lücken füllen und den Umsatz steigern.' },
             { title: 'Einwirkzeiten nutzen', text: 'Bei Farbbehandlungen mit 30-45min Einwirkzeit: Plane parallel einen Herrenschnitt oder eine kurze Beratung ein.' },
-            { title: 'No-Show Praevention', text: 'Erinnerungen 24h vor dem Termin reduzieren No-Shows um 60%. WF-08 sendet diese automatisch.', action: 'Erinnerungen pruefen', page: 'system' }
+            { title: 'No-Show Prävention', text: 'Erinnerungen 24h vor dem Termin reduzieren No-Shows um 60%. WF-08 sendet diese automatisch.', action: 'Erinnerungen prüfen', page: 'system' }
           ],
           actions: [
             { label: 'Neuer Termin', fn: function() { showToast('Tippe auf eine freie Stelle im Kalender', 'info', 3000); } },
-            { label: 'Tages-Uebersicht', fn: function() { switchPage('dashboard'); } }
+            { label: 'Tages-Übersicht', fn: function() { switchPage('dashboard'); } }
           ]
         },
         kasse: {
           title: 'Kassen-Assistent', sub: 'Finanzen & Rechnungen',
           tips: [
-            { title: 'MwSt-Hinweis', text: '19% MwSt fuer Friseurdienstleistungen und Produktverkaeufe. Die Rechnung berechnet automatisch.' },
-            { title: 'Tagesabschluss', text: 'Der Tagesabschluss sollte taeglich um Ladenschluss gemacht werden. GoBD-Pflicht: Lueckenlose Kassenfuehrung.', action: 'Tagesabschluss starten', fn: function() { if (typeof openTagesabschluss === 'function') openTagesabschluss(); } },
-            { title: 'Ausgaben erfassen', text: 'Betriebsausgaben wie Produkteinkauf, Miete oder Material direkt erfassen fuer die EUeR-Abrechnung.', action: 'Ausgabe erfassen', fn: function() { fabAction('ausgabe'); } }
+            { title: 'MwSt-Hinweis', text: '19% MwSt für Friseurdienstleistungen und Produktverkäufe. Die Rechnung berechnet automatisch.' },
+            { title: 'Tagesabschluss', text: 'Der Tagesabschluss sollte täglich um Ladenschluss gemacht werden. GoBD-Pflicht: Lückenlose Kassenführung.', action: 'Tagesabschluss starten', fn: function() { if (typeof openTagesabschluss === 'function') openTagesabschluss(); } },
+            { title: 'Ausgaben erfassen', text: 'Betriebsausgaben wie Produkteinkauf, Miete oder Material direkt erfassen für die EÜR-Abrechnung.', action: 'Ausgabe erfassen', fn: function() { fabAction('ausgabe'); } }
           ],
           actions: [
             { label: 'Rechnung erstellen', fn: function() { fabAction('rechnung'); } },
@@ -7434,18 +7434,18 @@
         beratung: {
           title: 'Beratungs-Assistent', sub: 'KI-Tools & Kundenberatung',
           tips: [
-            { title: 'Haaranalyse nutzen', text: 'Die KI-Profi-Analyse erkennt 8 Parameter: Haartyp, Schaedigung, Kopfhaut, Porositaet, Farbhistorie, Elastizitaet, Dichte, Glanz. Ideal fuer Erstberatung.' },
-            { title: 'Wunschfrisur-Check', text: 'Kunden koennen ein Foto ihrer Wunschfrisur zeigen. Die KI prueft Machbarkeit, Technik, Dauer und Preis — direkt am Platz.' },
-            { title: 'Farbcode-Berechnung', text: 'Der Farbcode-Rechner bestimmt deterministisch die richtige Mischung. Kein LLM — reine Formelberechnung fuer praezise Ergebnisse.' }
+            { title: 'Haaranalyse nutzen', text: 'Die KI-Profi-Analyse erkennt 8 Parameter: Haartyp, Schädigung, Kopfhaut, Porosität, Farbhistorie, Elastizität, Dichte, Glanz. Ideal für Erstberatung.' },
+            { title: 'Wunschfrisur-Check', text: 'Kunden können ein Foto ihrer Wunschfrisur zeigen. Die KI prüft Machbarkeit, Technik, Dauer und Preis — direkt am Platz.' },
+            { title: 'Farbcode-Berechnung', text: 'Der Farbcode-Rechner bestimmt deterministisch die richtige Mischung. Kein LLM — reine Formelberechnung für präzise Ergebnisse.' }
           ],
           actions: []
         },
         lager: {
           title: 'Lager-Assistent', sub: 'Bestand & Nachbestellungen',
           tips: [
-            { title: 'Mindestbestand pruefen', text: 'Produkte unter Mindestbestand werden gelb markiert. Nachbestellungen fuer kritische Artikel sollten priorisiert werden.' },
+            { title: 'Mindestbestand prüfen', text: 'Produkte unter Mindestbestand werden gelb markiert. Nachbestellungen für kritische Artikel sollten priorisiert werden.' },
             { title: 'Verbrauchstrend', text: 'Analysiere, welche Produkte schneller verbraucht werden als erwartet. Saisonale Schwankungen bei Pflegeprodukten beachten.' },
-            { title: 'La Biosthetique', text: 'Als La Biosthetique Partner: Bestellungen ueber den Aussendienst oder Online-Portal. Lieferzeit ca. 2-3 Werktage.' }
+            { title: 'La Biosthetique', text: 'Als La Biosthetique Partner: Bestellungen über den Außendienst oder Online-Portal. Lieferzeit ca. 2-3 Werktage.' }
           ],
           actions: [
             { label: 'Nachbestellen', fn: function() { if (typeof openNachbestellungSheet === 'function') openNachbestellungSheet(); } }
@@ -7454,7 +7454,7 @@
         bestellungen: {
           title: 'Bestell-Assistent', sub: 'Nachbestellungen verwalten',
           tips: [
-            { title: 'Bestellstatus', text: 'Offene Bestellungen im Blick behalten. Bei Verzoegerungen ueber 5 Werktage den Lieferanten kontaktieren.' },
+            { title: 'Bestellstatus', text: 'Offene Bestellungen im Blick behalten. Bei Verzögerungen über 5 Werktage den Lieferanten kontaktieren.' },
             { title: 'Sammelbestellung', text: 'Tipp: Mehrere Artikel gleichzeitig bestellen spart Versandkosten und reduziert den Aufwand.' }
           ],
           actions: [
@@ -7464,8 +7464,8 @@
         system: {
           title: 'System-Assistent', sub: 'Administration & Monitoring',
           tips: [
-            { title: 'Workflow-Status', text: 'Alle 26 Workflows im Blick. Gruene Punkte = aktiv, gelbe = Pruefung noetig, rote = Fehler. Klicke auf einen Workflow fuer Details.' },
-            { title: 'Debug-Prozess', text: 'Bei Fehlern: Der Debug-Prozess prueft alle Systeme automatisch und gibt Loesungsvorschlaege. Kritische Fehler werden priorisiert.' },
+            { title: 'Workflow-Status', text: 'Alle 26 Workflows im Blick. Grüne Punkte = aktiv, gelbe = Prüfung nötig, rote = Fehler. Klicke auf einen Workflow für Details.' },
+            { title: 'Debug-Prozess', text: 'Bei Fehlern: Der Debug-Prozess prüft alle Systeme automatisch und gibt Lösungsvorschläge. Kritische Fehler werden priorisiert.' },
             { title: 'Go-Live Checkliste', text: 'Vor der Aktivierung: Phase 1-5 Reihenfolge beachten! Auth + Intent zuerst, Automatisierung (Erinnerungen) zuletzt.' }
           ],
           actions: []
@@ -7476,16 +7476,16 @@
 
     function getKiDemoResponse(page, question) {
       var q = question.toLowerCase();
-      if (q.indexOf('termin') > -1 || q.indexOf('buchen') > -1) return 'Termine koennen ueber den Kalender-Tab angelegt werden. Der KI-Buchungsassistent (WF-02a) extrahiert Services aus Freitext und findet automatisch freie Slots.';
-      if (q.indexOf('farbe') > -1 || q.indexOf('balayage') > -1 || q.indexOf('straehne') > -1) return 'Farbbehandlungen benoetigen je nach Technik 60-180min. Balayage: Blondierpulver + Oxid 6% (1:2), 35min Einwirkzeit. Immer Olaplex Nr. 1 zur Struktursicherung.';
-      if (q.indexOf('preis') > -1 || q.indexOf('kosten') > -1) return 'Preise werden aus der Services_Preisliste geladen. MwSt 19% fuer Dienstleistungen und Produkte. Alle Berechnungen deterministisch im Code, nie durch das LLM.';
-      if (q.indexOf('lager') > -1 || q.indexOf('produkt') > -1 || q.indexOf('bestell') > -1) return 'Der Lagerbestand wird in Echtzeit geprueft. Produkte unter Mindestbestand werden gelb markiert. Nachbestellungen ueber den Lager-Tab oder per Sprachbefehl an die KI.';
-      if (q.indexOf('umsatz') > -1 || q.indexOf('kasse') > -1) return 'Der aktuelle Tagesumsatz wird live berechnet (WF-10). Tagesabschluss taeglich um Ladenschluss machen — GoBD-Pflicht fuer lueckenlose Kassenfuehrung.';
-      if (q.indexOf('haar') > -1 || q.indexOf('analyse') > -1) return 'Die KI-Haaranalyse erfasst 8-17 Parameter (je nach Paket). Ergebnis: Pflegeempfehlung, Produktvorschlaege, PDF-Report. Basis: 98 trichologische Fachdokumente in der Qdrant-Wissensbasis.';
+      if (q.indexOf('termin') > -1 || q.indexOf('buchen') > -1) return 'Termine können über den Kalender-Tab angelegt werden. Der KI-Buchungsassistent (WF-02a) extrahiert Services aus Freitext und findet automatisch freie Slots.';
+      if (q.indexOf('farbe') > -1 || q.indexOf('balayage') > -1 || q.indexOf('straehne') > -1) return 'Farbbehandlungen benötigen je nach Technik 60-180min. Balayage: Blondierpulver + Oxid 6% (1:2), 35min Einwirkzeit. Immer Olaplex Nr. 1 zur Struktursicherung.';
+      if (q.indexOf('preis') > -1 || q.indexOf('kosten') > -1) return 'Preise werden aus der Services_Preisliste geladen. MwSt 19% für Dienstleistungen und Produkte. Alle Berechnungen deterministisch im Code, nie durch das LLM.';
+      if (q.indexOf('lager') > -1 || q.indexOf('produkt') > -1 || q.indexOf('bestell') > -1) return 'Der Lagerbestand wird in Echtzeit geprüft. Produkte unter Mindestbestand werden gelb markiert. Nachbestellungen über den Lager-Tab oder per Sprachbefehl an die KI.';
+      if (q.indexOf('umsatz') > -1 || q.indexOf('kasse') > -1) return 'Der aktuelle Tagesumsatz wird live berechnet (WF-10). Tagesabschluss täglich um Ladenschluss machen — GoBD-Pflicht für lückenlose Kassenführung.';
+      if (q.indexOf('haar') > -1 || q.indexOf('analyse') > -1) return 'Die KI-Haaranalyse erfasst 8-17 Parameter (je nach Paket). Ergebnis: Pflegeempfehlung, Produktvorschläge, PDF-Report. Basis: 98 trichologische Fachdokumente in der Qdrant-Wissensbasis.';
       if (page === 'termine') return 'Ich kann dir bei der Terminplanung helfen. Freie Slots finden, Einwirkzeiten optimal nutzen oder Termine umbuchen — frag mich einfach!';
       if (page === 'kasse') return 'Bei Kassenfragen helfe ich gerne. Rechnungen, Ausgaben, MwSt-Differenzierung oder Tagesabschluss — alles GoBD-konform.';
-      if (page === 'beratung') return 'Fuer Beratungen stehen dir 3 KI-Tools zur Verfuegung: Haaranalyse (8 Parameter), Wunschfrisur-Check (Machbarkeit) und Farbcode-Berechnung (deterministisch).';
-      return 'Ich bin dein KI-Assistent fuer das Casa 2035 Dashboard. Stelle mir Fragen zu Terminen, Kasse, Lager, Beratung oder dem System — ich helfe dir gerne!';
+      if (page === 'beratung') return 'Für Beratungen stehen dir 3 KI-Tools zur Verfügung: Haaranalyse (8 Parameter), Wunschfrisur-Check (Machbarkeit) und Farbcode-Berechnung (deterministisch).';
+      return 'Ich bin dein KI-Assistent für das Casa 2035 Dashboard. Stelle mir Fragen zu Terminen, Kasse, Lager, Beratung oder dem System — ich helfe dir gerne!';
     }
 
     // === Anfragen-Uebersicht (Bottom Sheet mit offenen Kundenanfragen) ===
@@ -7495,7 +7495,7 @@
       service: { label: 'Service', color: 'var(--success)', icon: '\u2702\uFE0F' },
       farbe: { label: 'Farbe', color: 'var(--rose)', icon: '\uD83C\uDFA8' },
       produkt: { label: 'Produkt', color: 'var(--info)', icon: '\uD83E\uDDF4' },
-      kapazitaet: { label: 'Kapazitaet', color: 'var(--warning)', icon: '\u23F0' },
+      kapazitaet: { label: 'Kapazität', color: 'var(--warning)', icon: '\u23F0' },
       kunde: { label: 'Kunde', color: '#9b59b6', icon: '\uD83D\uDC64' },
       sonstiges: { label: 'Sonstiges', color: 'var(--text-dim)', icon: '\u2699\uFE0F' }
     };
@@ -7575,7 +7575,7 @@
         if (regeln.length === 0) {
           var empty = document.createElement('div');
           empty.style.cssText = 'padding:16px;text-align:center;color:var(--text-dim);font-size:12px;background:var(--bg-warm);border-radius:var(--radius-sm)';
-          empty.textContent = 'Noch keine Regeln definiert. Fuege deine erste Salon-Regel hinzu!';
+          empty.textContent = 'Noch keine Regeln definiert. Füge deine erste Salon-Regel hinzu!';
           container.appendChild(empty);
           return;
         }
@@ -7894,7 +7894,7 @@
         var loesungDiv = document.createElement('div');
         loesungDiv.style.cssText = 'font-size:11px;color:var(--success);line-height:1.5;padding:8px;background:rgba(45,138,78,0.06);border-radius:6px;border:1px solid rgba(45,138,78,0.15)';
         var loesungLabel = document.createElement('strong');
-        loesungLabel.textContent = 'Loesung: ';
+        loesungLabel.textContent = 'Lösung: ';
         loesungDiv.appendChild(loesungLabel);
         loesungDiv.appendChild(document.createTextNode(err.loesung));
         card.appendChild(loesungDiv);
@@ -8077,7 +8077,7 @@
       sheet.appendChild(title);
       var desc = document.createElement('p');
       desc.style.cssText = 'font-size:12px;color:var(--text-dim);margin-bottom:12px';
-      desc.textContent = 'Beschreibe was nicht funktioniert. Andreas bekommt eine Nachricht und kuemmert sich darum.';
+      desc.textContent = 'Beschreibe was nicht funktioniert. Andreas bekommt eine Nachricht und kümmert sich darum.';
       sheet.appendChild(desc);
 
       var select = document.createElement('select');
@@ -8246,19 +8246,19 @@
 
       // 1. Tageszeitabhaengige Empfehlung
       if (hour >= 6 && hour < 10) {
-        insights.push({ title: 'Guten Morgen', text: 'Fruehe Termine haben 23% weniger No-Shows. Perfekt fuer Neukunden und aufwaendige Treatments.', action: 'Termine ansehen', page: 'termine' });
+        insights.push({ title: 'Guten Morgen', text: 'Frühe Termine haben 23% weniger No-Shows. Perfekt für Neukunden und aufwändige Treatments.', action: 'Termine ansehen', page: 'termine' });
       } else if (hour >= 12 && hour < 14) {
-        insights.push({ title: 'Mittagszeit', text: 'Idealer Zeitpunkt fuer kurze Behandlungen oder Produktberatung zwischen den Terminen.', action: null, page: null });
+        insights.push({ title: 'Mittagszeit', text: 'Idealer Zeitpunkt für kurze Behandlungen oder Produktberatung zwischen den Terminen.', action: null, page: null });
       } else if (hour >= 17) {
         insights.push({ title: 'Tagesabschluss', text: 'Kassenabschluss nicht vergessen. Noch ' + (finanzData.offene_buchungen || 0) + ' offene Buchungen heute.', action: 'Zur Kasse', page: 'kasse' });
       }
 
       // 2. Wochentagsspezifisch
       if (dayOfWeek === 6) { // Samstag
-        insights.push({ title: dayNames[dayOfWeek] + '-Tipp', text: 'Samstag ist der staerkste Umsatztag. Produktempfehlungen am Platz erhoehen den Umsatz um bis zu 25%.', action: null, page: null });
+        insights.push({ title: dayNames[dayOfWeek] + '-Tipp', text: 'Samstag ist der stärkste Umsatztag. Produktempfehlungen am Platz erhöhen den Umsatz um bis zu 25%.', action: null, page: null });
       } else if (dayOfWeek === 1) { // Montag
         var yesterdaySa = new Date(now); yesterdaySa.setDate(yesterdaySa.getDate() - 2);
-        insights.push({ title: 'Wochenstart', text: 'Guter Zeitpunkt fuer Nachbestellungen und Lager-Check. Wochenendverbrauch pruefen.', action: 'Lager pruefen', page: 'lager' });
+        insights.push({ title: 'Wochenstart', text: 'Guter Zeitpunkt für Nachbestellungen und Lager-Check. Wochenendverbrauch prüfen.', action: 'Lager prüfen', page: 'lager' });
       } else if (dayOfWeek >= 2 && dayOfWeek <= 3) { // Di/Mi
         insights.push({ title: dayNames[dayOfWeek] + '-Tipp', text: 'Unter der Woche buchen Kunden +18% mehr bei gezielten Farb-Specials oder Pflege-Aktionen.', action: null, page: null });
       }
@@ -8286,9 +8286,9 @@
         var teamMinAvail = 3 * 8 * 60; // 3 Stylisten x 8h
         var auslPct = Math.round(totalMin / teamMinAvail * 100);
         if (auslPct >= 90) {
-          insights.push({ title: 'Voller Tag', text: auslPct + '% Teamauslastung \u2014 Pausen einplanen und bei Walk-Ins freundlich auf naechsten freien Slot verweisen.', action: null, page: null });
+          insights.push({ title: 'Voller Tag', text: auslPct + '% Teamauslastung \u2014 Pausen einplanen und bei Walk-Ins freundlich auf nächsten freien Slot verweisen.', action: null, page: null });
         } else if (auslPct < 50 && todayTermine.length > 0) {
-          insights.push({ title: 'Kapazitaet frei', text: 'Noch ' + (100 - auslPct) + '% Kapazitaet heute. Ideal fuer spontane Termine oder Social-Media-Posts.', action: null, page: null });
+          insights.push({ title: 'Kapazität frei', text: 'Noch ' + (100 - auslPct) + '% Kapazität heute. Ideal für spontane Termine oder Social-Media-Posts.', action: null, page: null });
         }
       }
 
@@ -8300,7 +8300,7 @@
         if (pct >= 80) {
           insights.push({ title: 'Umsatz-Ziel', text: pct + '% des Tagesziels erreicht (' + umsatz.toFixed(0) + ' / ' + tagesziel.toFixed(0) + ' EUR). Weiter so!', action: null, page: null });
         } else if (hour >= 14 && pct < 50) {
-          insights.push({ title: 'Umsatz-Hinweis', text: 'Erst ' + pct + '% des Tagesziels. Nachmittags-Termine fuer Zusatzbehandlungen nutzen.', action: 'Zur Kasse', page: 'kasse' });
+          insights.push({ title: 'Umsatz-Hinweis', text: 'Erst ' + pct + '% des Tagesziels. Nachmittags-Termine für Zusatzbehandlungen nutzen.', action: 'Zur Kasse', page: 'kasse' });
         }
       }
 
@@ -8526,7 +8526,7 @@
       document.getElementById('bestellErledigt').textContent = erledigt;
       var kunden = items.filter(function(b) { return b.Typ === 'kunde' || (b.Bestellt_Von || '').indexOf('Kund') !== -1; }).length;
       document.getElementById('bestellKunden').textContent = kunden;
-      document.getElementById('bestellListCount').textContent = items.length + ' Eintraege';
+      document.getElementById('bestellListCount').textContent = items.length + ' Einträge';
 
       var list = document.getElementById('bestellList');
       list.textContent = '';
@@ -8648,11 +8648,11 @@
     function renderBestellungenList(items) {
       var list = document.getElementById('bestellList');
       list.textContent = '';
-      document.getElementById('bestellListCount').textContent = items.length + ' Eintraege';
+      document.getElementById('bestellListCount').textContent = items.length + ' Einträge';
       if (!items.length) {
         var emptyDiv = document.createElement('div');
         emptyDiv.className = 'empty';
-        emptyDiv.textContent = 'Keine Bestellungen fuer diesen Filter';
+        emptyDiv.textContent = 'Keine Bestellungen für diesen Filter';
         list.appendChild(emptyDiv);
         return;
       }
@@ -9022,7 +9022,7 @@
       editBtn.style.cssText = 'width:100%;padding:10px;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--text-dim);cursor:pointer;font-family:Inter,sans-serif';
       editBtn.textContent = 'Bestand korrigieren';
       editBtn.onclick = function() {
-        showToast('Bestandskorrektur kommt in der naechsten Version', 'info');
+        showToast('Bestandskorrektur kommt in der nächsten Version', 'info');
       };
       sheet.appendChild(editBtn);
 
@@ -9096,7 +9096,7 @@
           body: JSON.stringify(payload)
         }).catch(function() {});
       }
-      showToast('Danke fuer Ihr Feedback!', 'success');
+      showToast('Danke für Ihr Feedback!', 'success');
       document.getElementById('dashFeedbackText').value = '';
       toggleDashFeedback();
     }
