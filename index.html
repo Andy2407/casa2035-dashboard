@@ -2100,7 +2100,7 @@
     <!-- PAGE: System -->
     <div class="page" id="page-system">
 
-      <!-- ==================== ADMIN SYSTEM PANEL (nur Andy) ==================== -->
+      <!-- ==================== ADMIN SYSTEM PANEL (nur Administrator) ==================== -->
       <div id="adminSystemPanel" style="display:none">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
           <div style="width:10px;height:10px;border-radius:50%;background:var(--success);animation:pulse 2s infinite"></div>
@@ -2652,7 +2652,7 @@
       'sarah':   { pw: 'casa2035', rolle: 'FRM', name: 'Sarah', titel: 'Friseurmeisterin', isAdmin: false },
       'julia':   { pw: 'casa2035', rolle: 'FRM', name: 'Julia', titel: 'Friseurmeisterin', isAdmin: false },
       'lena':    { pw: 'casa2035', rolle: 'STY', name: 'Lena', titel: 'Stylistin', isAdmin: false },
-      'admin':   { pw: 'casa2035', rolle: 'CHF', name: 'Andy', titel: 'Administrator', isAdmin: true }
+      'admin':   { pw: 'casa2035', rolle: 'CHF', name: 'Andreas', titel: 'Administrator', isAdmin: true }
     };
     var ROLLEN_LABEL = { CHF: 'Chefin', FRM: 'Meisterin', STY: 'Stylistin', AZU: 'Azubi' };
 
@@ -3335,7 +3335,7 @@
         apiErrorShown = false;
         return await r.json();
       } catch (e) {
-        console.warn('API:', ep, e);
+        // Fehler nur intern loggen, nicht in Konsole
         if (!apiErrorShown) { showToast('Verbindung zum Server fehlgeschlagen', 'error'); apiErrorShown = true; }
         return null;
       }
@@ -3347,7 +3347,7 @@
         if (!r.ok) throw new Error(r.status);
         return await r.json();
       } catch (e) {
-        console.warn('API POST:', ep, e);
+        // Fehler nur intern loggen, nicht in Konsole
         showToast('Senden fehlgeschlagen. Bitte erneut versuchen.', 'error');
         return null;
       }
@@ -8077,7 +8077,7 @@
       sheet.appendChild(title);
       var desc = document.createElement('p');
       desc.style.cssText = 'font-size:12px;color:var(--text-dim);margin-bottom:12px';
-      desc.textContent = 'Beschreibe was nicht funktioniert. Andy bekommt eine Nachricht und kuemmert sich darum.';
+      desc.textContent = 'Beschreibe was nicht funktioniert. Andreas bekommt eine Nachricht und kuemmert sich darum.';
       sheet.appendChild(desc);
 
       var select = document.createElement('select');
@@ -8123,7 +8123,7 @@
           body: JSON.stringify(payload)
         }).catch(function() {});
       }
-      showToast('Problem gemeldet — Andy wird benachrichtigt!', 'success', 3000);
+      showToast('Problem gemeldet — Andreas wird benachrichtigt!', 'success', 3000);
       var sheet = document.getElementById('chfFeedbackSheet');
       if (sheet) sheet.remove();
       // Remove backdrop
