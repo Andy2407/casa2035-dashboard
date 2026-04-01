@@ -231,7 +231,7 @@
     .profile-menu-item.danger svg { color: var(--danger); }
     .profile-menu-item.danger:hover { background: var(--danger-bg); }
 
-    /* === Passwort-Aendern Sheet === */
+    /* === Passwort-Ändern Sheet === */
     .pw-change-overlay {
       position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,0.4);
       backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center;
@@ -1683,7 +1683,7 @@
   <!-- Passwort aendern Dialog -->
   <div class="pw-change-overlay" id="pwChangeOverlay">
     <div class="pw-change-card">
-      <h3>Passwort aendern</h3>
+      <h3>Passwort ändern</h3>
       <p>Gib dein aktuelles und ein neues Passwort ein.</p>
       <input type="password" class="pw-field" id="pwOld" placeholder="Aktuelles Passwort" onkeypress="if(event.key==='Enter')document.getElementById('pwNew').focus()">
       <input type="password" class="pw-field" id="pwNew" placeholder="Neues Passwort" onkeypress="if(event.key==='Enter')document.getElementById('pwConfirm').focus()">
@@ -1700,7 +1700,7 @@
   <div class="pw-change-overlay" id="profileOverlay">
     <div class="pw-change-card" style="max-width:400px">
       <h3>Profil &amp; Einstellungen</h3>
-      <p>Passe dein Profil an — Kuerzel, Farbe und Name.</p>
+      <p>Passe dein Profil an — Kürzel, Farbe und Name.</p>
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:14px;background:var(--bg-warm);border-radius:var(--radius-sm)">
         <div class="profile-menu-avatar" id="profileSheetAvatar" style="width:52px;height:52px;font-size:16px;letter-spacing:0.5px;font-weight:700;border-radius:50%;flex-shrink:0">RR</div>
         <div>
@@ -1713,7 +1713,7 @@
       <input type="text" class="pw-field" id="profileDisplayName" placeholder="Dein Name" maxlength="30">
       <div style="display:flex;gap:10px;margin-top:2px">
         <div style="flex:1">
-          <label style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Kuerzel (2 Buchstaben)</label>
+          <label style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Kürzel (2 Buchstaben)</label>
           <input type="text" class="pw-field" id="profileKuerzel" placeholder="z.B. RR" maxlength="2" style="text-transform:uppercase;text-align:center;font-weight:700;letter-spacing:2px">
         </div>
         <div style="flex:1">
@@ -1725,7 +1725,7 @@
         </div>
       </div>
       <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px" id="profileFarbePresets">
-        <label style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;display:block;width:100%;margin-bottom:2px">Oder waehle eine Farbe</label>
+        <label style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;display:block;width:100%;margin-bottom:2px">Oder wähle eine Farbe</label>
       </div>
       <div id="profileSaveInfo" style="font-size:12px;color:var(--success);margin-top:8px;display:none">Gespeichert!</div>
       <div class="pw-change-actions">
@@ -1767,7 +1767,7 @@
             </div>
             <button class="profile-menu-item" onclick="openPasswordChange()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              Passwort aendern
+              Passwort ändern
             </button>
             <button class="profile-menu-item" onclick="openProfileSettings()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -2637,7 +2637,7 @@
         <option value="personal">Personalkosten</option>
         <option value="versicherung">Versicherungen</option>
         <option value="marketing">Marketing / Werbung</option>
-        <option value="buero">Buerobedarf</option>
+        <option value="buero">Bürobedarf</option>
         <option value="reinigung">Reinigung</option>
         <option value="reparatur">Reparatur / Wartung</option>
         <option value="sonstiges">Sonstiges</option>
@@ -3069,7 +3069,7 @@
       var errorEl = document.getElementById('pwChangeError');
 
       if (!oldPw || !newPw || !confirmPw) {
-        errorEl.textContent = 'Bitte alle Felder ausfuellen';
+        errorEl.textContent = 'Bitte alle Felder ausfüllen';
         errorEl.style.display = 'block';
         return;
       }
@@ -3084,7 +3084,7 @@
         return;
       }
       if (newPw !== confirmPw) {
-        errorEl.textContent = 'Neue Passwoerter stimmen nicht ueberein';
+        errorEl.textContent = 'Neue Passwörter stimmen nicht überein';
         errorEl.style.display = 'block';
         return;
       }
@@ -3096,7 +3096,7 @@
       // Passwort aendern (Client-seitig — spaeter ueber Auth-Backend)
       user.pw = newPw;
       closePasswordChange();
-      showToast('Passwort erfolgreich geaendert', 'success', 3000);
+      showToast('Passwort erfolgreich geändert', 'success', 3000);
     }
 
     // Farb-Presets fuer Profil
@@ -3105,8 +3105,8 @@
       { name: 'Rose', hex: '#e06b8f' },
       { name: 'Blau', hex: '#6b8fe0' },
       { name: 'Lila', hex: '#8f6be0' },
-      { name: 'Gruen', hex: '#2eb87a' },
-      { name: 'Tuerkis', hex: '#2eb8b8' },
+      { name: 'Grün', hex: '#2eb87a' },
+      { name: 'Türkis', hex: '#2eb8b8' },
       { name: 'Orange', hex: '#e0946b' },
       { name: 'Koralle', hex: '#e06b6b' },
       { name: 'Mint', hex: '#6be0b8' },
@@ -3181,7 +3181,7 @@
       var newFarbe = document.getElementById('profileFarbe').value;
 
       if (!newName) { showToast('Name darf nicht leer sein', 'warning', 2000); return; }
-      if (newKuerzel.length < 1 || newKuerzel.length > 2) { showToast('Kuerzel muss 1-2 Buchstaben haben', 'warning', 2000); return; }
+      if (newKuerzel.length < 1 || newKuerzel.length > 2) { showToast('Kürzel muss 1-2 Buchstaben haben', 'warning', 2000); return; }
 
       if (user) {
         user.name = newName;
@@ -3211,7 +3211,7 @@
       }
       document.getElementById('profileSaveInfo').style.display = 'block';
       setTimeout(function() { document.getElementById('profileSaveInfo').style.display = 'none'; }, 2500);
-      showToast('Profil gespeichert — Kuerzel: ' + newKuerzel, 'success', 3000);
+      showToast('Profil gespeichert — Kürzel: ' + newKuerzel, 'success', 3000);
     }
 
     // Escape-Taste schliesst Overlays
@@ -5103,7 +5103,7 @@
           produkte: [
             { name: 'Shampoo Vital', menge: '10 ml' },
             { name: 'Conditioner', menge: '8 ml' },
-            { name: 'Hitzeschutz-Spray', menge: '3 Spruehstoesse' }
+            { name: 'Hitzeschutz-Spray', menge: '3 Sprühstöße' }
           ]
         },
         'Haarschnitt Feminin': {
@@ -5129,7 +5129,7 @@
           produkte: [
             { name: 'Blondierpulver', menge: '30 g' },
             { name: 'Oxid 6%', menge: '60 ml', mischung: '1:2 mit Blondierpulver' },
-            { name: 'Balayage Folie 30cm', menge: '15-20 Stueck' },
+            { name: 'Balayage Folie 30cm', menge: '15-20 Stück' },
             { name: 'Olaplex No. 1', menge: '3.75 ml', mischung: 'In Blondierung einmischen' },
             { name: 'Olaplex No. 2', menge: '15 ml', mischung: 'Nach Auswaschen einarbeiten, 10 Min einwirken' },
             { name: 'Shampoo Silber', menge: '15 ml' },
@@ -5140,7 +5140,7 @@
           aufgaben: [
             { schritt: 'Farbberatung', dauer_min: 5 },
             { schritt: 'Farbe anmischen', dauer_min: 5 },
-            { schritt: 'Auftragen (Ansatz + Laengen)', dauer_min: 20 },
+            { schritt: 'Auftragen (Ansatz + Längen)', dauer_min: 20 },
             { schritt: 'Einwirkzeit', dauer_min: 30, einwirkzeit: true },
             { schritt: 'Auswaschen + Emulgieren', dauer_min: 8 },
             { schritt: 'Pflege + Föhnen', dauer_min: 15 }
@@ -5205,14 +5205,14 @@
           ],
           produkte: [
             { name: 'Olaplex No. 1', menge: '3.75 ml', mischung: 'Pur auftragen, Scheitel bis Spitzen' },
-            { name: 'Olaplex No. 2', menge: '15 ml', mischung: 'Grosszuegig einarbeiten' },
+            { name: 'Olaplex No. 2', menge: '15 ml', mischung: 'Großzügig einarbeiten' },
             { name: 'Shampoo Vital', menge: '10 ml' },
             { name: 'Pflegekur', menge: '20 ml' }
           ]
         },
         'Brautstyling Probe': {
           aufgaben: [
-            { schritt: 'Beratungsgespraech', dauer_min: 15 },
+            { schritt: 'Beratungsgespräch', dauer_min: 15 },
             { schritt: 'Probefrisur aufbauen', dauer_min: 30 },
             { schritt: 'Locken/Wellen', dauer_min: 20 },
             { schritt: 'Haarschmuck einarbeiten', dauer_min: 10 },
@@ -5220,10 +5220,10 @@
             { schritt: 'Styling dokumentieren', dauer_min: 5 }
           ],
           produkte: [
-            { name: 'Haarspray Extra Strong', menge: '5-8 Spruehstoesse' },
-            { name: 'Lockenspray', menge: '3 Spruehstoesse' },
-            { name: 'Haarnadeln', menge: '20-30 Stueck' },
-            { name: 'Hitzeschutz-Spray', menge: '3 Spruehstoesse' }
+            { name: 'Haarspray Extra Strong', menge: '5-8 Sprühstöße' },
+            { name: 'Lockenspray', menge: '3 Sprühstöße' },
+            { name: 'Haarnadeln', menge: '20-30 Stück' },
+            { name: 'Hitzeschutz-Spray', menge: '3 Sprühstöße' }
           ]
         },
         'Brautstyling': {
@@ -5236,10 +5236,10 @@
           ],
           produkte: [
             { name: 'Shampoo Vital', menge: '10 ml' },
-            { name: 'Volumen-Mousse', menge: 'walnussgrosse Menge' },
-            { name: 'Haarspray Extra Strong', menge: '8-10 Spruehstoesse' },
-            { name: 'Haarnadeln', menge: '30-40 Stueck' },
-            { name: 'Hitzeschutz-Spray', menge: '3 Spruehstoesse' }
+            { name: 'Volumen-Mousse', menge: 'walnussgroße Menge' },
+            { name: 'Haarspray Extra Strong', menge: '8-10 Sprühstöße' },
+            { name: 'Haarnadeln', menge: '30-40 Stück' },
+            { name: 'Hitzeschutz-Spray', menge: '3 Sprühstöße' }
           ]
         },
         'Kinderhaarschnitt': {
@@ -5264,7 +5264,7 @@
             { name: 'Shampoo Men', menge: '8 ml' },
             { name: 'Bartoel', menge: '3-4 Tropfen' },
             { name: 'Styling Paste', menge: 'erbsengrosse Menge' },
-            { name: 'Aftershave', menge: '2-3 Spruehstoesse' }
+            { name: 'Aftershave', menge: '2-3 Sprühstöße' }
           ]
         },
         'Dauerwelle': {
@@ -5281,7 +5281,7 @@
           produkte: [
             { name: 'Dauerwellmittel', menge: '80 ml' },
             { name: 'Fixierung', menge: '80 ml' },
-            { name: 'Wickler', menge: '30-40 Stueck (je nach Laenge)' },
+            { name: 'Wickler', menge: '30-40 Stück (je nach Länge)' },
             { name: 'Pflegekur', menge: '20 ml' }
           ]
         },
@@ -5313,7 +5313,7 @@
           produkte: [
             { name: 'Blondierpulver', menge: '25 g' },
             { name: 'Oxid 6%', menge: '50 ml', mischung: '1:2 mit Blondierpulver' },
-            { name: 'Alufolie', menge: '20-25 Stueck (vorgeschnitten)' },
+            { name: 'Alufolie', menge: '20-25 Stück (vorgeschnitten)' },
             { name: 'Shampoo Silber', menge: '15 ml' },
             { name: 'Pflegekur', menge: '20 ml' }
           ]
@@ -5323,13 +5323,13 @@
             { schritt: 'Kopfhautanalyse', dauer_min: 5 },
             { schritt: 'Waschen', dauer_min: 5 },
             { schritt: 'Pflegekur einarbeiten', dauer_min: 5 },
-            { schritt: 'Einwirkzeit unter Waerme', dauer_min: 15, einwirkzeit: true },
+            { schritt: 'Einwirkzeit unter Wärme', dauer_min: 15, einwirkzeit: true },
             { schritt: 'Auswaschen', dauer_min: 5 },
             { schritt: 'Föhnen', dauer_min: 10 }
           ],
           produkte: [
             { name: 'Shampoo Vital', menge: '10 ml' },
-            { name: 'Intensiv-Kur', menge: '25 ml', mischung: 'Grosszuegig in Laengen + Spitzen' },
+            { name: 'Intensiv-Kur', menge: '25 ml', mischung: 'Großzügig in Längen + Spitzen' },
             { name: 'Kopfhaut-Serum', menge: '5 ml', mischung: 'Tropfenweise auf Kopfhaut' }
           ]
         },
@@ -5663,7 +5663,7 @@
         { Bestell_ID: 'NB-2026-003', Produkt: 'Balayage Folie 30cm', Menge: '5', Lieferant: 'Wella', Status: 'offen', Datum: '17.03.2026', Bestellt_Von: 'Sarah' },
         { Bestell_ID: 'NB-2026-004', Produkt: 'La Biosthetique Conditioner', Menge: '10', Lieferant: 'La Biosthetique', Status: 'bestellt', Datum: '15.03.2026', Bestellt_Von: 'Rena' },
         { Bestell_ID: 'NB-2026-005', Produkt: 'Haarfarbe 7.0 Mittelblond', Menge: '6', Lieferant: 'La Biosthetique', Status: 'offen', Datum: '18.03.2026', Bestellt_Von: 'Julia' },
-        { Bestell_ID: 'KB-2026-001', Produkt: 'La Biosthetique Shampoo Vital', Menge: '2', Lieferant: 'La Biosthetique', Status: 'bestellt', Datum: '18.03.2026', Bestellt_Von: 'Kundin Anna Mueller', Typ: 'kunde' },
+        { Bestell_ID: 'KB-2026-001', Produkt: 'La Biosthetique Shampoo Vital', Menge: '2', Lieferant: 'La Biosthetique', Status: 'bestellt', Datum: '18.03.2026', Bestellt_Von: 'Kundin Anna Müller', Typ: 'kunde' },
         { Bestell_ID: 'KB-2026-002', Produkt: 'Olaplex No. 3 Treatment', Menge: '1', Lieferant: 'Olaplex', Status: 'geliefert', Datum: '15.03.2026', Bestellt_Von: 'Kundin Lisa Kramer', Typ: 'kunde' },
         { Bestell_ID: 'KB-2026-003', Produkt: 'Haarkur Repair', Menge: '1', Lieferant: 'La Biosthetique', Status: 'offen', Datum: '19.03.2026', Bestellt_Von: 'Kundin Sandra Fischer', Typ: 'kunde' },
       ]);
@@ -6084,11 +6084,11 @@
       if (typ.includes('termin_bestaetigt')) {
         return [
           'Vielen Dank für Ihre Terminbestätigung! Wir freuen uns auf Ihren Besuch bei Rena Rados Friseure. Bitte kommen Sie ca. 5 Minuten vor Ihrem Termin. Bei Fragen erreichen Sie uns jederzeit.',
-          'Super, Ihr Termin ist bestaetigt! Wir freuen uns auf Sie. Bis bald bei Rena Rados!'
+          'Super, Ihr Termin ist bestätigt! Wir freuen uns auf Sie. Bis bald bei Rena Rados!'
         ];
       } else if (typ.includes('storno')) {
         return [
-          'Schade, dass Sie Ihren Termin absagen muessen. Wir haben die Stornierung vorgemerkt. Moechten Sie direkt einen neuen Termin vereinbaren? Wir haben diese Woche noch freie Plaetze.',
+          'Schade, dass Sie Ihren Termin absagen müssen. Wir haben die Stornierung vorgemerkt. Möchten Sie direkt einen neuen Termin vereinbaren? Wir haben diese Woche noch freie Plätze.',
           'Kein Problem, der Termin ist storniert. Melden Sie sich gerne, wenn Sie einen neuen Termin möchten!'
         ];
       } else if (typ.includes('nachbestellung')) {
@@ -6808,7 +6808,7 @@
           + '<input type="text" id="wfToolName" placeholder="Kundenname" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif">'
           + '<select id="wfToolHaartyp" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">'
           + '<option value="">Haartyp</option><option>Fein &amp; glatt</option><option>Normal &amp; wellig</option><option>Dick &amp; lockig</option><option>Naturkraus</option></select></div>'
-          + '<textarea id="wfToolNotiz" placeholder="Aktuelle Laenge, Vorbehandlungen, Wuensche..." rows="2" style="width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none;margin-bottom:12px;box-sizing:border-box"></textarea>'
+          + '<textarea id="wfToolNotiz" placeholder="Aktuelle Länge, Vorbehandlungen, Wünsche…" rows="2" style="width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none;margin-bottom:12px;box-sizing:border-box"></textarea>'
           + '<button onclick="checkMachbarkeit()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--success),#2a9d63);color:#fff;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Machbarkeits-Check starten</button>'
           + '<div id="machbarkeitResult" style="display:none;margin-top:14px"></div>');
       }
