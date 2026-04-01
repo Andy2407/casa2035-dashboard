@@ -1673,6 +1673,7 @@
       <input type="password" id="loginPw" placeholder="Passwort" onkeypress="if(event.key==='Enter')checkLogin()" style="width:100%;padding:14px 18px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:15px;font-family:'Inter',sans-serif;text-align:center;background:var(--bg-warm);color:var(--text);-webkit-text-fill-color:var(--text);margin-bottom:12px;letter-spacing:2px">
       <div id="loginError" style="font-size:12px;color:var(--danger);margin-bottom:8px;display:none">Benutzername oder Passwort falsch</div>
       <button onclick="checkLogin()" style="width:100%;padding:14px;background:var(--rose-gradient);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;letter-spacing:0.5px">Anmelden</button>
+      <div style="margin-top:10px;font-size:11px;color:var(--text-micro);text-align:center">Passwort vergessen? Wende dich an deine Salonleitung.</div>
       <div style="margin-top:16px;font-size:10px;color:var(--text-dim);line-height:1.5">
         <span id="loginRoleHint"></span>
       </div>
@@ -1729,7 +1730,7 @@
       </div>
       <div id="profileSaveInfo" style="font-size:12px;color:var(--success);margin-top:8px;display:none">Gespeichert!</div>
       <div class="pw-change-actions">
-        <button class="pw-btn-cancel" onclick="closeProfileSettings()">Schliessen</button>
+        <button class="pw-btn-cancel" onclick="closeProfileSettings()">Schließen</button>
         <button class="pw-btn-save" onclick="saveProfileSettings()">Speichern</button>
       </div>
     </div>
@@ -2701,7 +2702,7 @@
       <div class="ta-diff" id="taDiff"></div>
       <div class="sheet-actions">
         <button class="btn btn-secondary" onclick="closeSheet('taSheet')">Abbrechen</button>
-        <button class="btn btn-primary" onclick="submitTagesabschluss()">Abschliessen</button>
+        <button class="btn btn-primary" onclick="submitTagesabschluss()">Abschließen</button>
       </div>
     </div>
   </div>
@@ -2781,7 +2782,7 @@
       <div class="sheet-handle"></div>
       <div id="detailInner"></div>
       <div class="sheet-actions" style="margin-top:12px">
-        <button class="btn btn-secondary" onclick="closeSheet('detailSheet')">Schliessen</button>
+        <button class="btn btn-secondary" onclick="closeSheet('detailSheet')">Schließen</button>
       </div>
     </div>
   </div>
@@ -2791,7 +2792,7 @@
     // Testphase: Benutzer-Datenbank (spaeter Supabase Auth)
     var USERS = {
       'rena':    { pw: 'casa2035', rolle: 'CHF', name: 'Rena', nachname: 'Rados', titel: 'Inhaberin & Friseurmeisterin', isAdmin: false, kuerzel: 'RR', farbe: '#b8962e' },
-      'sarah':   { pw: 'casa2035', rolle: 'FRM', name: 'Sarah', nachname: 'Mueller', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'SM', farbe: '#e06b8f' },
+      'sarah':   { pw: 'casa2035', rolle: 'FRM', name: 'Sarah', nachname: 'Müller', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'SM', farbe: '#e06b8f' },
       'julia':   { pw: 'casa2035', rolle: 'FRM', name: 'Julia', nachname: 'Weber', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'JW', farbe: '#6b8fe0' },
       'lena':    { pw: 'casa2035', rolle: 'STY', name: 'Lena', nachname: 'Fischer', titel: 'Stylistin', isAdmin: false, kuerzel: 'LF', farbe: '#8f6be0' },
       'admin':   { pw: 'casa2035', rolle: 'CHF', name: 'Andreas', nachname: 'Schengel', titel: 'Administrator', isAdmin: true, kuerzel: 'AS', farbe: '#2eb87a' }
@@ -5858,7 +5859,7 @@
       btnImage.appendChild(document.createTextNode(' Bild senden'));
       btnImage.addEventListener('click', function() {
         closeSheet('detailSheet');
-        showToast('Bild-Auswahl wird geoeffnet...', 'info', 2000);
+        showToast('Bild-Auswahl wird geöffnet…', 'info', 2000);
       });
       actions.appendChild(btnImage);
 
@@ -7396,7 +7397,7 @@
       var notiz = document.getElementById('wfToolNotiz').value;
       if (!files || !files.length) { showToast('Bitte Wunschbild hochladen', 'warning'); return; }
       if (!name) { showToast('Bitte Kundennamen angeben', 'warning'); return; }
-      showToast('Machbarkeits-Check laeuft...', 'info');
+      showToast('Machbarkeits-Check läuft…', 'info');
 
       var resultEl = document.getElementById('machbarkeitResult');
       resultEl.style.display = 'block';
@@ -7932,7 +7933,7 @@
       saveSalonRegeln(regeln);
       document.getElementById('regelText').value = '';
       renderSalonRegeln();
-      showToast('Regel hinzugefuegt: ' + text.substring(0, 40), 'success', 2000);
+      showToast('Regel hinzugefügt: ' + text.substring(0, 40), 'success', 2000);
     }
 
     function addSalonRegelFromVorschlag(kat, text) {
@@ -7944,7 +7945,7 @@
       regeln.push({ id: newId, kategorie: kat, text: text, aktiv: true, erstellt: new Date().toISOString() });
       saveSalonRegeln(regeln);
       renderSalonRegeln();
-      showToast('Regel hinzugefuegt: ' + text, 'success', 2000);
+      showToast('Regel hinzugefügt: ' + text, 'success', 2000);
     }
 
     function toggleSalonRegel(id) {
@@ -7958,7 +7959,7 @@
       var regeln = getSalonRegeln().filter(function(r) { return r.id !== id; });
       saveSalonRegeln(regeln);
       renderSalonRegeln();
-      showToast('Regel geloescht', 'info', 1500);
+      showToast('Regel gelöscht', 'info', 1500);
     }
 
     function renderSalonRegeln() {
@@ -8240,14 +8241,14 @@
           id: 'ERR-001', severity: 'warning', workflow: 'WF-01 Intent',
           message: 'Gmail Trigger: 3x Timeout in letzter Stunde',
           analyse: 'Moegliche Ursache: Google OAuth Token abgelaufen oder Rate-Limit erreicht.',
-          loesung: 'Token-Refresh in n8n Credentials pruefen. Falls persistent: Gmail Credential neu autorisieren.',
+          loesung: 'Token-Refresh in n8n Credentials prüfen. Falls persistent: Gmail Credential neu autorisieren.',
           zeit: '14:23'
         },
         {
           id: 'ERR-002', severity: 'info', workflow: 'WF-02a Termin',
           message: 'RAG-Suche: Durchschnittliche Latenz 1.2s (Schwellwert: 1.0s)',
           analyse: 'Qdrant Free Tier hat keine garantierte Latenz. Erhoehte Latenz deutet auf Cold-Start hin.',
-          loesung: 'Monitoring fortsetzen. Bei >2s: Qdrant Cluster-Status pruefen.',
+          loesung: 'Monitoring fortsetzen. Bei >2s: Qdrant Cluster-Status prüfen.',
           zeit: '13:45'
         }
       ];
@@ -8309,7 +8310,7 @@
     }
 
     function startDebugProcess() {
-      showToast('Debug-Prozess gestartet — Systeme werden geprueft...', 'info', 3000);
+      showToast('Debug-Prozess gestartet — Systeme werden geprüft…', 'info', 3000);
       setTimeout(function() {
         showToast('Alle Checks abgeschlossen. 1 Warning, 0 Critical.', 'success', 4000);
       }, 3000);
@@ -8322,7 +8323,7 @@
       container.textContent = '';
       var phases = [
         { nr: 1, label: 'Kern-System', wfs: 'WF-09 + Auth-MW + WF-01 + WF-02a', status: 'bereit', desc: 'Zuerst aktivieren — Auth + Intent + Termin' },
-        { nr: 2, label: 'Booking-Flow', wfs: 'WF-02b + WF-06a + WF-06b', status: 'bereit', desc: 'Bestaetigung + Storno' },
+        { nr: 2, label: 'Booking-Flow', wfs: 'WF-02b + WF-06a + WF-06b', status: 'bereit', desc: 'Bestätigung + Storno' },
         { nr: 3, label: 'Features', wfs: 'WF-03a/b/c + WF-04 + WF-05', status: 'teilweise', desc: 'Frisur-Analyse, Lager, Rechnungen' },
         { nr: 4, label: 'Dashboard + Finanzen', wfs: 'WF-10 + WF-11 + PWA-Dash', status: 'bereit', desc: 'Kasse, Tagesabschluss, API' },
         { nr: 5, label: 'Automatisierung', wfs: 'WF-07 + WF-08', status: 'bereit', desc: 'Cron-Trigger + Erinnerungen (zuletzt!)' }
@@ -8367,7 +8368,7 @@
         { time: '27.03. 18:00', event: 'Domain DNS konfiguriert', type: 'config', detail: 'casa2035.de + app.casa2035.de auf GitHub Pages' },
         { time: '27.03. 14:30', event: 'Dashboard UX-Overhaul', type: 'feature', detail: 'KI-Rezepte, Anfragen-Overlay, Timeline-Limit' },
         { time: '27.03. 11:00', event: 'PWA-Icons erstellt', type: 'fix', detail: 'Logo als 192px + 512px Icon' },
-        { time: '25.03. 16:00', event: 'Businessplan v1.16', type: 'doc', detail: '.md + .docx + .pdf fuer Gruenderzuschuss' },
+        { time: '25.03. 16:00', event: 'Businessplan v1.16', type: 'doc', detail: '.md + .docx + .pdf für Gründerzuschuss' },
         { time: '24.03. 13:00', event: 'Produkt-Website LIVE', type: 'deploy', detail: 'casa2035.de — SaaS Landing Page' }
       ];
       var typeColors = { deploy: 'var(--success)', config: 'var(--info)', feature: 'var(--rose)', fix: 'var(--warning)', doc: 'var(--text-dim)' };
