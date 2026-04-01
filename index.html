@@ -185,12 +185,71 @@
     }
     .live-dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: breathe 2.5s infinite; }
     .avatar {
-      width: 36px; height: 36px; border-radius: 50%;
+      width: 38px; height: 38px; border-radius: 50%;
       background: var(--rose-gradient);
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 700; color: #fff;
+      font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 0.5px;
       box-shadow: 0 0 0 2px var(--bg), 0 0 0 3px rgba(184,150,46,0.3);
+      cursor: pointer; position: relative; -webkit-tap-highlight-color: transparent;
+      transition: transform 150ms var(--ease), box-shadow 150ms var(--ease);
     }
+    .avatar:active { transform: scale(0.93); }
+
+    /* === Profil-Dropdown === */
+    .avatar-wrap { position: relative; }
+    .profile-menu {
+      position: absolute; top: calc(100% + 10px); right: 0; z-index: 200;
+      min-width: 240px; background: var(--card-solid); border: 1px solid var(--border-accent);
+      border-radius: var(--radius); box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 0 0 1px var(--border);
+      padding: 8px 0; opacity: 0; visibility: hidden; transform: translateY(-6px) scale(0.97);
+      transition: opacity 180ms var(--ease), transform 180ms var(--ease), visibility 180ms;
+    }
+    .profile-menu.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
+    .profile-menu-header {
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .profile-menu-avatar {
+      width: 40px; height: 40px; border-radius: 50%; background: var(--rose-gradient);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .profile-menu-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .profile-menu-name { font-size: 14px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .profile-menu-role { font-size: 11px; color: var(--text-dim); font-weight: 500; }
+    .profile-menu-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+      font-size: 13px; font-weight: 500; color: var(--text-secondary);
+      cursor: pointer; transition: background 120ms, color 120ms; border: none; background: none; width: 100%; text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+    .profile-menu-item:hover { background: var(--surface-hover); color: var(--text); }
+    .profile-menu-item svg { width: 16px; height: 16px; flex-shrink: 0; opacity: 0.6; }
+    .profile-menu-item:hover svg { opacity: 1; }
+    .profile-menu-divider { height: 1px; background: var(--border); margin: 4px 0; }
+    .profile-menu-item.danger { color: var(--danger); }
+    .profile-menu-item.danger svg { color: var(--danger); }
+    .profile-menu-item.danger:hover { background: var(--danger-bg); }
+
+    /* === Passwort-Aendern Sheet === */
+    .pw-change-overlay {
+      position: fixed; inset: 0; z-index: 9998; background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center;
+    }
+    .pw-change-overlay.show { display: flex; }
+    .pw-change-card {
+      background: var(--card-solid); border: 1px solid var(--border-accent);
+      border-radius: var(--radius-lg); padding: 28px; width: 90%; max-width: 360px;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+    }
+    .pw-change-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+    .pw-change-card p { font-size: 12px; color: var(--text-dim); margin-bottom: 18px; }
+    .pw-field { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: 'Inter', sans-serif; background: var(--bg-warm); color: var(--text); margin-bottom: 10px; }
+    .pw-field:focus { outline: none; border-color: var(--rose); }
+    .pw-change-actions { display: flex; gap: 8px; margin-top: 14px; }
+    .pw-change-actions button { flex: 1; padding: 12px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; font-family: 'Inter', sans-serif; cursor: pointer; border: none; }
+    .pw-btn-cancel { background: var(--surface-hover); color: var(--text-secondary); }
+    .pw-btn-save { background: var(--rose-gradient); color: #fff; }
     .header-sub {
       display: flex; justify-content: space-between; align-items: center;
       margin-top: 6px; font-size: 10px; color: var(--text-micro); letter-spacing: 0.2px;
@@ -1442,6 +1501,9 @@
       .header-greeting { font-size: 10px; }
       .header-right { gap: 8px; }
       .avatar { width: 32px; height: 32px; font-size: 11px; }
+      .profile-menu { min-width: 220px; right: -8px; }
+      .profile-menu-header { padding: 12px 14px; }
+      .profile-menu-item { padding: 9px 14px; font-size: 12px; }
       .live-dot { font-size: 9px; padding: 3px 8px; }
       .content { padding: 4px 12px 12px; }
       .hero-card { padding: 18px 16px; border-radius: var(--radius); }
@@ -1618,6 +1680,61 @@
     <div style="font-size:10px;color:var(--text-micro)">Rena Rados Friseure &middot; Powered by Casa 2035</div>
   </div>
 
+  <!-- Passwort aendern Dialog -->
+  <div class="pw-change-overlay" id="pwChangeOverlay">
+    <div class="pw-change-card">
+      <h3>Passwort aendern</h3>
+      <p>Gib dein aktuelles und ein neues Passwort ein.</p>
+      <input type="password" class="pw-field" id="pwOld" placeholder="Aktuelles Passwort" onkeypress="if(event.key==='Enter')document.getElementById('pwNew').focus()">
+      <input type="password" class="pw-field" id="pwNew" placeholder="Neues Passwort" onkeypress="if(event.key==='Enter')document.getElementById('pwConfirm').focus()">
+      <input type="password" class="pw-field" id="pwConfirm" placeholder="Neues Passwort wiederholen" onkeypress="if(event.key==='Enter')saveNewPassword()">
+      <div id="pwChangeError" style="font-size:12px;color:var(--danger);margin-top:4px;display:none"></div>
+      <div class="pw-change-actions">
+        <button class="pw-btn-cancel" onclick="closePasswordChange()">Abbrechen</button>
+        <button class="pw-btn-save" onclick="saveNewPassword()">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profil-Einstellungen Sheet -->
+  <div class="pw-change-overlay" id="profileOverlay">
+    <div class="pw-change-card" style="max-width:400px">
+      <h3>Profil &amp; Einstellungen</h3>
+      <p>Passe dein Profil an — Kuerzel, Farbe und Name.</p>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:14px;background:var(--bg-warm);border-radius:var(--radius-sm)">
+        <div class="profile-menu-avatar" id="profileSheetAvatar" style="width:52px;height:52px;font-size:16px;letter-spacing:0.5px;font-weight:700;border-radius:50%;flex-shrink:0">RR</div>
+        <div>
+          <div style="font-size:15px;font-weight:600" id="profileSheetName">Rena</div>
+          <div style="font-size:12px;color:var(--text-dim)" id="profileSheetTitel">Inhaberin & Friseurmeisterin</div>
+          <div style="font-size:11px;color:var(--rose);font-weight:600;margin-top:2px" id="profileSheetRolle">Chefin</div>
+        </div>
+      </div>
+      <label style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Anzeigename</label>
+      <input type="text" class="pw-field" id="profileDisplayName" placeholder="Dein Name" maxlength="30">
+      <div style="display:flex;gap:10px;margin-top:2px">
+        <div style="flex:1">
+          <label style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Kuerzel (2 Buchstaben)</label>
+          <input type="text" class="pw-field" id="profileKuerzel" placeholder="z.B. RR" maxlength="2" style="text-transform:uppercase;text-align:center;font-weight:700;letter-spacing:2px">
+        </div>
+        <div style="flex:1">
+          <label style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Meine Farbe</label>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input type="color" id="profileFarbe" value="#b8962e" style="width:44px;height:44px;border:2px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;padding:2px;background:var(--bg-warm)">
+            <div id="profileFarbePreview" style="width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;letter-spacing:0.5px">RR</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px" id="profileFarbePresets">
+        <label style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;display:block;width:100%;margin-bottom:2px">Oder waehle eine Farbe</label>
+      </div>
+      <div id="profileSaveInfo" style="font-size:12px;color:var(--success);margin-top:8px;display:none">Gespeichert!</div>
+      <div class="pw-change-actions">
+        <button class="pw-btn-cancel" onclick="closeProfileSettings()">Schliessen</button>
+        <button class="pw-btn-save" onclick="saveProfileSettings()">Speichern</button>
+      </div>
+    </div>
+  </div>
+
   <!-- V4.0: Goldpartikel-Hintergrund -->
   <div class="particles" aria-hidden="true"></div>
 
@@ -1638,11 +1755,36 @@
         <button id="darkModeToggle" onclick="toggleDarkMode()" style="background:none;border:1px solid var(--border-accent);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);transition:all .2s" aria-label="Dark Mode">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
-        <div class="avatar" id="avatar">R</div>
+        <div class="avatar-wrap">
+          <div class="avatar" id="avatar" onclick="toggleProfileMenu(event)">R</div>
+          <div class="profile-menu" id="profileMenu">
+            <div class="profile-menu-header">
+              <div class="profile-menu-avatar" id="profileMenuAvatar">R</div>
+              <div class="profile-menu-info">
+                <div class="profile-menu-name" id="profileMenuName">Rena</div>
+                <div class="profile-menu-role" id="profileMenuRole">Inhaberin</div>
+              </div>
+            </div>
+            <button class="profile-menu-item" onclick="openPasswordChange()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              Passwort aendern
+            </button>
+            <button class="profile-menu-item" onclick="openProfileSettings()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Profil &amp; Einstellungen
+            </button>
+            <div class="profile-menu-divider"></div>
+            <button class="profile-menu-item danger" onclick="doLogout()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Abmelden
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <div class="header-sub">
       <span id="headerDate"></span>
+      <span id="headerWelcome" style="font-weight:500"></span>
       <span id="lastRefresh">Update: --:--</span>
     </div>
   </header>
@@ -2648,12 +2790,24 @@
     // === Login mit Benutzer + Rolle ===
     // Testphase: Benutzer-Datenbank (spaeter Supabase Auth)
     var USERS = {
-      'rena':    { pw: 'casa2035', rolle: 'CHF', name: 'Rena', titel: 'Inhaberin & Friseurmeisterin', isAdmin: false },
-      'sarah':   { pw: 'casa2035', rolle: 'FRM', name: 'Sarah', titel: 'Friseurmeisterin', isAdmin: false },
-      'julia':   { pw: 'casa2035', rolle: 'FRM', name: 'Julia', titel: 'Friseurmeisterin', isAdmin: false },
-      'lena':    { pw: 'casa2035', rolle: 'STY', name: 'Lena', titel: 'Stylistin', isAdmin: false },
-      'admin':   { pw: 'casa2035', rolle: 'CHF', name: 'Andreas', titel: 'Administrator', isAdmin: true }
+      'rena':    { pw: 'casa2035', rolle: 'CHF', name: 'Rena', nachname: 'Rados', titel: 'Inhaberin & Friseurmeisterin', isAdmin: false, kuerzel: 'RR', farbe: '#b8962e' },
+      'sarah':   { pw: 'casa2035', rolle: 'FRM', name: 'Sarah', nachname: 'Mueller', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'SM', farbe: '#e06b8f' },
+      'julia':   { pw: 'casa2035', rolle: 'FRM', name: 'Julia', nachname: 'Weber', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'JW', farbe: '#6b8fe0' },
+      'lena':    { pw: 'casa2035', rolle: 'STY', name: 'Lena', nachname: 'Fischer', titel: 'Stylistin', isAdmin: false, kuerzel: 'LF', farbe: '#8f6be0' },
+      'admin':   { pw: 'casa2035', rolle: 'CHF', name: 'Andreas', nachname: 'Schengel', titel: 'Administrator', isAdmin: true, kuerzel: 'AS', farbe: '#2eb87a' }
     };
+
+    // Gespeicherte Personalisierungen laden (Kuerzel, Farbe, Name)
+    var userCustomizations = JSON.parse(localStorage.getItem('casa_user_custom') || '{}');
+    // Gespeicherte Werte auf USERS anwenden
+    Object.keys(userCustomizations).forEach(function(uname) {
+      if (USERS[uname]) {
+        var c = userCustomizations[uname];
+        if (c.kuerzel) USERS[uname].kuerzel = c.kuerzel;
+        if (c.farbe) USERS[uname].farbe = c.farbe;
+        if (c.name) USERS[uname].name = c.name;
+      }
+    });
     var ROLLEN_LABEL = { CHF: 'Chefin', FRM: 'Meisterin', STY: 'Stylistin', AZU: 'Azubi' };
 
     // === Rollen-Berechtigungen (RBAC) ===
@@ -2765,10 +2919,20 @@
       currentPerms = getEffectivePerms(rolle, username || sessionStorage.getItem('casa_user'));
       currentIsAdmin = !!isAdmin;
 
-      // Header
-      var greet = document.querySelector('.header-sub');
+      // Header — Willkommen separat (nicht header-sub ueberschreiben!)
+      var welcomeEl = document.getElementById('headerWelcome');
       var rolleLabel = isAdmin ? 'Admin' : ROLLEN_LABEL[rolle];
-      if (greet) greet.textContent = 'Willkommen, ' + name + ' (' + rolleLabel + ')';
+      if (welcomeEl) welcomeEl.textContent = name + ' (' + rolleLabel + ')';
+
+      // Avatar-Kuerzel + Farbe aktualisieren
+      var uname = username || sessionStorage.getItem('casa_user');
+      var userObj = USERS[uname];
+      var avatarEl = document.getElementById('avatar');
+      if (userObj) {
+        avatarEl.textContent = userObj.kuerzel || name.charAt(0).toUpperCase();
+        avatarEl.style.background = 'linear-gradient(135deg, ' + userObj.farbe + ' 0%, ' + lightenColor(userObj.farbe, 20) + ' 100%)';
+        avatarEl.style.boxShadow = '0 0 0 2px var(--bg), 0 0 0 3px ' + userObj.farbe + '4d';
+      }
 
       // Legacy: data-min-role Support
       document.querySelectorAll('[data-min-role]').forEach(function(el) {
@@ -2821,6 +2985,244 @@
         el.style.display = perms.lagerBestellen ? '' : 'none';
       });
     }
+
+    // === Farb-Hilfsfunktion ===
+    function lightenColor(hex, percent) {
+      hex = hex.replace('#', '');
+      var r = parseInt(hex.substring(0, 2), 16);
+      var g = parseInt(hex.substring(2, 4), 16);
+      var b = parseInt(hex.substring(4, 6), 16);
+      r = Math.min(255, Math.floor(r + (255 - r) * percent / 100));
+      g = Math.min(255, Math.floor(g + (255 - g) * percent / 100));
+      b = Math.min(255, Math.floor(b + (255 - b) * percent / 100));
+      return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+
+    // === Profil-Menue, Logout, Passwort aendern ===
+
+    function toggleProfileMenu(e) {
+      e.stopPropagation();
+      var menu = document.getElementById('profileMenu');
+      var isOpen = menu.classList.contains('show');
+      menu.classList.toggle('show', !isOpen);
+      // Update Profil-Infos im Menue
+      var username = sessionStorage.getItem('casa_user');
+      var user = USERS[username];
+      if (user) {
+        document.getElementById('profileMenuAvatar').textContent = user.name.charAt(0);
+        document.getElementById('profileMenuName').textContent = user.name;
+        var rolleLabel = user.isAdmin ? 'Administrator' : (ROLLEN_LABEL[user.rolle] || user.rolle);
+        document.getElementById('profileMenuRole').textContent = user.titel + ' — ' + rolleLabel;
+      }
+    }
+
+    // Click-Outside schliesst das Menue
+    document.addEventListener('click', function(e) {
+      var menu = document.getElementById('profileMenu');
+      if (menu && menu.classList.contains('show')) {
+        if (!e.target.closest('.avatar-wrap')) {
+          menu.classList.remove('show');
+        }
+      }
+    });
+
+    function doLogout() {
+      // Session komplett leeren
+      sessionStorage.removeItem('casa_auth');
+      sessionStorage.removeItem('casa_user');
+      sessionStorage.removeItem('casa_rolle');
+      sessionStorage.removeItem('casa_name');
+      sessionStorage.removeItem('casa_admin');
+      // Profil-Menue schliessen
+      document.getElementById('profileMenu').classList.remove('show');
+      // Login-Overlay anzeigen
+      document.getElementById('loginOverlay').style.display = 'flex';
+      // Felder zuruecksetzen
+      document.getElementById('loginUser').value = '';
+      document.getElementById('loginPw').value = '';
+      document.getElementById('loginError').style.display = 'none';
+      // Zurueck zur Dashboard-Seite
+      switchPage('dashboard');
+      showToast('Erfolgreich abgemeldet', 'success', 2000);
+    }
+
+    function openPasswordChange() {
+      document.getElementById('profileMenu').classList.remove('show');
+      document.getElementById('pwOld').value = '';
+      document.getElementById('pwNew').value = '';
+      document.getElementById('pwConfirm').value = '';
+      document.getElementById('pwChangeError').style.display = 'none';
+      document.getElementById('pwChangeOverlay').classList.add('show');
+      setTimeout(function() { document.getElementById('pwOld').focus(); }, 200);
+    }
+
+    function closePasswordChange() {
+      document.getElementById('pwChangeOverlay').classList.remove('show');
+    }
+
+    function saveNewPassword() {
+      var username = sessionStorage.getItem('casa_user');
+      var user = USERS[username];
+      var oldPw = document.getElementById('pwOld').value;
+      var newPw = document.getElementById('pwNew').value;
+      var confirmPw = document.getElementById('pwConfirm').value;
+      var errorEl = document.getElementById('pwChangeError');
+
+      if (!oldPw || !newPw || !confirmPw) {
+        errorEl.textContent = 'Bitte alle Felder ausfuellen';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (user && oldPw !== user.pw) {
+        errorEl.textContent = 'Aktuelles Passwort ist falsch';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (newPw.length < 4) {
+        errorEl.textContent = 'Neues Passwort muss mindestens 4 Zeichen lang sein';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (newPw !== confirmPw) {
+        errorEl.textContent = 'Neue Passwoerter stimmen nicht ueberein';
+        errorEl.style.display = 'block';
+        return;
+      }
+      if (newPw === oldPw) {
+        errorEl.textContent = 'Neues Passwort muss sich vom alten unterscheiden';
+        errorEl.style.display = 'block';
+        return;
+      }
+      // Passwort aendern (Client-seitig — spaeter ueber Auth-Backend)
+      user.pw = newPw;
+      closePasswordChange();
+      showToast('Passwort erfolgreich geaendert', 'success', 3000);
+    }
+
+    // Farb-Presets fuer Profil
+    var FARB_PRESETS = [
+      { name: 'Gold', hex: '#b8962e' },
+      { name: 'Rose', hex: '#e06b8f' },
+      { name: 'Blau', hex: '#6b8fe0' },
+      { name: 'Lila', hex: '#8f6be0' },
+      { name: 'Gruen', hex: '#2eb87a' },
+      { name: 'Tuerkis', hex: '#2eb8b8' },
+      { name: 'Orange', hex: '#e0946b' },
+      { name: 'Koralle', hex: '#e06b6b' },
+      { name: 'Mint', hex: '#6be0b8' },
+      { name: 'Indigo', hex: '#6b6be0' }
+    ];
+
+    function updateProfilePreview() {
+      var kuerzel = (document.getElementById('profileKuerzel').value || '??').toUpperCase();
+      var farbe = document.getElementById('profileFarbe').value;
+      var preview = document.getElementById('profileFarbePreview');
+      var sheetAvatar = document.getElementById('profileSheetAvatar');
+      preview.textContent = kuerzel;
+      preview.style.background = 'linear-gradient(135deg, ' + farbe + ' 0%, ' + lightenColor(farbe, 20) + ' 100%)';
+      sheetAvatar.textContent = kuerzel;
+      sheetAvatar.style.background = 'linear-gradient(135deg, ' + farbe + ' 0%, ' + lightenColor(farbe, 20) + ' 100%)';
+    }
+
+    function openProfileSettings() {
+      document.getElementById('profileMenu').classList.remove('show');
+      var username = sessionStorage.getItem('casa_user');
+      var user = USERS[username];
+      if (user) {
+        document.getElementById('profileSheetAvatar').textContent = user.kuerzel || user.name.charAt(0);
+        document.getElementById('profileSheetAvatar').style.background = 'linear-gradient(135deg, ' + user.farbe + ' 0%, ' + lightenColor(user.farbe, 20) + ' 100%)';
+        document.getElementById('profileSheetName').textContent = user.name;
+        document.getElementById('profileSheetTitel').textContent = user.titel;
+        var rolleLabel = user.isAdmin ? 'Administrator' : (ROLLEN_LABEL[user.rolle] || user.rolle);
+        document.getElementById('profileSheetRolle').textContent = rolleLabel;
+        document.getElementById('profileDisplayName').value = user.name;
+        document.getElementById('profileKuerzel').value = user.kuerzel || '';
+        document.getElementById('profileFarbe').value = user.farbe || '#b8962e';
+        document.getElementById('profileFarbePreview').textContent = user.kuerzel || user.name.charAt(0);
+        document.getElementById('profileFarbePreview').style.background = 'linear-gradient(135deg, ' + user.farbe + ' 0%, ' + lightenColor(user.farbe, 20) + ' 100%)';
+      }
+      // Farb-Presets rendern (sicher ohne innerHTML)
+      var presetsContainer = document.getElementById('profileFarbePresets');
+      var label = presetsContainer.querySelector('label');
+      while (presetsContainer.firstChild) { presetsContainer.removeChild(presetsContainer.firstChild); }
+      presetsContainer.appendChild(label);
+      FARB_PRESETS.forEach(function(preset) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.title = preset.name;
+        btn.style.cssText = 'width:28px;height:28px;border-radius:50%;border:2px solid var(--border);cursor:pointer;background:' + preset.hex + ';transition:transform 120ms,border-color 120ms';
+        btn.onmouseover = function() { btn.style.transform = 'scale(1.15)'; };
+        btn.onmouseout = function() { btn.style.transform = 'scale(1)'; };
+        btn.onclick = function() {
+          document.getElementById('profileFarbe').value = preset.hex;
+          updateProfilePreview();
+          presetsContainer.querySelectorAll('button').forEach(function(b) { b.style.borderColor = 'var(--border)'; });
+          btn.style.borderColor = '#fff';
+        };
+        if (user && user.farbe === preset.hex) btn.style.borderColor = '#fff';
+        presetsContainer.appendChild(btn);
+      });
+      // Live-Vorschau bei Eingabe
+      document.getElementById('profileKuerzel').oninput = updateProfilePreview;
+      document.getElementById('profileFarbe').oninput = updateProfilePreview;
+      document.getElementById('profileSaveInfo').style.display = 'none';
+      document.getElementById('profileOverlay').classList.add('show');
+    }
+
+    function closeProfileSettings() {
+      document.getElementById('profileOverlay').classList.remove('show');
+    }
+
+    function saveProfileSettings() {
+      var username = sessionStorage.getItem('casa_user');
+      var user = USERS[username];
+      var newName = document.getElementById('profileDisplayName').value.trim();
+      var newKuerzel = document.getElementById('profileKuerzel').value.trim().toUpperCase();
+      var newFarbe = document.getElementById('profileFarbe').value;
+
+      if (!newName) { showToast('Name darf nicht leer sein', 'warning', 2000); return; }
+      if (newKuerzel.length < 1 || newKuerzel.length > 2) { showToast('Kuerzel muss 1-2 Buchstaben haben', 'warning', 2000); return; }
+
+      if (user) {
+        user.name = newName;
+        user.kuerzel = newKuerzel;
+        user.farbe = newFarbe;
+        sessionStorage.setItem('casa_name', newName);
+        currentUser = newName;
+
+        // In localStorage persistieren
+        var customs = JSON.parse(localStorage.getItem('casa_user_custom') || '{}');
+        customs[username] = { name: newName, kuerzel: newKuerzel, farbe: newFarbe };
+        localStorage.setItem('casa_user_custom', JSON.stringify(customs));
+
+        // Avatar im Header aktualisieren
+        var avatarEl = document.getElementById('avatar');
+        avatarEl.textContent = newKuerzel;
+        avatarEl.style.background = 'linear-gradient(135deg, ' + newFarbe + ' 0%, ' + lightenColor(newFarbe, 20) + ' 100%)';
+        avatarEl.style.boxShadow = '0 0 0 2px var(--bg), 0 0 0 3px ' + newFarbe + '4d';
+
+        // Profil-Sheet aktualisieren
+        document.getElementById('profileSheetName').textContent = newName;
+
+        // Header-Welcome aktualisieren
+        var rolleLabel = user.isAdmin ? 'Admin' : ROLLEN_LABEL[user.rolle];
+        var welcomeEl = document.getElementById('headerWelcome');
+        if (welcomeEl) welcomeEl.textContent = newName + ' (' + rolleLabel + ')';
+      }
+      document.getElementById('profileSaveInfo').style.display = 'block';
+      setTimeout(function() { document.getElementById('profileSaveInfo').style.display = 'none'; }, 2500);
+      showToast('Profil gespeichert — Kuerzel: ' + newKuerzel, 'success', 3000);
+    }
+
+    // Escape-Taste schliesst Overlays
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        if (document.getElementById('pwChangeOverlay').classList.contains('show')) closePasswordChange();
+        if (document.getElementById('profileOverlay').classList.contains('show')) closeProfileSettings();
+        var menu = document.getElementById('profileMenu');
+        if (menu && menu.classList.contains('show')) menu.classList.remove('show');
+      }
+    });
 
     // =============================================================
     // Casa 2035 — PWA Dashboard v4.0 Luxury Edition
@@ -3322,6 +3724,8 @@
       document.getElementById('headerGreeting').textContent = h < 12 ? 'Guten Morgen' : h < 17 ? 'Guten Tag' : 'Guten Abend';
       document.getElementById('headerDate').textContent = now.toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     }
+    // Begruessung alle 60 Sekunden aktualisieren
+    setInterval(updateDate, 60000);
     function updateRefreshTime() {
       document.getElementById('lastRefresh').textContent = 'Update: ' + new Date().toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     }
@@ -4279,7 +4683,8 @@
       saveSettings();
       applyRoleLegacy();
       document.querySelectorAll('.role-chip').forEach(c => c.classList.toggle('active', c.dataset.role === role));
-      document.getElementById('avatar').textContent = role.charAt(0);
+      var uName = sessionStorage.getItem('casa_name') || role.charAt(0);
+      document.getElementById('avatar').textContent = uName.charAt(0).toUpperCase();
     }
     function applyRoleLegacy() {
       const canAusgabe = userRole === 'FRM' || userRole === 'CHF';
