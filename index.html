@@ -591,7 +591,8 @@
     @media print {
       .header, .bottom-nav, .fab-wrap, #dashFeedbackFab, #dashFeedbackPanel, .ki-assist-panel { display: none !important; }
       body { padding: 0; background: #fff; color: #000; }
-      .page { display: block !important; }
+      .page { display: none !important; }
+      .page.active { display: block !important; }
     }
 
     /* === Termin Day/Week Views === */
@@ -756,6 +757,119 @@
       width: 120px; height: 6px; border-radius: 3px; background: var(--surface-active); overflow: hidden;
     }
     .golive-footer .progress-fill { height: 100%; border-radius: 3px; background: var(--gold-gradient); transition: width 400ms var(--ease); }
+
+    /* === IRON MAN COCKPIT === */
+    .cockpit-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;
+    }
+    .cockpit-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 14px 16px; backdrop-filter: blur(12px);
+      transition: all 300ms var(--ease);
+    }
+    .cockpit-card:hover { border-color: var(--border-accent); box-shadow: var(--shadow-glow); }
+    .cockpit-wide { grid-column: 1 / -1; }
+    .cockpit-center { display: flex; flex-direction: column; align-items: center; }
+    .cockpit-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+      color: var(--text-dim); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+    }
+    .cockpit-trend {
+      font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px;
+    }
+    .cockpit-trend.up { background: var(--success-bg); color: var(--success); }
+    .cockpit-trend.down { background: var(--danger-bg); color: var(--danger); }
+    .cockpit-trend.flat { background: var(--info-bg); color: var(--info); }
+
+    /* Bar Chart */
+    .bar-chart {
+      display: flex; align-items: flex-end; gap: 8px; height: 100px;
+      padding: 0 4px;
+    }
+    .bar-col {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    }
+    .bar-col span { font-size: 10px; font-weight: 600; color: var(--text-dim); }
+    .bar {
+      width: 100%; border-radius: 4px 4px 0 0; min-height: 4px;
+      background: var(--gold); opacity: 0.6;
+      transition: height 600ms var(--ease-spring), opacity 300ms;
+    }
+    .bar.today { opacity: 1; background: var(--gold-gradient); box-shadow: 0 0 12px rgba(184,150,46,0.3); }
+    .bar:hover { opacity: 1; }
+    .bar-legend {
+      text-align: center; margin-top: 8px; font-size: 11px; font-weight: 600; color: var(--text-secondary);
+    }
+
+    /* Channel Bars */
+    .channel-bars { display: flex; flex-direction: column; gap: 8px; }
+    .ch-row { display: flex; align-items: center; gap: 8px; }
+    .ch-label { font-size: 10px; font-weight: 600; color: var(--text-secondary); width: 65px; flex-shrink: 0; }
+    .ch-track {
+      flex: 1; height: 8px; border-radius: 4px; background: var(--surface-active); overflow: hidden;
+    }
+    .ch-fill {
+      height: 100%; border-radius: 4px; transition: width 800ms var(--ease-spring);
+    }
+    .ch-pct { font-size: 10px; font-weight: 700; color: var(--text-dim); width: 30px; text-align: right; }
+
+    /* Team Performance */
+    .team-perf { display: flex; flex-direction: column; gap: 10px; }
+    .perf-row { display: flex; align-items: center; gap: 10px; }
+    .perf-avatar {
+      width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .perf-info { flex: 1; }
+    .perf-name { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .perf-track {
+      height: 6px; border-radius: 3px; background: var(--surface-active); overflow: hidden;
+    }
+    .perf-fill {
+      height: 100%; border-radius: 3px; background: var(--gold-gradient);
+      transition: width 800ms var(--ease-spring);
+    }
+    .perf-val { font-size: 11px; font-weight: 700; color: var(--gold); white-space: nowrap; }
+
+    /* Salon Pulse Ring */
+    .pulse-ring-wrap { position: relative; width: 120px; height: 120px; }
+    .pulse-ring { width: 100%; height: 100%; }
+    .pulse-center {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .pulse-value { font-size: 24px; font-weight: 800; color: var(--gold); font-family: 'Inter', sans-serif; }
+    .pulse-label { font-size: 9px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Sparkline */
+    .sparkline { width: 100%; height: 60px; display: block; }
+    .spark-labels {
+      display: flex; justify-content: space-between; margin-top: 4px;
+      font-size: 9px; color: var(--text-micro); font-weight: 500;
+    }
+    .spark-labels span:nth-child(2) { font-weight: 700; color: var(--gold); font-size: 11px; }
+
+    /* Top Services */
+    .top-services { display: flex; flex-direction: column; gap: 6px; }
+    .ts-row {
+      display: flex; align-items: center; gap: 10px; padding: 6px 10px;
+      background: var(--surface); border-radius: var(--radius-sm); border: 1px solid var(--border);
+    }
+    .ts-rank {
+      width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 800; flex-shrink: 0;
+    }
+    .ts-row:nth-child(1) .ts-rank { background: var(--gold-gradient); color: #fff; }
+    .ts-row:nth-child(2) .ts-rank { background: var(--surface-active); color: var(--text-secondary); }
+    .ts-row:nth-child(3) .ts-rank { background: var(--surface-active); color: var(--text-dim); }
+    .ts-name { flex: 1; font-size: 12px; font-weight: 600; color: var(--text); }
+    .ts-count { font-size: 11px; font-weight: 600; color: var(--text-dim); }
+    .ts-rev { font-size: 11px; font-weight: 700; color: var(--gold); white-space: nowrap; }
+
+    @media (max-width: 480px) {
+      .cockpit-grid { grid-template-columns: 1fr; }
+      .cockpit-wide { grid-column: 1; }
+    }
   </style>
 </head>
 <body>
@@ -906,6 +1020,76 @@
           <div class="stat-label" id="statLagerAlarmSub">Lager-Alarm</div>
         </div>
       </div>
+      <!-- IRON MAN COCKPIT -->
+      <div class="section-title">Cockpit <span class="demo-badge" onclick="openGoLive()" title="Demo-Daten">D</span></div>
+      <div class="cockpit-grid stagger" id="cockpitGrid">
+        <!-- Wochen-Umsatz Chart -->
+        <div class="cockpit-card cockpit-wide">
+          <div class="cockpit-title">Wochen-Umsatz <span class="cockpit-trend up" id="weekTrend">+12%</span></div>
+          <div class="bar-chart" id="weekRevenueChart">
+            <div class="bar-col"><div class="bar" id="bar0" style="height:40%"></div><span>Mo</span></div>
+            <div class="bar-col"><div class="bar" id="bar1" style="height:65%"></div><span>Di</span></div>
+            <div class="bar-col"><div class="bar" id="bar2" style="height:50%"></div><span>Mi</span></div>
+            <div class="bar-col"><div class="bar" id="bar3" style="height:85%"></div><span>Do</span></div>
+            <div class="bar-col"><div class="bar" id="bar4" style="height:70%"></div><span>Fr</span></div>
+            <div class="bar-col"><div class="bar today" id="bar5" style="height:55%"></div><span>Sa</span></div>
+          </div>
+          <div class="bar-legend"><span id="weekTotal">Gesamt: 0 EUR</span></div>
+        </div>
+        <!-- Kanal-Verteilung -->
+        <div class="cockpit-card">
+          <div class="cockpit-title">Kanaele</div>
+          <div class="channel-bars" id="channelBars">
+            <div class="ch-row"><span class="ch-label">WhatsApp</span><div class="ch-track"><div class="ch-fill" style="width:42%;background:#25D366"></div></div><span class="ch-pct">42%</span></div>
+            <div class="ch-row"><span class="ch-label">E-Mail</span><div class="ch-track"><div class="ch-fill" style="width:28%;background:var(--info)"></div></div><span class="ch-pct">28%</span></div>
+            <div class="ch-row"><span class="ch-label">Instagram</span><div class="ch-track"><div class="ch-fill" style="width:18%;background:#E1306C"></div></div><span class="ch-pct">18%</span></div>
+            <div class="ch-row"><span class="ch-label">Facebook</span><div class="ch-track"><div class="ch-fill" style="width:8%;background:#1877F2"></div></div><span class="ch-pct">8%</span></div>
+            <div class="ch-row"><span class="ch-label">Telefon</span><div class="ch-track"><div class="ch-fill" style="width:4%;background:var(--text-dim)"></div></div><span class="ch-pct">4%</span></div>
+          </div>
+        </div>
+        <!-- Team-Performance -->
+        <div class="cockpit-card">
+          <div class="cockpit-title">Team-Performance</div>
+          <div class="team-perf" id="teamPerf">
+            <div class="perf-row"><div class="perf-avatar" style="background:#b8962e">RR</div><div class="perf-info"><div class="perf-name">Rena</div><div class="perf-track"><div class="perf-fill" style="width:85%"></div></div></div><span class="perf-val" id="perfRena">0 EUR</span></div>
+            <div class="perf-row"><div class="perf-avatar" style="background:#e06090">SL</div><div class="perf-info"><div class="perf-name">Sarah</div><div class="perf-track"><div class="perf-fill" style="width:62%"></div></div></div><span class="perf-val" id="perfSarah">0 EUR</span></div>
+            <div class="perf-row"><div class="perf-avatar" style="background:#6090e0">JK</div><div class="perf-info"><div class="perf-name">Julia</div><div class="perf-track"><div class="perf-fill" style="width:48%"></div></div></div><span class="perf-val" id="perfJulia">0 EUR</span></div>
+          </div>
+        </div>
+        <!-- Salon-Puls -->
+        <div class="cockpit-card cockpit-center">
+          <div class="cockpit-title">Salon-Puls</div>
+          <div class="pulse-ring-wrap">
+            <svg viewBox="0 0 120 120" class="pulse-ring">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="8"/>
+              <circle cx="60" cy="60" r="52" fill="none" stroke="url(#goldGrad)" stroke-width="8" stroke-dasharray="0 326.73" stroke-linecap="round" transform="rotate(-90 60 60)" id="pulseArc"/>
+              <defs><linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#b8962e"/><stop offset="100%" stop-color="#d4b44e"/></linearGradient></defs>
+            </svg>
+            <div class="pulse-center">
+              <div class="pulse-value" id="pulseValue">0%</div>
+              <div class="pulse-label">Auslastung</div>
+            </div>
+          </div>
+        </div>
+        <!-- Kunden-Trend Sparkline -->
+        <div class="cockpit-card cockpit-wide">
+          <div class="cockpit-title">Kundenbesuche (30 Tage) <span class="cockpit-trend up" id="kundenTrend">+8%</span></div>
+          <svg class="sparkline" id="kundenSparkline" viewBox="0 0 300 60" preserveAspectRatio="none">
+            <defs><linearGradient id="sparkGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="var(--gold)" stop-opacity="0.3"/><stop offset="100%" stop-color="var(--gold)" stop-opacity="0"/></linearGradient></defs>
+            <path class="spark-area" d="" fill="url(#sparkGrad)"/>
+            <path class="spark-line" d="" fill="none" stroke="var(--gold)" stroke-width="2"/>
+          </svg>
+          <div class="spark-labels"><span>vor 30 Tagen</span><span id="sparkTotal">0 Besuche</span><span>Heute</span></div>
+        </div>
+        <!-- Top-Services -->
+        <div class="cockpit-card cockpit-wide">
+          <div class="cockpit-title">Top-Services heute</div>
+          <div class="top-services" id="topServices">
+            <div class="ts-row"><span class="ts-rank">1</span><span class="ts-name">—</span><span class="ts-count">0x</span><span class="ts-rev">0 EUR</span></div>
+          </div>
+        </div>
+      </div>
+
       <div class="section-title">Aktuelle Ereignisse <span class="demo-badge" onclick="openGoLive()" title="Demo-Daten — Klicken fuer Go-Live Status">D</span></div>
       <div class="event-list stagger" id="eventList"></div>
     </div>
@@ -915,7 +1099,7 @@
       <div class="section-title" style="margin-top:0">TERMINE <span class="demo-badge" onclick="openGoLive()" title="Demo-Daten">D</span></div>
       <div class="date-nav">
         <button onclick="changeTerminDate(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <div class="date-label" id="terminDateLabel">Heute</div>
+        <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer" title="Zurueck zu Heute">Heute</div>
         <button onclick="changeTerminDate(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg></button>
       </div>
       <div class="staff-filter" id="terminStaffFilter"></div>
@@ -999,6 +1183,7 @@
         <button class="filter-btn" onclick="setLagerKategorie('Farbe')">Farbe</button>
         <button class="filter-btn" onclick="setLagerKategorie('Styling')">Styling</button>
         <button class="filter-btn" onclick="setLagerKategorie('Treatment')">Treatment</button>
+        <button class="filter-btn" onclick="setLagerKategorie('Zubehoer')">Zubehoer</button>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <span style="font-size:12px;color:var(--text-dim)" id="lagerCount">0 Produkte</span>
@@ -1218,7 +1403,7 @@
         <div><label>Zahlungsart *</label>
           <select id="reZahlart"><option value="bar">Bar</option><option value="karte">EC-Karte</option><option value="kredit">Kreditkarte</option></select>
         </div>
-        <div><label>Trinkgeld</label><input type="number" id="reTrinkgeld" placeholder="0,00" step="0.50" min="0" value="0"></div>
+        <div><label>Trinkgeld</label><input type="number" id="reTrinkgeld" placeholder="0,00" step="0.50" min="0" value="0" oninput="updateRePreview()"></div>
       </div>
       <div id="rePreview" style="background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius-sm);padding:12px;margin-top:12px;font-size:12px;line-height:1.8;color:var(--text)"></div>
       <div class="sheet-actions">
@@ -1402,21 +1587,25 @@
     async function sbGet(table, params) {
       var url = config.baseUrl + '/rest/v1/' + table + (params ? '?' + params : '');
       var r = await fetch(url, { headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json' } });
+      if (!r.ok) throw new Error('Supabase ' + r.status + ': ' + table);
       return r.json();
     }
     async function sbPost(table, data) {
       var url = config.baseUrl + '/rest/v1/' + table;
       var r = await fetch(url, { method: 'POST', headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, body: JSON.stringify(data) });
+      if (!r.ok) throw new Error('Supabase ' + r.status + ': ' + table);
       return r.json();
     }
     async function sbPatch(table, params, data) {
       var url = config.baseUrl + '/rest/v1/' + table + '?' + params;
       var r = await fetch(url, { method: 'PATCH', headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, body: JSON.stringify(data) });
+      if (!r.ok) throw new Error('Supabase ' + r.status + ': ' + table);
       return r.json();
     }
     async function sbRpc(fn, params) {
       var url = config.baseUrl + '/rest/v1/rpc/' + fn;
       var r = await fetch(url, { method: 'POST', headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json' }, body: JSON.stringify(params || {}) });
+      if (!r.ok) throw new Error('Supabase ' + r.status + ': ' + fn);
       return r.json();
     }
 
@@ -1740,6 +1929,7 @@
         document.getElementById('liveIndicator').textContent = 'LIVE';
       } catch(e) {
         console.log('Fetch error, falling back to demo:', e);
+        showToast('Verbindung fehlgeschlagen — Demo-Modus aktiv', 'warning');
         loadDemoData();
       }
     }
@@ -1772,6 +1962,7 @@
         list.appendChild(card);
       });
       renderSmartHints();
+      renderCockpit();
     }
 
     function getKanalColor(kanal) {
@@ -1956,6 +2147,10 @@
       }
       renderTermine(termineCache);
     }
+    function goTerminHeute() {
+      terminViewDate = new Date();
+      renderTermine(termineCache);
+    }
 
     // === Render Kasse / Finanzen ===
     function renderFinanzen(data) {
@@ -2097,6 +2292,12 @@
         showToast('Rechnung erstellt: ' + fmtEur(brutto) + ' EUR', 'success');
       }
       closeSheet('rechnungSheet');
+      document.getElementById('reKunde').value = '';
+      document.getElementById('reProdukt').value = '';
+      document.getElementById('reProduktPreis').value = '';
+      document.getElementById('reTrinkgeld').value = '0';
+      document.getElementById('reZusatz').selectedIndex = 0;
+      document.getElementById('rePreview').textContent = '';
     }
 
     // === Ausgabe ===
@@ -2122,9 +2323,17 @@
       } else {
         kasseCache.push({ Kunde: beschr, Service: kat, Betrag: brutto, Zahlart: document.getElementById('auZahlart').value, typ: 'ausgabe' });
         renderKasseEntries(kasseCache);
+        var f = finanzenCache || { tagesUmsatz: 0, barEinnahmen: 0, karteEinnahmen: 0 };
+        f.tagesUmsatz = parseFloat(f.tagesUmsatz || 0) - brutto;
+        renderFinanzen(f);
         showToast('Ausgabe gebucht: ' + fmtEur(brutto) + ' EUR', 'success');
       }
       closeSheet('ausgabeSheet');
+      document.getElementById('auBeschreibung').value = '';
+      document.getElementById('auNetto').value = '';
+      document.getElementById('auBeleg').value = '';
+      document.getElementById('auKategorie').selectedIndex = 0;
+      document.getElementById('auBrutto').textContent = '0,00';
     }
 
     // === Tagesabschluss ===
@@ -2149,6 +2358,7 @@
     async function submitTagesabschluss() {
       var ist = parseFloat(document.getElementById('taIst').value);
       if (isNaN(ist)) { showToast('Bitte Kassen-Ist eingeben', 'error'); return; }
+      if (!confirm('Tagesabschluss jetzt speichern?\n\nNach dem Speichern ist der Abschluss unveraenderbar (GoBD §146 AO).')) return;
       var f = finanzenCache || {};
       var data = {
         datum: new Date().toISOString().split('T')[0],
@@ -2500,12 +2710,149 @@
       hints.slice(0, 4).forEach(function(hint) {
         var card = document.createElement('div');
         card.className = 'hint-card ' + hint.type;
-        card.innerHTML = '<div class="hint-icon" style="background:var(--' + hint.type + '-bg, var(--bg-warm))">' + hint.icon + '</div>'
+        var bgMap = { critical: 'danger', urgent: 'warning', success: 'success', info: 'info' };
+        var bgVar = bgMap[hint.type] || hint.type;
+        card.innerHTML = '<div class="hint-icon" style="background:var(--' + bgVar + '-bg, var(--bg-warm))">' + hint.icon + '</div>'
           + '<div class="hint-text">' + hint.text + '</div>'
           + '<div class="hint-action">Ansehen ›</div>';
         card.onclick = function() { showPage(hint.action); };
         container.appendChild(card);
       });
+    }
+
+    // === COCKPIT RENDERING ===
+    function renderCockpit() {
+      if (!termineCache || !termineCache.length) return;
+      var now = new Date();
+      var todayStr = now.toISOString().split('T')[0];
+
+      // --- Weekly Revenue Bar Chart ---
+      var weekDays = [];
+      var dayOfWeek = now.getDay(); // 0=Sun
+      var mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      for (var wd = 0; wd < 6; wd++) {
+        var d = new Date(now); d.setDate(d.getDate() + mondayOffset + wd);
+        weekDays.push(d.toISOString().split('T')[0]);
+      }
+      var weekRevenue = weekDays.map(function(ds) {
+        return termineCache.filter(function(t) {
+          return (t.Start_ISO || '').indexOf(ds) === 0 && (t.Status === 'abgeschlossen' || new Date(t.Start_ISO) < now);
+        }).reduce(function(s, t) { return s + (parseFloat(t.Preis) || 0); }, 0);
+      });
+      var maxRev = Math.max.apply(null, weekRevenue) || 1;
+      var weekTotal = weekRevenue.reduce(function(a, b) { return a + b; }, 0);
+      weekDays.forEach(function(ds, i) {
+        var barEl = document.getElementById('bar' + i);
+        if (barEl) {
+          var pct = Math.max(4, (weekRevenue[i] / maxRev) * 100);
+          barEl.style.height = pct + '%';
+          barEl.className = ds === todayStr ? 'bar today' : 'bar';
+          barEl.title = fmtEur(weekRevenue[i]) + ' EUR';
+        }
+      });
+      document.getElementById('weekTotal').textContent = 'Gesamt: ' + fmtEur(weekTotal) + ' EUR';
+      // Trend vs last week
+      var lastWeekDays = [];
+      for (var lw = 0; lw < 6; lw++) {
+        var ld = new Date(now); ld.setDate(ld.getDate() + mondayOffset - 7 + lw);
+        lastWeekDays.push(ld.toISOString().split('T')[0]);
+      }
+      var lastWeekTotal = lastWeekDays.map(function(ds) {
+        return termineCache.filter(function(t) {
+          return (t.Start_ISO || '').indexOf(ds) === 0;
+        }).reduce(function(s, t) { return s + (parseFloat(t.Preis) || 0); }, 0);
+      }).reduce(function(a, b) { return a + b; }, 0);
+      var trendPct = lastWeekTotal > 0 ? Math.round((weekTotal - lastWeekTotal) / lastWeekTotal * 100) : 0;
+      var trendEl = document.getElementById('weekTrend');
+      trendEl.textContent = (trendPct >= 0 ? '+' : '') + trendPct + '%';
+      trendEl.className = 'cockpit-trend ' + (trendPct > 0 ? 'up' : trendPct < 0 ? 'down' : 'flat');
+
+      // --- Team Performance ---
+      var teamMap = {};
+      termineCache.forEach(function(t) {
+        if ((t.Start_ISO || '').indexOf(todayStr) !== 0) return;
+        if (new Date(t.Start_ISO) > now) return;
+        var s = t.Stylist || 'Unbekannt';
+        if (!teamMap[s]) teamMap[s] = 0;
+        teamMap[s] += parseFloat(t.Preis) || 0;
+      });
+      var teamMax = 1;
+      Object.keys(teamMap).forEach(function(k) { if (teamMap[k] > teamMax) teamMax = teamMap[k]; });
+      ['Rena', 'Sarah', 'Julia'].forEach(function(name) {
+        var val = teamMap[name] || 0;
+        var el = document.getElementById('perf' + name);
+        if (el) el.textContent = fmtEur(val) + ' EUR';
+        var row = el ? el.closest('.perf-row') : null;
+        if (row) {
+          var fill = row.querySelector('.perf-fill');
+          if (fill) fill.style.width = Math.max(4, (val / teamMax) * 100) + '%';
+        }
+      });
+
+      // --- Salon Pulse (Auslastung) ---
+      var todayTermine = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(todayStr) === 0; });
+      var maxSlots = 18; // ~6 pro Stylistin * 3
+      var auslastung = Math.min(100, Math.round(todayTermine.length / maxSlots * 100));
+      var circumference = 326.73;
+      var pulseArc = document.getElementById('pulseArc');
+      if (pulseArc) pulseArc.setAttribute('stroke-dasharray', (circumference * auslastung / 100) + ' ' + circumference);
+      document.getElementById('pulseValue').textContent = auslastung + '%';
+
+      // --- Kunden Sparkline (30 days) ---
+      var sparkData = [];
+      for (var sd = -29; sd <= 0; sd++) {
+        var sDate = new Date(now); sDate.setDate(sDate.getDate() + sd);
+        var sStr = sDate.toISOString().split('T')[0];
+        var count = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(sStr) === 0; }).length;
+        sparkData.push(count);
+      }
+      var sparkMax = Math.max.apply(null, sparkData) || 1;
+      var sparkW = 300, sparkH = 60, pad = 2;
+      var points = sparkData.map(function(v, i) {
+        return (i / (sparkData.length - 1)) * sparkW + ',' + (sparkH - pad - (v / sparkMax) * (sparkH - pad * 2));
+      });
+      var lineD = 'M' + points.join(' L');
+      var areaD = lineD + ' L' + sparkW + ',' + sparkH + ' L0,' + sparkH + ' Z';
+      var sparkSvg = document.getElementById('kundenSparkline');
+      if (sparkSvg) {
+        sparkSvg.querySelector('.spark-line').setAttribute('d', lineD);
+        sparkSvg.querySelector('.spark-area').setAttribute('d', areaD);
+      }
+      var totalBesuche = sparkData.reduce(function(a, b) { return a + b; }, 0);
+      document.getElementById('sparkTotal').textContent = totalBesuche + ' Besuche';
+      // Trend: last 15 vs first 15
+      var first15 = sparkData.slice(0, 15).reduce(function(a, b) { return a + b; }, 0);
+      var last15 = sparkData.slice(15).reduce(function(a, b) { return a + b; }, 0);
+      var kTrend = first15 > 0 ? Math.round((last15 - first15) / first15 * 100) : 0;
+      var ktEl = document.getElementById('kundenTrend');
+      ktEl.textContent = (kTrend >= 0 ? '+' : '') + kTrend + '%';
+      ktEl.className = 'cockpit-trend ' + (kTrend > 0 ? 'up' : kTrend < 0 ? 'down' : 'flat');
+
+      // --- Top Services ---
+      var svcMap = {};
+      termineCache.filter(function(t) {
+        return (t.Start_ISO || '').indexOf(todayStr) === 0 && new Date(t.Start_ISO) < now;
+      }).forEach(function(t) {
+        var s = t.Service || 'Unbekannt';
+        if (!svcMap[s]) svcMap[s] = { count: 0, rev: 0 };
+        svcMap[s].count++;
+        svcMap[s].rev += parseFloat(t.Preis) || 0;
+      });
+      var topSvcs = Object.keys(svcMap).map(function(k) { return { name: k, count: svcMap[k].count, rev: svcMap[k].rev }; });
+      topSvcs.sort(function(a, b) { return b.rev - a.rev; });
+      var topContainer = document.getElementById('topServices');
+      if (topContainer) {
+        topContainer.textContent = '';
+        topSvcs.slice(0, 5).forEach(function(s, i) {
+          var row = document.createElement('div');
+          row.className = 'ts-row';
+          row.innerHTML = '<span class="ts-rank">' + (i + 1) + '</span><span class="ts-name">' + esc(s.name) + '</span><span class="ts-count">' + s.count + 'x</span><span class="ts-rev">' + fmtEur(s.rev) + ' EUR</span>';
+          topContainer.appendChild(row);
+        });
+        if (topSvcs.length === 0) {
+          topContainer.innerHTML = '<div style="font-size:12px;color:var(--text-dim);padding:8px;text-align:center">Noch keine abgeschlossenen Termine heute</div>';
+        }
+      }
     }
 
     // === DATEV Export (NEW) ===
@@ -2552,7 +2899,7 @@
         var konto = isAusgabe ? '4900' : '8400'; // Aufwand / Erloese 19%
         var gegen = isAusgabe ? '1200' : ((e.Zahlart || e.zahlart) === 'bar' ? '1000' : '1200');
         var shKz = isAusgabe ? 'S' : 'H';
-        var datum = new Date().getDate() + String(new Date().getMonth() + 1).padStart(2, '0');
+        var datum = String(new Date().getDate()).padStart(2, '0') + String(new Date().getMonth() + 1).padStart(2, '0');
         var beleg = 'RE-' + String(idx + 1).padStart(4, '0');
         var text = (e.Kunde || e.name || e.Service || e.service || 'Buchung').substring(0, 60);
         rows.push('"' + betrag.toFixed(2).replace('.', ',') + '";"' + shKz + '";"EUR";"";"";"";"' + konto + '";"' + gegen + '";"";"' + datum + '";"' + beleg + '";"";"";' + '"' + text + '"');
