@@ -726,6 +726,12 @@
       box-shadow: 0 2px 8px rgba(196,138,26,0.3); transition: all 200ms var(--ease);
       letter-spacing: -0.5px; user-select: none; position: relative;
     }
+    .demo-dot {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px; border-radius: 50%; font-size: 8px; font-weight: 800;
+      background: var(--danger, #e74c3c); color: #fff; flex-shrink: 0;
+      letter-spacing: 0; user-select: none; margin-left: 4px; vertical-align: middle;
+    }
     .demo-badge:hover { transform: scale(1.15); box-shadow: 0 3px 12px rgba(196,138,26,0.4); }
     .demo-badge::after {
       content: 'Demo-Daten'; position: absolute; bottom: calc(100% + 6px); left: 50%;
@@ -1996,6 +2002,8 @@
     }
 
     // === Data Caches ===
+    var isDemoMode = true;
+    function demoDot() { return isDemoMode ? ' <span class="demo-dot" title="Demo-Daten">D</span>' : ''; }
     var eventsCache = [];
     var termineCache = [];
     var servicesCache = [];
@@ -2006,28 +2014,68 @@
     var bestellungenCache = [];
     var kasseCache = [];
 
+    // === Supabase → Dashboard Spalten-Mapping ===
+    function mapServices(rows) {
+      return rows.map(function(r) {
+        return Object.assign({}, r, { Service: r.name || r.Service, service: r.name || r.service, Preis: r.preis_brutto || r.Preis || r.preis, preis: r.preis_brutto || r.preis, Dauer_Min: r.dauer_min || r.Dauer_Min });
+      });
+    }
+    function mapTermine(rows) {
+      return rows.map(function(r) {
+        return Object.assign({}, r, { Start_ISO: r.beginn || r.start_iso || r.Start_ISO, Ende_ISO: r.ende || r.ende_iso || r.Ende_ISO, Service: r.dienstleistung || r.Service || r.service, Kundenname: r.kundenname || r.Kundenname, Stylist: r.mitarbeiter || r.Stylist || 'Rena', Status: r.status || r.Status || 'bestaetigt', Preis: r.preis || r.Preis || 0 });
+      });
+    }
+    function mapLager(rows) {
+      return rows.map(function(r) {
+        return Object.assign({}, r, { Produkt: r.produktname || r.produkt || r.Produkt || r.Name, Name: r.produktname || r.Name, Bestand: r.bestand || r.Bestand || 0, Min_Bestand: r.mindestbestand || r.min_bestand || r.Min_Bestand || 5, VK_Preis: r.verkaufspreis || r.vk_preis || r.VK_Preis || 0, EK_Preis: r.einkaufspreis || r.ek_preis || r.EK_Preis || 0, Kategorie: r.kategorie || r.Kategorie || '' });
+      });
+    }
+    function mapKunden(rows) {
+      return rows.map(function(r) {
+        return Object.assign({}, r, { Name: r.name || r.Name, Email: r.email || r.Email, Telefon: r.telefon || r.kontakt || r.Telefon, Besuche: r.anzahl_besuche || r.Besuche || 0, VIP: r.vip || r.VIP || false, Follow_Up: r.follow_up || r.Follow_Up || false, Letzter_Besuch: r.letzter_besuch || r.Letzter_Besuch, Umsatz: r.umsatz || r.Umsatz || 0 });
+      });
+    }
+
     // === Fetch All Data ===
     async function fetchAll() {
       if (!isSupabaseMode()) { loadDemoData(); return; }
       try {
         var [events, termine, services, lager, kunden, beratungen, rechnungen] = await Promise.all([
-          sbGet('anfragen_log', 'order=erstellt_am.desc&limit=50'),
-          sbGet('terminvorschlaege', 'order=start_iso.asc&limit=200'),
-          sbGet('services_preisliste', 'order=service.asc'),
-          sbGet('lager', 'order=produkt.asc'),
-          sbGet('kunden', 'order=name.asc'),
+          sbGet('anfragen_log', 'order=erstellt_am.desc&limit=50').catch(function() { return []; }),
+          sbGet('terminvorschlaege', 'order=beginn.asc&limit=200').catch(function() { return []; }),
+          sbGet('services_preisliste', 'order=name.asc').catch(function() { return []; }),
+          sbGet('lager', 'order=produktname.asc').catch(function() { return []; }),
+          sbGet('kunden', 'order=name.asc').catch(function() { return []; }),
           sbGet('beratungen', 'order=timestamp.desc&limit=50').catch(function() { return []; }),
-          sbGet('rechnungen', 'order=datum.desc&limit=50').catch(function() { return []; })
+          sbGet('rechnungen', 'order=erstellt_am.desc&limit=50').catch(function() { return []; })
         ]);
-        if (Array.isArray(events)) { eventsCache = events; renderEvents(events); }
+
+        // Wenn ALLE Tabellen leer → Demo-Modus (DB existiert aber keine Daten)
+        var totalRows = (events||[]).length + (termine||[]).length + (services||[]).length + (lager||[]).length + (kunden||[]).length;
+        if (totalRows === 0) {
+          console.log('Supabase verbunden aber leer — Demo-Modus');
+          showToast('Supabase verbunden — noch keine Daten, Demo-Modus aktiv', 'info');
+          loadDemoData();
+          document.getElementById('liveIndicator').textContent = 'DEMO';
+          return;
+        }
+
+        // Spalten mappen fuer Dashboard-Kompatibilitaet
+        termine = mapTermine(termine || []);
+        services = mapServices(services || []);
+        lager = mapLager(lager || []);
+        kunden = mapKunden(kunden || []);
+
+        if (Array.isArray(events) && events.length > 0) { eventsCache = events; renderEvents(events); }
         if (Array.isArray(termine)) { termineCache = termine; renderTermine(termine); }
-        if (Array.isArray(services)) { servicesCache = services; renderServices(services); }
-        if (Array.isArray(lager)) { renderLagerTab(lager); }
-        if (Array.isArray(kunden)) { kundenCache = kunden; renderKunden(kunden); }
+        if (Array.isArray(services) && services.length > 0) { servicesCache = services; renderServices(services); }
+        if (Array.isArray(lager) && lager.length > 0) { renderLagerTab(lager); }
+        if (Array.isArray(kunden) && kunden.length > 0) { kundenCache = kunden; renderKunden(kunden); }
         if (Array.isArray(beratungen) && beratungen.length > 0) { renderBeratungen(beratungen); }
         if (Array.isArray(rechnungen) && rechnungen.length > 0) { renderKasseEntries(rechnungen); }
         renderCockpit();
         renderKiSuggestions();
+        isDemoMode = false;
         document.getElementById('liveIndicator').textContent = 'LIVE';
       } catch(e) {
         console.log('Fetch error, falling back to demo:', e);
@@ -2055,7 +2103,7 @@
         var dotColors = { termin_vorschlag: 'var(--gold)', termin_bestaetigt: 'var(--success)', event: 'var(--info)', storno: 'var(--danger)', nachbestellung: 'var(--warning)', antwort: '#9b59b6' };
         card.innerHTML = '<div class="event-dot" style="background:' + (dotColors[ev.Typ] || 'var(--text-dim)') + '"></div>'
           + '<div class="event-body">'
-          + '<div class="event-title">' + esc(ev.Titel || '') + '</div>'
+          + '<div class="event-title">' + esc(ev.Titel || '') + demoDot() + '</div>'
           + '<div class="event-msg">' + esc(ev.Nachricht || '') + '</div>'
           + '<div class="event-meta">'
           + '<span class="event-time">' + fmtTime(ev.Timestamp) + '</span>'
@@ -2359,7 +2407,7 @@
           + '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">'
           + '<div class="termin-stylist"><span class="dot" style="background:' + (u ? u.farbe : 'var(--text-dim)') + '"></span>' + esc(t.Stylist || '') + '</div>'
           + '<span class="termin-status ' + statusClass + '">' + esc(statusLabel) + '</span></div></div>'
-          + '<div class="termin-preis">' + fmtEur(t.Preis) + ' &euro;</div>';
+          + '<div class="termin-preis">' + fmtEur(t.Preis) + ' &euro;' + demoDot() + '</div>';
         container.appendChild(card);
       });
     }
@@ -2370,10 +2418,26 @@
       var dateStr = terminViewDate.toISOString().split('T')[0];
       document.getElementById('terminDateLabel').textContent = fmtDate(dateStr);
 
+      // Filter termine ZUERST
+      var filtered = termine.filter(function(t) {
+        var match = (t.Start_ISO || '').indexOf(dateStr) === 0;
+        if (terminStaffFilter !== 'alle') match = match && t.Stylist === terminStaffFilter;
+        return match;
+      });
+
+      // Group by stylist — Rena IMMER links (Chefin)
+      var staffCols = {};
+      filtered.forEach(function(t) { var s = t.Stylist || 'Unbekannt'; if (!staffCols[s]) staffCols[s] = []; staffCols[s].push(t); });
+      var STAFF_DAY_ORDER = ['Rena', 'Sarah', 'Julia', 'Lena'];
+      var staffKeys = STAFF_DAY_ORDER.filter(function(n) { return staffCols[n]; });
+      Object.keys(staffCols).forEach(function(n) { if (staffKeys.indexOf(n) === -1) staffKeys.push(n); });
+      // Wenn keine Termine: trotzdem alle 4 Stylistinnen als Spalten zeigen
+      if (staffKeys.length === 0) staffKeys = STAFF_DAY_ORDER.slice();
+
       var grid = document.createElement('div');
       grid.className = 'day-view-grid';
 
-      // Stylist column headers
+      // Stylist column headers — staffKeys ist jetzt definiert
       var headerRow = document.createElement('div');
       headerRow.className = 'day-hour-row';
       headerRow.style.cssText = 'min-height:32px;border-bottom:2px solid var(--border-accent)';
@@ -2393,21 +2457,6 @@
         grid.appendChild(row);
       }
       container.appendChild(grid);
-
-      var filtered = termine.filter(function(t) {
-        var match = (t.Start_ISO || '').indexOf(dateStr) === 0;
-        if (terminStaffFilter !== 'alle') match = match && t.Stylist === terminStaffFilter;
-        return match;
-      });
-
-      // Group by stylist for column layout — Rena IMMER links (Chefin)
-      var staffCols = {};
-      filtered.forEach(function(t) { var s = t.Stylist || 'Unbekannt'; if (!staffCols[s]) staffCols[s] = []; staffCols[s].push(t); });
-      // FESTE Reihenfolge: Rena, Sarah, Julia, Lena
-      var STAFF_DAY_ORDER = ['Rena', 'Sarah', 'Julia', 'Lena'];
-      var staffKeys = STAFF_DAY_ORDER.filter(function(n) { return staffCols[n]; });
-      // Falls unbekannter Stylist auftaucht, hinten anfuegen
-      Object.keys(staffCols).forEach(function(n) { if (staffKeys.indexOf(n) === -1) staffKeys.push(n); });
       var colCount = Math.max(staffKeys.length, 1);
       var colWidth = 100 / colCount;
 
@@ -2438,7 +2487,7 @@
         block.innerHTML = '<div style="font-weight:600;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
           + '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + statusDot + ';margin-right:3px;vertical-align:middle"></span>'
           + fmtTime(t.Start_ISO) + ' ' + esc(t.Service || '') + '</div>'
-          + '<div style="font-size:9px;color:var(--text-dim)">' + esc(t.Stylist || '') + ' — ' + esc(t.Kundenname || '') + '</div>';
+          + '<div style="font-size:9px;color:var(--text-dim)">' + esc(t.Stylist || '') + ' — ' + esc(t.Kundenname || '') + demoDot() + '</div>';
         block.onclick = function() { openTerminDetail(t); };
         slot.appendChild(block);
       });
@@ -2546,7 +2595,7 @@
         div.innerHTML = '<div class="left"><div class="name">' + esc(e.Kunde || e.name || '') + '</div>'
           + '<div class="detail">' + esc(e.Service || e.service || '') + ' &middot; ' + esc(e.Zahlart || e.zahlart || '') + '</div></div>'
           + '<div class="amount" style="color:' + (e.typ === 'ausgabe' ? 'var(--danger)' : 'var(--gold)') + '">'
-          + (e.typ === 'ausgabe' ? '-' : '+') + fmtEur(e.Betrag || e.betrag) + ' &euro;</div>';
+          + (e.typ === 'ausgabe' ? '-' : '+') + fmtEur(e.Betrag || e.betrag) + ' &euro;' + demoDot() + '</div>';
         container.appendChild(div);
       });
       renderKiKasseHints();
@@ -2791,7 +2840,7 @@
         card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
           + '<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 8px;border-radius:6px;background:' + katColor + '20;color:' + katColor + '">' + esc(p.Kategorie || 'Sonstiges') + '</span>'
           + '<span style="font-size:12px;font-weight:700;color:' + barColor + '">' + bestand + ' Stk.</span></div>'
-          + '<div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.3">' + esc(p.Produkt || p.Name || '') + '</div>'
+          + '<div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.3">' + esc(p.Produkt || p.Name || '') + demoDot() + '</div>'
           + '<div style="font-size:11px;color:var(--text-dim);margin-top:2px">' + esc(p.Marke || '') + (p.VK_Preis ? ' — ' + fmtEur(p.VK_Preis) + ' EUR' : '') + '</div>'
           + '<div style="margin-top:8px;height:6px;background:var(--bg-warm);border-radius:3px;overflow:hidden;position:relative">'
           + '<div style="height:100%;border-radius:3px;transition:width .5s ease;width:' + pct + '%;background:' + barColor + '"></div>'
@@ -2939,7 +2988,7 @@
         var card = document.createElement('div');
         card.className = 'kunde-card touch-scale';
         card.innerHTML = '<div class="kunde-avatar" style="background:' + colors[idx % colors.length] + '">' + esc(name.substring(0, 2).toUpperCase()) + '</div>'
-          + '<div class="kunde-info"><div class="kunde-name">' + esc(name) + '</div>'
+          + '<div class="kunde-info"><div class="kunde-name">' + esc(name) + demoDot() + '</div>'
           + '<div class="kunde-detail">' + (k.Email || k.email || '') + (besuche ? ' — ' + besuche + ' Besuche' : '') + (lastVisit ? ' — Letzter: ' + fmtDate(lastVisit) : '') + '</div>'
           + '<div class="kunde-tags">'
           + (isVip ? '<span class="kunde-tag" style="background:var(--gold-glow);color:var(--gold)">VIP</span>' : '')
@@ -3032,7 +3081,7 @@
         var avatarColor = colors[initial.charCodeAt(0) % colors.length];
         card.innerHTML = '<div class="beratung-header">'
           + '<div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:' + avatarColor + ';display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700">' + esc(initial) + '</div>'
-          + '<div><div class="beratung-name">' + esc(b.Kundenname || 'Unbekannt') + '</div></div></div>'
+          + '<div><div class="beratung-name">' + esc(b.Kundenname || 'Unbekannt') + demoDot() + '</div></div></div>'
           + '<div style="display:flex;align-items:center;gap:6px"><span class="beratung-time">' + fmtTime(b.Timestamp) + '</span>'
           + (b.Kanal ? '<span class="kanal-badge" style="background:' + getKanalColor(b.Kanal) + '20;color:' + getKanalColor(b.Kanal) + '">' + esc(b.Kanal) + '</span>' : '') + '</div></div>'
           + '<div class="beratung-msg">' + esc(b.Nachricht || '') + '</div>'
