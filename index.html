@@ -286,6 +286,24 @@
       transition: all 200ms var(--ease);
     }
     .termin-card:hover { border-color: var(--border-accent); box-shadow: var(--shadow-soft); }
+    .termin-status {
+      display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700;
+      padding: 2px 8px; border-radius: var(--radius-full); text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .termin-status.bestaetigt { background: var(--success-bg); color: var(--success); }
+    .termin-status.offen { background: var(--warning-bg); color: var(--warning); }
+    .termin-status.abgeschlossen { background: var(--bg-warm); color: var(--text-dim); }
+    .termin-status::before {
+      content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor;
+    }
+    .termin-overlap-warn {
+      border-left: 3px solid var(--danger) !important;
+      background: var(--danger-bg) !important;
+    }
+    .termin-overlap-badge {
+      display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 700;
+      color: var(--danger); margin-left: 6px;
+    }
     .termin-time-block {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-width: 50px; padding: 8px; background: var(--bg-warm); border-radius: var(--radius-sm);
@@ -1803,7 +1821,7 @@
         ];
       } else if (page === 'termine') {
         items = [
-          { icon: '&#128197;', label: 'Termin vorschlagen', action: 'showToast("Terminvorschlag via KI — kommt mit Supabase","info")' },
+          { icon: '&#128197;', label: 'Neuer Termin', action: 'openNeuerTermin()' },
           { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
         ];
       } else if (page === 'kasse') {
@@ -1815,7 +1833,7 @@
         ];
       } else if (page === 'kunden') {
         items = [
-          { icon: '&#128100;', label: 'Kunde anlegen', action: 'showToast("Kundenverwaltung kommt mit Supabase","info")' }
+          { icon: '&#128100;', label: 'Kunde anlegen', action: 'openNeuerKunde()' }
         ];
       } else if (page === 'lager') {
         items = [
@@ -1985,6 +2003,219 @@
     var terminViewMode = 'list';
     var terminStaffFilter = 'alle';
 
+    // === Overlap Detection ===
+    function detectOverlaps(termine) {
+      var result = {};
+      for (var i = 0; i < termine.length; i++) {
+        var a = termine[i];
+        var aStart = new Date(a.Start_ISO).getTime();
+        var aEnd = aStart + (parseInt(a.Dauer_Min) || 30) * 60000;
+        for (var j = i + 1; j < termine.length; j++) {
+          var b = termine[j];
+          if (a.Stylist !== b.Stylist) continue; // only same stylist overlaps
+          var bStart = new Date(b.Start_ISO).getTime();
+          var bEnd = bStart + (parseInt(b.Dauer_Min) || 30) * 60000;
+          if (aStart < bEnd && bStart < aEnd) {
+            result[i] = true;
+            result[j] = true;
+          }
+        }
+      }
+      return result;
+    }
+
+    // === Termin aus Beratung erstellen ===
+    function openTerminFromBeratung(idx) {
+      var b = beratungenCache[idx];
+      if (!b) return;
+      var inner = document.getElementById('detailInner');
+      var now = new Date();
+      var tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1);
+      var dateVal = tomorrow.toISOString().split('T')[0];
+
+      var serviceOptions = '';
+      var demoSvcs = [
+        { Service: 'Haarschnitt & Styling Damen K', Dauer_Min: 45, Preis: 55 },
+        { Service: 'Haarschnitt & Styling Damen M', Dauer_Min: 60, Preis: 75 },
+        { Service: 'Haarschnitt & Styling Damen L', Dauer_Min: 75, Preis: 90 },
+        { Service: 'Farbbehandlung Komplett', Dauer_Min: 120, Preis: 85 },
+        { Service: 'Balayage + Schnitt', Dauer_Min: 150, Preis: 130 },
+        { Service: 'Herrenschnitt Classic', Dauer_Min: 30, Preis: 32 },
+        { Service: 'Herrenschnitt + Bartpflege', Dauer_Min: 45, Preis: 45 },
+        { Service: 'Olaplex Treatment', Dauer_Min: 60, Preis: 55 },
+        { Service: 'Glossing', Dauer_Min: 35, Preis: 40 }
+      ];
+      demoSvcs.forEach(function(s) {
+        serviceOptions += '<option value="' + esc(s.Service) + '" data-dauer="' + s.Dauer_Min + '" data-preis="' + s.Preis + '">' + esc(s.Service) + ' (' + s.Dauer_Min + ' Min, ' + s.Preis + ' &euro;)</option>';
+      });
+
+      var stylistOptions = '';
+      Object.keys(USERS).forEach(function(key) {
+        if (key === 'admin') return;
+        var u = USERS[key];
+        stylistOptions += '<option value="' + esc(u.name) + '">' + esc(u.name) + ' (' + esc(ROLLEN_LABEL[u.rolle] || u.rolle) + ')</option>';
+      });
+
+      // Try to guess service from message
+      var msg = (b.Nachricht || '').toLowerCase();
+      var guessedSvc = '';
+      if (msg.indexOf('balayage') !== -1) guessedSvc = 'Balayage + Schnitt';
+      else if (msg.indexOf('olaplex') !== -1) guessedSvc = 'Olaplex Treatment';
+      else if (msg.indexOf('bart') !== -1 || msg.indexOf('maskulin') !== -1) guessedSvc = 'Herrenschnitt + Bartpflege';
+      else if (msg.indexOf('haarschnitt') !== -1 || msg.indexOf('schnitt') !== -1) guessedSvc = 'Haarschnitt & Styling Damen M';
+      else if (msg.indexOf('farb') !== -1) guessedSvc = 'Farbbehandlung Komplett';
+
+      inner.innerHTML = '<div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:4px">Termin eintragen</div>'
+        + '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">fuer ' + esc(b.Kundenname || '') + '</div>'
+        + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:10px;font-size:11px;color:var(--text-dim);margin-bottom:14px;line-height:1.4"><strong>Anfrage:</strong> ' + esc(b.Nachricht || '') + '</div>'
+        + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Service</label>'
+        + '<select id="terminSvcSelect" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif">' + serviceOptions + '</select>'
+        + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Stylist</label>'
+        + '<select id="terminStySelect" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif">' + stylistOptions + '</select>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+        + '<div><label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Datum</label>'
+        + '<input type="date" id="terminDateInput" value="' + dateVal + '" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div>'
+        + '<div><label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Uhrzeit</label>'
+        + '<input type="time" id="terminTimeInput" value="10:00" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div></div>'
+        + '<div style="display:flex;gap:8px;margin-top:14px">'
+        + '<button class="btn btn-primary" style="flex:1" onclick="confirmTerminFromBeratung(' + beratungenCache.indexOf(b) + ')">Termin eintragen</button>'
+        + '<button class="btn btn-secondary" onclick="closeSheet(\'detailSheet\')">Abbrechen</button></div>';
+      openSheet('detailSheet');
+
+      // Pre-select guessed service
+      if (guessedSvc) {
+        var sel = document.getElementById('terminSvcSelect');
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === guessedSvc) { sel.selectedIndex = i; break; }
+        }
+      }
+    }
+
+    function confirmTerminFromBeratung(idx) {
+      var b = beratungenCache[idx];
+      if (!b) return;
+      var svcSel = document.getElementById('terminSvcSelect');
+      var opt = svcSel.options[svcSel.selectedIndex];
+      var svc = opt.value;
+      var dauer = parseInt(opt.getAttribute('data-dauer')) || 60;
+      var preis = parseFloat(opt.getAttribute('data-preis')) || 0;
+      var stylist = document.getElementById('terminStySelect').value;
+      var datum = document.getElementById('terminDateInput').value;
+      var zeit = document.getElementById('terminTimeInput').value;
+
+      if (!datum || !zeit) { showToast('Bitte Datum und Uhrzeit eingeben', 'warning'); return; }
+
+      var startISO = datum + 'T' + zeit + ':00';
+
+      // Check for overlaps with existing termine
+      var newStart = new Date(startISO).getTime();
+      var newEnd = newStart + dauer * 60000;
+      var hasOverlap = termineCache.some(function(t) {
+        if (t.Stylist !== stylist) return false;
+        var tStart = new Date(t.Start_ISO).getTime();
+        var tEnd = tStart + (parseInt(t.Dauer_Min) || 30) * 60000;
+        return newStart < tEnd && tStart < newEnd;
+      });
+      if (hasOverlap) {
+        showToast('Achtung: Ueberlappung mit bestehendem Termin von ' + stylist + '!', 'warning');
+      }
+
+      var newTermin = {
+        Start_ISO: startISO, Service: svc, Dauer_Min: dauer, Preis: preis,
+        Stylist: stylist, Kundenname: b.Kundenname, Status: 'bestaetigt'
+      };
+      termineCache.push(newTermin);
+
+      // Mark Beratung as beantwortet
+      b.Status = 'beantwortet';
+
+      renderTermine(termineCache);
+      filterBeratungen();
+      closeSheet('detailSheet');
+      showToast('Termin fuer ' + b.Kundenname + ' eingetragen: ' + svc + ' am ' + fmtDate(datum) + ' um ' + zeit, 'success');
+    }
+
+    function openNeuerTermin() {
+      closeFab();
+      var inner = document.getElementById('detailInner');
+      var dateVal = terminViewDate.toISOString().split('T')[0];
+      var serviceOptions = '';
+      var demoSvcs = [
+        { Service: 'Haarschnitt & Styling Damen K', Dauer_Min: 45, Preis: 55 },
+        { Service: 'Haarschnitt & Styling Damen M', Dauer_Min: 60, Preis: 75 },
+        { Service: 'Haarschnitt & Styling Damen L', Dauer_Min: 75, Preis: 90 },
+        { Service: 'Farbbehandlung Komplett', Dauer_Min: 120, Preis: 85 },
+        { Service: 'Balayage + Schnitt', Dauer_Min: 150, Preis: 130 },
+        { Service: 'Herrenschnitt Classic', Dauer_Min: 30, Preis: 32 },
+        { Service: 'Herrenschnitt + Bartpflege', Dauer_Min: 45, Preis: 45 },
+        { Service: 'Olaplex Treatment', Dauer_Min: 60, Preis: 55 },
+        { Service: 'Glossing', Dauer_Min: 35, Preis: 40 }
+      ];
+      demoSvcs.forEach(function(s) {
+        serviceOptions += '<option value="' + esc(s.Service) + '" data-dauer="' + s.Dauer_Min + '" data-preis="' + s.Preis + '">' + esc(s.Service) + ' (' + s.Dauer_Min + ' Min, ' + s.Preis + ' &euro;)</option>';
+      });
+      var stylistOptions = '';
+      Object.keys(USERS).forEach(function(key) {
+        if (key === 'admin') return;
+        var u = USERS[key];
+        var sel = (currentUser && USERS[currentUser] && USERS[currentUser].name === u.name) ? ' selected' : '';
+        stylistOptions += '<option value="' + esc(u.name) + '"' + sel + '>' + esc(u.name) + '</option>';
+      });
+
+      inner.innerHTML = '<div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:12px">Neuer Termin</div>'
+        + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Kundenname</label>'
+        + '<input type="text" id="terminKundeInput" placeholder="Name eingeben..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif">'
+        + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Service</label>'
+        + '<select id="terminSvcSelect" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif">' + serviceOptions + '</select>'
+        + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Stylist</label>'
+        + '<select id="terminStySelect" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif">' + stylistOptions + '</select>'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+        + '<div><label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Datum</label>'
+        + '<input type="date" id="terminDateInput" value="' + dateVal + '" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div>'
+        + '<div><label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Uhrzeit</label>'
+        + '<input type="time" id="terminTimeInput" value="10:00" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div></div>'
+        + '<div style="display:flex;gap:8px;margin-top:14px">'
+        + '<button class="btn btn-primary" style="flex:1" onclick="confirmNeuerTermin()">Termin eintragen</button>'
+        + '<button class="btn btn-secondary" onclick="closeSheet(\'detailSheet\')">Abbrechen</button></div>';
+      openSheet('detailSheet');
+    }
+
+    function confirmNeuerTermin() {
+      var kunde = (document.getElementById('terminKundeInput').value || '').trim();
+      if (!kunde) { showToast('Bitte Kundennamen eingeben', 'warning'); return; }
+      var svcSel = document.getElementById('terminSvcSelect');
+      var opt = svcSel.options[svcSel.selectedIndex];
+      var svc = opt.value;
+      var dauer = parseInt(opt.getAttribute('data-dauer')) || 60;
+      var preis = parseFloat(opt.getAttribute('data-preis')) || 0;
+      var stylist = document.getElementById('terminStySelect').value;
+      var datum = document.getElementById('terminDateInput').value;
+      var zeit = document.getElementById('terminTimeInput').value;
+      if (!datum || !zeit) { showToast('Bitte Datum und Uhrzeit eingeben', 'warning'); return; }
+      var startISO = datum + 'T' + zeit + ':00';
+
+      // Overlap check
+      var newStart = new Date(startISO).getTime();
+      var newEnd = newStart + dauer * 60000;
+      var hasOverlap = termineCache.some(function(t) {
+        if (t.Stylist !== stylist) return false;
+        var tStart = new Date(t.Start_ISO).getTime();
+        var tEnd = tStart + (parseInt(t.Dauer_Min) || 30) * 60000;
+        return newStart < tEnd && tStart < newEnd;
+      });
+      if (hasOverlap) {
+        showToast('Achtung: Ueberlappung mit bestehendem Termin von ' + stylist + '!', 'warning');
+      }
+
+      termineCache.push({
+        Start_ISO: startISO, Service: svc, Dauer_Min: dauer, Preis: preis,
+        Stylist: stylist, Kundenname: kunde, Status: 'bestaetigt'
+      });
+      renderTermine(termineCache);
+      closeSheet('detailSheet');
+      showToast('Termin fuer ' + kunde + ' eingetragen: ' + svc + ' am ' + fmtDate(datum) + ' um ' + zeit, 'success');
+    }
+
     function renderTermine(termine) {
       termineCache = termine;
       var today = new Date(); today.setHours(0,0,0,0);
@@ -2036,15 +2267,24 @@
         container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim);font-size:13px">Keine Termine an diesem Tag</div>';
         return;
       }
+      // Detect overlaps
+      var overlaps = detectOverlaps(filtered);
+
       filtered.forEach(function(t, idx) {
         var card = document.createElement('div');
         card.className = 'termin-card touch-scale';
+        if (overlaps[idx]) card.classList.add('termin-overlap-warn');
         card.onclick = function() { openTerminDetail(t); };
         var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
+        var statusLabel = t.Status || 'bestaetigt';
+        var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt');
         card.innerHTML = '<div class="termin-time-block"><div class="time">' + fmtTime(t.Start_ISO) + '</div><div class="mins">' + (t.Dauer_Min || '?') + ' Min</div></div>'
-          + '<div class="termin-body"><div class="termin-service">' + esc(t.Service || 'Termin') + '</div>'
+          + '<div class="termin-body"><div class="termin-service">' + esc(t.Service || 'Termin')
+          + (overlaps[idx] ? '<span class="termin-overlap-badge">&#9888; Ueberlappung</span>' : '') + '</div>'
           + '<div class="termin-kunde">' + esc(t.Kundenname || t.Kunde || '') + '</div>'
-          + '<div class="termin-stylist"><span class="dot" style="background:' + (u ? u.farbe : 'var(--text-dim)') + '"></span>' + esc(t.Stylist || '') + '</div></div>'
+          + '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">'
+          + '<div class="termin-stylist"><span class="dot" style="background:' + (u ? u.farbe : 'var(--text-dim)') + '"></span>' + esc(t.Stylist || '') + '</div>'
+          + '<span class="termin-status ' + statusClass + '">' + esc(statusLabel) + '</span></div></div>'
           + '<div class="termin-preis">' + fmtEur(t.Preis) + ' &euro;</div>';
         container.appendChild(card);
       });
@@ -2072,7 +2312,17 @@
         return match;
       });
 
-      filtered.forEach(function(t) {
+      // Group by stylist for column layout
+      var staffCols = {};
+      filtered.forEach(function(t) { var s = t.Stylist || 'Unbekannt'; if (!staffCols[s]) staffCols[s] = []; staffCols[s].push(t); });
+      var staffKeys = Object.keys(staffCols);
+      var colCount = Math.max(staffKeys.length, 1);
+      var colWidth = 100 / colCount;
+
+      // Detect overlaps for day view
+      var dayOverlaps = detectOverlaps(filtered);
+
+      filtered.forEach(function(t, idx) {
         var startD = new Date(t.Start_ISO);
         var startH = startD.getHours();
         var startM = startD.getMinutes();
@@ -2082,13 +2332,21 @@
         var slot = document.getElementById('daySlot' + startH);
         if (!slot) return;
         var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
+        var colIdx = staffKeys.indexOf(t.Stylist || 'Unbekannt');
         var block = document.createElement('div');
         block.className = 'day-termin-block';
+        if (dayOverlaps[idx]) block.classList.add('termin-overlap-warn');
         block.style.top = topPx + 'px';
         block.style.height = heightPx + 'px';
+        block.style.left = (colIdx * colWidth) + '%';
+        block.style.width = colWidth + '%';
+        block.style.right = 'auto';
         block.style.borderLeftColor = u ? u.farbe : 'var(--gold)';
-        block.innerHTML = '<div style="font-weight:600;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + fmtTime(t.Start_ISO) + ' ' + esc(t.Service || '') + '</div>'
-          + '<div style="font-size:9px;color:var(--text-dim)">' + esc(t.Stylist || '') + '</div>';
+        var statusDot = t.Status === 'bestaetigt' ? '#2d8a4e' : (t.Status === 'offen' ? '#c48a1a' : '#686058');
+        block.innerHTML = '<div style="font-weight:600;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
+          + '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + statusDot + ';margin-right:3px;vertical-align:middle"></span>'
+          + fmtTime(t.Start_ISO) + ' ' + esc(t.Service || '') + '</div>'
+          + '<div style="font-size:9px;color:var(--text-dim)">' + esc(t.Stylist || '') + ' — ' + esc(t.Kundenname || '') + '</div>';
         block.onclick = function() { openTerminDetail(t); };
         slot.appendChild(block);
       });
@@ -2126,7 +2384,9 @@
           chip.className = 'week-termin-chip';
           var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
           chip.style.borderLeftColor = u ? u.farbe : 'var(--gold)';
-          chip.textContent = fmtTime(t.Start_ISO) + ' ' + (t.Service || '').substring(0, 12);
+          var statusDot = t.Status === 'bestaetigt' ? '#2d8a4e' : (t.Status === 'offen' ? '#c48a1a' : '#686058');
+          chip.innerHTML = '<span style="display:inline-block;width:4px;height:4px;border-radius:50%;background:' + statusDot + ';margin-right:2px;vertical-align:middle"></span>'
+            + fmtTime(t.Start_ISO) + ' ' + esc((t.Service || '').substring(0, 12));
           chip.onclick = function() { openTerminDetail(t); };
           col.appendChild(chip);
         });
@@ -2610,6 +2870,39 @@
       openSheet('detailSheet');
     }
 
+    function openNeuerKunde() {
+      closeFab();
+      var inner = document.getElementById('detailInner');
+      inner.innerHTML = '<div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:12px">Neuen Kunden anlegen</div>'
+        + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Name</label>'
+        + '<input type="text" id="neuerKundeName" placeholder="Vor- und Nachname" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif">'
+        + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">E-Mail</label>'
+        + '<input type="email" id="neuerKundeEmail" placeholder="email@beispiel.de" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif">'
+        + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Telefon</label>'
+        + '<input type="tel" id="neuerKundeTelefon" placeholder="0176-..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif">'
+        + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Notiz (optional)</label>'
+        + '<textarea id="neuerKundeNotiz" rows="2" placeholder="z.B. Neukundin via Instagram..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif;resize:none"></textarea>'
+        + '<div style="display:flex;gap:8px;margin-top:8px">'
+        + '<button class="btn btn-primary" style="flex:1" onclick="confirmNeuerKunde()">Kunde anlegen</button>'
+        + '<button class="btn btn-secondary" onclick="closeSheet(\'detailSheet\')">Abbrechen</button></div>';
+      openSheet('detailSheet');
+    }
+
+    function confirmNeuerKunde() {
+      var name = (document.getElementById('neuerKundeName').value || '').trim();
+      if (!name) { showToast('Bitte Namen eingeben', 'warning'); return; }
+      var email = (document.getElementById('neuerKundeEmail').value || '').trim();
+      var telefon = (document.getElementById('neuerKundeTelefon').value || '').trim();
+      var notiz = (document.getElementById('neuerKundeNotiz').value || '').trim();
+      kundenCache.push({
+        Name: name, Email: email, Telefon: telefon, Besuche: 0, Umsatz: 0,
+        Notiz: notiz || 'Manuell angelegt am ' + new Date().toLocaleDateString('de-DE')
+      });
+      renderKunden(kundenCache);
+      closeSheet('detailSheet');
+      showToast('Kunde ' + name + ' angelegt', 'success');
+    }
+
     // === Render Beratungen ===
     var currentBeratungFilter = 'alle';
     function renderBeratungen(data) {
@@ -2650,7 +2943,7 @@
           + '<div class="beratung-msg">' + esc(b.Nachricht || '') + '</div>'
           + '<div class="beratung-actions">'
           + '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openAntwortSheet(' + beratungenCache.indexOf(b) + ')">Antworten</button>'
-          + '<button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showToast(\'Termin vorschlagen — kommt mit Supabase\',\'info\')">Termin</button>'
+          + '<button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openTerminFromBeratung(' + beratungenCache.indexOf(b) + ')">Termin</button>'
           + '</div>';
         list.appendChild(card);
       });
@@ -3007,9 +3300,12 @@
       var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
       var recipe = serviceProdukte[t.Service] || null;
 
+      var statusLabel = t.Status || 'bestaetigt';
+      var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt');
       var html = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">';
       html += '<div><div style="font-family:Playfair Display,serif;font-size:22px;font-weight:700">' + esc(t.Service || 'Termin') + '</div>';
-      html += '<div style="font-size:13px;color:var(--text-secondary);margin-top:2px">' + esc(t.Kundenname || t.Kunde || '') + '</div></div>';
+      html += '<div style="font-size:13px;color:var(--text-secondary);margin-top:2px">' + esc(t.Kundenname || t.Kunde || '') + '</div>';
+      html += '<span class="termin-status ' + statusClass + '" style="margin-top:6px">' + esc(statusLabel) + '</span></div>';
       html += '<div style="text-align:right"><div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;color:var(--gold)">' + fmtEur(t.Preis) + ' &euro;</div></div></div>';
 
       html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">';
@@ -3719,7 +4015,7 @@
           allTermine.push({
             Start_ISO: isoDay(dayOff, startH, startM),
             Service: svc.Service, Dauer_Min: svc.Dauer_Min, Preis: svc.Preis,
-            Stylist: stylist, Kundenname: kunde, Status: dayOff < 0 ? 'abgeschlossen' : 'bestaetigt'
+            Stylist: stylist, Kundenname: kunde, Status: dayOff < 0 ? 'abgeschlossen' : (rng() > 0.8 ? 'offen' : 'bestaetigt')
           });
         }
       }
