@@ -142,21 +142,33 @@
     .serif { font-family: 'Playfair Display', 'Georgia', serif; }
     .tabular { font-variant-numeric: tabular-nums; }
 
-    /* Animations */
-    .touch-scale { transition: transform 180ms var(--ease); -webkit-tap-highlight-color: transparent; }
-    .touch-scale:active { transform: scale(0.97); }
-    .stagger > * { animation: slideUp 400ms var(--ease) both; }
+    /* Animations — 2035 Premium */
+    .touch-scale { transition: transform 180ms var(--ease), box-shadow 250ms var(--ease); -webkit-tap-highlight-color: transparent; }
+    .touch-scale:active { transform: scale(0.96); }
+    .touch-scale:hover { box-shadow: 0 4px 20px rgba(184,150,46,0.08); }
+    .stagger > * { animation: slideUp 500ms var(--ease) both; }
     .stagger > *:nth-child(1) { animation-delay: 0ms; }
-    .stagger > *:nth-child(2) { animation-delay: 50ms; }
-    .stagger > *:nth-child(3) { animation-delay: 100ms; }
-    .stagger > *:nth-child(4) { animation-delay: 150ms; }
-    .stagger > *:nth-child(5) { animation-delay: 200ms; }
-    .stagger > *:nth-child(6) { animation-delay: 250ms; }
-    .stagger > *:nth-child(7) { animation-delay: 300ms; }
-    .stagger > *:nth-child(8) { animation-delay: 350ms; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .stagger > *:nth-child(2) { animation-delay: 60ms; }
+    .stagger > *:nth-child(3) { animation-delay: 120ms; }
+    .stagger > *:nth-child(4) { animation-delay: 180ms; }
+    .stagger > *:nth-child(5) { animation-delay: 240ms; }
+    .stagger > *:nth-child(6) { animation-delay: 300ms; }
+    .stagger > *:nth-child(7) { animation-delay: 360ms; }
+    .stagger > *:nth-child(8) { animation-delay: 420ms; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+    @keyframes glowPulse { 0%,100% { box-shadow: 0 0 4px rgba(184,150,46,0.2); } 50% { box-shadow: 0 0 12px rgba(184,150,46,0.4); } }
+    .action-btn { transition: all 200ms var(--ease); }
+    .action-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .action-btn.primary { animation: glowPulse 3s ease infinite; }
+    .stat-card { transition: transform 250ms var(--ease), box-shadow 250ms var(--ease); }
+    .stat-card:hover { transform: translateY(-2px); }
+    .hero-card { transition: transform 300ms var(--ease), box-shadow 300ms var(--ease); }
+    .hero-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(184,150,46,0.12); }
+    .bottom-sheet.show { animation: sheetSlideUp 350ms cubic-bezier(0.32,0.72,0,1) both; }
+    @keyframes sheetSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     @keyframes breathe { 0%,100% { box-shadow: 0 0 0 0 rgba(125,186,138,0.3); } 50% { box-shadow: 0 0 0 6px rgba(125,186,138,0); } }
     @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
@@ -1792,6 +1804,18 @@
 
   <main class="content">
 
+    <!-- Testmodus-Banner: Zeigt an ob Demo-Daten oder Live-Daten -->
+    <div id="testModeBanner" style="display:none;background:linear-gradient(135deg,#2a1a0a,#1a1208);border:1px solid rgba(184,150,46,0.3);border-radius:12px;padding:10px 16px;margin:0 0 12px 0;display:none">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0" id="testModeDot"></div>
+        <div>
+          <div style="font-size:12px;font-weight:700;letter-spacing:0.3px" id="testModeTitle"></div>
+          <div style="font-size:10px;color:var(--text-dim);margin-top:1px" id="testModeDesc"></div>
+        </div>
+        <div style="margin-left:auto;font-size:9px;padding:3px 8px;border-radius:6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px" id="testModeBadge"></div>
+      </div>
+    </div>
+
     <!-- PAGE: Dashboard -->
     <div class="page active" id="page-dashboard">
       <!-- V6: Naechster Termin — Highlight -->
@@ -2791,11 +2815,11 @@
     // === Login mit Benutzer + Rolle ===
     // Vorschau: Benutzer-Datenbank (später Supabase Auth)
     var USERS = {
-      'rena':    { pw: 'casa2035', rolle: 'CHF', name: 'Rena', nachname: 'Rados', titel: 'Inhaberin & Friseurmeisterin', isAdmin: false, kuerzel: 'RR', farbe: '#b8962e' },
-      'sarah':   { pw: 'casa2035', rolle: 'FRM', name: 'Sarah', nachname: 'Müller', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'SM', farbe: '#e06b8f' },
-      'julia':   { pw: 'casa2035', rolle: 'FRM', name: 'Julia', nachname: 'Weber', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'JW', farbe: '#6b8fe0' },
-      'lena':    { pw: 'casa2035', rolle: 'STY', name: 'Lena', nachname: 'Fischer', titel: 'Stylistin', isAdmin: false, kuerzel: 'LF', farbe: '#8f6be0' },
-      'admin':   { pw: 'casa2035', rolle: 'CHF', name: 'Andreas', nachname: 'Schengel', titel: 'Administrator', isAdmin: true, kuerzel: 'AS', farbe: '#2eb87a' }
+      'rena':    { pw: 'Peter&Ruediger13', rolle: 'CHF', name: 'Rena', nachname: 'Rados', titel: 'Inhaberin & Friseurmeisterin', isAdmin: false, kuerzel: 'RR', farbe: '#b8962e' },
+      'sarah':   { pw: 'Peter&Ruediger13', rolle: 'FRM', name: 'Sarah', nachname: 'Müller', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'SM', farbe: '#e06b8f' },
+      'julia':   { pw: 'Peter&Ruediger13', rolle: 'FRM', name: 'Julia', nachname: 'Weber', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'JW', farbe: '#6b8fe0' },
+      'lena':    { pw: 'Peter&Ruediger13', rolle: 'STY', name: 'Lena', nachname: 'Fischer', titel: 'Stylistin', isAdmin: false, kuerzel: 'LF', farbe: '#8f6be0' },
+      'admin':   { pw: 'Peter&Ruediger13', rolle: 'CHF', name: 'Andreas', nachname: 'Schengel', titel: 'Administrator', isAdmin: true, kuerzel: 'AS', farbe: '#2eb87a' }
     };
 
     // Gespeicherte Personalisierungen laden (Kuerzel, Farbe, Name)
@@ -3639,7 +3663,141 @@
     });
     let servicesCache = [];
     var bestellungenCache = [];
-    let config = JSON.parse(localStorage.getItem('casa2035_config') || 'null') || { baseUrl: '', token: '', userId: '' };
+    let config = JSON.parse(localStorage.getItem('casa2035_config') || 'null') || { baseUrl: '', token: '', userId: '', n8nUrl: '' };
+
+    // =============================================================
+    // SUPABASE INTEGRATION — Go-Live-Ready (06.04.2026)
+    // Dashboard verbindet sich DIREKT mit Supabase PostgreSQL
+    // Kein n8n dazwischen fuer Daten-Abfragen (schneller, stabiler)
+    // n8n bleibt NUR fuer KI + Nachrichten-Versand
+    // =============================================================
+
+    // Supabase Mode: Wenn baseUrl auf api.casa2035.de zeigt
+    function isSupabaseMode() {
+      return config.baseUrl && config.baseUrl.indexOf('api.casa2035.de') !== -1;
+    }
+
+    // --- Supabase REST API Helpers ---
+    async function sbGet(table, params) {
+      var url = config.baseUrl + '/rest/v1/' + table + (params ? '?' + params : '');
+      var r = await fetch(url, {
+        headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json' }
+      });
+      if (!r.ok) throw new Error('Supabase GET ' + table + ': ' + r.status);
+      return r.json();
+    }
+
+    async function sbPost(table, body) {
+      var url = config.baseUrl + '/rest/v1/' + table;
+      var r = await fetch(url, {
+        method: 'POST',
+        headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) throw new Error('Supabase POST ' + table + ': ' + r.status);
+      return r.json();
+    }
+
+    async function sbPatch(table, filter, body) {
+      var url = config.baseUrl + '/rest/v1/' + table + '?' + filter;
+      var r = await fetch(url, {
+        method: 'PATCH',
+        headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) throw new Error('Supabase PATCH ' + table + ': ' + r.status);
+      return r.json();
+    }
+
+    async function sbRpc(fn, body) {
+      var url = config.baseUrl + '/rest/v1/rpc/' + fn;
+      var r = await fetch(url, {
+        method: 'POST',
+        headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if (!r.ok) throw new Error('Supabase RPC ' + fn + ': ' + r.status);
+      return r.json();
+    }
+
+    // --- Supabase → Dashboard Daten-Adapter ---
+    // Uebersetzen: PostgreSQL snake_case → Dashboard PascalCase
+    async function fetchEventsSupabase() {
+      var rows = await sbGet('anfragen_log', 'select=*&order=erstellt_am.desc&limit=50');
+      return rows.map(function(r) {
+        return { Ereignis_ID: r.ereignis_id, Anfrage_ID: r.anfrage_id, Typ: r.typ, Status: r.status,
+          Is_Read: r.gelesen ? 1 : 0, Gelesen: r.gelesen ? 1 : 0, Timestamp: r.erstellt_am,
+          Titel: r.titel, Nachricht: r.nachricht, Kanal: r.kanal, Proposal_ID: r.proposal_id,
+          Kontakt: r.absender, Kundenname: r.name, Betreff: r.betreff, metadaten: r.metadaten || {} };
+      });
+    }
+
+    async function fetchTermineSupabase() {
+      var rows = await sbGet('terminvorschlaege', 'select=*&order=beginn.desc&limit=50&status=neq.abgesagt');
+      return rows.map(function(r) {
+        return { Start_ISO: r.beginn, Beginn: r.beginn, Ende: r.ende,
+          Service: r.dienstleistung, Dienstleistung: r.dienstleistung,
+          Customer_Name: r.kundenname, Kundenname: r.kundenname,
+          Staff: r.mitarbeiter || '', Mitarbeiter: r.mitarbeiter || '',
+          Duration_Min: r.dauer_min, Dauer_Min: r.dauer_min,
+          Status: r.status, Proposal_ID: r.proposal_id, Kontakt: r.kontakt, Kanal: r.kanal };
+      });
+    }
+
+    async function fetchFinanzenSupabase() {
+      var today = new Date().toISOString().split('T')[0];
+      try {
+        var results = await Promise.all([
+          sbGet('rechnungen', 'select=brutto,netto,mwst_betrag,zahlungsart,trinkgeld&erstellt_am=gte.' + today + 'T00:00:00&status=neq.storniert'),
+          sbGet('tagesabschluss', 'select=*&datum=eq.' + today + '&limit=1'),
+          sbGet('ausgaben', 'select=brutto,zahlungsart&datum=eq.' + today)
+        ]);
+      } catch(e) { return { umsatz_gesamt: 0, einnahmen_bar: 0, einnahmen_karte: 0, trinkgeld: 0, mwst_19: 0, mwst_7: 0, kasse_soll: 0, kasse_ist: 0, ausgaben_bar: 0, saldo: 0 }; }
+      var rechnungen = results[0] || [], ta = results[1] || [], ausg = results[2] || [];
+      var einnahmen_bar = 0, einnahmen_karte = 0, mwst_total = 0, trinkgeld = 0, umsatz_brutto = 0;
+      rechnungen.forEach(function(r) {
+        umsatz_brutto += parseFloat(r.brutto || 0); mwst_total += parseFloat(r.mwst_betrag || 0);
+        trinkgeld += parseFloat(r.trinkgeld || 0);
+        if (r.zahlungsart === 'bar') einnahmen_bar += parseFloat(r.brutto || 0);
+        else einnahmen_karte += parseFloat(r.brutto || 0);
+      });
+      var ausgaben_bar = 0;
+      ausg.forEach(function(a) { if (a.zahlungsart === 'bar') ausgaben_bar += parseFloat(a.brutto || 0); });
+      var kasse_soll = einnahmen_bar - ausgaben_bar + trinkgeld;
+      var kasse_ist = ta.length ? parseFloat(ta[0].kasse_ist || 0) : 0;
+      return { umsatz_gesamt: umsatz_brutto, einnahmen_bar: einnahmen_bar, einnahmen_karte: einnahmen_karte,
+        trinkgeld: trinkgeld, mwst_19: mwst_total, mwst_7: 0, kasse_soll: kasse_soll,
+        kasse_ist: kasse_ist, ausgaben_bar: ausgaben_bar, saldo: kasse_ist || kasse_soll };
+    }
+
+    async function fetchLagerSupabase() {
+      var rows = await sbGet('lager', 'select=*&order=produktname');
+      return rows.map(function(r) {
+        return { Produkt_ID: r.produkt_id, Produkt: r.produktname, Name: r.produktname,
+          Kategorie: r.kategorie, Bestand: r.bestand, Min_Bestand: r.mindestbestand,
+          Einheit: r.einheit, Lieferant: r.lieferant, Marke: r.lieferant,
+          EK_Preis: r.einkaufspreis, VK_Preis: r.verkaufspreis };
+      });
+    }
+
+    async function fetchServicesSupabase() {
+      var rows = await sbGet('services_preisliste', 'select=*&aktiv=eq.true&order=reihenfolge,name');
+      return rows.map(function(r) {
+        return { Service_ID: r.service_id, Name: r.name, Kategorie: r.kategorie, Typ: r.typ,
+          Dauer_Min: r.dauer_min, Preis_Brutto: parseFloat(r.preis_brutto),
+          Preis_Netto: parseFloat(r.preis_netto), MwSt_Satz: parseFloat(r.mwst_satz) };
+      });
+    }
+
+    // n8n Webhook (NUR fuer KI-Operationen + Nachrichten-Versand)
+    async function n8nPost(endpoint, body) {
+      var base = config.n8nUrl || 'https://niniho13.app.n8n.cloud/webhook';
+      try {
+        var r = await fetch(base + endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+        if (!r.ok) throw new Error(r.status);
+        return r.json();
+      } catch(e) { showToast('KI-Verbindung fehlgeschlagen', 'error'); return null; }
+    }
 
     // === Appetit-Modell: Salon-Paket bestimmt KI-Feature-Tiefe ===
     // "starter" = Smart Start (EUR 49), "pro" = Salon Pro (EUR 79), "fullsuite" = Full Suite (EUR 199)
@@ -3686,12 +3844,52 @@
       if (config.baseUrl) {
         fetchAll();
         startAutoRefresh();
+        updateTestModeBanner(isSupabaseMode() ? 'live' : 'api');
       } else {
         loadDemoData();
+        updateTestModeBanner('demo');
       }
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
       initPullToRefresh();
     });
+
+    function updateTestModeBanner(mode) {
+      var banner = document.getElementById('testModeBanner');
+      var dot = document.getElementById('testModeDot');
+      var title = document.getElementById('testModeTitle');
+      var desc = document.getElementById('testModeDesc');
+      var badge = document.getElementById('testModeBadge');
+      if (!banner) return;
+      banner.style.display = 'block';
+      if (mode === 'live') {
+        dot.style.background = '#2d8a4e';
+        dot.style.boxShadow = '0 0 8px rgba(45,138,78,0.6)';
+        title.textContent = 'Supabase Live-Verbindung';
+        title.style.color = '#2d8a4e';
+        desc.textContent = 'Echte Daten von api.casa2035.de — Alle Aenderungen werden gespeichert';
+        badge.textContent = 'Live';
+        badge.style.background = 'rgba(45,138,78,0.15)';
+        badge.style.color = '#2d8a4e';
+      } else if (mode === 'api') {
+        dot.style.background = '#3b82f6';
+        dot.style.boxShadow = '0 0 8px rgba(59,130,246,0.6)';
+        title.textContent = 'API-Verbindung aktiv';
+        title.style.color = '#3b82f6';
+        desc.textContent = 'Verbunden mit n8n-Backend — Daten werden synchronisiert';
+        badge.textContent = 'API';
+        badge.style.background = 'rgba(59,130,246,0.15)';
+        badge.style.color = '#3b82f6';
+      } else {
+        dot.style.background = '#b8962e';
+        dot.style.boxShadow = '0 0 8px rgba(184,150,46,0.6)';
+        title.textContent = 'Vorschau-Modus — Testdaten';
+        title.style.color = '#b8962e';
+        desc.textContent = 'Realistische Demo-Daten fuer Vorfuehrung — Keine echte Verbindung';
+        badge.textContent = 'Demo';
+        badge.style.background = 'rgba(184,150,46,0.15)';
+        badge.style.color = '#b8962e';
+      }
+    }
 
     function switchPage(page) {
       // RBAC: Pruefen ob der User Zugriff auf die Seite hat
@@ -3759,20 +3957,49 @@
     }
     async function fetchAll() {
       showKiStatus('Daten werden geladen...');
-      const [events, termine, finanzen, lager, services] = await Promise.all([
-        apiGet('/pwa-events'),
-        apiGet('/pwa-termine'),
-        apiGet('/finanzen'),
-        apiGet('/pwa-lager'),
-        apiGet('/pwa-services')
-      ]);
+      var events, termine, finanzen, lager, services;
+
+      if (isSupabaseMode()) {
+        // === SUPABASE MODUS: Direkte DB-Abfragen (schnell, kein n8n noetig) ===
+        try {
+          var results = await Promise.all([
+            fetchEventsSupabase().catch(function() { return null; }),
+            fetchTermineSupabase().catch(function() { return null; }),
+            fetchFinanzenSupabase().catch(function() { return null; }),
+            fetchLagerSupabase().catch(function() { return null; }),
+            fetchServicesSupabase().catch(function() { return null; })
+          ]);
+          events = results[0];
+          termine = results[1];
+          finanzen = results[2];
+          lager = results[3];
+          services = results[4];
+        } catch(e) {
+          showToast('Supabase-Verbindung fehlgeschlagen', 'danger', 4000);
+        }
+      } else {
+        // === LEGACY n8n MODUS: Webhook-Abfragen ===
+        var results = await Promise.all([
+          apiGet('/pwa-events'),
+          apiGet('/pwa-termine'),
+          apiGet('/finanzen'),
+          apiGet('/pwa-lager'),
+          apiGet('/pwa-services')
+        ]);
+        events = results[0];
+        termine = results[1];
+        finanzen = results[2];
+        lager = results[3];
+        services = results[4];
+      }
+
       if (events) renderEvents(events);
       if (termine) renderTermine(termine);
       if (finanzen) renderFinanzen(finanzen);
       if (lager) renderLagerTab(lager);
       if (services) renderServices(services);
       updateRefreshTime();
-      document.getElementById('liveStatus').textContent = config.baseUrl ? 'Live' : 'Demo';
+      document.getElementById('liveStatus').textContent = config.baseUrl ? (isSupabaseMode() ? 'Supabase' : 'Live') : 'Demo';
       hideKiStatus();
       if (events || termine || finanzen) {
         showToast('Daten aktualisiert', 'success', 2000);
@@ -4472,11 +4699,41 @@
 
       if (config.baseUrl) {
         showKiStatus('Rechnung wird erstellt...');
-        var res = await apiPost('/pwa-rechnung', payload);
+        var res;
+        if (isSupabaseMode()) {
+          // Supabase: Rechnung ueber SQL-Funktion erstellen (MwSt 19%, fortlaufende Nr.)
+          try {
+            var positionen = [];
+            var dlPreis = parseFloat(opt.getAttribute('data-preis')) || 0;
+            var dlNetto = dlPreis / 1.19;
+            var dlMwst = dlPreis - dlNetto;
+            positionen.push({ name: opt.textContent.split('(')[0].trim(), typ: 'dienstleistung', netto: dlNetto.toFixed(2), mwst: dlMwst.toFixed(2), brutto: dlPreis.toFixed(2) });
+            if (zusatzPreis > 0) {
+              var zNetto = zusatzPreis / 1.19;
+              positionen.push({ name: zusatzName, typ: 'dienstleistung', netto: zNetto.toFixed(2), mwst: (zusatzPreis - zNetto).toFixed(2), brutto: zusatzPreis.toFixed(2) });
+            }
+            if (produktPreis > 0) {
+              var pNetto = produktPreis / 1.19;
+              positionen.push({ name: produktName || 'Produkt', typ: 'produkt', netto: pNetto.toFixed(2), mwst: (produktPreis - pNetto).toFixed(2), brutto: produktPreis.toFixed(2) });
+            }
+            // Salon-ID aus erster Abfrage holen (oder Standard fuer Rena Rados)
+            var salons = await sbGet('salons', 'select=id&limit=1');
+            var salonId = salons.length ? salons[0].id : null;
+            if (salonId) {
+              res = await sbRpc('rechnung_erstellen', {
+                p_salon_id: salonId, p_proposal_id: null, p_kundenname: kunde.substring(0, 200),
+                p_kontakt: '', p_positionen: positionen, p_zahlungsart: payload.zahlungsart,
+                p_trinkgeld: payload.trinkgeld
+              });
+            }
+          } catch(e) { res = null; }
+        } else {
+          res = await apiPost('/pwa-rechnung', payload);
+        }
         hideKiStatus();
         if (res) {
           closeSheet('rechnungSheet');
-          showToast('Rechnung ' + payload.rechnung_nr + ' erstellt', 'success', 2500);
+          showToast('Rechnung erstellt', 'success', 2500);
           fetchAll();
         } else {
           showToast('Fehler beim Erstellen', 'error', 3000);
@@ -4701,9 +4958,10 @@
       document.getElementById('configSheet').classList.add('show');
     }
     function quickSetup() {
-      document.getElementById('cfgUrl').value = 'https://niniho13.app.n8n.cloud/webhook';
+      document.getElementById('cfgUrl').value = 'https://api.casa2035.de';
+      document.getElementById('cfgToken').value = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzU1MDQ3NjUsImV4cCI6MTkzMzE4NDc2NX0.4wpQjYlTgmja6vSbLaVVHAGdRJMXIlDSWripkEaoXCk';
       document.getElementById('cfgUser').value = 'Rena';
-      showToast('n8n URL eingetragen! Bitte Auth Token eintragen, dann Speichern.', 'info', 3000);
+      showToast('Supabase eingerichtet! Druecke Speichern.', 'success', 3000);
     }
     function saveConfig() {
       config.baseUrl = document.getElementById('cfgUrl').value.replace(/\/$/, '');
@@ -4770,7 +5028,25 @@
         beleg_nr: document.getElementById('ausgabeBeleg').value.trim().substring(0, 50)
       };
       if (config.baseUrl) {
-        const res = await apiPost('/ausgabe', payload);
+        var res;
+        if (isSupabaseMode()) {
+          try {
+            var salons = await sbGet('salons', 'select=id&limit=1');
+            var salonId = salons.length ? salons[0].id : null;
+            var mwstSatz = payload.mwst_satz || 0.19;
+            var mwstBetrag = netto * mwstSatz;
+            var brutto = netto + mwstBetrag;
+            res = await sbPost('ausgaben', {
+              salon_id: salonId, ausgabe_id: 'AUS-' + new Date().getFullYear() + '-' + Date.now().toString().slice(-4),
+              datum: new Date().toISOString().split('T')[0], kategorie: payload.kategorie,
+              beschreibung: payload.beschreibung, lieferant: payload.lieferant,
+              netto: netto, mwst_satz: mwstSatz, mwst_betrag: mwstBetrag.toFixed(2),
+              brutto: brutto.toFixed(2), zahlungsart: payload.zahlungsart, beleg_nr: payload.beleg_nr
+            });
+          } catch(e) { res = null; }
+        } else {
+          res = await apiPost('/ausgabe', payload);
+        }
         if (res) { closeSheet('ausgabeSheet'); fetchAll(); showToast('Ausgabe gespeichert', 'success'); } else { showToast('Fehler beim Speichern', 'error'); }
       } else {
         closeSheet('ausgabeSheet');
@@ -4797,7 +5073,16 @@
       const ist = parseFloat(document.getElementById('taIstInput').value);
       if (isNaN(ist)) { showToast('Bitte Kasse-Ist eingeben', 'warning'); return; }
       if (config.baseUrl) {
-        const res = await apiPost('/tagesabschluss', { kasse_ist: ist });
+        var res;
+        if (isSupabaseMode()) {
+          try {
+            var salons = await sbGet('salons', 'select=id&limit=1');
+            var salonId = salons.length ? salons[0].id : null;
+            res = await sbRpc('tagesabschluss_erstellen', { p_salon_id: salonId, p_kasse_ist: ist });
+          } catch(e) { res = null; }
+        } else {
+          res = await apiPost('/tagesabschluss', { kasse_ist: ist });
+        }
         if (res) { closeSheet('taSheet'); fetchAll(); showToast('Tagesabschluss erfolgreich', 'success'); } else { showToast('Fehler beim Abschluss', 'error'); }
       } else {
         closeSheet('taSheet');
@@ -5841,25 +6126,49 @@
       });
       actions.appendChild(btnText);
 
-      // Sprachnachricht senden
+      // Sprachnachricht senden (Phase 2 — halbtransparent + Badge)
       var btnVoice = document.createElement('button');
       btnVoice.className = 'action-btn';
-      btnVoice.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>';
-      btnVoice.appendChild(document.createTextNode(' Sprachnachricht'));
+      btnVoice.style.opacity = '0.45';
+      btnVoice.style.position = 'relative';
+      var voiceSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      voiceSvg.setAttribute('viewBox', '0 0 24 24'); voiceSvg.setAttribute('fill', 'none');
+      voiceSvg.setAttribute('stroke', 'currentColor'); voiceSvg.setAttribute('stroke-width', '2');
+      var vp1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      vp1.setAttribute('d', 'M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z');
+      var vp2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      vp2.setAttribute('d', 'M19 10v2a7 7 0 0 1-14 0v-2');
+      voiceSvg.appendChild(vp1); voiceSvg.appendChild(vp2);
+      btnVoice.appendChild(voiceSvg);
+      btnVoice.appendChild(document.createTextNode(' Sprache'));
+      var voiceBadge = document.createElement('span');
+      voiceBadge.style.cssText = 'position:absolute;top:-4px;right:-4px;background:var(--gold);color:#000;font-size:7px;padding:1px 4px;border-radius:3px;font-weight:700';
+      voiceBadge.textContent = 'BALD';
+      btnVoice.appendChild(voiceBadge);
       btnVoice.addEventListener('click', function() {
-        closeSheet('detailSheet');
-        showToast('Sprachaufnahme wird vorbereitet...', 'info', 2000);
+        showToast('Sprachnachrichten kommen in Phase 2', 'info', 2000);
       });
       actions.appendChild(btnVoice);
 
-      // Bild senden
+      // Bild senden (Phase 2 — halbtransparent + Badge)
       var btnImage = document.createElement('button');
       btnImage.className = 'action-btn';
-      btnImage.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
-      btnImage.appendChild(document.createTextNode(' Bild senden'));
+      btnImage.style.opacity = '0.45';
+      btnImage.style.position = 'relative';
+      var imgSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      imgSvg.setAttribute('viewBox', '0 0 24 24'); imgSvg.setAttribute('fill', 'none');
+      imgSvg.setAttribute('stroke', 'currentColor'); imgSvg.setAttribute('stroke-width', '2');
+      var ir = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      ir.setAttribute('x', '3'); ir.setAttribute('y', '3'); ir.setAttribute('width', '18'); ir.setAttribute('height', '18'); ir.setAttribute('rx', '2');
+      imgSvg.appendChild(ir);
+      btnImage.appendChild(imgSvg);
+      btnImage.appendChild(document.createTextNode(' Bild'));
+      var imgBadge = document.createElement('span');
+      imgBadge.style.cssText = 'position:absolute;top:-4px;right:-4px;background:var(--gold);color:#000;font-size:7px;padding:1px 4px;border-radius:3px;font-weight:700';
+      imgBadge.textContent = 'BALD';
+      btnImage.appendChild(imgBadge);
       btnImage.addEventListener('click', function() {
-        closeSheet('detailSheet');
-        showToast('Bild-Auswahl wird geöffnet…', 'info', 2000);
+        showToast('Bild-Versand kommt in Phase 2', 'info', 2000);
       });
       actions.appendChild(btnImage);
 
@@ -6115,7 +6424,23 @@
     }
 
     function sendKiResponse(e, responseText) {
-      if (config.baseUrl) {
+      if (isSupabaseMode()) {
+        showKiStatus('Antwort wird gesendet...');
+        n8nPost('/pwa-antwort', {
+          anfrage_id: e.Anfrage_ID || '',
+          kanal: e.Kanal || 'email',
+          antwort: responseText,
+          typ: 'ki_antwort'
+        }).then(function(res) {
+          hideKiStatus();
+          showToast('Antwort gesendet', 'success', 2500);
+          closeSheet('detailSheet');
+          fetchAll();
+        }).catch(function(err) {
+          hideKiStatus();
+          showToast('Fehler beim Senden: ' + err.message, 'danger', 3000);
+        });
+      } else if (config.baseUrl) {
         showKiStatus('Antwort wird gesendet...');
         apiPost('/pwa-antwort', {
           anfrage_id: e.Anfrage_ID || '',
@@ -6139,7 +6464,22 @@
     }
 
     function markAsRead(e, idx) {
-      if (config.baseUrl && (e.Anfrage_ID || e.Ereignis_ID)) {
+      if (isSupabaseMode() && (e.Anfrage_ID || e.Ereignis_ID)) {
+        var id = e.Anfrage_ID || e.Ereignis_ID;
+        sbPatch('anfragen_log', 'anfrage_id=eq.' + encodeURIComponent(id), { gelesen: true, status: 'gelesen' }).then(function() {
+          eventsCache[idx].Is_Read = 1;
+          eventsCache[idx].Status = 'gelesen';
+          renderEvents(eventsCache);
+          closeSheet('detailSheet');
+          showToast('Als gelesen markiert', 'success', 2000);
+        }).catch(function() {
+          eventsCache[idx].Is_Read = 1;
+          eventsCache[idx].Status = 'gelesen';
+          renderEvents(eventsCache);
+          closeSheet('detailSheet');
+          showToast('Als gelesen markiert', 'success', 2000);
+        });
+      } else if (config.baseUrl && (e.Anfrage_ID || e.Ereignis_ID)) {
         apiPost('/pwa-mark-read', {
           anfrage_id: e.Anfrage_ID || e.Ereignis_ID || '',
           event_id: e.Ereignis_ID || e.Anfrage_ID || '',
@@ -6379,7 +6719,15 @@
         btnConfirm.appendChild(confirmSvg);
         btnConfirm.appendChild(document.createTextNode(' Termin bestaetigen'));
         btnConfirm.addEventListener('click', function() {
-          if (config.baseUrl) {
+          if (isSupabaseMode()) {
+            sbPatch('terminvorschlaege', 'proposal_id=eq.' + encodeURIComponent(t.Proposal_ID || t.Termin_ID), { status: 'bestaetigt', bestaetigt_am: new Date().toISOString() }).then(function() {
+              closeSheet('detailSheet');
+              showToast('Termin bestätigt', 'success', 2500);
+              fetchAll();
+            }).catch(function(err) {
+              showToast('Fehler: ' + err.message, 'danger', 3000);
+            });
+          } else if (config.baseUrl) {
             apiPost('/pwa-termin-confirm', { termin: t, action: 'confirm' }).then(function() {
               closeSheet('detailSheet');
               showToast('Termin bestätigt', 'success', 2500);
@@ -6420,7 +6768,15 @@
               btnAlt.appendChild(document.createTextNode(' Alternative: ' + slotLabel));
               btnAlt.addEventListener('click', (function(slotIdx, label) {
                 return function() {
-                  if (config.baseUrl) {
+                  if (isSupabaseMode()) {
+                    sbPatch('terminvorschlaege', 'proposal_id=eq.' + encodeURIComponent(t.Proposal_ID || t.Termin_ID), { status: 'alternative_gewaehlt', gewaehlt_slot: slotIdx, bestaetigt_am: new Date().toISOString() }).then(function() {
+                      closeSheet('detailSheet');
+                      showToast('Alternative ' + label + ' gewaehlt', 'success', 2500);
+                      fetchAll();
+                    }).catch(function(err) {
+                      showToast('Fehler: ' + err.message, 'danger', 3000);
+                    });
+                  } else if (config.baseUrl) {
                     apiPost('/pwa-termin-confirm', { termin: t, action: 'alternative', slot_index: slotIdx }).then(function() {
                       closeSheet('detailSheet');
                       showToast('Alternative ' + label + ' gewaehlt', 'success', 2500);
@@ -6440,11 +6796,24 @@
 
       var btnReschedule = document.createElement('button');
       btnReschedule.className = 'action-btn';
-      btnReschedule.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+      btnReschedule.style.opacity = '0.45';
+      btnReschedule.style.position = 'relative';
+      var reSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      reSvg.setAttribute('viewBox', '0 0 24 24'); reSvg.setAttribute('fill', 'none');
+      reSvg.setAttribute('stroke', 'currentColor'); reSvg.setAttribute('stroke-width', '2');
+      var rePoly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      rePoly.setAttribute('points', '1 4 1 10 7 10');
+      var rePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      rePath.setAttribute('d', 'M3.51 15a9 9 0 1 0 2.13-9.36L1 10');
+      reSvg.appendChild(rePoly); reSvg.appendChild(rePath);
+      btnReschedule.appendChild(reSvg);
       btnReschedule.appendChild(document.createTextNode(' Umbuchen'));
+      var reBadge = document.createElement('span');
+      reBadge.style.cssText = 'position:absolute;top:-4px;right:-4px;background:var(--gold);color:#000;font-size:7px;padding:1px 4px;border-radius:3px;font-weight:700';
+      reBadge.textContent = 'BALD';
+      btnReschedule.appendChild(reBadge);
       btnReschedule.addEventListener('click', function() {
-        closeSheet('detailSheet');
-        showToast('Umbuchung wird vorbereitet...', 'info', 2000);
+        showToast('Umbuchung kommt in Phase 2', 'info', 2000);
       });
       actions.appendChild(btnReschedule);
 
@@ -6542,13 +6911,23 @@
         if (!menge || menge < 1) { showToast('Bitte Menge angeben', 'warning'); return; }
 
         if (config.baseUrl) {
-          await apiPost('/pwa-nachbestellung', {
-            produkt: produkt,
-            menge: parseInt(menge),
-            lieferant: document.getElementById('nbLieferant').value,
-            notiz: document.getElementById('nbNotiz').value,
-            timestamp: new Date().toISOString()
-          });
+          if (isSupabaseMode()) {
+            try {
+              var salons = await sbGet('salons', 'select=id&limit=1');
+              var salonId = salons.length ? salons[0].id : null;
+              await sbPost('nachbestellungen', {
+                salon_id: salonId, bestell_id: 'ORD-' + new Date().getFullYear() + '-' + Date.now().toString().slice(-4),
+                produkt_id: produkt, produktname: produkt,
+                menge: parseInt(menge), notiz: document.getElementById('nbNotiz').value
+              });
+            } catch(e) { showToast('Fehler bei Nachbestellung', 'error'); }
+          } else {
+            await apiPost('/pwa-nachbestellung', {
+              produkt: produkt, menge: parseInt(menge),
+              lieferant: document.getElementById('nbLieferant').value,
+              notiz: document.getElementById('nbNotiz').value, timestamp: new Date().toISOString()
+            });
+          }
         }
         showToast('Nachbestellung aufgegeben!', 'success');
         sheet.remove();
@@ -7151,21 +7530,61 @@
       reader.readAsDataURL(files[0]);
     }
 
+    // Persistenter Speicher fuer alle Haaranalyse-Bilder (ueber mehrere Uploads hinweg)
+    var haaranalyseImages = [];
+
     function previewHaaranalysePhotos(files) {
       if (!files || !files.length) return;
       var gallery = document.getElementById('haaranalyseGallery');
       gallery.style.display = 'grid';
-      gallery.textContent = '';
-      Array.from(files).slice(0, 5).forEach(function(file) {
+      Array.from(files).forEach(function(file) {
+        if (haaranalyseImages.length >= 8) return;
         var reader = new FileReader();
         reader.onload = function(e) {
-          var img = document.createElement('img');
-          img.src = e.target.result;
-          img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover;border-radius:8px;border:1px solid var(--border)';
-          gallery.appendChild(img);
+          haaranalyseImages.push({ src: e.target.result, name: file.name });
+          renderHaaranalyseGallery();
         };
         reader.readAsDataURL(file);
       });
+    }
+
+    function renderHaaranalyseGallery() {
+      var gallery = document.getElementById('haaranalyseGallery');
+      gallery.style.display = 'grid';
+      gallery.style.gridTemplateColumns = 'repeat(4, 1fr)';
+      gallery.style.gap = '8px';
+      gallery.textContent = '';
+      haaranalyseImages.forEach(function(img, idx) {
+        var wrap = document.createElement('div');
+        wrap.style.cssText = 'position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid var(--border)';
+        var imgEl = document.createElement('img');
+        imgEl.src = img.src;
+        imgEl.style.cssText = 'width:100%;height:100%;object-fit:cover';
+        imgEl.title = img.name;
+        wrap.appendChild(imgEl);
+        var removeBtn = document.createElement('button');
+        removeBtn.style.cssText = 'position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1';
+        removeBtn.textContent = '\u00d7';
+        removeBtn.addEventListener('click', (function(i) {
+          return function(ev) {
+            ev.stopPropagation();
+            haaranalyseImages.splice(i, 1);
+            renderHaaranalyseGallery();
+          };
+        })(idx));
+        wrap.appendChild(removeBtn);
+        gallery.appendChild(wrap);
+      });
+      if (haaranalyseImages.length < 8) {
+        var addMore = document.createElement('div');
+        addMore.style.cssText = 'aspect-ratio:1;border-radius:8px;border:2px dashed var(--border-accent);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-dim);font-size:24px;transition:background 0.2s';
+        addMore.textContent = '+';
+        addMore.title = 'Weiteres Foto hinzufuegen';
+        addMore.addEventListener('click', function() {
+          document.getElementById('haaranalyseUpload').click();
+        });
+        gallery.appendChild(addMore);
+      }
     }
 
     function previewWunschTool(files) {
@@ -7297,7 +7716,7 @@
     }
 
     function startProfiAnalyse() {
-      var files = document.getElementById('haaranalyseUpload').files;
+      var files = haaranalyseImages.length > 0 ? haaranalyseImages : null;
       var name = document.getElementById('haKundeName').value;
       if (!files || !files.length) { showToast('Bitte mindestens 1 Foto aufnehmen', 'warning'); return; }
       if (!name) { showToast('Bitte Kundennamen angeben', 'warning'); return; }
@@ -7379,8 +7798,9 @@
 
         var pdfBtn = document.createElement('button');
         pdfBtn.style.cssText = 'margin-top:10px;width:100%;padding:10px;background:linear-gradient(135deg,var(--info),#2a6faa);color:#fff;border:none;border-radius:var(--radius-sm);font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
-        pdfBtn.textContent = 'PDF-Report per E-Mail senden (19 EUR)';
-        pdfBtn.addEventListener('click', function() { showToast('PDF-Report wird erstellt und versendet...', 'success', 3000); });
+        pdfBtn.textContent = 'PDF-Report per E-Mail senden (19 EUR) — Bald verfuegbar';
+        pdfBtn.style.opacity = '0.5';
+        pdfBtn.addEventListener('click', function() { showToast('PDF-Report kommt in Phase 2 — Salon Pro Paket', 'info', 3000); });
         resultEl.appendChild(pdfBtn);
 
         var note = document.createElement('div');
@@ -7882,16 +8302,73 @@
 
     function getKiDemoResponse(page, question) {
       var q = question.toLowerCase();
-      if (q.indexOf('termin') > -1 || q.indexOf('buchen') > -1) return 'Termine können über den Kalender-Tab angelegt werden. Der KI-Buchungsassistent (WF-02a) extrahiert Services aus Freitext und findet automatisch freie Slots.';
-      if (q.indexOf('farbe') > -1 || q.indexOf('balayage') > -1 || q.indexOf('straehne') > -1) return 'Farbbehandlungen benötigen je nach Technik 60-180min. Balayage: Blondierpulver + Oxid 6% (1:2), 35min Einwirkzeit. Immer Olaplex Nr. 1 zur Struktursicherung.';
-      if (q.indexOf('preis') > -1 || q.indexOf('kosten') > -1) return 'Preise werden aus der Services_Preisliste geladen. MwSt 19% für Dienstleistungen und Produkte. Alle Berechnungen deterministisch im Code, nie durch das LLM.';
-      if (q.indexOf('lager') > -1 || q.indexOf('produkt') > -1 || q.indexOf('bestell') > -1) return 'Der Lagerbestand wird in Echtzeit geprüft. Produkte unter Mindestbestand werden gelb markiert. Nachbestellungen über den Lager-Tab oder per Sprachbefehl an die KI.';
-      if (q.indexOf('umsatz') > -1 || q.indexOf('kasse') > -1) return 'Der aktuelle Tagesumsatz wird live berechnet (WF-10). Tagesabschluss täglich um Ladenschluss machen — GoBD-Pflicht für lückenlose Kassenführung.';
-      if (q.indexOf('haar') > -1 || q.indexOf('analyse') > -1) return 'Die KI-Haaranalyse erfasst 8-17 Parameter (je nach Paket). Ergebnis: Pflegeempfehlung, Produktvorschläge, PDF-Report. Basis: 98 trichologische Fachdokumente in der Qdrant-Wissensbasis.';
-      if (page === 'termine') return 'Ich kann dir bei der Terminplanung helfen. Freie Slots finden, Einwirkzeiten optimal nutzen oder Termine umbuchen — frag mich einfach!';
-      if (page === 'kasse') return 'Bei Kassenfragen helfe ich gerne. Rechnungen, Ausgaben, MwSt-Differenzierung oder Tagesabschluss — alles GoBD-konform.';
-      if (page === 'beratung') return 'Für Beratungen stehen dir 3 KI-Tools zur Verfügung: Haaranalyse (8 Parameter), Wunschfrisur-Check (Machbarkeit) und Farbcode-Berechnung (deterministisch).';
-      return 'Ich bin dein KI-Assistent für das Casa 2035 Dashboard. Stelle mir Fragen zu Terminen, Kasse, Lager, Beratung oder dem System — ich helfe dir gerne!';
+
+      // Echte Datenabfragen aus dem lokalen Cache
+      if (q.indexOf('lager') > -1 || q.indexOf('bestand') > -1 || q.indexOf('produkt') > -1) {
+        if (typeof lagerCache !== 'undefined' && lagerCache && lagerCache.length > 0) {
+          var low = lagerCache.filter(function(p) { return (parseInt(p.Bestand) || 0) <= (parseInt(p.Min_Bestand) || 5); });
+          var total = lagerCache.length;
+          var wert = lagerCache.reduce(function(sum, p) { return sum + (parseFloat(p.VK_Preis) || 0) * (parseInt(p.Bestand) || 0); }, 0);
+          var antwort = 'Lager: ' + total + ' Produkte, Gesamtwert ' + wert.toFixed(2).replace('.', ',') + ' EUR. ';
+          if (low.length > 0) {
+            antwort += low.length + ' Produkt(e) unter Mindestbestand: ';
+            antwort += low.slice(0, 3).map(function(p) { return (p.Produkt || p.Name) + ' (' + (p.Bestand || 0) + ' Stk.)'; }).join(', ');
+            if (low.length > 3) antwort += ' und ' + (low.length - 3) + ' weitere.';
+          } else {
+            antwort += 'Alle Produkte ueber Mindestbestand.';
+          }
+          return antwort;
+        }
+        return 'Lager-Daten werden geladen. Wechsle zum Lager-Tab oder lade die Daten neu.';
+      }
+
+      if (q.indexOf('termin') > -1 || q.indexOf('heute') > -1 || q.indexOf('kalender') > -1) {
+        if (typeof termineCache !== 'undefined' && termineCache && termineCache.length > 0) {
+          var today = new Date().toISOString().split('T')[0];
+          var heuteTermine = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(today) === 0; });
+          if (heuteTermine.length > 0) {
+            var antwort = 'Heute ' + heuteTermine.length + ' Termine: ';
+            antwort += heuteTermine.slice(0, 4).map(function(t) {
+              var zeit = t.Start_ISO ? new Date(t.Start_ISO).toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'}) : '--:--';
+              return zeit + ' ' + (t.Service || 'Termin') + ' (' + (t.Stylist || '') + ')';
+            }).join(' | ');
+            return antwort;
+          }
+          return 'Heute keine Termine. Gesamt im Kalender: ' + termineCache.length + ' Termine.';
+        }
+        return 'Termine werden geladen. Wechsle zum Termine-Tab fuer Details.';
+      }
+
+      if (q.indexOf('umsatz') > -1 || q.indexOf('kasse') > -1 || q.indexOf('einnahme') > -1) {
+        if (typeof finanzenCache !== 'undefined' && finanzenCache) {
+          var f = finanzenCache;
+          var tagesUmsatz = parseFloat(f.tagesUmsatz || f.Tagesumsatz || 0);
+          var barEin = parseFloat(f.barEinnahmen || f.Bar || 0);
+          var karteEin = parseFloat(f.karteEinnahmen || f.Karte || 0);
+          return 'Tagesumsatz: ' + tagesUmsatz.toFixed(2).replace('.', ',') + ' EUR (Bar: ' + barEin.toFixed(2).replace('.', ',') + ' EUR, Karte: ' + karteEin.toFixed(2).replace('.', ',') + ' EUR). Tagesabschluss taeglich machen — GoBD-Pflicht!';
+        }
+        return 'Kassendaten werden geladen. Wechsle zum Kasse-Tab.';
+      }
+
+      if (q.indexOf('anfrage') > -1 || q.indexOf('nachricht') > -1 || q.indexOf('ungelesen') > -1) {
+        if (typeof eventsCache !== 'undefined' && eventsCache && eventsCache.length > 0) {
+          var ungelesen = eventsCache.filter(function(e) { return e.Is_Read === 0 || e.Is_Read === '0'; });
+          return ungelesen.length + ' ungelesene Anfragen von ' + eventsCache.length + ' gesamt. ' +
+            (ungelesen.length > 0 ? 'Aelteste: "' + (ungelesen[ungelesen.length - 1].Titel || '') + '"' : 'Alles gelesen!');
+        }
+        return 'Anfragen werden geladen.';
+      }
+
+      if (q.indexOf('farbe') > -1 || q.indexOf('balayage') > -1 || q.indexOf('straehne') > -1) return 'Farbbehandlungen benoetigen je nach Technik 60-180min. Balayage: Blondierpulver + Oxid 6% (1:2), 35min Einwirkzeit. Immer Olaplex Nr. 1 zur Struktursicherung.';
+      if (q.indexOf('preis') > -1 || q.indexOf('kosten') > -1) return 'Preise aus der Services_Preisliste. MwSt 19% fuer Dienstleistungen UND Produkte (DE). Alle Berechnungen deterministisch im Code.';
+      if (q.indexOf('haar') > -1 || q.indexOf('analyse') > -1) return 'KI-Haaranalyse: 8-17 Parameter. Ergebnis: Pflegeempfehlung, Produktvorschlaege. Basis: 98 trichologische Fachdokumente. Zum Starten: Beratung > KI-Tools > Haaranalyse.';
+      if (q.indexOf('hilf') > -1 || q.indexOf('help') > -1 || q.indexOf('was kannst') > -1) return 'Ich kann dir helfen mit: Lagerbestand, heutige Termine, Umsatz/Kasse, ungelesene Anfragen, Farbrezepturen, Haaranalyse. Frag einfach!';
+
+      if (page === 'termine') return 'Frag mich nach heutigen Terminen, freien Slots oder Kundenhistorie.';
+      if (page === 'kasse') return 'Frag mich nach Tagesumsatz, offenen Rechnungen oder Ausgaben.';
+      if (page === 'lager') return 'Frag mich nach Bestandssituation, niedrigen Produkten oder Lagerwert.';
+      if (page === 'beratung') return '3 KI-Tools verfuegbar: Haaranalyse, Wunschfrisur-Check, Farbcode. Waehle eins aus den Kacheln.';
+      return 'Salon-Assistent bereit. Frag mich nach: Terminen, Lager, Umsatz, Anfragen, Haaranalyse oder Farbrezepturen.';
     }
 
     // === Anfragen-Uebersicht (Bottom Sheet mit offenen Kundenanfragen) ===
@@ -8522,7 +8999,16 @@
       var stored = JSON.parse(localStorage.getItem('casa_problem_reports') || '[]');
       stored.push(payload);
       localStorage.setItem('casa_problem_reports', JSON.stringify(stored));
-      if (config && config.baseUrl) {
+      if (isSupabaseMode()) {
+        sbPost('error_log', {
+          salon_id: null,
+          fehlertyp: type,
+          nachricht: text,
+          quelle: 'dashboard_problem_report',
+          metadaten: { user: currentUser, rolle: userRole, viewport: window.innerWidth + 'x' + window.innerHeight },
+          erstellt_am: new Date().toISOString()
+        }).catch(function() {});
+      } else if (config && config.baseUrl) {
         fetch(config.baseUrl + '/problem-report', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-Auth-Token': config.token || '' },
@@ -8888,14 +9374,25 @@
         } catch (e) { /* Bild optional */ }
       }
 
-      var result = await apiPost('/pwa-wunschfrisur', payload);
-      if (result) {
-        showToast('Wunschfrisur gesendet!', 'success');
-      } else if (!config.baseUrl) {
-        showToast('Demo-Modus: Wunschfrisur gespeichert (kein API konfiguriert)', 'info');
+      var result;
+      if (isSupabaseMode()) {
+        try {
+          result = await n8nPost('/pwa-wunschfrisur', payload);
+          showToast('Wunschfrisur gesendet!', 'success');
+        } catch (err) {
+          showToast('Fehler: ' + err.message, 'error');
+          return;
+        }
+      } else if (config.baseUrl) {
+        result = await apiPost('/pwa-wunschfrisur', payload);
+        if (result) {
+          showToast('Wunschfrisur gesendet!', 'success');
+        } else {
+          showToast('Fehler beim Senden. Bitte erneut versuchen.', 'error');
+          return;
+        }
       } else {
-        showToast('Fehler beim Senden. Bitte erneut versuchen.', 'error');
-        return;
+        showToast('Demo-Modus: Wunschfrisur gespeichert (kein API konfiguriert)', 'info');
       }
       document.getElementById('dashWfName').value = '';
       document.getElementById('dashWfTel').value = '';
@@ -9442,69 +9939,253 @@
   </script>
 
   <!-- Feedback Widget (Tester-Feedback) -->
-  <div id="dashFeedbackFab" onclick="toggleDashFeedback()" style="position:fixed;bottom:calc(env(safe-area-inset-bottom, 0px) + 74px);left:16px;z-index:100;width:44px;height:44px;border-radius:50%;background:rgba(184,150,46,0.12);border:1px solid rgba(184,150,46,0.25);color:var(--rose);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 200ms;box-shadow:0 2px 12px rgba(184,150,46,0.15)" title="Feedback geben">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:20px;height:20px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="12" y1="7" x2="12" y2="13"/></svg>
+  <style>
+    #dashFeedbackFab {
+      position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 74px); left: 16px; z-index: 100;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--rose), #c9a93d); color: #fff;
+      display: flex; align-items: center; justify-content: center; cursor: pointer;
+      transition: all 250ms cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 4px 16px rgba(184,150,46,0.3);
+      border: none;
+    }
+    #dashFeedbackFab:hover, #dashFeedbackFab:active { transform: scale(1.1); box-shadow: 0 6px 24px rgba(184,150,46,0.4); }
+    #dashFeedbackFab .fab-label {
+      position: absolute; left: 60px; white-space: nowrap; background: var(--surface); color: var(--text);
+      padding: 6px 12px; border-radius: var(--radius-sm); font-size: 12px; font-weight: 600;
+      box-shadow: var(--shadow-soft); border: 1px solid var(--border); pointer-events: none;
+      opacity: 0; transform: translateX(-8px); transition: all 250ms;
+    }
+    #dashFeedbackFab:hover .fab-label { opacity: 1; transform: translateX(0); }
+
+    #dashFeedbackPanel {
+      display: none; position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 134px); left: 16px; z-index: 101;
+      width: min(340px, calc(100vw - 32px)); border-radius: 16px;
+      background: var(--surface); border: 1px solid var(--border);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15); overflow: hidden; font-family: Inter, sans-serif;
+      animation: feedbackSlideUp 300ms cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes feedbackSlideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    .fb-header {
+      padding: 16px 20px; background: linear-gradient(135deg, var(--rose), #c9a93d); color: #fff;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .fb-header h4 { margin: 0; font-size: 15px; font-weight: 700; }
+    .fb-close { background: rgba(255,255,255,0.2); border: none; color: #fff; cursor: pointer;
+      width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 18px; transition: background 150ms; }
+    .fb-close:hover { background: rgba(255,255,255,0.35); }
+
+    .fb-body { padding: 18px 20px; }
+    .fb-body p { font-size: 13px; color: var(--text-dim); margin: 0 0 14px 0; line-height: 1.5; }
+
+    .fb-type-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .fb-chip {
+      padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer;
+      border: 1.5px solid var(--border); background: var(--bg-warm); color: var(--text-dim);
+      transition: all 150ms; user-select: none;
+    }
+    .fb-chip.active { border-color: var(--rose); background: rgba(184,150,46,0.1); color: var(--rose); }
+    .fb-chip:hover { border-color: var(--rose); }
+
+    .fb-stars { display: flex; gap: 4px; margin-bottom: 14px; }
+    .fb-star { width: 28px; height: 28px; cursor: pointer; color: var(--border); transition: all 150ms; }
+    .fb-star.active { color: #f5a623; }
+    .fb-star:hover { transform: scale(1.15); }
+
+    .fb-textarea {
+      width: 100%; min-height: 72px; border: 1.5px solid var(--border); border-radius: 12px;
+      padding: 12px 14px; font-size: 13px; font-family: Inter, sans-serif; resize: vertical;
+      outline: none; background: var(--bg-warm); color: var(--text); transition: border-color 200ms;
+    }
+    .fb-textarea:focus { border-color: var(--rose); }
+    .fb-textarea::placeholder { color: var(--text-dim); opacity: 0.6; }
+
+    .fb-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; }
+    .fb-counter { font-size: 11px; color: var(--text-dim); }
+    .fb-submit {
+      padding: 10px 24px; border: none; border-radius: 12px;
+      background: linear-gradient(135deg, var(--rose), #c9a93d); color: #fff;
+      font-size: 13px; font-weight: 700; cursor: pointer; font-family: Inter, sans-serif;
+      transition: all 200ms; box-shadow: 0 2px 8px rgba(184,150,46,0.25);
+    }
+    .fb-submit:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(184,150,46,0.35); }
+    .fb-submit:disabled { opacity: 0.5; pointer-events: none; }
+
+    .fb-success {
+      display: none; text-align: center; padding: 32px 20px;
+    }
+    .fb-success svg { width: 56px; height: 56px; color: #34c759; margin-bottom: 12px; }
+    .fb-success h4 { margin: 0 0 6px 0; font-size: 16px; color: var(--text); }
+    .fb-success p { margin: 0; font-size: 13px; color: var(--text-dim); }
+  </style>
+
+  <div id="dashFeedbackFab" onclick="toggleDashFeedback()" title="Feedback geben">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:22px;height:22px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span class="fab-label">Feedback geben</span>
   </div>
-  <div id="dashFeedbackPanel" style="display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom, 0px) + 126px);left:16px;z-index:101;width:min(320px, calc(100vw - 32px));border-radius:var(--radius);background:var(--surface);border:1px solid var(--border);box-shadow:var(--shadow-soft);overflow:hidden;font-family:Inter,sans-serif">
-    <div style="padding:14px 18px;background:linear-gradient(135deg,var(--rose),#c9a93d);color:#fff;display:flex;align-items:center;justify-content:space-between">
-      <span style="font-weight:600;font-size:14px">Dashboard Feedback</span>
-      <button onclick="toggleDashFeedback()" style="background:none;border:none;color:#fff;cursor:pointer;font-size:18px;padding:0;line-height:1">&times;</button>
+
+  <div id="dashFeedbackPanel">
+    <div class="fb-header">
+      <h4>Feedback geben</h4>
+      <button class="fb-close" onclick="toggleDashFeedback()">&times;</button>
     </div>
-    <div style="padding:16px">
-      <p style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Fehler, Verbesserung oder Idee? Jedes Feedback hilft!</p>
-      <textarea id="dashFeedbackText" placeholder="Was ist Ihnen aufgefallen?" maxlength="1000" style="width:100%;min-height:80px;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;font-family:Inter,sans-serif;resize:vertical;outline:none;background:var(--bg-warm);color:var(--text)"></textarea>
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <select id="dashFeedbackType" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-family:Inter,sans-serif;background:var(--bg-warm);color:var(--text)">
-          <option value="bug">Fehler</option>
-          <option value="verbesserung">Verbesserung</option>
-          <option value="idee">Idee</option>
-          <option value="design">Design</option>
-          <option value="sonstiges">Sonstiges</option>
-        </select>
-        <button onclick="submitDashFeedback()" style="padding:8px 18px;border:none;border-radius:var(--radius-sm);background:linear-gradient(135deg,var(--rose),#c9a93d);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Senden</button>
+
+    <div class="fb-body" id="fbFormView">
+      <p>Was funktioniert gut? Was fehlt? Jede Meldung hilft uns, das Dashboard besser zu machen.</p>
+
+      <div class="fb-type-chips" id="fbTypeChips">
+        <span class="fb-chip active" data-type="bug" onclick="selectFbType(this)">Fehler</span>
+        <span class="fb-chip" data-type="verbesserung" onclick="selectFbType(this)">Verbesserung</span>
+        <span class="fb-chip" data-type="idee" onclick="selectFbType(this)">Idee</span>
+        <span class="fb-chip" data-type="design" onclick="selectFbType(this)">Design</span>
+        <span class="fb-chip" data-type="lob" onclick="selectFbType(this)">Lob</span>
       </div>
+
+      <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-dim)">Bewertung (optional)</div>
+      <div class="fb-stars" id="fbStars">
+        <svg class="fb-star" data-val="1" onclick="setFbRating(1)" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="fb-star" data-val="2" onclick="setFbRating(2)" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="fb-star" data-val="3" onclick="setFbRating(3)" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="fb-star" data-val="4" onclick="setFbRating(4)" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <svg class="fb-star" data-val="5" onclick="setFbRating(5)" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+
+      <textarea class="fb-textarea" id="dashFeedbackText" placeholder="Beschreibe, was dir aufgefallen ist..." maxlength="1000" oninput="updateFbCounter()"></textarea>
+
+      <div class="fb-footer">
+        <span class="fb-counter" id="fbCounter">0 / 1000</span>
+        <button class="fb-submit" id="fbSubmitBtn" onclick="submitDashFeedback()">Absenden</button>
+      </div>
+    </div>
+
+    <div class="fb-success" id="fbSuccessView">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
+      <h4>Vielen Dank!</h4>
+      <p>Dein Feedback wurde gespeichert und an unser Team weitergeleitet.</p>
     </div>
   </div>
 
   <script>
     // === Dashboard Feedback Widget ===
     var dashFeedbackOpen = false;
+    var fbSelectedType = 'bug';
+    var fbRating = 0;
+
     function toggleDashFeedback() {
       dashFeedbackOpen = !dashFeedbackOpen;
-      document.getElementById('dashFeedbackPanel').style.display = dashFeedbackOpen ? 'block' : 'none';
+      var panel = document.getElementById('dashFeedbackPanel');
+      if (dashFeedbackOpen) {
+        panel.style.display = 'block';
+        resetFbForm();
+      } else {
+        panel.style.display = 'none';
+      }
     }
+
+    function selectFbType(el) {
+      var chips = document.querySelectorAll('#fbTypeChips .fb-chip');
+      for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
+      el.classList.add('active');
+      fbSelectedType = el.getAttribute('data-type');
+    }
+
+    function setFbRating(val) {
+      fbRating = val;
+      var stars = document.querySelectorAll('#fbStars .fb-star');
+      for (var i = 0; i < stars.length; i++) {
+        stars[i].classList.toggle('active', (i + 1) <= val);
+      }
+    }
+
+    function updateFbCounter() {
+      var text = document.getElementById('dashFeedbackText').value;
+      document.getElementById('fbCounter').textContent = text.length + ' / 1000';
+    }
+
+    function resetFbForm() {
+      document.getElementById('fbFormView').style.display = 'block';
+      document.getElementById('fbSuccessView').style.display = 'none';
+      document.getElementById('dashFeedbackText').value = '';
+      document.getElementById('fbCounter').textContent = '0 / 1000';
+      fbRating = 0;
+      setFbRating(0);
+      var chips = document.querySelectorAll('#fbTypeChips .fb-chip');
+      for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
+      if (chips[0]) chips[0].classList.add('active');
+      fbSelectedType = 'bug';
+    }
+
+    // Notion Feedback Tracker DB-ID (Projektzentrale)
+    var NOTION_FEEDBACK_DB = '6892c73ad1d44b9088fed5a56def130c';
+
     function submitDashFeedback() {
       var text = document.getElementById('dashFeedbackText').value.trim();
-      var type = document.getElementById('dashFeedbackType').value;
       if (!text || text.length < 5) {
-        showToast('Bitte geben Sie Ihr Feedback ein (mind. 5 Zeichen).', 'info');
+        showToast('Bitte mindestens 5 Zeichen eingeben.', 'info');
         return;
       }
+      var btn = document.getElementById('fbSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Wird gesendet...';
+
+      var currentPage = document.querySelector('.bottom-nav-item.active') ? document.querySelector('.bottom-nav-item.active').textContent.trim() : '';
       var payload = {
         feedback: text,
-        type: type,
+        type: fbSelectedType,
+        rating: fbRating,
         page: 'dashboard',
-        currentPage: document.querySelector('.bottom-nav-item.active') ? document.querySelector('.bottom-nav-item.active').textContent.trim() : '',
+        currentPage: currentPage,
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
         viewport: window.innerWidth + 'x' + window.innerHeight,
         theme: document.documentElement.getAttribute('data-theme') || 'light'
       };
-      // Lokal speichern
+      // 1. Lokal speichern (Backup)
       var stored = JSON.parse(localStorage.getItem('casa_dashboard_feedback') || '[]');
       stored.push(payload);
       localStorage.setItem('casa_dashboard_feedback', JSON.stringify(stored));
-      // An Webhook senden (wenn konfiguriert)
-      if (config && config.baseUrl) {
-        fetch(config.baseUrl + '/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Auth-Token': config.token || '', 'X-User-ID': config.userId || '' },
-          body: JSON.stringify(payload)
-        }).catch(function() {});
+      // 2. In Supabase speichern (wenn Supabase-Modus)
+      if (typeof isSupabaseMode === 'function' && isSupabaseMode()) {
+        sbPost('feedback', {
+          text: text,
+          typ: fbSelectedType,
+          bewertung: fbRating || null,
+          quelle: 'dashboard',
+          seite: currentPage,
+          viewport: payload.viewport,
+          user_agent: payload.userAgent,
+          erstellt_am: payload.timestamp,
+          status: 'neu',
+          notion_synced: false
+        }).catch(function(err) { console.log('Feedback Supabase:', err); });
       }
-      showToast('Danke für Ihr Feedback!', 'success');
-      document.getElementById('dashFeedbackText').value = '';
-      toggleDashFeedback();
+      // 3. An n8n Webhook senden (Notion-Sync)
+      var feedbackWebhook = 'https://niniho13.app.n8n.cloud/webhook/feedback';
+      fetch(feedbackWebhook, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source: 'dashboard',
+          type: fbSelectedType,
+          rating: fbRating,
+          text: text,
+          page: currentPage,
+          viewport: payload.viewport,
+          timestamp: payload.timestamp,
+          notion_db: NOTION_FEEDBACK_DB
+        })
+      }).catch(function() {});
+      // Erfolgs-Ansicht zeigen
+      document.getElementById('fbFormView').style.display = 'none';
+      document.getElementById('fbSuccessView').style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Absenden';
+      // Nach 2.5s automatisch schliessen
+      setTimeout(function() {
+        if (dashFeedbackOpen) toggleDashFeedback();
+      }, 2500);
     }
   </script>
 </body>
