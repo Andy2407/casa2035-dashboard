@@ -961,17 +961,19 @@
     <div class="login-box">
       <h1 class="serif">Casa <em>2035</em></h1>
       <div class="subtitle">Vision 2035 — Salon Management</div>
-      <select id="loginUser">
-        <option value="">Benutzer waehlen...</option>
-        <option value="rena">Rena (Chefin)</option>
-        <option value="sarah">Sarah (Meisterin)</option>
-        <option value="julia">Julia (Meisterin)</option>
-        <option value="lena">Lena (Stylistin)</option>
-        <option value="admin">Admin</option>
-      </select>
-      <input type="password" id="loginPw" placeholder="Passwort" onkeydown="if(event.key==='Enter')doLogin()">
-      <button class="login-btn" onclick="doLogin()">Anmelden</button>
-      <div class="login-error" id="loginError">Falsches Passwort</div>
+      <form id="loginForm" autocomplete="on" onsubmit="event.preventDefault();doLogin()">
+        <select id="loginUser" name="username" autocomplete="username">
+          <option value="">Benutzer waehlen...</option>
+          <option value="rena">Rena (Chefin)</option>
+          <option value="sarah">Sarah (Meisterin)</option>
+          <option value="julia">Julia (Meisterin)</option>
+          <option value="lena">Lena (Stylistin)</option>
+          <option value="admin">Admin</option>
+        </select>
+        <input type="password" id="loginPw" name="password" autocomplete="current-password" placeholder="Passwort" onkeydown="if(event.key==='Enter')doLogin()">
+        <button type="submit" class="login-btn">Anmelden</button>
+        <div class="login-error" id="loginError">Falsches Passwort</div>
+      </form>
     </div>
   </div>
 
@@ -2298,6 +2300,20 @@
 
       var grid = document.createElement('div');
       grid.className = 'day-view-grid';
+
+      // Stylist column headers
+      var headerRow = document.createElement('div');
+      headerRow.className = 'day-hour-row';
+      headerRow.style.cssText = 'min-height:32px;border-bottom:2px solid var(--border-accent)';
+      headerRow.innerHTML = '<div class="day-hour-label"></div><div class="day-hour-slots" style="display:flex">' +
+        staffKeys.map(function(name) {
+          var u = Object.values(USERS).find(function(u) { return u.name === name; });
+          return '<div style="flex:1;text-align:center;font-size:11px;font-weight:700;padding:6px 0;color:' + (u ? u.farbe : 'var(--text-dim)') + '">' +
+            '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + (u ? u.farbe : 'var(--text-dim)') + ';margin-right:4px;vertical-align:middle"></span>' +
+            esc(name) + '</div>';
+        }).join('') + '</div>';
+      grid.appendChild(headerRow);
+
       for (var h = 8; h <= 20; h++) {
         var row = document.createElement('div');
         row.className = 'day-hour-row';
@@ -2312,10 +2328,15 @@
         return match;
       });
 
-      // Group by stylist for column layout
+      // Group by stylist for column layout — Rena IMMER links (Chefin)
       var staffCols = {};
       filtered.forEach(function(t) { var s = t.Stylist || 'Unbekannt'; if (!staffCols[s]) staffCols[s] = []; staffCols[s].push(t); });
-      var staffKeys = Object.keys(staffCols);
+      // Sort: Rena first, then alphabetical
+      var staffKeys = Object.keys(staffCols).sort(function(a, b) {
+        if (a === 'Rena') return -1;
+        if (b === 'Rena') return 1;
+        return a.localeCompare(b);
+      });
       var colCount = Math.max(staffKeys.length, 1);
       var colWidth = 100 / colCount;
 
@@ -3996,7 +4017,7 @@
         { Service: 'Glossing', Dauer_Min: 35, Preis: 40 },
         { Service: 'Haarschnitt & Styling Damen M', Dauer_Min: 60, Preis: 75 }
       ];
-      var demoStylists = ['Rena', 'Sarah', 'Julia'];
+      var demoStylists = ['Rena', 'Sarah', 'Julia', 'Lena'];
       var demoKunden = ['Maria Mueller', 'Anna Schmidt', 'Lisa Wagner', 'Sophie Klein', 'Laura Braun', 'Nina Fischer', 'Lara Weber', 'Julia Hoffmann', 'Sarah Becker', 'Emma Schulz', 'Stefan Braun', 'Thomas Meier', 'Max Fischer', 'Paul Weber', 'Tim Schneider', 'Mia Lehmann', 'Clara Wolf', 'Helena Richter'];
 
       var allTermine = [];
