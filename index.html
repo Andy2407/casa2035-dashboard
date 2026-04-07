@@ -293,6 +293,7 @@
     .termin-status.bestaetigt { background: var(--success-bg); color: var(--success); }
     .termin-status.offen { background: var(--warning-bg); color: var(--warning); }
     .termin-status.abgeschlossen { background: var(--bg-warm); color: var(--text-dim); }
+    .termin-status.storniert { background: var(--danger-bg); color: var(--danger); text-decoration: line-through; }
     .termin-status::before {
       content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor;
     }
@@ -1233,7 +1234,6 @@
         <button onclick="changeTerminDate(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg></button>
         <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()">Heute</button>
       </div>
-      <div class="staff-filter" id="terminStaffFilter"></div>
       <div class="termin-view-toggle">
         <button class="termin-view-btn active" onclick="setTerminView('list')" id="tvList">Liste</button>
         <button class="termin-view-btn" onclick="setTerminView('day')" id="tvDay">Tag</button>
@@ -2399,25 +2399,6 @@
       var todayTermine = termine.filter(function(t) { return (t.Start_ISO || '').indexOf(todayStr) === 0; });
       document.getElementById('statTermine').textContent = todayTermine.length;
 
-      // Build staff filter — FESTE Reihenfolge: Rena, Sarah, Julia, Lena
-      var staffFilter = document.getElementById('terminStaffFilter');
-      staffFilter.textContent = '';
-      var allChip = document.createElement('div');
-      allChip.className = 'staff-chip' + (terminStaffFilter === 'alle' ? ' active' : '');
-      allChip.textContent = 'Alle';
-      allChip.onclick = function() { terminStaffFilter = 'alle'; renderTermine(termineCache); };
-      staffFilter.appendChild(allChip);
-      var STAFF_ORDER = ['Rena', 'Sarah', 'Julia', 'Lena'];
-      STAFF_ORDER.forEach(function(name) {
-        var u = Object.values(USERS).find(function(u) { return u.name === name; });
-        if (!u) return;
-        var chip = document.createElement('div');
-        chip.className = 'staff-chip' + (terminStaffFilter === name ? ' active' : '');
-        chip.innerHTML = '<span class="dot" style="background:' + u.farbe + '"></span>' + esc(name);
-        chip.onclick = function() { terminStaffFilter = name; renderTermine(termineCache); };
-        staffFilter.appendChild(chip);
-      });
-
       if (terminViewMode === 'list') renderTerminList(termine);
       else if (terminViewMode === 'day') renderDayView(termine);
       else if (terminViewMode === 'week') renderWeekView(termine);
@@ -2433,7 +2414,6 @@
 
       var filtered = termine.filter(function(t) {
         var match = (t.Start_ISO || '').indexOf(dateStr) === 0;
-        if (terminStaffFilter !== 'alle') match = match && t.Stylist === terminStaffFilter;
         if (!perms.alleTermine && currentUser) {
           var uName = USERS[currentUser].name;
           match = match && t.Stylist === uName;
@@ -2455,7 +2435,7 @@
         card.onclick = function() { openTerminDetail(t); };
         var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
         var statusLabel = t.Status || 'bestaetigt';
-        var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt');
+        var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt'));
         card.innerHTML = '<div class="termin-time-block"><div class="time">' + fmtTime(t.Start_ISO) + '</div><div class="mins">' + (t.Dauer_Min || '?') + ' Min</div></div>'
           + '<div class="termin-body"><div class="termin-service">' + esc(t.Service || 'Termin')
           + (overlaps[idx] ? '<span class="termin-overlap-badge">&#9888; Ueberlappung</span>' : '') + '</div>'
@@ -2476,9 +2456,7 @@
 
       // Filter termine ZUERST
       var filtered = termine.filter(function(t) {
-        var match = (t.Start_ISO || '').indexOf(dateStr) === 0;
-        if (terminStaffFilter !== 'alle') match = match && t.Stylist === terminStaffFilter;
-        return match;
+        return (t.Start_ISO || '').indexOf(dateStr) === 0;
       });
 
       // Group by stylist — Rena IMMER links (Chefin)
@@ -2573,7 +2551,6 @@
         col.appendChild(header);
 
         var dayTermine = termine.filter(function(t) { return (t.Start_ISO || '').indexOf(dStr) === 0; });
-        if (terminStaffFilter !== 'alle') dayTermine = dayTermine.filter(function(t) { return t.Stylist === terminStaffFilter; });
         dayTermine.sort(function(a, b) { return (a.Start_ISO || '').localeCompare(b.Start_ISO || ''); });
 
         dayTermine.forEach(function(t) {
@@ -3581,7 +3558,7 @@
       var recipe = serviceProdukte[t.Service] || null;
 
       var statusLabel = t.Status || 'bestaetigt';
-      var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt');
+      var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt'));
       var html = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">';
       html += '<div><div style="font-family:Playfair Display,serif;font-size:22px;font-weight:700">' + esc(t.Service || 'Termin') + '</div>';
       html += '<div style="font-size:13px;color:var(--text-secondary);margin-top:2px">' + esc(t.Kundenname || t.Kunde || '') + '</div>';
@@ -3615,8 +3592,16 @@
       }
 
       html += '<div style="display:flex;gap:8px;margin-top:16px">';
-      html += '<button class="btn btn-primary" style="flex:1" onclick="showToast(\'Termin bestaetigt\',\'success\');closeSheet(\'detailSheet\')">Bestaetigen</button>';
-      html += '<button class="btn btn-danger" onclick="showToast(\'Stornierung eingeleitet\',\'warning\');closeSheet(\'detailSheet\')">Stornieren</button>';
+      if (statusLabel === 'offen') {
+        html += '<button class="btn btn-primary" style="flex:1" onclick="terminBestaetigen(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\')">Bestaetigen</button>';
+      } else if (statusLabel === 'bestaetigt') {
+        html += '<button class="btn btn-primary" style="flex:1;opacity:0.5" disabled>Bereits bestaetigt</button>';
+      } else {
+        html += '<button class="btn btn-primary" style="flex:1;opacity:0.5" disabled>' + esc(statusLabel) + '</button>';
+      }
+      if (statusLabel !== 'storniert' && statusLabel !== 'abgeschlossen') {
+        html += '<button class="btn btn-danger" onclick="terminStornieren(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\')">Stornieren</button>';
+      }
       html += '</div>';
       inner.innerHTML = html;
       openSheet('detailSheet');
@@ -3636,6 +3621,26 @@
       { stufe: 9, name: 'Sehr hellblond', hex: '#ddc080' },
       { stufe: 10, name: 'Platinblond', hex: '#f0daa0' }
     ];
+    function terminBestaetigen(startISO, kundenname) {
+      var found = termineCache.find(function(t) { return t.Start_ISO === startISO && t.Kundenname === kundenname; });
+      if (found) {
+        found.Status = 'bestaetigt';
+        renderTermine(termineCache);
+        showToast('Termin bestaetigt — ' + kundenname, 'success');
+      }
+      closeSheet('detailSheet');
+    }
+
+    function terminStornieren(startISO, kundenname) {
+      var found = termineCache.find(function(t) { return t.Start_ISO === startISO && t.Kundenname === kundenname; });
+      if (found) {
+        found.Status = 'storniert';
+        renderTermine(termineCache);
+        showToast('Termin storniert — ' + kundenname, 'warning');
+      }
+      closeSheet('detailSheet');
+    }
+
     var selectedIstFarbe = null;
     var selectedZielFarbe = null;
 
@@ -4768,18 +4773,30 @@
         var dayDate = new Date(now); dayDate.setDate(dayDate.getDate() + dayOff);
         var dow = dayDate.getDay();
         if (dow === 0) continue; // No Sunday
-        var terminePerDay = dow === 6 ? Math.floor(rng() * 4 + 6) : Math.floor(rng() * 3 + 4); // Sat: 6-9, else: 4-6
-        var startHours = [8, 9, 9, 10, 10, 11, 12, 13, 14, 14, 15, 16, 17];
+        // Realistisch: 12-18 Termine pro Tag (4 Stylisten), Samstag 10-14
+        var terminePerDay = dow === 6 ? Math.floor(rng() * 5 + 10) : Math.floor(rng() * 7 + 12);
+        // Verteile Termine gleichmaessig ueber den Tag: 8:00 bis 18:00
         for (var ti = 0; ti < terminePerDay; ti++) {
           var svc = demoServices[Math.floor(rng() * demoServices.length)];
-          var stylist = demoStylists[Math.floor(rng() * demoStylists.length)];
+          // Verteile Stylisten gleichmaessiger: je ~3-4 Termine pro Stylist/Tag
+          var stylist = demoStylists[ti % demoStylists.length];
+          if (rng() > 0.7) stylist = demoStylists[Math.floor(rng() * demoStylists.length)]; // etwas Variation
           var kunde = demoKunden[Math.floor(rng() * demoKunden.length)];
-          var startH = startHours[Math.floor(rng() * startHours.length)];
+          var startH = 8 + Math.floor(rng() * 10); // 8-17 Uhr
           var startM = Math.floor(rng() * 4) * 15; // 0, 15, 30, 45
+          var status;
+          if (dayOff < 0) { status = 'abgeschlossen'; }
+          else if (dayOff === 0) {
+            var termTime = new Date(now); termTime.setHours(startH, startM, 0, 0);
+            if (termTime < now) status = 'abgeschlossen';
+            else status = rng() > 0.15 ? 'bestaetigt' : 'offen';
+          } else {
+            status = rng() > 0.25 ? 'bestaetigt' : 'offen';
+          }
           allTermine.push({
             Start_ISO: isoDay(dayOff, startH, startM),
             Service: svc.Service, Dauer_Min: svc.Dauer_Min, Preis: svc.Preis,
-            Stylist: stylist, Kundenname: kunde, Status: dayOff < 0 ? 'abgeschlossen' : (rng() > 0.8 ? 'offen' : 'bestaetigt')
+            Stylist: stylist, Kundenname: kunde, Status: status
           });
         }
       }
