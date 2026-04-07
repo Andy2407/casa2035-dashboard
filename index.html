@@ -931,8 +931,8 @@
         </div>
         <div class="golive-section">
           <h4>Daten</h4>
-          <div class="golive-item"><span class="check open">&#9679;</span>Echte Services + Preise von Rena eintragen</div>
-          <div class="golive-item"><span class="check open">&#9679;</span>Echte Mitarbeiter-Accounts anlegen</div>
+          <div class="golive-item"><span class="check done">&#10003;</span>Echte Services + Preise von Rena eintragen</div>
+          <div class="golive-item"><span class="check done">&#10003;</span>Echte Mitarbeiter-Accounts anlegen (Rena, Sarah, Julia, Lena)</div>
           <div class="golive-item"><span class="check open">&#9679;</span>Lagerbestand erfassen</div>
           <div class="golive-item"><span class="check open">&#9679;</span>Kundendaten importieren (DSGVO-konform)</div>
         </div>
@@ -950,8 +950,8 @@
         </div>
       </div>
       <div class="golive-footer">
-        <span class="progress-text" id="goliveProgress">5 / 17 erledigt</span>
-        <div class="progress-bar"><div class="progress-fill" id="goliveFill" style="width:29%"></div></div>
+        <span class="progress-text" id="goliveProgress">7 / 17 erledigt</span>
+        <div class="progress-bar"><div class="progress-fill" id="goliveFill" style="width:41%"></div></div>
       </div>
     </div>
   </div>
@@ -2225,7 +2225,7 @@
       var todayTermine = termine.filter(function(t) { return (t.Start_ISO || '').indexOf(todayStr) === 0; });
       document.getElementById('statTermine').textContent = todayTermine.length;
 
-      // Build staff filter
+      // Build staff filter — FESTE Reihenfolge: Rena, Sarah, Julia, Lena
       var staffFilter = document.getElementById('terminStaffFilter');
       staffFilter.textContent = '';
       var allChip = document.createElement('div');
@@ -2233,13 +2233,13 @@
       allChip.textContent = 'Alle';
       allChip.onclick = function() { terminStaffFilter = 'alle'; renderTermine(termineCache); };
       staffFilter.appendChild(allChip);
-      var staffNames = {};
-      termine.forEach(function(t) { if (t.Stylist) staffNames[t.Stylist] = true; });
-      Object.keys(staffNames).forEach(function(name) {
+      var STAFF_ORDER = ['Rena', 'Sarah', 'Julia', 'Lena'];
+      STAFF_ORDER.forEach(function(name) {
         var u = Object.values(USERS).find(function(u) { return u.name === name; });
+        if (!u) return;
         var chip = document.createElement('div');
         chip.className = 'staff-chip' + (terminStaffFilter === name ? ' active' : '');
-        chip.innerHTML = '<span class="dot" style="background:' + (u ? u.farbe : 'var(--text-dim)') + '"></span>' + esc(name);
+        chip.innerHTML = '<span class="dot" style="background:' + u.farbe + '"></span>' + esc(name);
         chip.onclick = function() { terminStaffFilter = name; renderTermine(termineCache); };
         staffFilter.appendChild(chip);
       });
@@ -2331,12 +2331,11 @@
       // Group by stylist for column layout — Rena IMMER links (Chefin)
       var staffCols = {};
       filtered.forEach(function(t) { var s = t.Stylist || 'Unbekannt'; if (!staffCols[s]) staffCols[s] = []; staffCols[s].push(t); });
-      // Sort: Rena first, then alphabetical
-      var staffKeys = Object.keys(staffCols).sort(function(a, b) {
-        if (a === 'Rena') return -1;
-        if (b === 'Rena') return 1;
-        return a.localeCompare(b);
-      });
+      // FESTE Reihenfolge: Rena, Sarah, Julia, Lena
+      var STAFF_DAY_ORDER = ['Rena', 'Sarah', 'Julia', 'Lena'];
+      var staffKeys = STAFF_DAY_ORDER.filter(function(n) { return staffCols[n]; });
+      // Falls unbekannter Stylist auftaucht, hinten anfuegen
+      Object.keys(staffCols).forEach(function(n) { if (staffKeys.indexOf(n) === -1) staffKeys.push(n); });
       var colCount = Math.max(staffKeys.length, 1);
       var colWidth = 100 / colCount;
 
