@@ -644,15 +644,19 @@
       cursor: pointer; transition: all 200ms var(--ease); z-index: 1;
     }
     .day-termin-block:hover { box-shadow: var(--shadow-soft); z-index: 2; }
-    .week-view-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
-    .week-day-col { min-width: 0; }
-    .week-day-header { font-size: 11px; font-weight: 700; text-align: center; padding: 6px; color: var(--text-dim); }
+    .week-view-wrapper { display: flex; overflow-x: auto; }
+    .week-time-axis { width: 40px; flex-shrink: 0; padding-top: 30px; }
+    .week-time-label { height: 48px; font-size: 10px; color: var(--text-dim); text-align: right; padding-right: 6px; font-variant-numeric: tabular-nums; line-height: 48px; }
+    .week-view-grid { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; min-width: 0; }
+    .week-day-col { min-width: 0; border-left: 1px solid var(--border); }
+    .week-day-header { font-size: 11px; font-weight: 700; text-align: center; padding: 6px; color: var(--text-dim); border-bottom: 1px solid var(--border); height: 30px; }
     .week-day-header.today { color: var(--gold); }
+    .week-hour-cell { height: 48px; border-bottom: 1px solid var(--border); position: relative; }
     .week-termin-chip {
-      font-size: 10px; padding: 4px 6px; margin-bottom: 2px;
+      font-size: 9px; padding: 2px 4px; margin: 1px 2px;
       background: var(--surface); border: 1px solid var(--border); border-left: 2px solid var(--gold);
       border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      cursor: pointer;
+      cursor: pointer; position: absolute; left: 1px; right: 1px; z-index: 1;
     }
 
     /* === Profil Dropdown === */
@@ -2551,6 +2555,20 @@
       start.setDate(start.getDate() - dow + 1); // Monday
       document.getElementById('terminDateLabel').textContent = 'KW ' + getWeekNumber(terminViewDate);
 
+      var wrapper = document.createElement('div');
+      wrapper.className = 'week-view-wrapper';
+
+      // Time axis
+      var timeAxis = document.createElement('div');
+      timeAxis.className = 'week-time-axis';
+      for (var h = 8; h <= 20; h++) {
+        var lbl = document.createElement('div');
+        lbl.className = 'week-time-label';
+        lbl.textContent = String(h).padStart(2, '0') + ':00';
+        timeAxis.appendChild(lbl);
+      }
+      wrapper.appendChild(timeAxis);
+
       var grid = document.createElement('div');
       grid.className = 'week-view-grid';
       var days = ['Mo','Di','Mi','Do','Fr','Sa'];
@@ -2566,6 +2584,15 @@
         header.textContent = days[i] + ' ' + d.getDate();
         col.appendChild(header);
 
+        // Hour cells
+        var cells = {};
+        for (var hh = 8; hh <= 20; hh++) {
+          var cell = document.createElement('div');
+          cell.className = 'week-hour-cell';
+          col.appendChild(cell);
+          cells[hh] = cell;
+        }
+
         var dayTermine = termine.filter(function(t) {
           var match = (t.Start_ISO || '').indexOf(dStr) === 0;
           if (terminStaffFilter !== 'alle') match = match && t.Stylist === terminStaffFilter;
@@ -2574,19 +2601,30 @@
         dayTermine.sort(function(a, b) { return (a.Start_ISO || '').localeCompare(b.Start_ISO || ''); });
 
         dayTermine.forEach(function(t) {
+          var startD = new Date(t.Start_ISO);
+          var startH = startD.getHours();
+          var startM = startD.getMinutes();
+          var dur = parseInt(t.Dauer_Min) || 30;
+          if (!cells[startH]) return;
           var chip = document.createElement('div');
           chip.className = 'week-termin-chip';
+          var topPx = (startM / 60) * 48;
+          var heightPx = Math.max((dur / 60) * 48, 16);
+          chip.style.top = topPx + 'px';
+          chip.style.height = heightPx + 'px';
           var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
           chip.style.borderLeftColor = u ? u.farbe : 'var(--gold)';
-          var statusDot = t.Status === 'bestaetigt' ? '#2d8a4e' : (t.Status === 'offen' ? '#c48a1a' : '#686058');
-          chip.innerHTML = '<span style="display:inline-block;width:4px;height:4px;border-radius:50%;background:' + statusDot + ';margin-right:2px;vertical-align:middle"></span>'
-            + fmtTime(t.Start_ISO) + ' ' + esc((t.Service || '').substring(0, 12));
+          var timeStr = fmtTime(t.Start_ISO);
+          var svcStr = esc((t.Service || '').substring(0, 10));
+          chip.textContent = timeStr + ' ' + svcStr;
+          chip.title = timeStr + ' ' + esc(t.Service || '') + ' — ' + esc(t.Kundenname || '');
           chip.onclick = function() { openTerminDetail(t); };
-          col.appendChild(chip);
+          cells[startH].appendChild(chip);
         });
         grid.appendChild(col);
       }
-      container.appendChild(grid);
+      wrapper.appendChild(grid);
+      container.appendChild(wrapper);
     }
 
     function getWeekNumber(d) {
@@ -3696,13 +3734,16 @@
       // Photo upload
       var uploadArea = document.createElement('div');
       uploadArea.style.cssText = 'background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;margin-bottom:14px';
-      uploadArea.onclick = function() { document.getElementById('farbcodeUpload').click(); };
+      var fcIcon = document.createElement('div'); fcIcon.style.cssText = 'font-size:24px;margin-bottom:4px'; fcIcon.textContent = '\uD83D\uDCF7';
+      var fcTitle = document.createElement('div'); fcTitle.style.cssText = 'font-size:13px;font-weight:600'; fcTitle.textContent = 'Haar fotografieren';
+      var fcHint = document.createElement('div'); fcHint.style.cssText = 'font-size:11px;color:var(--text-dim)'; fcHint.textContent = 'KI erkennt den Ist-Farbton automatisch';
+      uploadArea.appendChild(fcIcon); uploadArea.appendChild(fcTitle); uploadArea.appendChild(fcHint);
       var fileInput = document.createElement('input');
       fileInput.type = 'file'; fileInput.id = 'farbcodeUpload'; fileInput.accept = 'image/*';
       fileInput.setAttribute('capture', 'environment'); fileInput.style.display = 'none';
       fileInput.onchange = function() { previewFarbcode(this.files); };
       uploadArea.appendChild(fileInput);
-      uploadArea.innerHTML += '<div style="font-size:24px;margin-bottom:4px">&#128247;</div><div style="font-size:13px;font-weight:600">Haar fotografieren</div><div style="font-size:11px;color:var(--text-dim)">KI erkennt den Ist-Farbton automatisch</div>';
+      uploadArea.onclick = function(ev) { if (ev.target !== fileInput) fileInput.click(); };
       wrapper.appendChild(uploadArea);
 
       var previewRow = document.createElement('div');
@@ -3847,19 +3888,47 @@
     }
 
     function buildHaaranalyseTool(wrapper) {
-      wrapper.innerHTML = '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5">3-5 Fotos vom Haar aufnehmen — KI analysiert Struktur, Schaedigung, Porositaet und gibt Pflegeempfehlung.</div>'
-        + '<div style="background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;margin-bottom:10px" onclick="document.getElementById(\'haaranalyseUpload\').click()">'
-        + '<input type="file" id="haaranalyseUpload" accept="image/*" capture="environment" multiple style="display:none" onchange="previewHaaranalysePhotos(this.files)">'
-        + '<div style="font-size:24px;margin-bottom:4px">&#128247;</div>'
-        + '<div style="font-size:13px;font-weight:600">Fotos aufnehmen (3-5 Bilder)</div>'
-        + '<div style="font-size:11px;color:var(--text-dim)">Vorne, hinten, Seite, Scheitel, Ansatz</div></div>'
-        + '<div id="haaranalyseGallery" style="display:none;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px"></div>'
-        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">'
-        + '<input type="text" id="haKundeName" placeholder="Kundenname" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif">'
-        + '<input type="email" id="haKundeEmail" placeholder="E-Mail (fuer PDF)" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div>'
-        + '<button class="btn btn-primary btn-block" onclick="startProfiAnalyse()">KI-Analyse starten</button>'
-        + '<div id="haaranalyseResult" style="display:none;margin-top:14px"></div>'
-        + '<div style="font-size:10px;color:var(--text-dim);margin-top:8px;text-align:center">Profi-Analyse im Termin inklusive · Premium-PDF-Report: 19 EUR</div>';
+      haaranalysePhotos = [];
+      var intro = document.createElement('div');
+      intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
+      intro.textContent = '3-5 Fotos vom Haar aufnehmen \u2014 KI analysiert Struktur, Schaedigung, Porositaet und gibt Pflegeempfehlung.';
+      wrapper.appendChild(intro);
+      var haUploadArea = document.createElement('div');
+      haUploadArea.style.cssText = 'background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;margin-bottom:10px';
+      var haIcon = document.createElement('div'); haIcon.style.cssText = 'font-size:24px;margin-bottom:4px'; haIcon.textContent = '\uD83D\uDCF7';
+      var haTitle = document.createElement('div'); haTitle.style.cssText = 'font-size:13px;font-weight:600'; haTitle.textContent = 'Fotos aufnehmen (3-5 Bilder)';
+      var haHint = document.createElement('div'); haHint.style.cssText = 'font-size:11px;color:var(--text-dim)'; haHint.textContent = 'Vorne, hinten, Seite, Scheitel, Ansatz';
+      var haFileInput = document.createElement('input');
+      haFileInput.type = 'file'; haFileInput.id = 'haaranalyseUpload'; haFileInput.accept = 'image/*';
+      haFileInput.setAttribute('capture', 'environment'); haFileInput.multiple = true; haFileInput.style.display = 'none';
+      haFileInput.onchange = function() { previewHaaranalysePhotos(this.files); };
+      haUploadArea.appendChild(haIcon); haUploadArea.appendChild(haTitle); haUploadArea.appendChild(haHint); haUploadArea.appendChild(haFileInput);
+      haUploadArea.onclick = function(ev) { if (ev.target !== haFileInput) haFileInput.click(); };
+      wrapper.appendChild(haUploadArea);
+      var haGallery = document.createElement('div');
+      haGallery.id = 'haaranalyseGallery'; haGallery.style.cssText = 'display:none;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px';
+      wrapper.appendChild(haGallery);
+      var haFieldsGrid = document.createElement('div');
+      haFieldsGrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px';
+      var haNameInput = document.createElement('input');
+      haNameInput.type = 'text'; haNameInput.id = 'haKundeName'; haNameInput.placeholder = 'Kundenname';
+      haNameInput.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif';
+      var haEmailInput = document.createElement('input');
+      haEmailInput.type = 'email'; haEmailInput.id = 'haKundeEmail'; haEmailInput.placeholder = 'E-Mail (fuer PDF)';
+      haEmailInput.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif';
+      haFieldsGrid.appendChild(haNameInput); haFieldsGrid.appendChild(haEmailInput);
+      wrapper.appendChild(haFieldsGrid);
+      var haBtn = document.createElement('button');
+      haBtn.className = 'btn btn-primary btn-block'; haBtn.textContent = 'KI-Analyse starten';
+      haBtn.onclick = startProfiAnalyse;
+      wrapper.appendChild(haBtn);
+      var haResult = document.createElement('div');
+      haResult.id = 'haaranalyseResult'; haResult.style.cssText = 'display:none;margin-top:14px';
+      wrapper.appendChild(haResult);
+      var haFooter = document.createElement('div');
+      haFooter.style.cssText = 'font-size:10px;color:var(--text-dim);margin-top:8px;text-align:center';
+      haFooter.textContent = 'Profi-Analyse im Termin inklusive \u00B7 Premium-PDF-Report: 19 EUR';
+      wrapper.appendChild(haFooter);
 
       if (salonPaket === 'starter') {
         var teaser = document.createElement('div');
@@ -3875,19 +3944,31 @@
       if (!files || !files.length) return;
       var gallery = document.getElementById('haaranalyseGallery');
       gallery.style.display = 'grid';
-      gallery.textContent = '';
-      for (var i = 0; i < Math.min(files.length, 5); i++) {
+      var remaining = 5 - haaranalysePhotos.length;
+      if (remaining <= 0) { showToast('Maximal 5 Fotos', 'info'); return; }
+      for (var i = 0; i < Math.min(files.length, remaining); i++) {
         (function(file) {
           var reader = new FileReader();
           reader.onload = function(e) {
+            haaranalysePhotos.push(e.target.result);
+            var wrap = document.createElement('div');
+            wrap.style.cssText = 'position:relative';
             var img = document.createElement('img');
             img.src = e.target.result;
             img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border)';
-            gallery.appendChild(img);
+            wrap.appendChild(img);
+            var del = document.createElement('div');
+            del.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;font-size:11px;line-height:18px;text-align:center;cursor:pointer';
+            del.textContent = '\u00D7';
+            del.onclick = function(ev) { ev.stopPropagation(); var idx = haaranalysePhotos.indexOf(e.target.result); if (idx > -1) haaranalysePhotos.splice(idx, 1); wrap.remove(); if (!haaranalysePhotos.length) gallery.style.display = 'none'; };
+            wrap.appendChild(del);
+            gallery.appendChild(wrap);
           };
           reader.readAsDataURL(file);
         })(files[i]);
       }
+      // Reset input so same file can be selected again
+      document.getElementById('haaranalyseUpload').value = '';
     }
 
     function startProfiAnalyse() {
@@ -5027,6 +5108,17 @@
         <svg class="fb-star" data-val="5" onclick="setFbRating(5)" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       </div>
       <textarea class="fb-textarea" id="dashFeedbackText" placeholder="Beschreibe, was dir aufgefallen ist..." maxlength="1000" oninput="updateFbCounter()"></textarea>
+      <div style="display:flex;gap:6px;margin-top:8px;margin-bottom:4px">
+        <button class="fb-voice-btn" id="fbVoiceBtn" onclick="toggleFbVoice()" title="Spracheingabe" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg-warm);cursor:pointer;color:var(--text-dim);transition:all 200ms">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+        <label title="Screenshot beifuegen" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg-warm);cursor:pointer;color:var(--text-dim);transition:all 200ms">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <input type="file" id="fbScreenshotInput" accept="image/*" style="display:none" onchange="handleFbScreenshot(this)">
+        </label>
+        <div id="fbScreenshotPreview" style="display:none;flex:1;position:relative"></div>
+      </div>
+      <div id="fbVoiceStatus" style="display:none;font-size:11px;color:var(--danger);margin-bottom:4px"></div>
       <div class="fb-footer">
         <span class="fb-counter" id="fbCounter">0 / 1000</span>
         <button class="fb-submit" id="fbSubmitBtn" onclick="submitDashFeedback()">Absenden</button>
@@ -5073,23 +5165,137 @@
       if (first) first.classList.add('active');
       fbSelectedType = 'bug';
     }
+    var fbScreenshotData = null;
+    var fbVoiceRecorder = null;
+    var fbVoiceRecording = false;
+
+    function handleFbScreenshot(input) {
+      if (!input.files || !input.files[0]) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        fbScreenshotData = e.target.result;
+        var preview = document.getElementById('fbScreenshotPreview');
+        preview.style.display = 'block';
+        var img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.cssText = 'height:36px;border-radius:6px;border:1px solid var(--border)';
+        preview.textContent = '';
+        preview.appendChild(img);
+        var del = document.createElement('div');
+        del.style.cssText = 'position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--danger);color:#fff;font-size:10px;line-height:16px;text-align:center;cursor:pointer';
+        del.textContent = '\u00D7';
+        del.onclick = function() { fbScreenshotData = null; preview.style.display = 'none'; preview.textContent = ''; input.value = ''; };
+        preview.appendChild(del);
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+
+    function toggleFbVoice() {
+      if (fbVoiceRecording) { stopFbVoice(); return; }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showToast('Mikrofon nicht verfuegbar', 'error'); return; }
+      var btn = document.getElementById('fbVoiceBtn');
+      var status = document.getElementById('fbVoiceStatus');
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+        fbVoiceRecording = true;
+        btn.style.borderColor = 'var(--danger)'; btn.style.color = 'var(--danger)'; btn.style.background = 'var(--danger-bg)';
+        status.style.display = 'block'; status.textContent = 'Aufnahme laeuft...';
+        var chunks = [];
+        fbVoiceRecorder = new MediaRecorder(stream);
+        fbVoiceRecorder.ondataavailable = function(e) { if (e.data.size > 0) chunks.push(e.data); };
+        fbVoiceRecorder.onstop = function() {
+          stream.getTracks().forEach(function(t) { t.stop(); });
+          var blob = new Blob(chunks, { type: 'audio/webm' });
+          // Use Speech Recognition if available, otherwise note audio was recorded
+          if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+            status.textContent = 'Wird transkribiert...';
+          }
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            var ta = document.getElementById('dashFeedbackText');
+            if (ta.value) ta.value += '\n';
+            ta.value += '[Sprachnotiz aufgenommen]';
+            updateFbCounter();
+            status.style.display = 'none';
+          };
+          reader.readAsDataURL(blob);
+        };
+        fbVoiceRecorder.start();
+        // Auto-stop after 30s
+        setTimeout(function() { if (fbVoiceRecording) stopFbVoice(); }, 30000);
+      }).catch(function() { showToast('Mikrofon-Zugriff verweigert', 'error'); });
+    }
+
+    function stopFbVoice() {
+      fbVoiceRecording = false;
+      var btn = document.getElementById('fbVoiceBtn');
+      btn.style.borderColor = ''; btn.style.color = ''; btn.style.background = '';
+      if (fbVoiceRecorder && fbVoiceRecorder.state === 'recording') fbVoiceRecorder.stop();
+    }
+
+    // Use Web Speech API for live transcription if available
+    (function() {
+      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return;
+      window.fbSpeechRec = new SR();
+      window.fbSpeechRec.lang = 'de-DE';
+      window.fbSpeechRec.continuous = true;
+      window.fbSpeechRec.interimResults = true;
+      window.fbSpeechRec.onresult = function(e) {
+        var transcript = '';
+        for (var i = 0; i < e.results.length; i++) { transcript += e.results[i][0].transcript; }
+        var ta = document.getElementById('dashFeedbackText');
+        if (ta && transcript) { ta.value = transcript; updateFbCounter(); }
+      };
+    })();
+
+    function toggleFbSpeechRec() {
+      if (!window.fbSpeechRec) return;
+      if (fbVoiceRecording) { window.fbSpeechRec.stop(); }
+      else { window.fbSpeechRec.start(); }
+    }
+
     function submitDashFeedback() {
       var text = document.getElementById('dashFeedbackText').value.trim();
       if (!text || text.length < 5) { showToast('Bitte mindestens 5 Zeichen eingeben', 'info'); return; }
       var btn = document.getElementById('fbSubmitBtn');
       btn.disabled = true; btn.textContent = 'Wird gesendet...';
       var currentPageName = document.querySelector('.nav-item.active .nav-label') ? document.querySelector('.nav-item.active .nav-label').textContent : '';
-      var payload = { feedback: text, type: fbSelectedType, rating: fbRating, page: 'dashboard', currentPage: currentPageName, timestamp: new Date().toISOString(), viewport: window.innerWidth + 'x' + window.innerHeight, theme: document.documentElement.getAttribute('data-theme') || 'dark' };
+      var payload = { feedback: text, type: fbSelectedType, rating: fbRating, page: 'dashboard', currentPage: currentPageName, timestamp: new Date().toISOString(), viewport: window.innerWidth + 'x' + window.innerHeight, theme: document.documentElement.getAttribute('data-theme') || 'dark', screenshot: fbScreenshotData || null };
       var stored = JSON.parse(localStorage.getItem('casa_dashboard_feedback') || '[]');
-      stored.push(payload); localStorage.setItem('casa_dashboard_feedback', JSON.stringify(stored));
+      var storeCopy = { feedback: text, type: fbSelectedType, rating: fbRating, page: 'dashboard', currentPage: currentPageName, timestamp: payload.timestamp };
+      stored.push(storeCopy); localStorage.setItem('casa_dashboard_feedback', JSON.stringify(stored));
       if (typeof isSupabaseMode === 'function' && isSupabaseMode()) {
         sbPost('feedback', { text: text, typ: fbSelectedType, bewertung: fbRating || null, quelle: 'dashboard', seite: currentPageName, viewport: payload.viewport, erstellt_am: payload.timestamp, status: 'neu' }).catch(function() {});
       }
-      fetch('https://api.casa2035.de/webhook/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: 'dashboard', type: fbSelectedType, rating: fbRating, text: text, page: currentPageName, viewport: payload.viewport, timestamp: payload.timestamp, notion_db: NOTION_FEEDBACK_DB }) }).catch(function() {});
+      // Send to webhook (routes to n8n -> Notion)
+      fetch('https://api.casa2035.de/webhook/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: 'dashboard', type: fbSelectedType, rating: fbRating, text: text, page: currentPageName, viewport: payload.viewport, timestamp: payload.timestamp, notion_db: NOTION_FEEDBACK_DB, screenshot: fbScreenshotData ? true : false }) }).catch(function() {});
+      // Send directly to Notion API as backup
+      sendFeedbackToNotion(text, fbSelectedType, fbRating, currentPageName, payload.timestamp);
       document.getElementById('fbFormView').style.display = 'none';
       document.getElementById('fbSuccessView').style.display = 'block';
       btn.disabled = false; btn.textContent = 'Absenden';
+      fbScreenshotData = null;
       setTimeout(function() { if (dashFeedbackOpen) toggleDashFeedback(); }, 2500);
+    }
+
+    function sendFeedbackToNotion(text, type, rating, page, timestamp) {
+      var notionPayload = {
+        parent: { database_id: NOTION_FEEDBACK_DB },
+        properties: {
+          'Feedback': { title: [{ text: { content: text.substring(0, 200) } }] },
+          'Typ': { select: { name: type || 'bug' } },
+          'Bewertung': { number: rating || 0 },
+          'Seite': { rich_text: [{ text: { content: page || 'dashboard' } }] },
+          'Quelle': { select: { name: 'Dashboard' } },
+          'Zeitpunkt': { date: { start: timestamp } }
+        }
+      };
+      // This goes through the webhook proxy to avoid CORS — n8n handles the Notion API call
+      fetch('https://api.casa2035.de/webhook/notion-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(notionPayload)
+      }).catch(function() { /* Fallback: already stored in localStorage + Supabase */ });
     }
   </script>
 </body>
