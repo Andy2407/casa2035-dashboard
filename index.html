@@ -695,6 +695,9 @@
       color: var(--text); transition: all 200ms;
     }
     .date-nav button:hover { border-color: var(--gold); color: var(--gold); }
+    .heute-btn { width: auto !important; padding: 0 12px !important; border-radius: 16px !important; font-size: 11px; font-weight: 600; font-family: 'Inter', sans-serif; background: var(--gold-gradient) !important; color: #fff !important; border: none !important; cursor: pointer; letter-spacing: 0.3px; }
+    .heute-btn:hover { opacity: 0.9; }
+    .heute-btn.hidden { display: none; }
 
     /* === Staff Filter === */
     .staff-filter { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
@@ -1179,6 +1182,7 @@
         <button onclick="changeTerminDate(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"/></svg></button>
         <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer" title="Zurueck zu Heute">Heute</div>
         <button onclick="changeTerminDate(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()">Heute</button>
       </div>
       <div class="staff-filter" id="terminStaffFilter"></div>
       <div class="termin-view-toggle">
@@ -2049,11 +2053,13 @@
           sbGet('rechnungen', 'order=erstellt_am.desc&limit=50').catch(function() { return []; })
         ]);
 
-        // Wenn ALLE Tabellen leer → Demo-Modus (DB existiert aber keine Daten)
-        var totalRows = (events||[]).length + (termine||[]).length + (services||[]).length + (lager||[]).length + (kunden||[]).length;
-        if (totalRows === 0) {
-          console.log('Backend verbunden aber leer — Demo-Modus');
-          showToast('Verbunden — noch keine Daten, Demo-Modus aktiv', 'info');
+        // Wenn wichtige Tabs (Termine, Kunden) leer → Demo-Modus fuer Vorfuehrung
+        var hatTermine = (termine||[]).length > 0;
+        var hatKunden = (kunden||[]).length > 0;
+        var hatLager = (lager||[]).length > 0;
+        if (!hatTermine && !hatKunden && !hatLager) {
+          console.log('Backend verbunden aber Kerndaten leer — Demo-Modus');
+          showToast('Verbunden — Demo-Modus fuer Vorfuehrung', 'info');
           loadDemoData();
           document.getElementById('liveIndicator').textContent = 'DEMO';
           return;
@@ -2066,7 +2072,7 @@
         kunden = mapKunden(kunden || []);
 
         if (Array.isArray(events) && events.length > 0) { eventsCache = events; renderEvents(events); }
-        if (Array.isArray(termine)) { termineCache = termine; renderTermine(termine); }
+        if (Array.isArray(termine) && termine.length > 0) { termineCache = termine; renderTermine(termine); }
         if (Array.isArray(services) && services.length > 0) { servicesCache = services; renderServices(services); }
         if (Array.isArray(lager) && lager.length > 0) { renderLagerTab(lager); }
         if (Array.isArray(kunden) && kunden.length > 0) { kundenCache = kunden; renderKunden(kunden); }
@@ -2365,6 +2371,7 @@
       if (terminViewMode === 'list') renderTerminList(termine);
       else if (terminViewMode === 'day') renderDayView(termine);
       else if (terminViewMode === 'week') renderWeekView(termine);
+      updateHeuteBtn();
       renderKiTermineHints();
     }
 
@@ -2560,6 +2567,19 @@
     function goTerminHeute() {
       terminViewDate = new Date();
       renderTermine(termineCache);
+    }
+    function updateHeuteBtn() {
+      var btn = document.getElementById('heuteBtn');
+      if (!btn) return;
+      var today = new Date(); today.setHours(0,0,0,0);
+      var view = new Date(terminViewDate); view.setHours(0,0,0,0);
+      if (terminViewMode === 'week') {
+        var todayMon = new Date(today); todayMon.setDate(todayMon.getDate() - ((todayMon.getDay() + 6) % 7));
+        var viewMon = new Date(view); viewMon.setDate(viewMon.getDate() - ((viewMon.getDay() + 6) % 7));
+        btn.classList.toggle('hidden', todayMon.getTime() === viewMon.getTime());
+      } else {
+        btn.classList.toggle('hidden', today.getTime() === view.getTime());
+      }
     }
 
     // === Render Kasse / Finanzen ===
