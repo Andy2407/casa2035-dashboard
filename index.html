@@ -3251,7 +3251,7 @@
       reader.onload = function(e) {
         var preview = document.getElementById('antwortImagePreview');
         preview.style.display = 'block';
-        preview.innerHTML = '<div style="position:relative;display:inline-block"><img src="' + e.target.result + '" style="width:80px;height:80px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border)">'
+        preview.innerHTML = '<div style="position:relative;display:inline-block"><img src="' + e.target.result + '" alt="Hochgeladenes Bild" style="width:80px;height:80px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border)">'
           + '<button onclick="this.parentElement.parentElement.style.display=\'none\';this.parentElement.parentElement.innerHTML=\'\'" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:var(--danger);color:#fff;border:none;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center">&times;</button></div>'
           + '<div style="font-size:10px;color:var(--text-dim);margin-top:4px">' + esc(file.name) + '</div>';
       };
@@ -3749,7 +3749,7 @@
       var previewRow = document.createElement('div');
       previewRow.id = 'farbcodePreview';
       previewRow.style.cssText = 'display:none;margin-bottom:14px;text-align:center';
-      previewRow.innerHTML = '<img id="farbcodeImg" style="width:100px;height:100px;object-fit:cover;border-radius:var(--radius);border:1px solid var(--border)">';
+      previewRow.innerHTML = '<img id="farbcodeImg" alt="Farbcode Vorschau" style="width:100px;height:100px;object-fit:cover;border-radius:var(--radius);border:1px solid var(--border)">';
       wrapper.appendChild(previewRow);
 
       // IST section
@@ -4014,8 +4014,8 @@
         + '<div style="font-size:20px;margin-bottom:4px">&#128247;</div>'
         + '<div style="font-size:12px;font-weight:600">Aktuelle Frisur</div></div></div>'
         + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
-        + '<div id="wunschPreview" style="display:none;text-align:center"><img id="wunschPreviewImg" style="max-width:100%;max-height:120px;border-radius:var(--radius);border:1px solid var(--border)"><div style="font-size:9px;color:var(--text-dim)">Wunsch</div></div>'
-        + '<div id="aktuellePreview" style="display:none;text-align:center"><img id="aktuellePreviewImg" style="max-width:100%;max-height:120px;border-radius:var(--radius);border:1px solid var(--border)"><div style="font-size:9px;color:var(--text-dim)">Aktuell</div></div></div>'
+        + '<div id="wunschPreview" style="display:none;text-align:center"><img id="wunschPreviewImg" alt="Wunschfrisur Vorschau" style="max-width:100%;max-height:120px;border-radius:var(--radius);border:1px solid var(--border)"><div style="font-size:9px;color:var(--text-dim)">Wunsch</div></div>'
+        + '<div id="aktuellePreview" style="display:none;text-align:center"><img id="aktuellePreviewImg" alt="Aktuelle Frisur Vorschau" style="max-width:100%;max-height:120px;border-radius:var(--radius);border:1px solid var(--border)"><div style="font-size:9px;color:var(--text-dim)">Aktuell</div></div></div>'
         + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
         + '<input type="text" id="wfName" placeholder="Kundenname" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif">'
         + '<select id="wfHaartyp" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">'
