@@ -1752,6 +1752,12 @@
       document.getElementById('appMain').style.display = '';
       document.getElementById('bottomNav').style.display = '';
       document.getElementById('fabWrap').style.display = '';
+      if (!isSupabaseMode() && SUPABASE_DEFAULTS.baseUrl) {
+        config.baseUrl = SUPABASE_DEFAULTS.baseUrl;
+        config.token = SUPABASE_DEFAULTS.token;
+        config.n8nUrl = SUPABASE_DEFAULTS.n8nUrl;
+        localStorage.setItem('casa2035_config', JSON.stringify(config));
+      }
       applyUserUI();
       initApp();
     }
@@ -1881,11 +1887,13 @@
           { icon: '&#9998;', label: 'Neue Rechnung', action: 'openRechnungSheet()' },
           { icon: '&#128181;', label: 'Ausgabe buchen', action: 'openAusgabeSheet()' },
           { icon: '&#128202;', label: 'Tagesabschluss', action: 'openTagesabschluss()' },
-          { icon: '&#128230;', label: 'DATEV-Export', action: 'openDatevExport()' }
+          { icon: '&#128230;', label: 'DATEV-Export', action: 'openDatevExport()' },
+          { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
         ];
       } else if (page === 'kunden') {
         items = [
-          { icon: '&#128100;', label: 'Kunde anlegen', action: 'openNeuerKunde()' }
+          { icon: '&#128100;', label: 'Kunde anlegen', action: 'openNeuerKunde()' },
+          { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
         ];
       } else if (page === 'lager') {
         items = [
@@ -1896,11 +1904,13 @@
         items = [
           { icon: '&#127912;', label: 'Farbcode-Tool', action: 'showKiTool("farbcode")' },
           { icon: '&#128269;', label: 'Haaranalyse', action: 'showKiTool("haaranalyse")' },
-          { icon: '&#10024;', label: 'Wunschfrisur', action: 'showKiTool("wunschfrisur")' }
+          { icon: '&#10024;', label: 'Wunschfrisur', action: 'showKiTool("wunschfrisur")' },
+          { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
         ];
       } else if (page === 'einstellungen') {
         items = [
-          { icon: '&#128279;', label: 'Verbindung einrichten', action: 'openConfigSheet()' }
+          { icon: '&#128279;', label: 'Verbindung einrichten', action: 'openConfigSheet()' },
+          { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
         ];
       }
       items.forEach(function(it) {
@@ -1937,10 +1947,15 @@
     }
 
     // === Config Sheet ===
+    var SUPABASE_DEFAULTS = {
+      baseUrl: 'https://api.casa2035.de',
+      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzU1MDQ3NjUsImV4cCI6MTkzMzE4NDc2NX0.4wpQjYlTgmja6vSbLaVVHAGdRJMXIlDSWripkEaoXCk',
+      n8nUrl: 'https://niniho13.app.n8n.cloud/webhook/'
+    };
     function openConfigSheet() {
-      document.getElementById('cfgUrl').value = config.baseUrl || '';
-      document.getElementById('cfgToken').value = config.token || '';
-      document.getElementById('cfgN8n').value = config.n8nUrl || '';
+      document.getElementById('cfgUrl').value = config.baseUrl || SUPABASE_DEFAULTS.baseUrl;
+      document.getElementById('cfgToken').value = config.token || SUPABASE_DEFAULTS.token;
+      document.getElementById('cfgN8n').value = config.n8nUrl || SUPABASE_DEFAULTS.n8nUrl;
       openSheet('configSheet');
     }
     function saveConfig() {
@@ -1995,18 +2010,24 @@
     async function fetchAll() {
       if (!isSupabaseMode()) { loadDemoData(); return; }
       try {
-        var [events, termine, services, lager, kunden] = await Promise.all([
+        var [events, termine, services, lager, kunden, beratungen, rechnungen] = await Promise.all([
           sbGet('anfragen_log', 'order=erstellt_am.desc&limit=50'),
           sbGet('terminvorschlaege', 'order=start_iso.asc&limit=200'),
           sbGet('services_preisliste', 'order=service.asc'),
           sbGet('lager', 'order=produkt.asc'),
-          sbGet('kunden', 'order=name.asc')
+          sbGet('kunden', 'order=name.asc'),
+          sbGet('beratungen', 'order=timestamp.desc&limit=50').catch(function() { return []; }),
+          sbGet('rechnungen', 'order=datum.desc&limit=50').catch(function() { return []; })
         ]);
         if (Array.isArray(events)) { eventsCache = events; renderEvents(events); }
         if (Array.isArray(termine)) { termineCache = termine; renderTermine(termine); }
         if (Array.isArray(services)) { servicesCache = services; renderServices(services); }
         if (Array.isArray(lager)) { renderLagerTab(lager); }
         if (Array.isArray(kunden)) { kundenCache = kunden; renderKunden(kunden); }
+        if (Array.isArray(beratungen) && beratungen.length > 0) { renderBeratungen(beratungen); }
+        if (Array.isArray(rechnungen) && rechnungen.length > 0) { renderKasseEntries(rechnungen); }
+        renderCockpit();
+        renderKiSuggestions();
         document.getElementById('liveIndicator').textContent = 'LIVE';
       } catch(e) {
         console.log('Fetch error, falling back to demo:', e);
@@ -3036,9 +3057,26 @@
       });
       replySuggHTML += '</div>';
 
+      var verlaufHTML = '';
+      if (b.Verlauf && b.Verlauf.length > 0) {
+        verlaufHTML = '<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">&#128172; Nachrichtenverlauf</div>'
+          + '<div style="max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:6px">';
+        b.Verlauf.forEach(function(v) {
+          var isSalon = v.von === 'salon';
+          verlaufHTML += '<div style="display:flex;justify-content:' + (isSalon ? 'flex-end' : 'flex-start') + '">'
+            + '<div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:12px;line-height:1.4;'
+            + (isSalon ? 'background:var(--gold-glow);border:1px solid var(--border-accent);color:var(--text)' : 'background:var(--surface);border:1px solid var(--border);color:var(--text-secondary)')
+            + '">' + esc(v.text || '') + (v.bild ? ' &#128247;' : '')
+            + '<div style="font-size:9px;color:var(--text-dim);margin-top:3px;text-align:' + (isSalon ? 'right' : 'left') + '">'
+            + (isSalon ? 'Salon' : esc(b.Kundenname || '')) + ' &middot; ' + fmtTime(v.zeit) + '</div></div></div>';
+        });
+        verlaufHTML += '</div></div>';
+      }
+
       inner.innerHTML = '<div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:4px">Antwort an ' + esc(b.Kundenname || '') + '</div>'
         + '<div style="font-size:11px;color:var(--text-dim);margin-bottom:10px">' + kanalLabel + '</div>'
-        + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.5">' + esc(b.Nachricht || '') + '</div>'
+        + verlaufHTML
+        + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.5"><span style="font-size:10px;font-weight:700;color:var(--text-dim);display:block;margin-bottom:4px">' + esc(b.Kundenname || '') + ':</span>' + esc(b.Nachricht || '') + '</div>'
         + replySuggHTML
         + '<div style="display:flex;gap:6px;align-items:flex-end;margin-bottom:8px">'
         + '<textarea id="antwortText" rows="4" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none" placeholder="Antwort eingeben oder KI-Vorschlag waehlen..."></textarea>'
@@ -3072,7 +3110,12 @@
       var hasImage = document.getElementById('antwortImagePreview').style.display !== 'none' && document.getElementById('antwortImagePreview').innerHTML !== '';
       if (!text && !hasImage) { showToast('Bitte Antwort eingeben oder Bild anhaengen', 'warning'); return; }
       var b = beratungenCache[idx];
-      if (b) b.Status = 'beantwortet';
+      if (b) {
+        b.Status = 'beantwortet';
+        if (!b.Verlauf) b.Verlauf = [];
+        b.Verlauf.push({ von: 'kunde', text: b.Nachricht, zeit: b.Timestamp });
+        b.Verlauf.push({ von: 'salon', text: text, zeit: new Date().toISOString(), bild: hasImage });
+      }
       filterBeratungen();
       closeSheet('detailSheet');
       showToast('Antwort an ' + (b ? b.Kundenname : '') + ' gesendet' + (hasImage ? ' (mit Bild)' : ''), 'success');
@@ -3993,7 +4036,7 @@
       var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       var recognition = new SpeechRecognition();
       recognition.lang = 'de-DE';
-      recognition.continuous = false;
+      recognition.continuous = true;
       recognition.interimResults = true;
       activeRecognition = recognition;
       btn.classList.add('recording');
@@ -4007,6 +4050,10 @@
         input.value = originalVal + (originalVal ? ' ' : '') + transcript;
       };
       recognition.onend = function() {
+        if (activeRecognition === recognition) {
+          recognition.start();
+          return;
+        }
         btn.classList.remove('recording');
         activeRecognition = null;
         input.focus();
