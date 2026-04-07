@@ -90,12 +90,30 @@
       --info-bg: rgba(58,122,189,0.12);
       --gold-glow: rgba(184,150,46,0.1);
     }
+    [data-theme="dark"] body {
+      background: linear-gradient(165deg, #0c0b09 0%, #0a0a0a 30%, #080a0c 60%, #0a0908 100%);
+      background-attachment: fixed;
+    }
     [data-theme="dark"] .header { background: var(--bg-glass); }
     [data-theme="dark"] .bottom-nav { background: var(--bg-glass); }
     [data-theme="dark"] .sheet { background: var(--card-solid); }
     [data-theme="dark"] img { opacity: 0.92; }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* Ambient Background Glow */
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(184,150,46,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 85%, rgba(184,150,46,0.04) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(184,150,46,0.02) 0%, transparent 70%);
+    }
+    [data-theme="light"] body::before {
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(184,150,46,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 85%, rgba(184,150,46,0.03) 0%, transparent 50%);
+    }
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -107,13 +125,6 @@
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
       overscroll-behavior: none;
-    }
-    body::before {
-      content: '';
-      position: fixed; top: -40%; left: -30%; width: 160%; height: 80%;
-      background: radial-gradient(ellipse at 25% 15%, rgba(184,150,46,0.04) 0%, transparent 55%),
-                  radial-gradient(ellipse at 75% 35%, rgba(184,150,46,0.02) 0%, transparent 45%);
-      pointer-events: none; z-index: 0;
     }
 
     .serif { font-family: 'Playfair Display', 'Georgia', serif; }
@@ -1962,7 +1973,6 @@
         list.appendChild(card);
       });
       renderSmartHints();
-      renderCockpit();
     }
 
     function getKanalColor(kanal) {
@@ -2395,7 +2405,7 @@
       document.getElementById('lagerLow').textContent = low;
       document.getElementById('lagerCount').textContent = items.length + ' Produkte';
       document.getElementById('statLagerAlarm').textContent = low;
-      document.getElementById('statLagerAlarmSub').textContent = low > 0 ? 'nachbestellen' : 'alles ok';
+      document.getElementById('statLagerAlarmSub').textContent = low > 0 ? 'Lager-Alarm' : 'Lager OK';
       filterLager();
     }
 
@@ -2736,7 +2746,7 @@
       }
       var weekRevenue = weekDays.map(function(ds) {
         return termineCache.filter(function(t) {
-          return (t.Start_ISO || '').indexOf(ds) === 0 && (t.Status === 'abgeschlossen' || new Date(t.Start_ISO) < now);
+          return (t.Start_ISO || '').indexOf(ds) === 0;
         }).reduce(function(s, t) { return s + (parseFloat(t.Preis) || 0); }, 0);
       });
       var maxRev = Math.max.apply(null, weekRevenue) || 1;
@@ -2771,7 +2781,6 @@
       var teamMap = {};
       termineCache.forEach(function(t) {
         if ((t.Start_ISO || '').indexOf(todayStr) !== 0) return;
-        if (new Date(t.Start_ISO) > now) return;
         var s = t.Stylist || 'Unbekannt';
         if (!teamMap[s]) teamMap[s] = 0;
         teamMap[s] += parseFloat(t.Preis) || 0;
@@ -2831,7 +2840,7 @@
       // --- Top Services ---
       var svcMap = {};
       termineCache.filter(function(t) {
-        return (t.Start_ISO || '').indexOf(todayStr) === 0 && new Date(t.Start_ISO) < now;
+        return (t.Start_ISO || '').indexOf(todayStr) === 0;
       }).forEach(function(t) {
         var s = t.Service || 'Unbekannt';
         if (!svcMap[s]) svcMap[s] = { count: 0, rev: 0 };
@@ -3795,6 +3804,9 @@
         { Kundenname: 'Anna Schmidt', Nachricht: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', Kanal: 'whatsapp', Timestamp: isoDay(-1, 16, 30), Status: 'beantwortet' },
         { Kundenname: 'Lisa Wagner', Nachricht: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', Kanal: 'email', Timestamp: isoDay(-2, 11, 0), Status: 'beantwortet' }
       ]);
+
+      // Cockpit NACH allen Caches rendern
+      renderCockpit();
     }
 
     // === Init App ===
