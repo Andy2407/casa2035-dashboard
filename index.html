@@ -1234,6 +1234,7 @@
         <button onclick="changeTerminDate(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg></button>
         <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()">Heute</button>
       </div>
+      <div class="staff-filter" id="terminStaffFilter"></div>
       <div class="termin-view-toggle">
         <button class="termin-view-btn active" onclick="setTerminView('list')" id="tvList">Liste</button>
         <button class="termin-view-btn" onclick="setTerminView('day')" id="tvDay">Tag</button>
@@ -2399,6 +2400,27 @@
       var todayTermine = termine.filter(function(t) { return (t.Start_ISO || '').indexOf(todayStr) === 0; });
       document.getElementById('statTermine').textContent = todayTermine.length;
 
+      // Staff-Filter oberhalb der Ansichts-Buttons
+      var staffFilter = document.getElementById('terminStaffFilter');
+      if (staffFilter) {
+        staffFilter.textContent = '';
+        var allChip = document.createElement('div');
+        allChip.className = 'staff-chip' + (terminStaffFilter === 'alle' ? ' active' : '');
+        allChip.textContent = 'Alle';
+        allChip.onclick = function() { terminStaffFilter = 'alle'; renderTermine(termineCache); };
+        staffFilter.appendChild(allChip);
+        var STAFF_ORDER = ['Rena', 'Sarah', 'Julia', 'Lena'];
+        STAFF_ORDER.forEach(function(name) {
+          var u = Object.values(USERS).find(function(u) { return u.name === name; });
+          if (!u) return;
+          var chip = document.createElement('div');
+          chip.className = 'staff-chip' + (terminStaffFilter === name ? ' active' : '');
+          chip.innerHTML = '<span class="dot" style="background:' + u.farbe + '"></span>' + esc(name);
+          chip.onclick = function() { terminStaffFilter = name; renderTermine(termineCache); };
+          staffFilter.appendChild(chip);
+        });
+      }
+
       if (terminViewMode === 'list') renderTerminList(termine);
       else if (terminViewMode === 'day') renderDayView(termine);
       else if (terminViewMode === 'week') renderWeekView(termine);
@@ -2414,6 +2436,7 @@
 
       var filtered = termine.filter(function(t) {
         var match = (t.Start_ISO || '').indexOf(dateStr) === 0;
+        if (terminStaffFilter !== 'alle') match = match && t.Stylist === terminStaffFilter;
         if (!perms.alleTermine && currentUser) {
           var uName = USERS[currentUser].name;
           match = match && t.Stylist === uName;
@@ -2454,35 +2477,28 @@
       var dateStr = terminViewDate.toISOString().split('T')[0];
       document.getElementById('terminDateLabel').textContent = fmtDate(dateStr);
 
-      // Filter termine ZUERST
+      // Filter termine ZUERST — inkl. Staff-Filter
       var filtered = termine.filter(function(t) {
-        return (t.Start_ISO || '').indexOf(dateStr) === 0;
+        var match = (t.Start_ISO || '').indexOf(dateStr) === 0;
+        if (terminStaffFilter !== 'alle') match = match && t.Stylist === terminStaffFilter;
+        return match;
       });
 
       // Group by stylist — Rena IMMER links (Chefin)
       var staffCols = {};
       filtered.forEach(function(t) { var s = t.Stylist || 'Unbekannt'; if (!staffCols[s]) staffCols[s] = []; staffCols[s].push(t); });
       var STAFF_DAY_ORDER = ['Rena', 'Sarah', 'Julia', 'Lena'];
-      var staffKeys = STAFF_DAY_ORDER.filter(function(n) { return staffCols[n]; });
-      Object.keys(staffCols).forEach(function(n) { if (staffKeys.indexOf(n) === -1) staffKeys.push(n); });
-      // Wenn keine Termine: trotzdem alle 4 Stylistinnen als Spalten zeigen
-      if (staffKeys.length === 0) staffKeys = STAFF_DAY_ORDER.slice();
+      var staffKeys;
+      if (terminStaffFilter !== 'alle') {
+        staffKeys = [terminStaffFilter];
+      } else {
+        staffKeys = STAFF_DAY_ORDER.filter(function(n) { return staffCols[n]; });
+        Object.keys(staffCols).forEach(function(n) { if (staffKeys.indexOf(n) === -1) staffKeys.push(n); });
+        if (staffKeys.length === 0) staffKeys = STAFF_DAY_ORDER.slice();
+      }
 
       var grid = document.createElement('div');
       grid.className = 'day-view-grid';
-
-      // Stylist column headers — staffKeys ist jetzt definiert
-      var headerRow = document.createElement('div');
-      headerRow.className = 'day-hour-row';
-      headerRow.style.cssText = 'min-height:32px;border-bottom:2px solid var(--border-accent)';
-      headerRow.innerHTML = '<div class="day-hour-label"></div><div class="day-hour-slots" style="display:flex">' +
-        staffKeys.map(function(name) {
-          var u = Object.values(USERS).find(function(u) { return u.name === name; });
-          return '<div style="flex:1;text-align:center;font-size:11px;font-weight:700;padding:6px 0;color:' + (u ? u.farbe : 'var(--text-dim)') + '">' +
-            '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + (u ? u.farbe : 'var(--text-dim)') + ';margin-right:4px;vertical-align:middle"></span>' +
-            esc(name) + '</div>';
-        }).join('') + '</div>';
-      grid.appendChild(headerRow);
 
       for (var h = 8; h <= 20; h++) {
         var row = document.createElement('div');
@@ -2550,7 +2566,11 @@
         header.textContent = days[i] + ' ' + d.getDate();
         col.appendChild(header);
 
-        var dayTermine = termine.filter(function(t) { return (t.Start_ISO || '').indexOf(dStr) === 0; });
+        var dayTermine = termine.filter(function(t) {
+          var match = (t.Start_ISO || '').indexOf(dStr) === 0;
+          if (terminStaffFilter !== 'alle') match = match && t.Stylist === terminStaffFilter;
+          return match;
+        });
         dayTermine.sort(function(a, b) { return (a.Start_ISO || '').localeCompare(b.Start_ISO || ''); });
 
         dayTermine.forEach(function(t) {
