@@ -1030,6 +1030,60 @@
       .cockpit-wide { grid-column: 1; }
     }
 
+    /* === iPhone Landscape: Kompakt-Modus === */
+    @media (max-height: 500px) and (orientation: landscape) {
+      :root { --nav-height: 44px; --safe-top: 0px; }
+      body { padding-top: 0; }
+      .header {
+        padding: 4px 16px 4px;
+        position: sticky; top: 0;
+      }
+      .header-greeting { display: none; }
+      .header-salon { font-size: 15px; }
+      .header-right .live-dot { font-size: 8px; padding: 2px 6px; }
+      .avatar { width: 28px; height: 28px; font-size: 11px; }
+      .theme-toggle { width: 28px; height: 28px; }
+      .theme-toggle svg { width: 14px; height: 14px; }
+      .badge { min-width: 14px; height: 14px; font-size: 8px; top: -2px; right: -2px; }
+      .bottom-nav {
+        height: var(--nav-height);
+        padding-bottom: 0;
+      }
+      .nav-item { padding: 2px 6px; gap: 1px; }
+      .nav-item svg { width: 18px; height: 18px; }
+      .nav-item .nav-label { font-size: 7px; }
+      main { padding: 0 12px; }
+      .page { padding: 8px 0; }
+      .section-title { margin: 10px 0 6px; font-size: 10px; }
+      .hero-card { padding: 12px; margin-bottom: 10px; border-radius: var(--radius); }
+      .hero-card h2 { font-size: 16px !important; }
+      .hero-card .hero-subtitle { font-size: 10px !important; }
+      .stats-grid { gap: 6px; margin-bottom: 8px; }
+      .stat-card { padding: 8px 10px; }
+      .stat-icon { width: 24px; height: 24px; margin-bottom: 4px; }
+      .stat-icon svg { width: 14px; height: 14px; }
+      .stat-value { font-size: 18px; }
+      .stat-label { font-size: 9px; }
+      .cockpit-card { padding: 10px; }
+      .cockpit-card h3 { font-size: 12px !important; }
+      .fab-wrap { bottom: calc(var(--nav-height) + 8px); }
+      .fab { width: 42px; height: 42px; }
+      .fab svg { width: 18px; height: 18px; }
+      #dashFeedbackFab { display: none; }
+      .termin-card { padding: 8px 10px !important; }
+      .ki-suggestion-card { padding: 8px; margin-bottom: 4px; }
+      .ki-suggestion-card .ki-icon { width: 28px; height: 28px; font-size: 13px; }
+      .ki-suggestion-card .ki-title { font-size: 11px; }
+      .ki-suggestion-card .ki-desc { font-size: 10px; }
+      .sheet { max-height: 90vh; }
+    }
+
+    /* iPhone Landscape: Cockpit Grid 2-spaltig */
+    @media (max-height: 500px) and (orientation: landscape) and (min-width: 600px) {
+      .cockpit-grid { grid-template-columns: 1fr 1fr; }
+      .stats-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
     /* === KI-Vorschlaege === */
     .ki-suggestion-card {
       display: flex; gap: 12px; padding: 14px; background: var(--surface);
@@ -1839,6 +1893,7 @@
     // === Helpers ===
     function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
     function fmtEur(n) { return (parseFloat(n) || 0).toFixed(2).replace('.', ','); }
+    function localDateStr(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
     function fmtDate(iso) {
       if (!iso) return '--';
       var d = new Date(iso);
@@ -2225,7 +2280,16 @@
     }
     function mapTermine(rows) {
       return rows.map(function(r) {
-        return Object.assign({}, r, { Start_ISO: r.beginn || r.start_iso || r.Start_ISO, Ende_ISO: r.ende || r.ende_iso || r.Ende_ISO, Service: r.dienstleistung || r.Service || r.service, Kundenname: r.kundenname || r.Kundenname, Stylist: r.mitarbeiter || r.Stylist || 'Rena', Status: r.status || r.Status || 'bestaetigt', Preis: r.preis || r.Preis || 0 });
+        return Object.assign({}, r, {
+          Start_ISO: r.beginn || r.start_iso || r.Start_ISO,
+          Ende_ISO: r.ende || r.ende_iso || r.Ende_ISO,
+          Service: r.dienstleistung || r.Service || r.service || '',
+          Kundenname: r.kundenname || r.Kundenname || '',
+          Stylist: r.mitarbeiter || r.Stylist || 'Rena',
+          Status: r.status || r.Status || 'bestaetigt',
+          Preis: r.preis || r.gesamtpreis_netto || r.Preis || 0,
+          Dauer_Min: r.dauer_min || r.gesamtdauer_min || r.Dauer_Min || 0
+        });
       });
     }
     function mapLager(rows) {
@@ -2236,6 +2300,29 @@
     function mapKunden(rows) {
       return rows.map(function(r) {
         return Object.assign({}, r, { Name: r.name || r.Name, Email: r.email || r.Email, Telefon: r.telefon || r.kontakt || r.Telefon, Besuche: r.anzahl_besuche || r.Besuche || 0, VIP: r.vip || r.VIP || false, Follow_Up: r.follow_up || r.Follow_Up || false, Letzter_Besuch: r.letzter_besuch || r.Letzter_Besuch, Umsatz: r.umsatz || r.Umsatz || 0 });
+      });
+    }
+    function mapBeratungen(rows) {
+      return rows.map(function(r) {
+        return Object.assign({}, r, {
+          Kundenname: r.kundenname || r.Kundenname || '',
+          Nachricht: r.nachricht || r.Nachricht || '',
+          Kanal: r.kanal || r.Kanal || '',
+          Timestamp: r.timestamp || r.Timestamp || r.erstellt_am || '',
+          Status: r.status || r.Status || 'offen',
+          Verlauf: r.verlauf || r.Verlauf || []
+        });
+      });
+    }
+    function mapRechnungen(rows) {
+      return rows.map(function(r) {
+        return Object.assign({}, r, {
+          Kunde: r.kundenname || r.Kunde || '',
+          Service: r.dienstleistung || r.Service || '',
+          Betrag: r.brutto || r.Betrag || 0,
+          Zahlart: r.zahlungsart || r.Zahlart || 'bar',
+          typ: 'einnahme'
+        });
       });
     }
 
@@ -2270,6 +2357,8 @@
         services = mapServices(services || []);
         lager = mapLager(lager || []);
         kunden = mapKunden(kunden || []);
+        beratungen = mapBeratungen(beratungen || []);
+        rechnungen = mapRechnungen(rechnungen || []);
 
         if (Array.isArray(events) && events.length > 0) { eventsCache = events; renderEvents(events); }
         if (Array.isArray(termine) && termine.length > 0) { termineCache = termine; renderTermine(termine); }
@@ -2277,7 +2366,17 @@
         if (Array.isArray(lager) && lager.length > 0) { renderLagerTab(lager); }
         if (Array.isArray(kunden) && kunden.length > 0) { kundenCache = kunden; renderKunden(kunden); }
         if (Array.isArray(beratungen) && beratungen.length > 0) { renderBeratungen(beratungen); }
-        if (Array.isArray(rechnungen) && rechnungen.length > 0) { renderKasseEntries(rechnungen); }
+        if (Array.isArray(rechnungen) && rechnungen.length > 0) {
+          renderKasseEntries(rechnungen);
+          // Finanzen aus Rechnungen berechnen
+          var barTotal = 0, karteTotal = 0;
+          rechnungen.forEach(function(r) {
+            var betrag = parseFloat(r.Betrag || r.brutto || 0);
+            if ((r.Zahlart || r.zahlungsart || '') === 'bar') barTotal += betrag;
+            else karteTotal += betrag;
+          });
+          renderFinanzen({ tagesUmsatz: barTotal + karteTotal, barEinnahmen: barTotal, karteEinnahmen: karteTotal });
+        }
         renderCockpit();
         renderKiSuggestions();
         updateHeroSubtitle();
