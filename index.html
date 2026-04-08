@@ -116,6 +116,12 @@
     [data-theme="dark"] .section-title {
       color: var(--gold); opacity: 0.7;
     }
+    [data-theme="dark"] .nav-item.active::after {
+      box-shadow: 0 0 8px rgba(201,168,76,0.4);
+    }
+    [data-theme="dark"] .bottom-nav {
+      border-top-color: rgba(201,168,76,0.08);
+    }
     [data-theme="dark"] .header { background: var(--bg-glass); }
     [data-theme="dark"] .bottom-nav { background: var(--bg-glass); }
     [data-theme="dark"] .sheet { background: var(--card-solid); }
@@ -903,8 +909,15 @@
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
       opacity: 0; transition: opacity 400ms;
     }
+    .cockpit-card::after {
+      content: ''; position: absolute; top: -2px; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent 20%, rgba(201,168,76,0.6) 50%, transparent 80%);
+      opacity: 0; transition: opacity 300ms;
+      filter: blur(0.5px);
+    }
     .cockpit-card:hover { border-color: var(--border-accent); box-shadow: var(--shadow-glow); }
     .cockpit-card:hover::before { opacity: 1; }
+    .cockpit-card:hover::after { opacity: 1; animation: scanline 2s linear infinite; }
     .cockpit-card:active { transform: scale(0.98); }
     .cockpit-wide { grid-column: 1 / -1; }
     .cockpit-center { display: flex; flex-direction: column; align-items: center; }
@@ -1955,10 +1968,28 @@
     var currentPage = 'dashboard';
     function showPage(page) {
       currentPage = page;
-      document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+      var activePage = document.querySelector('.page.active');
       var pageId = 'page' + page.charAt(0).toUpperCase() + page.slice(1);
       var el = document.getElementById(pageId);
-      if (el) el.classList.add('active');
+      if (activePage && el && activePage !== el) {
+        activePage.style.opacity = '0';
+        activePage.style.transform = 'translateY(-8px)';
+        setTimeout(function() {
+          document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); p.style.opacity = ''; p.style.transform = ''; });
+          el.classList.add('active');
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(8px)';
+          requestAnimationFrame(function() {
+            el.style.transition = 'opacity 250ms ease, transform 250ms ease';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+            setTimeout(function() { el.style.transition = ''; }, 260);
+          });
+        }, 120);
+      } else {
+        document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+        if (el) el.classList.add('active');
+      }
       document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
       var navItems = document.querySelectorAll('.nav-item');
       var pageMap = ['dashboard','termine','kasse','kunden','lager','beratung','einstellungen'];
