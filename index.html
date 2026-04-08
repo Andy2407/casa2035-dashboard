@@ -1032,82 +1032,124 @@
 
     /* === iPhone Landscape: Kompakt-Modus === */
     @media (max-height: 500px) and (orientation: landscape) {
-      :root { --nav-height: 44px; --safe-top: 0px; }
+      :root { --nav-height: 36px; --safe-top: 0px; }
       body { padding-top: 0; }
+      /* Header versteckt sich beim Scrollen */
       .header {
-        padding: 4px 16px 4px;
+        padding: 2px 12px;
         position: sticky; top: 0;
+        transition: transform 250ms ease, opacity 250ms ease;
+        z-index: 100;
+      }
+      .header.landscape-hidden {
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
       }
       .header-greeting { display: none; }
-      .header-salon { font-size: 15px; }
-      .header-right .live-dot { font-size: 8px; padding: 2px 6px; }
-      .avatar { width: 28px; height: 28px; font-size: 11px; }
-      .theme-toggle { width: 28px; height: 28px; }
-      .theme-toggle svg { width: 14px; height: 14px; }
-      .badge { min-width: 14px; height: 14px; font-size: 8px; top: -2px; right: -2px; }
+      .header-salon { font-size: 13px; }
+      .header-right .live-dot { font-size: 7px; padding: 1px 5px; }
+      .avatar { width: 24px; height: 24px; font-size: 10px; }
+      .theme-toggle { width: 24px; height: 24px; }
+      .theme-toggle svg { width: 12px; height: 12px; }
+      .badge { min-width: 12px; height: 12px; font-size: 7px; top: -2px; right: -2px; }
+      /* Nav versteckt sich beim Scrollen */
       .bottom-nav {
         height: var(--nav-height);
         padding-bottom: 0;
+        transition: transform 250ms ease, opacity 250ms ease;
       }
-      .nav-item { padding: 2px 6px; gap: 1px; }
-      .nav-item svg { width: 18px; height: 18px; }
-      .nav-item .nav-label { font-size: 7px; }
-      main { padding: 0 12px; }
-      .page { padding: 8px 0; }
-      .section-title { margin: 10px 0 6px; font-size: 10px; }
-      .hero-card { padding: 12px; margin-bottom: 10px; border-radius: var(--radius); }
-      .hero-card h2 { font-size: 16px !important; }
-      .hero-card .hero-subtitle { font-size: 10px !important; }
-      .stats-grid { gap: 6px; margin-bottom: 8px; }
-      .stat-card { padding: 8px 10px; }
-      .stat-icon { width: 24px; height: 24px; margin-bottom: 4px; }
-      .stat-icon svg { width: 14px; height: 14px; }
-      .stat-value { font-size: 18px; }
-      .stat-label { font-size: 9px; }
-      .cockpit-card { padding: 10px; }
-      .cockpit-card h3 { font-size: 12px !important; }
-      .fab-wrap { bottom: calc(var(--nav-height) + 8px); }
-      .fab { width: 42px; height: 42px; }
-      .fab svg { width: 18px; height: 18px; }
+      .bottom-nav.landscape-hidden {
+        transform: translateY(100%);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .nav-item { padding: 1px 8px; gap: 0; }
+      .nav-item svg { width: 16px; height: 16px; }
+      .nav-item .nav-label { display: none; }
+      main { padding: 0 10px; }
+      .page { padding: 4px 0; }
+      .section-title { margin: 6px 0 4px; font-size: 9px; }
+      .hero-card { padding: 8px; margin-bottom: 6px; border-radius: var(--radius-sm); }
+      .hero-card h2 { font-size: 14px !important; }
+      .hero-card .hero-subtitle { font-size: 9px !important; }
+      .stats-grid { gap: 4px; margin-bottom: 6px; }
+      .stat-card { padding: 6px 8px; }
+      .stat-icon { width: 20px; height: 20px; margin-bottom: 2px; }
+      .stat-icon svg { width: 12px; height: 12px; }
+      .stat-value { font-size: 16px; }
+      .stat-label { font-size: 8px; }
+      .cockpit-card { padding: 8px; }
+      .cockpit-card h3 { font-size: 11px !important; }
+      .fab-wrap { bottom: calc(var(--nav-height) + 4px); }
+      .fab { width: 36px; height: 36px; }
+      .fab svg { width: 16px; height: 16px; }
       #dashFeedbackFab { display: none; }
-      .termin-card { padding: 8px 10px !important; }
-      .ki-suggestion-card { padding: 8px; margin-bottom: 4px; }
-      .ki-suggestion-card .ki-icon { width: 28px; height: 28px; font-size: 13px; }
-      .ki-suggestion-card .ki-title { font-size: 11px; }
-      .ki-suggestion-card .ki-desc { font-size: 10px; }
-      .sheet { max-height: 90vh; }
+      /* Termine kompakt */
+      .termin-card { padding: 6px 8px !important; }
+      .termin-card .termin-time-block .time { font-size: 13px; }
+      .termin-card .termin-service { font-size: 12px; }
+      .termin-card .termin-kunde { font-size: 10px; }
+      .termin-card .termin-preis { font-size: 11px; }
+      .date-nav { gap: 4px; }
+      .date-label { font-size: 12px; }
+      .staff-filter { gap: 3px; margin-bottom: 4px; }
+      .staff-chip { font-size: 10px; padding: 3px 8px; }
+      .termin-view-toggle { margin-bottom: 4px; }
+      .termin-view-btn { font-size: 10px; padding: 3px 10px; }
+      /* Tagesansicht Kalender Breite */
+      .day-view-grid { font-size: 10px; }
+      .day-hour-label { font-size: 9px; min-width: 32px; padding: 2px 4px; }
+      .day-termin-block { font-size: 9px; padding: 2px 4px; }
+      /* KI-Hinweise kompakt */
+      .ki-suggestion-card { padding: 6px; margin-bottom: 3px; }
+      .ki-suggestion-card .ki-icon { width: 24px; height: 24px; font-size: 12px; }
+      .ki-suggestion-card .ki-title { font-size: 10px; }
+      .ki-suggestion-card .ki-desc { font-size: 9px; }
+      .sheet { max-height: 95vh; }
       /* Beratung-Tab Kompakt */
-      #kiToolPanel { font-size: 11px; }
-      #kiToolPanel details summary { font-size: 11px; padding: 6px 10px; }
-      #kiToolPanel details > div { font-size: 10px; padding: 4px 10px 8px; }
-      #kiToolPanel input, #kiToolPanel select, #kiToolPanel textarea { font-size: 11px !important; padding: 6px 8px !important; }
-      #kiToolPanel .btn { padding: 8px 12px; font-size: 11px; }
+      #kiToolPanel { font-size: 10px; }
+      #kiToolPanel details summary { font-size: 10px; padding: 4px 8px; }
+      #kiToolPanel details > div { font-size: 9px; padding: 4px 8px 6px; }
+      #kiToolPanel input, #kiToolPanel select, #kiToolPanel textarea { font-size: 10px !important; padding: 5px 7px !important; }
+      #kiToolPanel .btn { padding: 6px 10px; font-size: 10px; }
       /* Termin-Detail Sheet Kompakt */
-      #detailSheet .sheet-content { padding: 12px; }
+      #detailSheet .sheet-content { padding: 10px; }
+      /* Kasse kompakt */
+      .kasse-summary { gap: 4px; }
+      .kasse-box { padding: 6px; }
+      .kasse-box .value { font-size: 16px; }
+      .kasse-box .label { font-size: 8px; }
+      .ring-chart-wrap { display: none; }
+      .action-grid { gap: 4px; }
+      .action-card { padding: 8px; }
+      .action-card .icon { font-size: 16px; margin-bottom: 2px; }
+      .action-card .title { font-size: 11px; }
+      .action-card .desc { font-size: 8px; }
     }
 
     /* iPhone Landscape: Cockpit Grid 2-spaltig */
     @media (max-height: 500px) and (orientation: landscape) and (min-width: 600px) {
       .cockpit-grid { grid-template-columns: 1fr 1fr; }
       .stats-grid { grid-template-columns: repeat(4, 1fr); }
+      .action-grid { grid-template-columns: repeat(4, 1fr); }
     }
 
     /* iPhone SE / small phones landscape */
     @media (max-height: 400px) and (orientation: landscape) {
-      .header { padding: 2px 12px; }
-      .header-salon { font-size: 13px; }
-      .bottom-nav { height: 38px; }
-      .nav-item svg { width: 16px; height: 16px; }
-      .nav-item .nav-label { display: none; }
-      main { padding: 0 8px; }
-      .hero-card { padding: 8px; margin-bottom: 6px; }
-      .hero-card h2 { font-size: 14px !important; }
-      .stats-grid { gap: 4px; }
-      .stat-card { padding: 6px 8px; }
-      .stat-value { font-size: 16px; }
-      .fab-wrap { bottom: calc(38px + 4px); }
-      .fab { width: 36px; height: 36px; }
-      .fab svg { width: 16px; height: 16px; }
+      .header { padding: 1px 8px; }
+      .header-salon { font-size: 12px; }
+      .bottom-nav { height: 32px; }
+      .nav-item svg { width: 14px; height: 14px; }
+      main { padding: 0 6px; }
+      .hero-card { padding: 6px; margin-bottom: 4px; }
+      .hero-card h2 { font-size: 13px !important; }
+      .stats-grid { gap: 3px; }
+      .stat-card { padding: 4px 6px; }
+      .stat-value { font-size: 14px; }
+      .fab-wrap { bottom: calc(32px + 4px); }
+      .fab { width: 32px; height: 32px; }
+      .fab svg { width: 14px; height: 14px; }
     }
 
     /* === KI-Vorschlaege === */
@@ -5487,7 +5529,16 @@
       if (farbTermine.length >= 2) {
         hints.push({ icon: '&#127912;', title: farbTermine.length + ' Farbtermine heute', desc: 'Farbe + Entwickler vorab anmischen spart ~15 Min. Olaplex als Upsell empfehlen!' });
       }
-      renderKiHintCards(c, hints, 3);
+      // Fallback-Hinweise damit immer mind. 3 angezeigt werden
+      var fallbacks = [
+        { icon: '&#128161;', title: 'Upselling-Tipp: Pflegeprodukte', desc: 'Bei jedem Farbtermin Olaplex No.3 empfehlen — steigert Umsatz um ~25 EUR pro Kunde.' },
+        { icon: '&#128197;', title: 'Naechste Woche vorplanen', desc: 'Montags die Woche durchgehen: Welche Produkte werden gebraucht? Welche Kunden brauchen Erinnerung?' },
+        { icon: '&#11088;', title: 'Google-Bewertung anfragen', desc: 'Zufriedene Kunden nach Bewertung fragen — 5-Sterne-Reviews bringen neue Laufkundschaft.' },
+        { icon: '&#128247;', title: 'Vorher/Nachher-Foto machen', desc: 'Bei Farb- und Styling-Terminen ein Foto fuer Instagram — beste Werbung!' }
+      ];
+      var fi = 0;
+      while (hints.length < 3 && fi < fallbacks.length) { hints.push(fallbacks[fi++]); }
+      renderKiHintCards(c, hints);
     }
 
     // === KI-Hinweise fuer Kasse-Tab ===
@@ -5520,7 +5571,15 @@
       if (kasseCache.length === 0 && h > 10) {
         hints.push({ icon: '&#9203;', title: 'Noch keine Buchungen heute', desc: 'Erster Termin wird erwartet. Kasse pruefbereit? Wechselgeld ausreichend?' });
       }
-      renderKiHintCards(c, hints, 3);
+      var kFallbacks = [
+        { icon: '&#128176;', title: 'Produktverkauf steigern', desc: 'Tipp: Pflegeprodukte direkt am Stuhl empfehlen. Durchschnittlich +18 EUR pro Kunde moeglich.' },
+        { icon: '&#128202;', title: 'Monatsvergleich nutzen', desc: 'Vergleiche den heutigen Umsatz mit dem gleichen Wochentag letzten Monat — Trends erkennen!' },
+        { icon: '&#128179;', title: 'Kartenzahlung foerdern', desc: 'QR-Aufsteller am Tresen platzieren — schneller, hygienischer, weniger Wechselgeld noetig.' },
+        { icon: '&#9997;', title: 'Belege digitalisieren', desc: 'Papierbelege abfotografieren und digital archivieren — spart Platz und ist GoBD-konform.' }
+      ];
+      var kfi = 0;
+      while (hints.length < 3 && kfi < kFallbacks.length) { hints.push(kFallbacks[kfi++]); }
+      renderKiHintCards(c, hints);
     }
 
     // === KI-Hinweise fuer Kunden-Tab ===
@@ -5550,7 +5609,15 @@
       if (kundenCache.length > 0 && kundenCache.length < 30) {
         hints.push({ icon: '&#128200;', title: 'Kundenstamm ausbauen', desc: 'Tipp: Jeden Walk-In-Kunden nach E-Mail/Handy fragen. +1 Kontakt pro Tag = +365 im Jahr.' });
       }
-      renderKiHintCards(c, hints, 3);
+      var kuFallbacks = [
+        { icon: '&#127873;', title: 'Geburtstags-Aktion starten', desc: 'Kunden mit Geburtstag diesen Monat eine persoenliche Nachricht + 10% Gutschein senden.' },
+        { icon: '&#128172;', title: 'WhatsApp-Nachricht senden', desc: 'Persoenliche Nachrichten wirken 3x besser als E-Mail — kurze "Wie geht es Ihren Haaren?"-Nachricht.' },
+        { icon: '&#128200;', title: 'Stammkunden belohnen', desc: 'Ab dem 5. Besuch ein kleines Geschenk — Kundenbindung ist guenstiger als Neukundengewinnung.' },
+        { icon: '&#128247;', title: 'Kunden-Feedback einholen', desc: 'Nach dem Termin kurz fragen: "Sind Sie zufrieden?" — zeigt Wertschaetzung und verbessert den Service.' }
+      ];
+      var kufi = 0;
+      while (hints.length < 3 && kufi < kuFallbacks.length) { hints.push(kuFallbacks[kufi++]); }
+      renderKiHintCards(c, hints);
     }
 
     // === KI-Hinweise fuer Lager-Tab ===
@@ -5583,27 +5650,52 @@
           hints.push({ icon: '&#128176;', title: 'Lagerwert ca. ' + fmtEur(totalValue) + ' EUR', desc: 'Tipp: Langsam drehende Artikel identifizieren und mit Rabattaktion abverkaufen.' });
         }
       }
-      renderKiHintCards(c, hints, 3);
+      var laFallbacks = [
+        { icon: '&#128230;', title: 'Sammelbestellung planen', desc: 'Freitags Bestand pruefen und Montags bestellen — LA Biosthetique liefert in 3-5 Werktagen.' },
+        { icon: '&#128161;', title: 'Verkaufsregal auffuellen', desc: 'Produkte auf Augenhoehe platzieren. Shampoo + Conditioner als Set anbieten = hoehere Marge.' },
+        { icon: '&#128200;', title: 'Bestseller identifizieren', desc: 'Die Top 5 Produkte immer doppelt auf Lager halten — Nachschub-Engpaesse kosten Umsatz.' },
+        { icon: '&#127912;', title: 'Saisonale Produkte', desc: 'Im Sommer: Sonnenschutz-Spray + Leave-In-Conditioner promoten. Im Winter: Feuchtigkeitskuren.' }
+      ];
+      var lafi = 0;
+      while (hints.length < 3 && lafi < laFallbacks.length) { hints.push(laFallbacks[lafi++]); }
+      renderKiHintCards(c, hints);
     }
 
     // === Gemeinsamer KI-Hint-Card-Renderer ===
-    function renderKiHintCards(container, hints, max) {
-      hints.slice(0, max || 3).forEach(function(h) {
-        var card = document.createElement('div');
-        card.className = 'ki-suggestion-card touch-scale';
-        card.style.cursor = 'pointer';
-        if (h.prio === 'danger') card.style.borderLeftColor = 'var(--danger)';
-        card.innerHTML = '<div class="ki-icon">' + h.icon + '</div>'
-          + '<div class="ki-body"><div class="ki-title">' + h.title + ' <span class="ki-badge">KI</span></div>'
-          + '<div class="ki-desc">' + h.desc + '</div>'
-          + '<div class="ki-action" style="font-size:10px;color:var(--gold);font-weight:600;margin-top:4px">Details &amp; Chat &#8250;</div></div>';
-        (function(hint) {
-          card.onclick = function() { openKiHintDetail(hint); };
-        })(h);
-        container.appendChild(card);
-      });
+    // Zeigt den wichtigsten Hinweis als sichtbare Kachel, Rest aufklappbar
+    function buildKiCard(h) {
+      var card = document.createElement('div');
+      card.className = 'ki-suggestion-card touch-scale';
+      card.style.cursor = 'pointer';
+      if (h.prio === 'danger') card.style.borderLeftColor = 'var(--danger)';
+      card.innerHTML = '<div class="ki-icon">' + h.icon + '</div>'
+        + '<div class="ki-body"><div class="ki-title">' + h.title + ' <span class="ki-badge">KI</span></div>'
+        + '<div class="ki-desc">' + h.desc + '</div>'
+        + '<div class="ki-action" style="font-size:10px;color:var(--gold);font-weight:600;margin-top:4px">Details &amp; Chat &#8250;</div></div>';
+      (function(hint) {
+        card.onclick = function() { openKiHintDetail(hint); };
+      })(h);
+      return card;
+    }
+    function renderKiHintCards(container, hints) {
       if (hints.length === 0) {
         container.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-dim);font-size:11px">Alles im gruenen Bereich — keine KI-Hinweise.</div>';
+        return;
+      }
+      // Wichtigster Hinweis immer sichtbar
+      container.appendChild(buildKiCard(hints[0]));
+      // Weitere Hinweise aufklappbar
+      if (hints.length > 1) {
+        var details = document.createElement('details');
+        details.style.cssText = 'margin-top:4px';
+        var summary = document.createElement('summary');
+        summary.style.cssText = 'cursor:pointer;font-size:11px;font-weight:600;color:var(--gold);padding:6px 0;list-style:none;display:flex;align-items:center;gap:4px';
+        summary.innerHTML = '<span style="font-size:9px">&#9660;</span> ' + (hints.length - 1) + ' weitere KI-Hinweise';
+        details.appendChild(summary);
+        for (var i = 1; i < hints.length; i++) {
+          details.appendChild(buildKiCard(hints[i]));
+        }
+        container.appendChild(details);
       }
     }
 
@@ -5864,17 +5956,24 @@
       var iso = function(h, m) { var d = new Date(now); d.setHours(h, m, 0, 0); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00'; };
       var isoDay = function(dayOffset, h, m) { var d = new Date(now); d.setDate(d.getDate() + dayOffset); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00'; };
 
-      // Events
+      // Events — 12 Eintraege fuer realistischen Posteingang
       renderEvents([
+        { Timestamp: iso(9, 45), Typ: 'termin_vorschlag', Status: 'ungelesen', Is_Read: 0, Titel: 'Terminvorschlag: Balayage + Schnitt', Nachricht: 'Clara Wolf moechte eine Balayage-Auffrischung + Schnitt (135 Min, 185 EUR). Bevorzugt bei Rena.', Kanal: 'whatsapp', Anfrage_ID: 'EVT-002', Kontakt: '0171-8765432', Kundenname: 'Clara Wolf', Service: 'Balayage + Schnitt', Dauer_Min: 135, Preis: 185,
+          Slots: [{ tag: 'Do 10.04.', zeit: '09:00', ende: '11:15' }, { tag: 'Fr 11.04.', zeit: '10:00', ende: '12:15' }, { tag: 'Sa 12.04.', zeit: '09:30', ende: '11:45' }],
+          Antwortvorschlaege: ['Liebe Clara, super! Ich haette am Donnerstag ab 9 Uhr Zeit fuer deine Balayage — 135 Min, 185 EUR. Soll ich reservieren? LG Rena', 'Hi Clara! Freie Plaetze: Do 09:00, Fr 10:00, Sa 09:30. Welcher passt dir am besten? LG Rena', 'Hallo Clara! Ich freue mich auf deine Balayage. Am besten waere Freitag 10:00 — da habe ich extra viel Zeit. Passt dir das? LG Rena'] },
         { Timestamp: iso(9, 30), Typ: 'termin_vorschlag', Status: 'ungelesen', Is_Read: 0, Titel: 'Terminvorschlag: Haarschnitt & Styling Damen M', Nachricht: 'Maria Testkundin moechte einen Termin fuer Haarschnitt & Styling Damen M (60 Min, 75 EUR)', Kanal: 'email', Anfrage_ID: 'EVT-001', Kontakt: 'maria@test.de', Kundenname: 'Maria Testkundin', Service: 'Haarschnitt & Styling Damen M', Dauer_Min: 60, Preis: 75,
           Slots: [{ tag: 'Mo 07.04.', zeit: '10:00', ende: '11:00' }, { tag: 'Mo 07.04.', zeit: '10:30', ende: '11:30' }, { tag: 'Mo 07.04.', zeit: '11:00', ende: '12:00' }, { tag: 'Di 08.04.', zeit: '09:00', ende: '10:00' }, { tag: 'Di 08.04.', zeit: '14:00', ende: '15:00' }],
           Antwortvorschlaege: ['Liebe Maria, vielen Dank fuer Ihre Anfrage! Ich habe folgende Termine: Mo 07.04. um 10:00 Uhr — Haarschnitt & Styling (60 Min, 75 EUR). Passt Ihnen? Herzliche Gruesse, Rena Rados', 'Hallo Maria! Schoen, dass Sie sich melden. Ich haette am Montag ab 10 Uhr Zeit — 75 EUR fuer 60 Min. Soll ich reservieren? LG Rena', 'Hi Maria! Freie Plaetze: Mo (10:00, 10:30, 11:00) und Di (09:00, 14:00). Preis: 75 EUR / 60 Min. Welcher passt am besten? LG Rena'] },
+        { Timestamp: iso(9, 20), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Haaranalyse-Anfrage', Nachricht: 'Helena Richter hat 3 Fotos fuer eine Haaranalyse hochgeladen. Haar wirkt trocken und strapaeziert.', Kanal: 'homepage', Anfrage_ID: 'ANF-044' },
         { Timestamp: iso(9, 15), Typ: 'termin_bestaetigt', Status: 'ungelesen', Is_Read: 0, Titel: 'Termin bestaetigt', Nachricht: 'Maria Mueller — Haarschnitt Feminin, 14:00', Kanal: 'whatsapp', Anfrage_ID: 'ANF-042' },
         { Timestamp: iso(9, 2), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Neue Anfrage', Nachricht: 'Stefan Braun fragt nach Maskulin Schnitt + Bart', Kanal: 'instagram', Anfrage_ID: 'ANF-043' },
-        { Timestamp: iso(8, 45), Typ: 'nachbestellung', Status: 'gelesen', Is_Read: 1, Titel: 'Lagerbestand niedrig', Nachricht: 'Shampoo Vital: nur noch 3 Stueck (Min: 5)', Kanal: 'system' },
-        { Timestamp: iso(8, 30), Typ: 'storno', Status: 'erledigt', Is_Read: 1, Titel: 'Stornierung', Nachricht: 'Lisa Wagner hat Termin am 04.04. storniert', Kanal: 'whatsapp', Anfrage_ID: 'ANF-040' },
+        { Timestamp: iso(8, 50), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Wunschfrisur-Anfrage', Nachricht: 'Mia Lehmann moechte eine Wunschfrisur-Beratung. Hat 2 Referenzbilder mitgeschickt (Bob, schulterlang).', Kanal: 'homepage', Anfrage_ID: 'ANF-045' },
+        { Timestamp: iso(8, 45), Typ: 'nachbestellung', Status: 'gelesen', Is_Read: 1, Titel: 'Lagerbestand niedrig', Nachricht: 'Shampoo Vital: nur noch 3 Stueck (Min: 5). Olaplex No. 1: nur noch 2 Stueck (Min: 3).', Kanal: 'system' },
+        { Timestamp: iso(8, 30), Typ: 'storno', Status: 'erledigt', Is_Read: 1, Titel: 'Stornierung', Nachricht: 'Lisa Wagner hat Termin am 04.04. storniert (Grund: krank)', Kanal: 'whatsapp', Anfrage_ID: 'ANF-040' },
         { Timestamp: iso(8, 10), Typ: 'termin_bestaetigt', Status: 'gelesen', Is_Read: 1, Titel: 'Termin bestaetigt', Nachricht: 'Anna Schmidt — Balayage, 10:00', Kanal: 'email', Anfrage_ID: 'ANF-039' },
-        { Timestamp: iso(7, 50), Typ: 'antwort', Status: 'gelesen', Is_Read: 1, Titel: 'Kundenantwort', Nachricht: 'Danke fuer die Info! Komme gerne.', Kanal: 'facebook', Anfrage_ID: 'ANF-038' }
+        { Timestamp: iso(7, 50), Typ: 'antwort', Status: 'gelesen', Is_Read: 1, Titel: 'Kundenantwort', Nachricht: 'Danke fuer die Info! Komme gerne. Bis Donnerstag!', Kanal: 'facebook', Anfrage_ID: 'ANF-038' },
+        { Timestamp: iso(7, 30), Typ: 'event', Status: 'gelesen', Is_Read: 1, Titel: 'Google-Bewertung', Nachricht: 'Neue 5-Sterne-Bewertung von Laura Braun: "Beste Balayage in Muenchen! Rena ist ein Profi."', Kanal: 'system', Anfrage_ID: 'ANF-037' },
+        { Timestamp: isoDay(-1, 18, 0), Typ: 'antwort', Status: 'erledigt', Is_Read: 1, Titel: 'Produktanfrage', Nachricht: 'Nina Fischer fragt nach Olaplex No. 3 zum Mitnehmen — haben wir das auf Lager?', Kanal: 'whatsapp', Anfrage_ID: 'ANF-036' }
       ]);
 
       // Seeded random for consistent demo data
@@ -6001,17 +6100,26 @@
         { Name: 'Mia Lehmann', Email: 'mia.l@gmail.com', Besuche: 0, Umsatz: 0, Notiz: 'Hat Termin angefragt' },
         { Name: 'Clara Wolf', Email: 'clara.w@mail.de', Besuche: 18, Umsatz: 1560.00, Letzter_Besuch: isoDay(-1, 13, 0), VIP: true, Lieblings_Service: 'Farbbehandlung + Olaplex' },
         { Name: 'Helena Richter', Email: 'helena@test.de', Besuche: 7, Umsatz: 490.00, Letzter_Besuch: isoDay(-8, 10, 0) },
-        { Name: 'Emma Schulz', Besuche: 2, Umsatz: 150.00, Letzter_Besuch: isoDay(-30, 14, 0), Follow_Up: true }
+        { Name: 'Emma Schulz', Besuche: 2, Umsatz: 150.00, Letzter_Besuch: isoDay(-30, 14, 0), Follow_Up: true },
+        { Name: 'Petra Neumann', Email: 'petra.n@web.de', Telefon: '0173-4443322', Besuche: 11, Umsatz: 880.00, Letzter_Besuch: isoDay(-75, 10, 0), Lieblings_Service: 'Farbbehandlung Komplett', Notiz: 'War lange nicht da — Erinnerung senden' },
+        { Name: 'Kathrin Bauer', Email: 'kathrin.b@gmail.com', Besuche: 9, Umsatz: 620.00, Letzter_Besuch: isoDay(-90, 14, 0), Lieblings_Service: 'Damenhaarschnitt + Foehn' },
+        { Name: 'Sabine Huber', Telefon: '0176-7778899', Besuche: 5, Umsatz: 340.00, Letzter_Besuch: isoDay(-65, 11, 0), Follow_Up: true, Notiz: 'Wollte Haaranalyse machen' },
+        { Name: 'Max Fischer', Email: 'max.f@mail.de', Telefon: '0152-1112233', Besuche: 14, Umsatz: 490.00, Letzter_Besuch: isoDay(-4, 16, 0), Lieblings_Service: 'Herrenschnitt + Bartpflege' },
+        { Name: 'Paul Weber', Email: 'paul.w@test.de', Besuche: 3, Umsatz: 105.00, Letzter_Besuch: isoDay(-12, 9, 0), Lieblings_Service: 'Herrenschnitt' },
+        { Name: 'Lara Weber', Email: 'lara.w@mail.de', Telefon: '0171-5556677', Besuche: 6, Umsatz: 420.00, Letzter_Besuch: isoDay(-6, 15, 0), VIP: true, Lieblings_Service: 'Glossing' }
       ];
       renderKunden(kundenData);
 
-      // Demo Beratungen
+      // Demo Beratungen — 8 Eintraege mit verschiedenen Typen
       renderBeratungen([
+        { Kundenname: 'Helena Richter', Typ: 'haaranalyse', Nachricht: 'Meine Haare sind seit Monaten extrem trocken und brechen ab. Habe 3 Fotos gemacht. Koennen Sie mir sagen, was los ist?', Kanal: 'homepage', Timestamp: iso(9, 20), Status: 'offen' },
+        { Kundenname: 'Mia Lehmann', Typ: 'wunschfrisur', Nachricht: 'Ich haette gerne einen schulterlangen Bob wie auf den Bildern. Ist das mit meinem Haartyp machbar?', Kanal: 'homepage', Timestamp: iso(8, 50), Status: 'offen' },
         { Kundenname: 'Maria Testkundin', Nachricht: 'Hallo, ich moechte gerne einen Termin fuer Haarschnitt & Styling. Haben Sie naechste Woche noch was frei?', Kanal: 'email', Timestamp: iso(9, 30), Status: 'offen' },
         { Kundenname: 'Stefan Braun', Nachricht: 'Hi, ich braeuchte einen Maskulin Schnitt + Bartpflege. Am liebsten Samstag.', Kanal: 'instagram', Timestamp: iso(9, 2), Status: 'offen' },
-        { Kundenname: 'Sophie Klein', Nachricht: 'Danke fuer die Beratung letzte Woche! Wuerde gerne das Olaplex-Treatment buchen.', Kanal: 'whatsapp', Timestamp: iso(8, 15), Status: 'offen' },
+        { Kundenname: 'Sophie Klein', Typ: 'farbcode', Nachricht: 'Ich bin aktuell Stufe 5 (Hellbraun) und moechte Stufe 8 (Hellblond). Geht das in einer Sitzung?', Kanal: 'whatsapp', Timestamp: iso(8, 15), Status: 'offen' },
         { Kundenname: 'Anna Schmidt', Nachricht: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', Kanal: 'whatsapp', Timestamp: isoDay(-1, 16, 30), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', zeit: isoDay(-1, 16, 30) }, { von: 'salon', text: 'Hallo Anna! Klar, ich habe am Donnerstag um 14:00 noch einen Platz frei. Soll ich den fuer dich reservieren? Die Auffrischung dauert ca. 2,5 Stunden.', zeit: isoDay(-1, 17, 15) }] },
-        { Kundenname: 'Lisa Wagner', Nachricht: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', Kanal: 'email', Timestamp: isoDay(-2, 11, 0), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', zeit: isoDay(-2, 11, 0) }, { von: 'salon', text: 'Hallo Lisa, kein Problem — Ihr Termin am Freitag ist storniert. Moechten Sie gleich einen neuen Termin vereinbaren?', zeit: isoDay(-2, 11, 45) }] }
+        { Kundenname: 'Lisa Wagner', Nachricht: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', Kanal: 'email', Timestamp: isoDay(-2, 11, 0), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', zeit: isoDay(-2, 11, 0) }, { von: 'salon', text: 'Hallo Lisa, kein Problem — Ihr Termin am Freitag ist storniert. Moechten Sie gleich einen neuen Termin vereinbaren?', zeit: isoDay(-2, 11, 45) }] },
+        { Kundenname: 'Sabine Huber', Typ: 'haaranalyse', Nachricht: 'Hatte vor 2 Monaten eine Blondierung und seitdem faellt mir vermehrt Haar aus. Brauche dringend eine Analyse.', Kanal: 'whatsapp', Timestamp: isoDay(-3, 14, 20), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Hatte vor 2 Monaten eine Blondierung und seitdem faellt mir vermehrt Haar aus. Brauche dringend eine Analyse.', zeit: isoDay(-3, 14, 20) }, { von: 'salon', text: 'Hallo Sabine, das klingt nach einer Strukturschaedigung durch die Blondierung. Kommen Sie bitte vorbei fuer eine professionelle Haaranalyse — wir koennen das genau diagnostizieren und einen Pflegeplan erstellen. Ich haette Mittwoch um 11 Uhr Zeit.', zeit: isoDay(-3, 15, 10) }] }
       ]);
 
       // Cockpit NACH allen Caches rendern
@@ -6050,6 +6158,56 @@
         navigator.serviceWorker.register('sw.js').catch(function() {});
       }
     });
+
+    // === iPhone Landscape: Header + Nav auto-hide bei Scroll ===
+    (function() {
+      var lastScrollY = 0;
+      var hideTimer = null;
+      function isLandscape() {
+        return window.innerHeight < 500 && window.matchMedia('(orientation: landscape)').matches;
+      }
+      function hideChrome() {
+        var hdr = document.getElementById('appHeader');
+        var nav = document.getElementById('bottomNav');
+        if (hdr) hdr.classList.add('landscape-hidden');
+        if (nav) nav.classList.add('landscape-hidden');
+      }
+      function showChrome() {
+        var hdr = document.getElementById('appHeader');
+        var nav = document.getElementById('bottomNav');
+        if (hdr) hdr.classList.remove('landscape-hidden');
+        if (nav) nav.classList.remove('landscape-hidden');
+      }
+      function scheduleHide() {
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(function() {
+          if (isLandscape()) hideChrome();
+        }, 2500);
+      }
+      window.addEventListener('scroll', function() {
+        if (!isLandscape()) { showChrome(); return; }
+        var scrollY = window.scrollY || window.pageYOffset;
+        if (scrollY > lastScrollY && scrollY > 30) {
+          hideChrome();
+        } else {
+          showChrome();
+          scheduleHide();
+        }
+        lastScrollY = scrollY;
+      }, { passive: true });
+      // Tippen zeigt alles wieder
+      document.addEventListener('touchstart', function() {
+        if (!isLandscape()) return;
+        showChrome();
+        scheduleHide();
+      }, { passive: true });
+      // Bei Orientierungswechsel zuruecksetzen
+      window.addEventListener('orientationchange', function() {
+        setTimeout(function() {
+          if (!isLandscape()) showChrome();
+        }, 300);
+      });
+    })();
 
     // Close sheets on backdrop click
     document.querySelectorAll('.sheet-overlay').forEach(function(overlay) {
