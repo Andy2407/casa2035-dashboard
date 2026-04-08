@@ -6621,12 +6621,12 @@
         <button class="fb-voice-btn" id="fbVoiceBtn" onclick="toggleFbVoice()" title="Spracheingabe" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg-warm);cursor:pointer;color:var(--text-dim);transition:all 200ms">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         </button>
-        <label title="Screenshot beifuegen" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg-warm);cursor:pointer;color:var(--text-dim);transition:all 200ms">
+        <label title="Screenshots beifuegen (max 5)" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg-warm);cursor:pointer;color:var(--text-dim);transition:all 200ms">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-          <input type="file" id="fbScreenshotInput" accept="image/*" style="display:none" onchange="handleFbScreenshot(this)">
+          <input type="file" id="fbScreenshotInput" accept="image/*" multiple style="display:none" onchange="handleFbScreenshots(this)">
         </label>
-        <div id="fbScreenshotPreview" style="display:none;flex:1;position:relative"></div>
       </div>
+      <div id="fbScreenshotPreview" style="display:none;display:flex;gap:4px;flex-wrap:wrap;margin-top:6px"></div>
       <div id="fbVoiceStatus" style="display:none;font-size:11px;color:var(--danger);margin-bottom:4px"></div>
       <div class="fb-footer">
         <span class="fb-counter" id="fbCounter">0 / 1000</span>
@@ -6673,63 +6673,90 @@
       var first = document.querySelector('#fbTypeChips .fb-chip');
       if (first) first.classList.add('active');
       fbSelectedType = 'bug';
+      fbScreenshots = [];
+      var scPrev = document.getElementById('fbScreenshotPreview');
+      if (scPrev) { scPrev.style.display = 'none'; while (scPrev.firstChild) scPrev.removeChild(scPrev.firstChild); }
     }
-    var fbScreenshotData = null;
-    var fbVoiceRecorder = null;
+    var fbScreenshots = [];
     var fbVoiceRecording = false;
+    var fbSpeechRecorder = null;
+    var fbTextBeforeVoice = '';
 
-    function handleFbScreenshot(input) {
-      if (!input.files || !input.files[0]) return;
+    function resizeFbImage(file, maxW, cb) {
       var reader = new FileReader();
       reader.onload = function(e) {
-        fbScreenshotData = e.target.result;
-        var preview = document.getElementById('fbScreenshotPreview');
-        preview.style.display = 'block';
-        var img = document.createElement('img');
+        var img = new Image();
+        img.onload = function() {
+          var w = img.width, h = img.height;
+          if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+          var c = document.createElement('canvas'); c.width = w; c.height = h;
+          c.getContext('2d').drawImage(img, 0, 0, w, h);
+          cb(c.toDataURL('image/jpeg', 0.8));
+        };
         img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleFbScreenshots(input) {
+      if (!input.files) return;
+      var files = Array.from(input.files);
+      if (fbScreenshots.length + files.length > 5) { showToast('Maximal 5 Screenshots', 'info'); return; }
+      files.forEach(function(f) {
+        resizeFbImage(f, 1200, function(dataUrl) {
+          fbScreenshots.push(dataUrl);
+          renderFbScreenshotPreviews();
+        });
+      });
+      input.value = '';
+    }
+
+    function renderFbScreenshotPreviews() {
+      var preview = document.getElementById('fbScreenshotPreview');
+      preview.style.display = fbScreenshots.length ? 'flex' : 'none';
+      while (preview.firstChild) preview.removeChild(preview.firstChild);
+      fbScreenshots.forEach(function(data, idx) {
+        var wrap = document.createElement('div');
+        wrap.style.cssText = 'position:relative;display:inline-block';
+        var img = document.createElement('img');
+        img.src = data;
         img.style.cssText = 'height:36px;border-radius:6px;border:1px solid var(--border)';
-        preview.textContent = '';
-        preview.appendChild(img);
+        wrap.appendChild(img);
         var del = document.createElement('div');
         del.style.cssText = 'position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;background:var(--danger);color:#fff;font-size:10px;line-height:16px;text-align:center;cursor:pointer';
         del.textContent = '\u00D7';
-        del.onclick = function() { fbScreenshotData = null; preview.style.display = 'none'; preview.textContent = ''; input.value = ''; };
-        preview.appendChild(del);
-      };
-      reader.readAsDataURL(input.files[0]);
+        del.setAttribute('data-idx', idx);
+        del.onclick = function() { fbScreenshots.splice(parseInt(this.getAttribute('data-idx')), 1); renderFbScreenshotPreviews(); };
+        wrap.appendChild(del);
+        preview.appendChild(wrap);
+      });
     }
 
     function toggleFbVoice() {
       if (fbVoiceRecording) { stopFbVoice(); return; }
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { showToast('Mikrofon nicht verfuegbar', 'error'); return; }
+      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) { showToast('Spracherkennung nicht unterstuetzt', 'error'); return; }
       var btn = document.getElementById('fbVoiceBtn');
       var status = document.getElementById('fbVoiceStatus');
       navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+        stream.getTracks().forEach(function(t) { t.stop(); });
         fbVoiceRecording = true;
+        fbTextBeforeVoice = document.getElementById('dashFeedbackText').value;
         btn.style.borderColor = 'var(--danger)'; btn.style.color = 'var(--danger)'; btn.style.background = 'var(--danger-bg)';
-        status.style.display = 'block'; status.textContent = 'Aufnahme laeuft...';
-        var chunks = [];
-        fbVoiceRecorder = new MediaRecorder(stream);
-        fbVoiceRecorder.ondataavailable = function(e) { if (e.data.size > 0) chunks.push(e.data); };
-        fbVoiceRecorder.onstop = function() {
-          stream.getTracks().forEach(function(t) { t.stop(); });
-          var blob = new Blob(chunks, { type: 'audio/webm' });
-          // Use Speech Recognition if available, otherwise note audio was recorded
-          if (window.SpeechRecognition || window.webkitSpeechRecognition) {
-            status.textContent = 'Wird transkribiert...';
-          }
-          var reader = new FileReader();
-          reader.onload = function(e) {
-            var ta = document.getElementById('dashFeedbackText');
-            if (ta.value) ta.value += '\n';
-            ta.value += '[Sprachnotiz aufgenommen]';
-            updateFbCounter();
-            status.style.display = 'none';
-          };
-          reader.readAsDataURL(blob);
+        status.style.display = 'block'; status.textContent = 'Sprich jetzt...';
+        var rec = new SR();
+        rec.lang = 'de-DE'; rec.continuous = true; rec.interimResults = true;
+        fbSpeechRecorder = rec;
+        rec.onresult = function(e) {
+          var t = '';
+          for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+          var ta = document.getElementById('dashFeedbackText');
+          ta.value = fbTextBeforeVoice ? fbTextBeforeVoice + ' ' + t : t;
+          updateFbCounter();
         };
-        fbVoiceRecorder.start();
-        // Auto-stop after 30s
+        rec.onerror = function() { stopFbVoice(); };
+        rec.onend = function() { if (fbVoiceRecording) stopFbVoice(); };
+        rec.start();
         setTimeout(function() { if (fbVoiceRecording) stopFbVoice(); }, 30000);
       }).catch(function() { showToast('Mikrofon-Zugriff verweigert', 'error'); });
     }
@@ -6738,29 +6765,30 @@
       fbVoiceRecording = false;
       var btn = document.getElementById('fbVoiceBtn');
       btn.style.borderColor = ''; btn.style.color = ''; btn.style.background = '';
-      if (fbVoiceRecorder && fbVoiceRecorder.state === 'recording') fbVoiceRecorder.stop();
+      document.getElementById('fbVoiceStatus').style.display = 'none';
+      if (fbSpeechRecorder) { try { fbSpeechRecorder.stop(); } catch(e) {} fbSpeechRecorder = null; }
     }
 
-    // Use Web Speech API for live transcription if available
-    (function() {
-      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) return;
-      window.fbSpeechRec = new SR();
-      window.fbSpeechRec.lang = 'de-DE';
-      window.fbSpeechRec.continuous = true;
-      window.fbSpeechRec.interimResults = true;
-      window.fbSpeechRec.onresult = function(e) {
-        var transcript = '';
-        for (var i = 0; i < e.results.length; i++) { transcript += e.results[i][0].transcript; }
-        var ta = document.getElementById('dashFeedbackText');
-        if (ta && transcript) { ta.value = transcript; updateFbCounter(); }
-      };
-    })();
+    var SUPABASE_URL = 'https://api.casa2035.de';
+    var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzc1NTA0NzY1LCJleHAiOjE5MzMxODQ3NjV9.5YsRP4FLKHp7hTae7-RAyi13ofRfSGmjm8P2Ved2Wu4';
 
-    function toggleFbSpeechRec() {
-      if (!window.fbSpeechRec) return;
-      if (fbVoiceRecording) { window.fbSpeechRec.stop(); }
-      else { window.fbSpeechRec.start(); }
+    function uploadFbScreenshot(dataUrl, idx) {
+      var byteStr = atob(dataUrl.split(',')[1]);
+      var mime = dataUrl.split(',')[0].match(/:(.*?);/)[1];
+      var ab = new ArrayBuffer(byteStr.length);
+      var ia = new Uint8Array(ab);
+      for (var i = 0; i < byteStr.length; i++) ia[i] = byteStr.charCodeAt(i);
+      var blob = new Blob([ab], { type: mime });
+      var ext = mime === 'image/png' ? 'png' : 'jpg';
+      var filename = 'fb_' + Date.now() + '_' + idx + '.' + ext;
+      return fetch(SUPABASE_URL + '/storage/v1/object/feedback_screenshots/' + filename, {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON, 'apikey': SUPABASE_ANON, 'Content-Type': mime },
+        body: blob
+      }).then(function(r) {
+        if (!r.ok) throw new Error('Upload fehlgeschlagen');
+        return SUPABASE_URL + '/storage/v1/object/public/feedback_screenshots/' + filename;
+      });
     }
 
     function submitDashFeedback() {
@@ -6769,20 +6797,25 @@
       var btn = document.getElementById('fbSubmitBtn');
       btn.disabled = true; btn.textContent = 'Wird gesendet...';
       var currentPageName = document.querySelector('.nav-item.active .nav-label') ? document.querySelector('.nav-item.active .nav-label').textContent : '';
-      var payload = { feedback: text, type: fbSelectedType, rating: fbRating, page: 'dashboard', currentPage: currentPageName, timestamp: new Date().toISOString(), viewport: window.innerWidth + 'x' + window.innerHeight, theme: document.documentElement.getAttribute('data-theme') || 'dark', screenshot: fbScreenshotData || null };
+      var ts = new Date().toISOString();
+      var vp = window.innerWidth + 'x' + window.innerHeight;
       var stored = JSON.parse(localStorage.getItem('casa_dashboard_feedback') || '[]');
-      var storeCopy = { feedback: text, type: fbSelectedType, rating: fbRating, page: 'dashboard', currentPage: currentPageName, timestamp: payload.timestamp };
-      stored.push(storeCopy); localStorage.setItem('casa_dashboard_feedback', JSON.stringify(stored));
+      stored.push({ feedback: text, type: fbSelectedType, rating: fbRating, page: 'dashboard', currentPage: currentPageName, timestamp: ts });
+      localStorage.setItem('casa_dashboard_feedback', JSON.stringify(stored));
       if (typeof isBackendMode === 'function' && isBackendMode()) {
-        apiPost('feedback', { text: text, typ: fbSelectedType, bewertung: fbRating || null, quelle: 'dashboard', seite: currentPageName, viewport: payload.viewport, erstellt_am: payload.timestamp, status: 'neu' }).catch(function() {});
+        apiPost('feedback', { text: text, typ: fbSelectedType, bewertung: fbRating || null, quelle: 'dashboard', seite: currentPageName, viewport: vp, erstellt_am: ts, status: 'neu' }).catch(function() {});
       }
-      // Send to n8n Webhook (Supabase + Notion)
-      fetch('https://niniho13.app.n8n.cloud/webhook/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: 'dashboard', type: fbSelectedType, rating: fbRating, text: text, page: currentPageName, viewport: payload.viewport, timestamp: payload.timestamp }) }).catch(function() {});
-      document.getElementById('fbFormView').style.display = 'none';
-      document.getElementById('fbSuccessView').style.display = 'block';
-      btn.disabled = false; btn.textContent = 'Absenden';
-      fbScreenshotData = null;
-      setTimeout(function() { if (dashFeedbackOpen) toggleDashFeedback(); }, 2500);
+      var uploads = fbScreenshots.map(function(s, i) { return uploadFbScreenshot(s, i); });
+      Promise.all(uploads).then(function(urls) { return urls; }).catch(function() { return []; }).then(function(screenshotUrls) {
+        var webhookPayload = { source: 'dashboard', type: fbSelectedType, rating: fbRating, text: text, page: currentPageName, viewport: vp, timestamp: ts };
+        if (screenshotUrls.length) webhookPayload.screenshots = screenshotUrls;
+        fetch('https://niniho13.app.n8n.cloud/webhook/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(webhookPayload) }).catch(function() {});
+        document.getElementById('fbFormView').style.display = 'none';
+        document.getElementById('fbSuccessView').style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Absenden';
+        fbScreenshots = [];
+        setTimeout(function() { if (dashFeedbackOpen) toggleDashFeedback(); }, 2500);
+      });
     }
 
   </script>
