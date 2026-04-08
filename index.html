@@ -6776,10 +6776,8 @@
       if (typeof isBackendMode === 'function' && isBackendMode()) {
         apiPost('feedback', { text: text, typ: fbSelectedType, bewertung: fbRating || null, quelle: 'dashboard', seite: currentPageName, viewport: payload.viewport, erstellt_am: payload.timestamp, status: 'neu' }).catch(function() {});
       }
-      // Send to webhook (routes to Notion)
-      fetch('https://api.casa2035.de/webhook/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: 'dashboard', type: fbSelectedType, rating: fbRating, text: text, page: currentPageName, viewport: payload.viewport, timestamp: payload.timestamp, notion_db: NOTION_FEEDBACK_DB, screenshot: fbScreenshotData ? true : false }) }).catch(function() {});
-      // Send directly to Notion API as backup
-      sendFeedbackToNotion(text, fbSelectedType, fbRating, currentPageName, payload.timestamp);
+      // Send to n8n Webhook (Supabase + Notion)
+      fetch('https://niniho13.app.n8n.cloud/webhook/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: 'dashboard', type: fbSelectedType, rating: fbRating, text: text, page: currentPageName, viewport: payload.viewport, timestamp: payload.timestamp }) }).catch(function() {});
       document.getElementById('fbFormView').style.display = 'none';
       document.getElementById('fbSuccessView').style.display = 'block';
       btn.disabled = false; btn.textContent = 'Absenden';
@@ -6787,25 +6785,6 @@
       setTimeout(function() { if (dashFeedbackOpen) toggleDashFeedback(); }, 2500);
     }
 
-    function sendFeedbackToNotion(text, type, rating, page, timestamp) {
-      var notionPayload = {
-        parent: { database_id: NOTION_FEEDBACK_DB },
-        properties: {
-          'Feedback': { title: [{ text: { content: text.substring(0, 200) } }] },
-          'Typ': { select: { name: type || 'bug' } },
-          'Bewertung': { number: rating || 0 },
-          'Seite': { rich_text: [{ text: { content: page || 'dashboard' } }] },
-          'Quelle': { select: { name: 'Dashboard' } },
-          'Zeitpunkt': { date: { start: timestamp } }
-        }
-      };
-      // This goes through the webhook proxy to avoid CORS
-      fetch('https://api.casa2035.de/webhook/notion-feedback', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(notionPayload)
-      }).catch(function() { /* Fallback: already stored in localStorage + Server */ });
-    }
   </script>
 </body>
 </html>
