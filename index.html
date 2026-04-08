@@ -1076,12 +1076,38 @@
       .ki-suggestion-card .ki-title { font-size: 11px; }
       .ki-suggestion-card .ki-desc { font-size: 10px; }
       .sheet { max-height: 90vh; }
+      /* Beratung-Tab Kompakt */
+      #kiToolPanel { font-size: 11px; }
+      #kiToolPanel details summary { font-size: 11px; padding: 6px 10px; }
+      #kiToolPanel details > div { font-size: 10px; padding: 4px 10px 8px; }
+      #kiToolPanel input, #kiToolPanel select, #kiToolPanel textarea { font-size: 11px !important; padding: 6px 8px !important; }
+      #kiToolPanel .btn { padding: 8px 12px; font-size: 11px; }
+      /* Termin-Detail Sheet Kompakt */
+      #detailSheet .sheet-content { padding: 12px; }
     }
 
     /* iPhone Landscape: Cockpit Grid 2-spaltig */
     @media (max-height: 500px) and (orientation: landscape) and (min-width: 600px) {
       .cockpit-grid { grid-template-columns: 1fr 1fr; }
       .stats-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+
+    /* iPhone SE / small phones landscape */
+    @media (max-height: 400px) and (orientation: landscape) {
+      .header { padding: 2px 12px; }
+      .header-salon { font-size: 13px; }
+      .bottom-nav { height: 38px; }
+      .nav-item svg { width: 16px; height: 16px; }
+      .nav-item .nav-label { display: none; }
+      main { padding: 0 8px; }
+      .hero-card { padding: 8px; margin-bottom: 6px; }
+      .hero-card h2 { font-size: 14px !important; }
+      .stats-grid { gap: 4px; }
+      .stat-card { padding: 6px 8px; }
+      .stat-value { font-size: 16px; }
+      .fab-wrap { bottom: calc(38px + 4px); }
+      .fab { width: 36px; height: 36px; }
+      .fab svg { width: 16px; height: 16px; }
     }
 
     /* === KI-Vorschlaege === */
@@ -4143,15 +4169,36 @@
       selectedIstFarbe = null; selectedZielFarbe = null;
       var intro = document.createElement('div');
       intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
-      intro.textContent = 'Fotografiere das Haar — die KI erkennt den aktuellen Farbton. Waehle dann den Wunschton und zeige die Farbe direkt deinem Kunden.';
+      intro.textContent = 'Fotografiere das Haar \u2014 die KI erkennt den aktuellen Farbton. Waehle den Wunschton und erhalte eine realistische Vorher/Nachher-Vorschau.';
       wrapper.appendChild(intro);
 
+      // Foto-Tipps
+      var tips = document.createElement('details');
+      tips.style.cssText = 'margin-bottom:14px;background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius-sm);overflow:hidden';
+      var tSum = document.createElement('summary');
+      tSum.style.cssText = 'padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--gold)';
+      tSum.textContent = '\u{1F3A8} Foto-Tipps fuer Farbanalyse';
+      tips.appendChild(tSum);
+      var tBody = document.createElement('div');
+      tBody.style.cssText = 'padding:8px 14px 12px;font-size:11px;color:var(--text-secondary);line-height:1.8';
+      ['\u2022 Tageslicht ist Pflicht (Kunstlicht verfaelscht Farben)','\u2022 Haar vor neutralem Hintergrund fotografieren','\u2022 Nah an die Haarstraehne herangehen','\u2022 Ansatz UND Laengen getrennt zeigen','\u2022 Keine Filter oder Auto-Korrektur'].forEach(function(t) { var p = document.createElement('div'); p.textContent = t; tBody.appendChild(p); });
+      tips.appendChild(tBody);
+      wrapper.appendChild(tips);
+
       // Photo upload — Dual: Kamera + Datei
+      var uploadLabel = document.createElement('div');
+      uploadLabel.style.cssText = 'font-size:12px;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px';
+      uploadLabel.textContent = 'Aktuelles Haar fotografieren';
+      wrapper.appendChild(uploadLabel);
+
       var fcUploadRow = document.createElement('div');
-      fcUploadRow.style.cssText = 'display:flex;gap:8px;margin-bottom:14px';
+      fcUploadRow.style.cssText = 'display:flex;gap:8px;margin-bottom:10px';
       var fcCamArea = document.createElement('div');
       fcCamArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
-      fcCamArea.innerHTML = '<div style="font-size:20px;margin-bottom:4px">&#128247;</div><div style="font-size:11px;font-weight:600">Kamera</div><div style="font-size:9px;color:var(--text-dim)">Haar fotografieren</div>';
+      var fcCamIcon = document.createElement('div'); fcCamIcon.style.cssText = 'font-size:20px;margin-bottom:4px'; fcCamIcon.textContent = '\u{1F4F7}';
+      var fcCamLabel = document.createElement('div'); fcCamLabel.style.cssText = 'font-size:11px;font-weight:600'; fcCamLabel.textContent = 'Kamera';
+      var fcCamSub = document.createElement('div'); fcCamSub.style.cssText = 'font-size:9px;color:var(--text-dim)'; fcCamSub.textContent = 'Haar fotografieren';
+      fcCamArea.appendChild(fcCamIcon); fcCamArea.appendChild(fcCamLabel); fcCamArea.appendChild(fcCamSub);
       var fcCamInput = document.createElement('input');
       fcCamInput.type = 'file'; fcCamInput.id = 'farbcodeCamInput'; fcCamInput.accept = 'image/*';
       fcCamInput.setAttribute('capture', 'environment'); fcCamInput.style.display = 'none';
@@ -4160,7 +4207,10 @@
       fcCamArea.onclick = function(ev) { if (ev.target !== fcCamInput) fcCamInput.click(); };
       var fcFileArea = document.createElement('div');
       fcFileArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
-      fcFileArea.innerHTML = '<div style="font-size:20px;margin-bottom:4px">&#128444;</div><div style="font-size:11px;font-weight:600">Galerie / Datei</div><div style="font-size:9px;color:var(--text-dim)">Bestehendes Foto</div>';
+      var fcFileIcon = document.createElement('div'); fcFileIcon.style.cssText = 'font-size:20px;margin-bottom:4px'; fcFileIcon.textContent = '\u{1F5BC}';
+      var fcFileLabel = document.createElement('div'); fcFileLabel.style.cssText = 'font-size:11px;font-weight:600'; fcFileLabel.textContent = 'Galerie / Datei';
+      var fcFileSub = document.createElement('div'); fcFileSub.style.cssText = 'font-size:9px;color:var(--text-dim)'; fcFileSub.textContent = 'Bestehendes Foto';
+      fcFileArea.appendChild(fcFileIcon); fcFileArea.appendChild(fcFileLabel); fcFileArea.appendChild(fcFileSub);
       var fcFileInput = document.createElement('input');
       fcFileInput.type = 'file'; fcFileInput.id = 'farbcodeUpload'; fcFileInput.accept = 'image/*';
       fcFileInput.style.display = 'none';
@@ -4173,7 +4223,10 @@
       var previewRow = document.createElement('div');
       previewRow.id = 'farbcodePreview';
       previewRow.style.cssText = 'display:none;margin-bottom:14px;text-align:center';
-      previewRow.innerHTML = '<img id="farbcodeImg" alt="Farbcode Vorschau" style="width:100px;height:100px;object-fit:cover;border-radius:var(--radius);border:1px solid var(--border)">';
+      var previewImg = document.createElement('img');
+      previewImg.id = 'farbcodeImg'; previewImg.alt = 'Farbcode Vorschau';
+      previewImg.style.cssText = 'width:100px;height:100px;object-fit:cover;border-radius:var(--radius);border:1px solid var(--border)';
+      previewRow.appendChild(previewImg);
       wrapper.appendChild(previewRow);
 
       // IST section
@@ -4216,6 +4269,51 @@
       formelResult.id = 'farbFormelResult';
       formelResult.style.cssText = 'display:none;margin-top:14px';
       wrapper.appendChild(formelResult);
+
+      // Vorher/Nachher KI-Vorschau
+      var vnPreview = document.createElement('div');
+      vnPreview.id = 'farbKiVorschau';
+      vnPreview.style.cssText = 'display:none;margin-top:14px;padding:16px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(201,168,76,0.02));border:1px solid var(--border-accent);border-radius:var(--radius)';
+      var vnTitle = document.createElement('div');
+      vnTitle.style.cssText = 'font-family:Playfair Display,serif;font-size:15px;font-weight:700;margin-bottom:12px;color:var(--gold)';
+      vnTitle.textContent = 'Vorher / Nachher Vorschau';
+      vnPreview.appendChild(vnTitle);
+      var vnRow = document.createElement('div');
+      vnRow.style.cssText = 'display:flex;gap:12px;justify-content:center;align-items:center';
+      var vnBefore = document.createElement('div');
+      vnBefore.style.cssText = 'text-align:center';
+      var vnBeforeBox = document.createElement('div');
+      vnBeforeBox.id = 'fcVorherBox';
+      vnBeforeBox.style.cssText = 'width:110px;height:150px;background:var(--bg-warm);border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-dim);text-align:center';
+      vnBeforeBox.textContent = 'Aktuelles Haar';
+      vnBefore.appendChild(vnBeforeBox);
+      var vnBeforeLabel = document.createElement('div');
+      vnBeforeLabel.style.cssText = 'font-size:10px;margin-top:4px;font-weight:600;color:var(--text-dim)';
+      vnBeforeLabel.textContent = 'Vorher';
+      vnBefore.appendChild(vnBeforeLabel);
+      vnRow.appendChild(vnBefore);
+      var vnArrow = document.createElement('div');
+      vnArrow.style.cssText = 'font-size:24px;color:var(--gold)';
+      vnArrow.textContent = '\u2192';
+      vnRow.appendChild(vnArrow);
+      var vnAfter = document.createElement('div');
+      vnAfter.style.cssText = 'text-align:center';
+      var vnAfterBox = document.createElement('div');
+      vnAfterBox.id = 'fcNachherBox';
+      vnAfterBox.style.cssText = 'width:110px;height:150px;background:var(--bg-warm);border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-dim);text-align:center';
+      vnAfterBox.textContent = 'Neue Farbe (KI-generiert)';
+      vnAfter.appendChild(vnAfterBox);
+      var vnAfterLabel = document.createElement('div');
+      vnAfterLabel.style.cssText = 'font-size:10px;margin-top:4px;font-weight:600;color:var(--gold)';
+      vnAfterLabel.textContent = 'Nachher';
+      vnAfter.appendChild(vnAfterLabel);
+      vnRow.appendChild(vnAfter);
+      vnPreview.appendChild(vnRow);
+      var vnNote = document.createElement('div');
+      vnNote.style.cssText = 'font-size:10px;color:var(--text-micro);margin-top:10px;text-align:center';
+      vnNote.textContent = 'KI-Simulation \u2014 Gesicht bleibt echt, nur die Haarfarbe wird veraendert';
+      vnPreview.appendChild(vnNote);
+      wrapper.appendChild(vnPreview);
 
       // Appetit-Teaser for Starter
       if (salonPaket === 'starter') {
@@ -4309,19 +4407,52 @@
         + '<div style="font-size:12px"><strong>Differenz:</strong> ' + (diff > 0 ? '+' : '') + diff + ' Stufen</div></div>'
         + '<div style="font-size:11px;color:var(--text-secondary);line-height:1.5;padding:8px;background:var(--surface);border-radius:var(--radius-sm)">' + hinweis + '</div>'
         + '<div style="font-size:9px;color:var(--text-micro);margin-top:8px;text-align:center">Berechnung deterministisch im Code — kein LLM</div></div>';
+      // Show Vorher/Nachher KI preview
+      var vnDiv = document.getElementById('farbKiVorschau');
+      if (vnDiv) {
+        vnDiv.style.display = 'block';
+        var vorherBox = document.getElementById('fcVorherBox');
+        var nachherBox = document.getElementById('fcNachherBox');
+        if (vorherBox) { vorherBox.style.background = selectedIstFarbe.hex; vorherBox.textContent = 'Stufe ' + selectedIstFarbe.stufe; vorherBox.style.color = selectedIstFarbe.stufe <= 5 ? '#fff' : '#333'; }
+        if (nachherBox) { nachherBox.style.background = selectedZielFarbe.hex; nachherBox.textContent = 'Stufe ' + selectedZielFarbe.stufe; nachherBox.style.color = selectedZielFarbe.stufe <= 5 ? '#fff' : '#333'; }
+      }
     }
 
     function buildHaaranalyseTool(wrapper) {
       haaranalysePhotos = [];
+      wrapper.textContent = '';
+
       var intro = document.createElement('div');
       intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
-      intro.textContent = '3-5 Fotos vom Haar aufnehmen \u2014 KI analysiert Struktur, Schaedigung, Porositaet und gibt Pflegeempfehlung.';
+      intro.textContent = '3-5 Fotos vom Haar aufnehmen \u2014 KI analysiert Struktur, Schaedigung, Porositaet und gibt Pflegeempfehlung mit Heilungsprognose.';
       wrapper.appendChild(intro);
+
+      // Foto-Tipps
+      var tips = document.createElement('details');
+      tips.style.cssText = 'margin-bottom:14px;background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius-sm);overflow:hidden';
+      var tSum = document.createElement('summary');
+      tSum.style.cssText = 'padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--gold)';
+      tSum.textContent = '\u{1F50D} Foto-Tipps fuer Haaranalyse';
+      tips.appendChild(tSum);
+      var tBody = document.createElement('div');
+      tBody.style.cssText = 'padding:8px 14px 12px;font-size:11px;color:var(--text-secondary);line-height:1.8';
+      ['\u2022 Tageslicht nutzen (Kunstlicht verfaelscht Diagnose)','\u2022 Haar offen und trocken fotografieren','\u2022 Nahaufnahme von Ansatz + Spitzen getrennt','\u2022 Scheitel zeigen (Kopfhaut sichtbar)','\u2022 Geschaedigtes Haar besonders nah fotografieren'].forEach(function(t) { var p = document.createElement('div'); p.textContent = t; tBody.appendChild(p); });
+      tips.appendChild(tBody);
+      wrapper.appendChild(tips);
+
+      // Upload Section
+      var uploadLabel = document.createElement('div');
+      uploadLabel.style.cssText = 'font-size:12px;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px';
+      uploadLabel.textContent = 'Haar fotografieren (max. 10 Bilder)';
+      wrapper.appendChild(uploadLabel);
+
       var haUploadRow = document.createElement('div');
       haUploadRow.style.cssText = 'display:flex;gap:8px;margin-bottom:10px';
       var haCamArea = document.createElement('div');
       haCamArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
-      haCamArea.innerHTML = '<div style="font-size:20px;margin-bottom:4px">&#128247;</div><div style="font-size:11px;font-weight:600">Kamera</div>';
+      var haCamIcon = document.createElement('div'); haCamIcon.style.cssText = 'font-size:20px;margin-bottom:4px'; haCamIcon.textContent = '\u{1F4F7}';
+      var haCamLabel = document.createElement('div'); haCamLabel.style.cssText = 'font-size:11px;font-weight:600'; haCamLabel.textContent = 'Kamera';
+      haCamArea.appendChild(haCamIcon); haCamArea.appendChild(haCamLabel);
       var haCamInput = document.createElement('input');
       haCamInput.type = 'file'; haCamInput.id = 'haaranalyseCamInput'; haCamInput.accept = 'image/*';
       haCamInput.setAttribute('capture', 'environment'); haCamInput.style.display = 'none';
@@ -4330,7 +4461,9 @@
       haCamArea.onclick = function(ev) { if (ev.target !== haCamInput) haCamInput.click(); };
       var haFileArea = document.createElement('div');
       haFileArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
-      haFileArea.innerHTML = '<div style="font-size:20px;margin-bottom:4px">&#128444;</div><div style="font-size:11px;font-weight:600">Galerie / Datei</div>';
+      var haFileIcon = document.createElement('div'); haFileIcon.style.cssText = 'font-size:20px;margin-bottom:4px'; haFileIcon.textContent = '\u{1F5BC}';
+      var haFileLabel = document.createElement('div'); haFileLabel.style.cssText = 'font-size:11px;font-weight:600'; haFileLabel.textContent = 'Galerie / Datei';
+      haFileArea.appendChild(haFileIcon); haFileArea.appendChild(haFileLabel);
       var haFileInput = document.createElement('input');
       haFileInput.type = 'file'; haFileInput.id = 'haaranalyseUpload'; haFileInput.accept = 'image/*';
       haFileInput.multiple = true; haFileInput.style.display = 'none';
@@ -4341,11 +4474,18 @@
       wrapper.appendChild(haUploadRow);
       var haUploadHint = document.createElement('div');
       haUploadHint.style.cssText = 'font-size:10px;color:var(--text-dim);margin-bottom:8px;text-align:center';
-      haUploadHint.textContent = '3-5 Bilder: Vorne, hinten, Seite, Scheitel, Ansatz';
+      haUploadHint.textContent = 'Vorne, hinten, Seite, Scheitel, Ansatz, Spitzen, geschaedigte Stellen';
       wrapper.appendChild(haUploadHint);
       var haGallery = document.createElement('div');
-      haGallery.id = 'haaranalyseGallery'; haGallery.style.cssText = 'display:none;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px';
+      haGallery.id = 'haaranalyseGallery'; haGallery.style.cssText = 'display:none;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px';
       wrapper.appendChild(haGallery);
+      var haPhotoCount = document.createElement('div');
+      haPhotoCount.id = 'haPhotoCount';
+      haPhotoCount.style.cssText = 'font-size:10px;color:var(--text-micro);margin-bottom:14px;text-align:right';
+      haPhotoCount.textContent = '0 / 10 Bilder';
+      wrapper.appendChild(haPhotoCount);
+
+      // Kundeninfos
       var haFieldsGrid = document.createElement('div');
       haFieldsGrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px';
       var haNameInput = document.createElement('input');
@@ -4356,13 +4496,77 @@
       haEmailInput.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif';
       haFieldsGrid.appendChild(haNameInput); haFieldsGrid.appendChild(haEmailInput);
       wrapper.appendChild(haFieldsGrid);
+
+      // Button
       var haBtn = document.createElement('button');
-      haBtn.className = 'btn btn-primary btn-block'; haBtn.textContent = 'KI-Analyse starten';
+      haBtn.className = 'btn btn-primary btn-block'; haBtn.textContent = 'KI-Analyse + Heilungsprognose starten';
       haBtn.onclick = startProfiAnalyse;
       wrapper.appendChild(haBtn);
+
+      // Ergebnis
       var haResult = document.createElement('div');
       haResult.id = 'haaranalyseResult'; haResult.style.cssText = 'display:none;margin-top:14px';
       wrapper.appendChild(haResult);
+
+      // Prognose-Stufen (3 Zeitraeume)
+      var prognoseSection = document.createElement('div');
+      prognoseSection.id = 'haPrognose';
+      prognoseSection.style.cssText = 'display:none;margin-top:14px;padding:16px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(201,168,76,0.02));border:1px solid var(--border-accent);border-radius:var(--radius)';
+      var progTitle = document.createElement('div');
+      progTitle.style.cssText = 'font-family:Playfair Display,serif;font-size:15px;font-weight:700;margin-bottom:4px;color:var(--gold)';
+      progTitle.textContent = 'Heilungsprognose';
+      prognoseSection.appendChild(progTitle);
+      var progSubtitle = document.createElement('div');
+      progSubtitle.style.cssText = 'font-size:11px;color:var(--text-secondary);margin-bottom:14px;line-height:1.4';
+      progSubtitle.textContent = 'So kann Ihr Haar aussehen, wenn Sie die Pflegehinweise einhalten und empfohlene Produkte verwenden.';
+      prognoseSection.appendChild(progSubtitle);
+
+      // Tab-Buttons fuer 3 Stufen
+      var progTabs = document.createElement('div');
+      progTabs.style.cssText = 'display:flex;gap:4px;margin-bottom:14px;background:var(--bg-warm);border-radius:var(--radius-full);padding:3px';
+      var stages = [{key:'1w',label:'1 Woche'},{key:'1m',label:'1 Monat'},{key:'3m',label:'3 Monate'}];
+      stages.forEach(function(s, idx) {
+        var tab = document.createElement('button');
+        tab.id = 'progTab_' + s.key;
+        tab.style.cssText = 'flex:1;padding:8px 4px;border:none;border-radius:var(--radius-full);font-size:11px;font-weight:600;font-family:Inter,sans-serif;cursor:pointer;transition:all 200ms;' + (idx === 0 ? 'background:var(--gold);color:#fff' : 'background:transparent;color:var(--text-dim)');
+        tab.textContent = s.label;
+        tab.onclick = function() { switchPrognoseTab(s.key); };
+        progTabs.appendChild(tab);
+      });
+      prognoseSection.appendChild(progTabs);
+
+      // Prognose-Panels (3 Stueck)
+      stages.forEach(function(s, idx) {
+        var panel = document.createElement('div');
+        panel.id = 'progPanel_' + s.key;
+        panel.style.cssText = idx === 0 ? '' : 'display:none';
+        var row = document.createElement('div');
+        row.style.cssText = 'display:flex;gap:12px;align-items:center';
+        var imgBox = document.createElement('div');
+        imgBox.style.cssText = 'width:100px;height:130px;background:var(--bg-warm);border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-dim);text-align:center;flex-shrink:0';
+        imgBox.textContent = 'KI-generiert\n' + s.label;
+        row.appendChild(imgBox);
+        var infoBox = document.createElement('div');
+        infoBox.style.cssText = 'flex:1;font-size:12px;line-height:1.6;color:var(--text-secondary)';
+        if (s.key === '1w') {
+          infoBox.textContent = 'Erste Verbesserungen sichtbar: Glanz kehrt zurueck, Spitzen wirken gepflegter. Feuchtigkeitsgehalt steigt.';
+        } else if (s.key === '1m') {
+          infoBox.textContent = 'Deutliche Verbesserung: Haarstruktur erholt sich, Bruch reduziert, natuerlicher Glanz, Spitzen weniger gespalten.';
+        } else {
+          infoBox.textContent = 'Optimaler Zustand: Haar sieht gesund und kraeftig aus. Schaedigung weitgehend repariert, voller Glanz.';
+        }
+        row.appendChild(infoBox);
+        panel.appendChild(row);
+        prognoseSection.appendChild(panel);
+      });
+
+      var progNote = document.createElement('div');
+      progNote.style.cssText = 'font-size:9px;color:var(--text-micro);margin-top:10px;text-align:center';
+      progNote.textContent = 'KI bestimmt realistischen Zeitrahmen \u2014 Prognose endet, wenn Behandlung erfolgreich';
+      prognoseSection.appendChild(progNote);
+      wrapper.appendChild(prognoseSection);
+
+      // Footer
       var haFooter = document.createElement('div');
       haFooter.style.cssText = 'font-size:10px;color:var(--text-dim);margin-top:8px;text-align:center';
       haFooter.textContent = 'Profi-Analyse im Termin inklusive \u00B7 Premium-PDF-Report: 19 EUR';
@@ -4371,19 +4575,39 @@
       if (salonPaket === 'starter') {
         var teaser = document.createElement('div');
         teaser.style.cssText = 'margin-top:14px;padding:16px;background:linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03));border:2px solid rgba(201,168,76,0.3);border-radius:var(--radius)';
-        teaser.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px">★ Smart Start: Light-Analyse (5 von 17 Parametern)</div>'
-          + '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5">Ihr Paket zeigt: Haartyp, Schaedigung, Kopfhaut, Porenstruktur, Farbhistorie. Mit Salon Pro: alle 17 Parameter + Scoring + Pflegeempfehlung + Produkt-Matching.</div>'
-          + '<button class="btn btn-primary btn-block btn-sm" onclick="showToast(\'Kontaktieren Sie uns fuer ein Upgrade\',\'info\',3000)">Upgrade auf Salon Pro →</button>';
+        var teaserTitle = document.createElement('div');
+        teaserTitle.style.cssText = 'font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px';
+        teaserTitle.textContent = '\u2605 Smart Start: Light-Analyse (5 von 17 Parametern)';
+        teaser.appendChild(teaserTitle);
+        var teaserDesc = document.createElement('div');
+        teaserDesc.style.cssText = 'font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5';
+        teaserDesc.textContent = 'Ihr Paket zeigt: Haartyp, Schaedigung, Kopfhaut, Porenstruktur, Farbhistorie. Mit Salon Pro: alle 17 Parameter + Scoring + Pflegeempfehlung + Produkt-Matching.';
+        teaser.appendChild(teaserDesc);
+        var teaserBtn = document.createElement('button');
+        teaserBtn.className = 'btn btn-primary btn-block btn-sm';
+        teaserBtn.textContent = 'Upgrade auf Salon Pro \u2192';
+        teaserBtn.onclick = function() { showToast('Kontaktieren Sie uns fuer ein Upgrade', 'info', 3000); };
+        teaser.appendChild(teaserBtn);
         wrapper.appendChild(teaser);
       }
+    }
+
+    function switchPrognoseTab(key) {
+      var keys = ['1w','1m','3m'];
+      keys.forEach(function(k) {
+        var tab = document.getElementById('progTab_' + k);
+        var panel = document.getElementById('progPanel_' + k);
+        if (tab) { tab.style.background = k === key ? 'var(--gold)' : 'transparent'; tab.style.color = k === key ? '#fff' : 'var(--text-dim)'; }
+        if (panel) { panel.style.display = k === key ? '' : 'none'; }
+      });
     }
 
     function previewHaaranalysePhotos(files) {
       if (!files || !files.length) return;
       var gallery = document.getElementById('haaranalyseGallery');
       gallery.style.display = 'grid';
-      var remaining = 5 - haaranalysePhotos.length;
-      if (remaining <= 0) { showToast('Maximal 5 Fotos', 'info'); return; }
+      var remaining = 10 - haaranalysePhotos.length;
+      if (remaining <= 0) { showToast('Maximal 10 Fotos', 'info'); return; }
       for (var i = 0; i < Math.min(files.length, remaining); i++) {
         (function(file) {
           var reader = new FileReader();
@@ -4398,23 +4622,35 @@
             var del = document.createElement('div');
             del.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;font-size:11px;line-height:18px;text-align:center;cursor:pointer';
             del.textContent = '\u00D7';
-            del.onclick = function(ev) { ev.stopPropagation(); var idx = haaranalysePhotos.indexOf(e.target.result); if (idx > -1) haaranalysePhotos.splice(idx, 1); wrap.remove(); if (!haaranalysePhotos.length) gallery.style.display = 'none'; };
+            del.onclick = function(ev) { ev.stopPropagation(); var idx = haaranalysePhotos.indexOf(e.target.result); if (idx > -1) haaranalysePhotos.splice(idx, 1); wrap.remove(); if (!haaranalysePhotos.length) gallery.style.display = 'none'; updateHaCount(); };
             wrap.appendChild(del);
             gallery.appendChild(wrap);
+            updateHaCount();
           };
           reader.readAsDataURL(file);
         })(files[i]);
       }
-      // Reset inputs so same file can be selected again
       var haUpEl = document.getElementById('haaranalyseUpload'); if (haUpEl) haUpEl.value = '';
       var haCamEl = document.getElementById('haaranalyseCamInput'); if (haCamEl) haCamEl.value = '';
+    }
+
+    function updateHaCount() {
+      var c = document.getElementById('haPhotoCount');
+      if (c) c.textContent = haaranalysePhotos.length + ' / 10 Bilder';
     }
 
     function startProfiAnalyse() {
       var result = document.getElementById('haaranalyseResult');
       result.style.display = 'block';
-      result.innerHTML = '<div style="text-align:center;padding:20px"><div class="skeleton" style="width:100%;height:12px;margin-bottom:8px"></div><div class="skeleton" style="width:80%;height:12px;margin-bottom:8px"></div><div style="font-size:11px;color:var(--text-dim)">KI analysiert... (simuliert)</div></div>';
-      // Simulated result after delay
+      // Build loading skeleton with DOM (no innerHTML with user data)
+      result.textContent = '';
+      var loadWrap = document.createElement('div');
+      loadWrap.style.cssText = 'text-align:center;padding:20px';
+      var skel1 = document.createElement('div'); skel1.className = 'skeleton'; skel1.style.cssText = 'width:100%;height:12px;margin-bottom:8px'; loadWrap.appendChild(skel1);
+      var skel2 = document.createElement('div'); skel2.className = 'skeleton'; skel2.style.cssText = 'width:80%;height:12px;margin-bottom:8px'; loadWrap.appendChild(skel2);
+      var loadText = document.createElement('div'); loadText.style.cssText = 'font-size:11px;color:var(--text-dim)'; loadText.textContent = 'KI analysiert... (simuliert)'; loadWrap.appendChild(loadText);
+      result.appendChild(loadWrap);
+
       setTimeout(function() {
         var params = [
           { name: 'Haartyp', value: 'Wellig (2B)', score: 7 },
@@ -4427,73 +4663,254 @@
           { name: 'Feuchtigkeitsgehalt', value: 'Leicht reduziert', score: 5 }
         ];
         var avgScore = Math.round(params.reduce(function(s, p) { return s + p.score; }, 0) / params.length * 10);
-        var html = '<div style="font-family:Playfair Display,serif;font-size:16px;font-weight:700;margin-bottom:8px">Analyseergebnis</div>';
-        html += '<div style="text-align:center;margin-bottom:12px"><div style="font-size:36px;font-weight:700;color:var(--gold);font-family:Playfair Display,serif">' + avgScore + '%</div><div style="font-size:11px;color:var(--text-dim)">Haar-Gesundheit</div></div>';
+
+        // Build result with DOM API
+        result.textContent = '';
+        var rTitle = document.createElement('div');
+        rTitle.style.cssText = 'font-family:Playfair Display,serif;font-size:16px;font-weight:700;margin-bottom:8px';
+        rTitle.textContent = 'Analyseergebnis';
+        result.appendChild(rTitle);
+
+        var scoreWrap = document.createElement('div');
+        scoreWrap.style.cssText = 'text-align:center;margin-bottom:12px';
+        var scoreVal = document.createElement('div');
+        scoreVal.style.cssText = 'font-size:36px;font-weight:700;color:var(--gold);font-family:Playfair Display,serif';
+        scoreVal.textContent = avgScore + '%';
+        scoreWrap.appendChild(scoreVal);
+        var scoreLabel = document.createElement('div');
+        scoreLabel.style.cssText = 'font-size:11px;color:var(--text-dim)';
+        scoreLabel.textContent = 'Haar-Gesundheit';
+        scoreWrap.appendChild(scoreLabel);
+        result.appendChild(scoreWrap);
+
         params.forEach(function(p) {
           var barColor = p.score >= 7 ? 'var(--success)' : p.score >= 5 ? 'var(--warning)' : 'var(--danger)';
-          html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0"><span style="font-size:11px;font-weight:600;min-width:100px">' + p.name + '</span>'
-            + '<div style="flex:1;height:4px;background:var(--bg-warm);border-radius:2px;overflow:hidden"><div style="height:100%;width:' + (p.score * 10) + '%;background:' + barColor + ';border-radius:2px"></div></div>'
-            + '<span style="font-size:10px;color:var(--text-dim);min-width:80px;text-align:right">' + p.value + '</span></div>';
+          var row = document.createElement('div');
+          row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:4px 0';
+          var nameEl = document.createElement('span');
+          nameEl.style.cssText = 'font-size:11px;font-weight:600;min-width:100px';
+          nameEl.textContent = p.name;
+          row.appendChild(nameEl);
+          var barOuter = document.createElement('div');
+          barOuter.style.cssText = 'flex:1;height:4px;background:var(--bg-warm);border-radius:2px;overflow:hidden';
+          var barInner = document.createElement('div');
+          barInner.style.cssText = 'height:100%;width:' + (p.score * 10) + '%;background:' + barColor + ';border-radius:2px';
+          barOuter.appendChild(barInner);
+          row.appendChild(barOuter);
+          var valEl = document.createElement('span');
+          valEl.style.cssText = 'font-size:10px;color:var(--text-dim);min-width:80px;text-align:right';
+          valEl.textContent = p.value;
+          row.appendChild(valEl);
+          result.appendChild(row);
         });
-        html += '<div style="margin-top:12px;padding:12px;background:var(--bg-warm);border-radius:var(--radius-sm);font-size:12px;line-height:1.5">'
-          + '<strong>Empfehlung:</strong> Feuchtigkeitskur 1x/Woche, Hitzeschutz beim Foehnen. Olaplex Nr. 3 als Home-Treatment. Naechste Balayage-Auffrischung in 4-6 Wochen.</div>';
-        result.innerHTML = html;
+
+        var empf = document.createElement('div');
+        empf.style.cssText = 'margin-top:12px;padding:12px;background:var(--bg-warm);border-radius:var(--radius-sm);font-size:12px;line-height:1.5';
+        var empfStrong = document.createElement('strong');
+        empfStrong.textContent = 'Empfehlung: ';
+        empf.appendChild(empfStrong);
+        empf.appendChild(document.createTextNode('Feuchtigkeitskur 1x/Woche, Hitzeschutz beim Foehnen. Olaplex Nr. 3 als Home-Treatment. Naechste Balayage-Auffrischung in 4-6 Wochen.'));
+        result.appendChild(empf);
+
+        // Show Prognose section
+        var progSection = document.getElementById('haPrognose');
+        if (progSection) progSection.style.display = 'block';
       }, 2000);
     }
 
-    var wunschfrisurPhotos = [];
+    var wfAktuellePhotos = [];
+    var wfWunschPhotos = [];
     function buildWunschfrisurTool(wrapper) {
-      wunschfrisurPhotos = [];
-      wrapper.innerHTML = '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5">3-5 Bilder hochladen: Wunschfrisur, aktuelle Frisur, verschiedene Winkel — KI prueft Machbarkeit und empfiehlt passende Techniken.</div>'
-        + '<div style="display:flex;gap:8px;margin-bottom:10px">'
-        + '<div style="flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer" onclick="document.getElementById(\'wfCameraInput\').click()">'
-        + '<input type="file" id="wfCameraInput" accept="image/*" capture="environment" style="display:none" onchange="addWunschfrisurPhotos(this.files)">'
-        + '<div style="font-size:20px;margin-bottom:4px">&#128247;</div>'
-        + '<div style="font-size:11px;font-weight:600">Kamera</div></div>'
-        + '<div style="flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer" onclick="document.getElementById(\'wfFileInput\').click()">'
-        + '<input type="file" id="wfFileInput" accept="image/*" multiple style="display:none" onchange="addWunschfrisurPhotos(this.files)">'
-        + '<div style="font-size:20px;margin-bottom:4px">&#128444;</div>'
-        + '<div style="font-size:11px;font-weight:600">Galerie / Datei</div></div></div>'
-        + '<div style="font-size:10px;color:var(--text-dim);margin-bottom:8px;text-align:center">3-5 Bilder: Wunsch vorne, aktuell vorne, Seite, hinten</div>'
-        + '<div id="wfGallery" style="display:none;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px"></div>'
-        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
-        + '<input type="text" id="wfName" placeholder="Kundenname" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif">'
-        + '<select id="wfHaartyp" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">'
-        + '<option value="">Haartyp</option><option>Fein &amp; glatt</option><option>Normal &amp; wellig</option><option>Dick &amp; lockig</option><option>Naturkraus</option></select></div>'
-        + '<textarea id="wfNotiz" placeholder="Aktuelle Laenge, Vorbehandlungen, Wuensche..." rows="2" style="width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none;margin-bottom:12px;box-sizing:border-box"></textarea>'
-        + '<button class="btn btn-primary btn-block" onclick="checkMachbarkeit()">Machbarkeits-Check starten</button>'
-        + '<div id="machbarkeitResult" style="display:none;margin-top:14px"></div>';
+      wfAktuellePhotos = []; wfWunschPhotos = [];
+      // All content is built with static strings — no user input is interpolated into HTML
+      wrapper.textContent = '';
+
+      // Intro
+      var intro = document.createElement('div');
+      intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
+      intro.textContent = 'Laden Sie Fotos Ihrer aktuellen Frisur und Ihrer Wunschfrisur getrennt hoch. Die KI kombiniert Ihr Gesicht mit der Wunschfrisur fuer eine realistische Vorschau.';
+      wrapper.appendChild(intro);
+
+      // Foto-Tipps
+      var tips = document.createElement('details');
+      tips.style.cssText = 'margin-bottom:14px;background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius-sm);overflow:hidden';
+      var tSum = document.createElement('summary');
+      tSum.style.cssText = 'padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--gold)';
+      tSum.textContent = '\u{1F4F8} Foto-Tipps fuer beste Ergebnisse';
+      tips.appendChild(tSum);
+      var tBody = document.createElement('div');
+      tBody.style.cssText = 'padding:8px 14px 12px;font-size:11px;color:var(--text-secondary);line-height:1.8';
+      var tipItems = ['\u2022 Tageslicht nutzen (kein Blitz)','\u2022 Neutraler Hintergrund (Wand, Tuer)','\u2022 Haar offen tragen, nicht zusammengebunden','\u2022 Verschiedene Winkel: Vorne, Seite links, Seite rechts, Hinten','\u2022 Keine Filter oder Bearbeitungen','\u2022 Gesicht frei sichtbar (keine Sonnenbrille)'];
+      tipItems.forEach(function(t) { var p = document.createElement('div'); p.textContent = t; tBody.appendChild(p); });
+      tips.appendChild(tBody);
+      wrapper.appendChild(tips);
+
+      // === Bereich 1: Aktuelle Frisur ===
+      buildWfUploadSection(wrapper, 'aktuell', '1', 'Aktuelle Frisur', '3-5 Bilder: Gesicht von vorne, Seite, Hinterkopf', 'var(--info-bg)', 'var(--info)');
+
+      // === Bereich 2: Wunschfrisur ===
+      buildWfUploadSection(wrapper, 'wunsch', '2', 'Wunschfrisur', '3-5 Referenzbilder: Screenshots, Magazin-Fotos, Promi-Frisuren', 'var(--gold-glow)', 'var(--gold)');
+
+      // Gesamt-Zaehler
+      var totalCount = document.createElement('div');
+      totalCount.id = 'wfTotalCount';
+      totalCount.style.cssText = 'font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:12px;padding:8px;background:var(--bg-warm);border-radius:var(--radius-sm);text-align:center';
+      totalCount.textContent = 'Gesamt: 0 / 10 Bilder';
+      wrapper.appendChild(totalCount);
+
+      // Kundeninfos
+      var fields = document.createElement('div');
+      fields.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px';
+      var nameIn = document.createElement('input');
+      nameIn.type = 'text'; nameIn.id = 'wfName'; nameIn.placeholder = 'Kundenname';
+      nameIn.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif';
+      var selHaar = document.createElement('select');
+      selHaar.id = 'wfHaartyp';
+      selHaar.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif';
+      ['','Fein & glatt','Normal & wellig','Dick & lockig','Naturkraus'].forEach(function(v,i) { var o = document.createElement('option'); o.value = v; o.textContent = i === 0 ? 'Haartyp' : v; selHaar.appendChild(o); });
+      fields.appendChild(nameIn); fields.appendChild(selHaar);
+      wrapper.appendChild(fields);
+      var notiz = document.createElement('textarea');
+      notiz.id = 'wfNotiz'; notiz.placeholder = 'Aktuelle Laenge, Vorbehandlungen, Wuensche...'; notiz.rows = 2;
+      notiz.style.cssText = 'width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none;margin-bottom:12px;box-sizing:border-box';
+      wrapper.appendChild(notiz);
+
+      // Button
+      var btn = document.createElement('button');
+      btn.className = 'btn btn-primary btn-block';
+      btn.textContent = 'Machbarkeits-Check + KI-Vorschau starten';
+      btn.onclick = checkMachbarkeit;
+      wrapper.appendChild(btn);
+
+      var result = document.createElement('div');
+      result.id = 'machbarkeitResult'; result.style.cssText = 'display:none;margin-top:14px';
+      wrapper.appendChild(result);
+
+      // KI-Vorschau Platzhalter
+      var kiPreview = document.createElement('div');
+      kiPreview.id = 'wfKiPreview';
+      kiPreview.style.cssText = 'display:none;margin-top:14px;padding:16px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(201,168,76,0.02));border:1px solid var(--border-accent);border-radius:var(--radius)';
+      var kiTitle = document.createElement('div');
+      kiTitle.style.cssText = 'font-family:Playfair Display,serif;font-size:15px;font-weight:700;margin-bottom:10px;color:var(--gold)';
+      kiTitle.textContent = 'KI-generierte Vorschau';
+      kiPreview.appendChild(kiTitle);
+      var kiPlaceholder = document.createElement('div');
+      kiPlaceholder.style.cssText = 'width:140px;height:180px;background:var(--bg-warm);border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-dim);text-align:center;margin:0 auto';
+      kiPlaceholder.textContent = 'Ihr Gesicht + Wunschfrisur';
+      kiPreview.appendChild(kiPlaceholder);
+      var kiNote = document.createElement('div');
+      kiNote.style.cssText = 'font-size:10px;color:var(--text-micro);margin-top:10px;text-align:center';
+      kiNote.textContent = 'Dein Gesicht bleibt 100% echt \u2014 nur die Frisur wird generiert';
+      kiPreview.appendChild(kiNote);
+      wrapper.appendChild(kiPreview);
     }
 
-    function addWunschfrisurPhotos(files) {
+    function buildWfUploadSection(parent, type, num, title, hint, bgColor, textColor) {
+      var header = document.createElement('div');
+      header.style.cssText = 'font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px';
+      var badge = document.createElement('span');
+      badge.style.cssText = 'width:22px;height:22px;border-radius:50%;background:' + bgColor + ';color:' + textColor + ';font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center';
+      badge.textContent = num;
+      header.appendChild(badge);
+      header.appendChild(document.createTextNode(' ' + title));
+      parent.appendChild(header);
+
+      var hintEl = document.createElement('div');
+      hintEl.style.cssText = 'font-size:11px;color:var(--text-dim);margin-bottom:8px';
+      hintEl.textContent = hint;
+      parent.appendChild(hintEl);
+
+      var camId = type === 'aktuell' ? 'wfAktuellCam' : 'wfWunschCam';
+      var fileId = type === 'aktuell' ? 'wfAktuellFile' : 'wfWunschFile';
+
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px';
+      var camArea = document.createElement('div');
+      camArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:12px 8px;text-align:center;cursor:pointer';
+      var camInput = document.createElement('input');
+      camInput.type = 'file'; camInput.id = camId; camInput.accept = 'image/*';
+      camInput.setAttribute('capture', 'environment'); camInput.style.display = 'none';
+      camInput.onchange = function() { addWfPhotos(this.files, type); };
+      var camIcon = document.createElement('div');
+      camIcon.style.cssText = 'font-size:18px'; camIcon.textContent = '\u{1F4F7}';
+      var camLabel = document.createElement('div');
+      camLabel.style.cssText = 'font-size:10px;font-weight:600'; camLabel.textContent = 'Kamera';
+      camArea.appendChild(camInput); camArea.appendChild(camIcon); camArea.appendChild(camLabel);
+      camArea.onclick = function(ev) { if (ev.target !== camInput) camInput.click(); };
+
+      var fileArea = document.createElement('div');
+      fileArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:12px 8px;text-align:center;cursor:pointer';
+      var fileInput = document.createElement('input');
+      fileInput.type = 'file'; fileInput.id = fileId; fileInput.accept = 'image/*';
+      fileInput.multiple = true; fileInput.style.display = 'none';
+      fileInput.onchange = function() { addWfPhotos(this.files, type); };
+      var fileIcon = document.createElement('div');
+      fileIcon.style.cssText = 'font-size:18px'; fileIcon.textContent = '\u{1F5BC}';
+      var fileLabel = document.createElement('div');
+      fileLabel.style.cssText = 'font-size:10px;font-weight:600'; fileLabel.textContent = 'Galerie';
+      fileArea.appendChild(fileInput); fileArea.appendChild(fileIcon); fileArea.appendChild(fileLabel);
+      fileArea.onclick = function(ev) { if (ev.target !== fileInput) fileInput.click(); };
+
+      row.appendChild(camArea); row.appendChild(fileArea);
+      parent.appendChild(row);
+
+      var gallery = document.createElement('div');
+      gallery.id = type === 'aktuell' ? 'wfAktuellGallery' : 'wfWunschGallery';
+      gallery.style.cssText = 'display:none;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:8px';
+      parent.appendChild(gallery);
+
+      var count = document.createElement('div');
+      count.id = type === 'aktuell' ? 'wfAktuellCount' : 'wfWunschCount';
+      count.style.cssText = 'font-size:10px;color:var(--text-micro);margin-bottom:14px;text-align:right';
+      count.textContent = '0 / 5 Bilder';
+      parent.appendChild(count);
+    }
+
+    function addWfPhotos(files, type) {
       if (!files || !files.length) return;
-      var gallery = document.getElementById('wfGallery');
+      var arr = type === 'aktuell' ? wfAktuellePhotos : wfWunschPhotos;
+      var galleryId = type === 'aktuell' ? 'wfAktuellGallery' : 'wfWunschGallery';
+      var gallery = document.getElementById(galleryId);
       gallery.style.display = 'grid';
-      var remaining = 5 - wunschfrisurPhotos.length;
-      if (remaining <= 0) { showToast('Maximal 5 Fotos', 'info'); return; }
+      var remaining = 5 - arr.length;
+      var totalRemaining = 10 - wfAktuellePhotos.length - wfWunschPhotos.length;
+      remaining = Math.min(remaining, totalRemaining);
+      if (remaining <= 0) { showToast('Maximale Anzahl erreicht', 'info'); return; }
       for (var i = 0; i < Math.min(files.length, remaining); i++) {
-        (function(file) {
+        (function(file, arrRef, gal) {
           var reader = new FileReader();
           reader.onload = function(e) {
-            wunschfrisurPhotos.push(e.target.result);
+            arrRef.push(e.target.result);
             var wrap = document.createElement('div');
             wrap.style.cssText = 'position:relative';
             var img = document.createElement('img');
-            img.src = e.target.result; img.alt = 'Foto ' + wunschfrisurPhotos.length;
+            img.src = e.target.result; img.alt = 'Foto';
             img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border)';
             wrap.appendChild(img);
             var del = document.createElement('div');
             del.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;font-size:11px;line-height:18px;text-align:center;cursor:pointer';
             del.textContent = '\u00D7';
-            del.onclick = function(ev) { ev.stopPropagation(); var idx = wunschfrisurPhotos.indexOf(e.target.result); if (idx > -1) wunschfrisurPhotos.splice(idx, 1); wrap.remove(); if (!wunschfrisurPhotos.length) gallery.style.display = 'none'; };
+            del.onclick = function(ev) { ev.stopPropagation(); var idx = arrRef.indexOf(e.target.result); if (idx > -1) arrRef.splice(idx, 1); wrap.remove(); if (!arrRef.length) gal.style.display = 'none'; updateWfCounts(); };
             wrap.appendChild(del);
-            gallery.appendChild(wrap);
+            gal.appendChild(wrap);
+            updateWfCounts();
           };
           reader.readAsDataURL(file);
-        })(files[i]);
+        })(files[i], arr, gallery);
       }
-      document.getElementById('wfCameraInput').value = '';
-      document.getElementById('wfFileInput').value = '';
+      var camId = type === 'aktuell' ? 'wfAktuellCam' : 'wfWunschCam';
+      var fileId = type === 'aktuell' ? 'wfAktuellFile' : 'wfWunschFile';
+      var camEl = document.getElementById(camId); if (camEl) camEl.value = '';
+      var fileEl = document.getElementById(fileId); if (fileEl) fileEl.value = '';
+    }
+
+    function updateWfCounts() {
+      var ac = document.getElementById('wfAktuellCount');
+      var wc = document.getElementById('wfWunschCount');
+      var tc = document.getElementById('wfTotalCount');
+      if (ac) ac.textContent = wfAktuellePhotos.length + ' / 5 Bilder';
+      if (wc) wc.textContent = wfWunschPhotos.length + ' / 5 Bilder';
+      if (tc) tc.textContent = 'Gesamt: ' + (wfAktuellePhotos.length + wfWunschPhotos.length) + ' / 10 Bilder';
     }
 
     function previewWunsch(files, imgId) {
@@ -4510,16 +4927,48 @@
     function checkMachbarkeit() {
       var result = document.getElementById('machbarkeitResult');
       result.style.display = 'block';
-      result.innerHTML = '<div style="text-align:center;padding:20px"><div class="skeleton" style="width:100%;height:12px;margin-bottom:8px"></div><div style="font-size:11px;color:var(--text-dim)">Machbarkeit wird geprueft...</div></div>';
+      result.textContent = '';
+      var loadWrap = document.createElement('div');
+      loadWrap.style.cssText = 'text-align:center;padding:20px';
+      var skel = document.createElement('div'); skel.className = 'skeleton'; skel.style.cssText = 'width:100%;height:12px;margin-bottom:8px'; loadWrap.appendChild(skel);
+      var loadMsg = document.createElement('div'); loadMsg.style.cssText = 'font-size:11px;color:var(--text-dim)'; loadMsg.textContent = 'Machbarkeit wird geprueft...'; loadWrap.appendChild(loadMsg);
+      result.appendChild(loadWrap);
       setTimeout(function() {
         var score = 87;
-        result.innerHTML = '<div style="background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px">'
-          + '<div style="text-align:center;margin-bottom:12px"><div style="font-size:40px;font-weight:700;color:var(--success);font-family:Playfair Display,serif">' + score + '%</div><div style="font-size:12px;color:var(--text-dim)">Machbarkeit</div></div>'
-          + '<div style="font-size:12px;line-height:1.6">'
-          + '<div style="margin-bottom:6px"><strong style="color:var(--success)">✓ Gut machbar:</strong> Schnittform, Styling-Technik</div>'
-          + '<div style="margin-bottom:6px"><strong style="color:var(--warning)">⚠ Bedingt:</strong> Farbton erfordert 2 Sitzungen bei dunklem Ausgangston</div>'
-          + '<div style="margin-bottom:6px"><strong>Empfohlene Technik:</strong> Balayage + Glossing</div>'
-          + '<div><strong>Geschaetzte Dauer:</strong> 150 Min (2 Termine bei starker Aufhellung)</div></div></div>';
+        result.textContent = '';
+        var card = document.createElement('div');
+        card.style.cssText = 'background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px';
+        var scoreWrap = document.createElement('div');
+        scoreWrap.style.cssText = 'text-align:center;margin-bottom:12px';
+        var scoreVal = document.createElement('div');
+        scoreVal.style.cssText = 'font-size:40px;font-weight:700;color:var(--success);font-family:Playfair Display,serif';
+        scoreVal.textContent = score + '%';
+        scoreWrap.appendChild(scoreVal);
+        var scoreLabel = document.createElement('div');
+        scoreLabel.style.cssText = 'font-size:12px;color:var(--text-dim)';
+        scoreLabel.textContent = 'Machbarkeit';
+        scoreWrap.appendChild(scoreLabel);
+        card.appendChild(scoreWrap);
+        var details = document.createElement('div');
+        details.style.cssText = 'font-size:12px;line-height:1.6';
+        var items = [
+          {color:'var(--success)',text:'\u2713 Gut machbar: Schnittform, Styling-Technik'},
+          {color:'var(--warning)',text:'\u26A0 Bedingt: Farbton erfordert 2 Sitzungen bei dunklem Ausgangston'},
+          {color:'var(--text)',text:'Empfohlene Technik: Balayage + Glossing'},
+          {color:'var(--text)',text:'Geschaetzte Dauer: 150 Min (2 Termine bei starker Aufhellung)'}
+        ];
+        items.forEach(function(it) {
+          var line = document.createElement('div');
+          line.style.cssText = 'margin-bottom:6px';
+          line.textContent = it.text;
+          if (it.color !== 'var(--text)') line.style.color = it.color;
+          details.appendChild(line);
+        });
+        card.appendChild(details);
+        result.appendChild(card);
+        // Show KI preview
+        var kiPreview = document.getElementById('wfKiPreview');
+        if (kiPreview) kiPreview.style.display = 'block';
       }, 2500);
     }
 
