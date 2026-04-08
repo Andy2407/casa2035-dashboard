@@ -3965,25 +3965,80 @@
       html += '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="display:flex;align-items:center;justify-content:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:' + (u ? u.farbe : 'var(--text-dim)') + '"></span><span style="font-size:13px;font-weight:600">' + esc(t.Stylist || '') + '</span></div><div style="font-size:9px;color:var(--text-dim);text-transform:uppercase">Stylist</div></div>';
       html += '</div>';
 
-      // Service Recipe (Aufgaben + Produkte)
+      // === REZEPTUR & ABLAUFPLAN ===
+      html += '<div style="margin-top:16px;border:1px solid var(--border-accent);border-left:3px solid var(--gold);border-radius:var(--radius-sm);background:var(--gold-glow);overflow:hidden">';
+      html += '<div style="padding:10px 12px;background:var(--gold-glow);border-bottom:1px solid var(--border-accent);display:flex;align-items:center;gap:6px">';
+      html += '<span style="font-size:14px">&#128203;</span>';
+      html += '<span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gold)">Ablaufplan &amp; Rezeptur</span></div>';
       if (recipe) {
-        html += '<div style="font-size:12px;font-weight:700;margin:12px 0 8px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim)">Arbeitsschritte</div>';
+        // Arbeitsschritte
+        html += '<div style="padding:10px 12px">';
+        html += '<div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--text-dim)">ARBEITSSCHRITTE</div>';
+        var totalMin = 0;
         recipe.aufgaben.forEach(function(a, i) {
-          html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">';
-          html += '<span style="font-size:10px;font-weight:700;color:var(--gold);min-width:20px">' + (i + 1) + '.</span>';
-          html += '<span style="flex:1;font-size:12px">' + esc(a.schritt) + '</span>';
-          html += '<span style="font-size:11px;font-weight:600;color:var(--text-dim)">' + a.dauer_min + ' Min' + (a.einwirkzeit ? ' ⏱' : '') + '</span>';
-          html += '</div>';
+          totalMin += a.dauer_min;
+          html += '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">';
+          html += '<span style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#fff;font-size:10px;font-weight:700;flex-shrink:0">' + (i + 1) + '</span>';
+          html += '<span style="flex:1;font-size:12px;font-weight:500">' + esc(a.schritt) + '</span>';
+          html += '<span style="font-size:11px;font-weight:600;color:var(--text-dim);white-space:nowrap">' + a.dauer_min + ' Min';
+          if (a.einwirkzeit) html += ' <span style="color:var(--warning)" title="Einwirkzeit">&#9201;</span>';
+          html += '</span></div>';
         });
+        html += '<div style="display:flex;justify-content:flex-end;padding:6px 0;font-size:11px;font-weight:700;color:var(--gold)">Gesamt: ' + totalMin + ' Min</div>';
 
-        html += '<div style="font-size:12px;font-weight:700;margin:16px 0 8px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim)">Produkte & Mengen</div>';
+        // Produkte & Rezeptur
+        html += '<div style="font-size:11px;font-weight:700;margin:10px 0 6px;color:var(--text-dim)">PRODUKTE &amp; REZEPTUR</div>';
         recipe.produkte.forEach(function(p) {
-          html += '<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">';
+          html += '<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">';
+          html += '<span style="font-size:12px">&#128225;</span>';
           html += '<span style="font-size:12px;font-weight:600;flex:1">' + esc(p.name) + '</span>';
-          html += '<span style="font-size:11px;color:var(--text-dim);text-align:right">' + esc(p.menge) + (p.mischung ? '<br><em style="font-size:10px;color:var(--gold)">' + esc(p.mischung) + '</em>' : '') + '</span>';
-          html += '</div>';
+          html += '<span style="font-size:11px;color:var(--text-dim);text-align:right">' + esc(p.menge);
+          if (p.mischung) html += '<br><em style="font-size:10px;color:var(--gold)">' + esc(p.mischung) + '</em>';
+          html += '</span></div>';
         });
+        html += '</div>';
+      } else {
+        html += '<div style="padding:16px 12px;text-align:center;color:var(--text-dim);font-size:12px">Keine Rezeptur fuer diesen Service hinterlegt</div>';
       }
+      html += '</div>';
+
+      // === KI-EMPFEHLUNGEN fuer diesen Termin ===
+      var kiTerminHints = [];
+      // Farbtermin-Hinweis
+      if (/farb|balayage|straeh|glossing/i.test(t.Service || '')) {
+        kiTerminHints.push({ icon: '&#127912;', title: 'Farbtermin — Olaplex empfehlen', desc: 'Strukturschutz mit Olaplex No. 1 + No. 2 anbieten. Upselling-Potenzial: +25 EUR.' });
+        kiTerminHints.push({ icon: '&#128247;', title: 'Vorher/Nachher-Foto machen', desc: 'Perfekt fuer Instagram & Google-Bewertung. Foto VOR dem Faerben nicht vergessen!' });
+      }
+      // Neukunden-Hinweis
+      var kundenMatch = kundenCache.find(function(k) { return (k.Name || k.name) === t.Kundenname; });
+      if (kundenMatch && (kundenMatch.Besuche || 0) <= 2) {
+        kiTerminHints.push({ icon: '&#11088;', title: 'Neukundin — Willkommens-Erlebnis', desc: 'Erster/zweiter Besuch! Extra aufmerksam sein: Getraenk anbieten, Salonrundgang, Pflegetipps mitgeben.' });
+      }
+      if (kundenMatch && kundenMatch.VIP) {
+        kiTerminHints.push({ icon: '&#128081;', title: 'VIP-Kundin', desc: 'Stammkundin mit ' + (kundenMatch.Besuche || 0) + ' Besuchen. Persoenliche Ansprache, Lieblingsprodukte bereitstellen.' });
+      }
+      // Zeitdruck-Hinweis
+      if ((parseInt(t.Dauer_Min) || 0) >= 90) {
+        kiTerminHints.push({ icon: '&#9200;', title: 'Langer Termin — ' + t.Dauer_Min + ' Min', desc: 'Getraenk + Zeitschrift anbieten. Einwirkzeiten fuer Beratung/Produktempfehlung nutzen.' });
+      }
+      // Produktempfehlung
+      if (/schnitt|feminin|maskulin|styling/i.test(t.Service || '')) {
+        kiTerminHints.push({ icon: '&#128161;', title: 'Pflegeprodukt empfehlen', desc: 'Passendes Styling-Produkt fuer zuhause mitgeben — steigert Umsatz + Kundenzufriedenheit.' });
+      }
+      // Fallback
+      if (kiTerminHints.length < 2) {
+        kiTerminHints.push({ icon: '&#128172;', title: 'Feedback einholen', desc: 'Am Ende fragen: "Sind Sie zufrieden?" — zeigt Wertschaetzung und bringt Google-Bewertungen.' });
+      }
+      // KI-Empfehlungen rendern
+      html += '<div style="margin-top:12px">';
+      html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:6px;display:flex;align-items:center;gap:4px"><span style="font-size:12px">&#129302;</span> KI-Empfehlungen</div>';
+      kiTerminHints.slice(0, 3).forEach(function(h) {
+        html += '<div style="display:flex;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--gold);border-radius:var(--radius-sm);margin-bottom:4px;font-size:11px;line-height:1.4">';
+        html += '<span style="font-size:14px;flex-shrink:0">' + h.icon + '</span>';
+        html += '<div><strong>' + h.title + '</strong> <span class="ki-badge" style="font-size:8px">KI</span><br><span style="color:var(--text-secondary)">' + h.desc + '</span></div>';
+        html += '</div>';
+      });
+      html += '</div>';
 
       // Notiz-Feld
       if (statusLabel !== 'storniert' && statusLabel !== 'abgeschlossen') {
@@ -5682,20 +5737,39 @@
         container.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-dim);font-size:11px">Alles im gruenen Bereich — keine KI-Hinweise.</div>';
         return;
       }
+      // "X weitere" Link in die Ueberschrift einbauen (rechte Seite)
+      var titleEl = container.previousElementSibling;
+      if (titleEl && titleEl.classList.contains('section-title') && hints.length > 1) {
+        titleEl.style.cssText = 'display:flex;justify-content:space-between;align-items:center;' + (titleEl.style.cssText || '');
+        // Alten Toggle-Link entfernen falls vorhanden
+        var oldToggle = titleEl.querySelector('.ki-more-toggle');
+        if (oldToggle) oldToggle.remove();
+        var toggleLink = document.createElement('span');
+        toggleLink.className = 'ki-more-toggle';
+        toggleLink.style.cssText = 'font-size:11px;font-weight:600;color:var(--gold);cursor:pointer;text-transform:none;letter-spacing:0';
+        toggleLink.textContent = (hints.length - 1) + ' weitere';
+        var extraId = 'kiExtra_' + container.id;
+        toggleLink.onclick = function() {
+          var extra = document.getElementById(extraId);
+          if (extra) {
+            var isHidden = extra.style.display === 'none';
+            extra.style.display = isHidden ? 'block' : 'none';
+            toggleLink.textContent = isHidden ? 'einklappen' : (hints.length - 1) + ' weitere';
+          }
+        };
+        titleEl.appendChild(toggleLink);
+      }
       // Wichtigster Hinweis immer sichtbar
       container.appendChild(buildKiCard(hints[0]));
-      // Weitere Hinweise aufklappbar
+      // Weitere Hinweise versteckt
       if (hints.length > 1) {
-        var details = document.createElement('details');
-        details.style.cssText = 'margin-top:4px';
-        var summary = document.createElement('summary');
-        summary.style.cssText = 'cursor:pointer;font-size:11px;font-weight:600;color:var(--gold);padding:6px 0;list-style:none;display:flex;align-items:center;gap:4px';
-        summary.innerHTML = '<span style="font-size:9px">&#9660;</span> ' + (hints.length - 1) + ' weitere KI-Hinweise';
-        details.appendChild(summary);
+        var extraDiv = document.createElement('div');
+        extraDiv.id = 'kiExtra_' + container.id;
+        extraDiv.style.display = 'none';
         for (var i = 1; i < hints.length; i++) {
-          details.appendChild(buildKiCard(hints[i]));
+          extraDiv.appendChild(buildKiCard(hints[i]));
         }
-        container.appendChild(details);
+        container.appendChild(extraDiv);
       }
     }
 
@@ -6000,18 +6074,18 @@
       var demoKunden = ['Maria Mueller', 'Anna Schmidt', 'Lisa Wagner', 'Sophie Klein', 'Laura Braun', 'Nina Fischer', 'Lara Weber', 'Julia Hoffmann', 'Sarah Becker', 'Emma Schulz', 'Stefan Braun', 'Thomas Meier', 'Max Fischer', 'Paul Weber', 'Tim Schneider', 'Mia Lehmann', 'Clara Wolf', 'Helena Richter'];
 
       var allTermine = [];
-      for (var dayOff = -14; dayOff <= 15; dayOff++) {
+      // Voller Monat: 14 Tage zurueck + 30 Tage voraus = 44 Tage
+      for (var dayOff = -14; dayOff <= 30; dayOff++) {
         var dayDate = new Date(now); dayDate.setDate(dayDate.getDate() + dayOff);
         var dow = dayDate.getDay();
-        if (dow === 0) continue; // No Sunday
-        // Realistisch: 12-18 Termine pro Tag (4 Stylisten), Samstag 10-14
-        var terminePerDay = dow === 6 ? Math.floor(rng() * 5 + 10) : Math.floor(rng() * 7 + 12);
-        // Verteile Termine gleichmaessig ueber den Tag: 8:00 bis 18:00
+        if (dow === 0) continue; // Sonntag geschlossen
+        // Realistisch: Mo-Fr 14-18 Termine (4 Stylisten), Sa 10-14
+        var terminePerDay = dow === 6 ? Math.floor(rng() * 5 + 10) : Math.floor(rng() * 5 + 14);
         for (var ti = 0; ti < terminePerDay; ti++) {
           var svc = demoServices[Math.floor(rng() * demoServices.length)];
-          // Verteile Stylisten gleichmaessiger: je ~3-4 Termine pro Stylist/Tag
+          // Stylisten gleichmaessig verteilen
           var stylist = demoStylists[ti % demoStylists.length];
-          if (rng() > 0.7) stylist = demoStylists[Math.floor(rng() * demoStylists.length)]; // etwas Variation
+          if (rng() > 0.7) stylist = demoStylists[Math.floor(rng() * demoStylists.length)];
           var kunde = demoKunden[Math.floor(rng() * demoKunden.length)];
           var startH = 8 + Math.floor(rng() * 10); // 8-17 Uhr
           var startM = Math.floor(rng() * 4) * 15; // 0, 15, 30, 45
@@ -6024,8 +6098,12 @@
           } else {
             status = rng() > 0.25 ? 'bestaetigt' : 'offen';
           }
+          // Ende_ISO berechnen
+          var endD = new Date(dayDate); endD.setHours(startH, startM + svc.Dauer_Min, 0, 0);
+          var endeISO = endD.getFullYear() + '-' + String(endD.getMonth()+1).padStart(2,'0') + '-' + String(endD.getDate()).padStart(2,'0') + 'T' + String(endD.getHours()).padStart(2,'0') + ':' + String(endD.getMinutes()).padStart(2,'0') + ':00';
           allTermine.push({
             Start_ISO: isoDay(dayOff, startH, startM),
+            Ende_ISO: endeISO,
             Service: svc.Service, Dauer_Min: svc.Dauer_Min, Preis: svc.Preis,
             Stylist: stylist, Kundenname: kunde, Status: status
           });
