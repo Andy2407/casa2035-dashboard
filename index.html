@@ -1722,6 +1722,16 @@
     </div>
   </div>
 
+  <div class="sheet-overlay" id="kiHintSheet">
+    <div class="sheet" style="max-height:92vh">
+      <div class="sheet-handle"></div>
+      <div id="kiHintInner"></div>
+      <div class="sheet-actions" style="margin-top:12px">
+        <button class="btn btn-secondary" onclick="closeSheet('kiHintSheet')">Schliessen</button>
+      </div>
+    </div>
+  </div>
+
   <div class="sheet-overlay" id="configSheet">
     <div class="sheet">
       <div class="sheet-handle"></div>
@@ -1731,7 +1741,7 @@
       <label style="margin-top:8px">Zugangsschluessel</label>
       <input type="password" id="cfgToken" placeholder="eyJ...">
       <label style="margin-top:8px">Webhook URL (optional)</label>
-      <input type="url" id="cfgN8n" placeholder="https://...">
+      <input type="url" id="cfgBackend" placeholder="https://...">
       <div class="sheet-actions">
         <button class="btn btn-secondary" onclick="closeSheet('configSheet')">Abbrechen</button>
         <button class="btn btn-primary" onclick="saveConfig()">Speichern</button>
@@ -1798,28 +1808,28 @@
     var salonPaket = 'pro'; // pro, starter, full
 
     // === Backend Config ===
-    var config = JSON.parse(localStorage.getItem('casa2035_config') || 'null') || { baseUrl: '', token: '', userId: '', n8nUrl: '' };
-    function isSupabaseMode() { return config.baseUrl && config.baseUrl.indexOf('api.casa2035.de') !== -1; }
+    var config = JSON.parse(localStorage.getItem('casa2035_config') || 'null') || { baseUrl: '', token: '', userId: '', backendUrl: '' };
+    function isBackendMode() { return config.baseUrl && config.baseUrl.indexOf('api.casa2035.de') !== -1; }
 
-    async function sbGet(table, params) {
+    async function apiGet(table, params) {
       var url = config.baseUrl + '/rest/v1/' + table + (params ? '?' + params : '');
       var r = await fetch(url, { headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json' } });
       if (!r.ok) throw new Error('Server ' + r.status + ': ' + table);
       return r.json();
     }
-    async function sbPost(table, data) {
+    async function apiPost(table, data) {
       var url = config.baseUrl + '/rest/v1/' + table;
       var r = await fetch(url, { method: 'POST', headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, body: JSON.stringify(data) });
       if (!r.ok) throw new Error('Server ' + r.status + ': ' + table);
       return r.json();
     }
-    async function sbPatch(table, params, data) {
+    async function apiPatch(table, params, data) {
       var url = config.baseUrl + '/rest/v1/' + table + '?' + params;
       var r = await fetch(url, { method: 'PATCH', headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, body: JSON.stringify(data) });
       if (!r.ok) throw new Error('Server ' + r.status + ': ' + table);
       return r.json();
     }
-    async function sbRpc(fn, params) {
+    async function apiRpc(fn, params) {
       var url = config.baseUrl + '/rest/v1/rpc/' + fn;
       var r = await fetch(url, { method: 'POST', headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json' }, body: JSON.stringify(params || {}) });
       if (!r.ok) throw new Error('Server ' + r.status + ': ' + fn);
@@ -1928,10 +1938,10 @@
       document.getElementById('appMain').style.display = '';
       document.getElementById('bottomNav').style.display = '';
       document.getElementById('fabWrap').style.display = '';
-      if (!isSupabaseMode() && SUPABASE_DEFAULTS.baseUrl) {
-        config.baseUrl = SUPABASE_DEFAULTS.baseUrl;
-        config.token = SUPABASE_DEFAULTS.token;
-        config.n8nUrl = SUPABASE_DEFAULTS.n8nUrl;
+      if (!isBackendMode() && API_DEFAULTS.baseUrl) {
+        config.baseUrl = API_DEFAULTS.baseUrl;
+        config.token = API_DEFAULTS.token;
+        config.backendUrl = API_DEFAULTS.backendUrl;
         localStorage.setItem('casa2035_config', JSON.stringify(config));
       }
       applyUserUI();
@@ -1968,8 +1978,8 @@
         document.getElementById('umsatzProMaTitle').style.display = '';
       }
       // Config status
-      document.getElementById('configStatus').textContent = isSupabaseMode() ? 'Verbunden' : 'Demo-Modus (lokal)';
-      document.getElementById('liveIndicator').textContent = isSupabaseMode() ? 'LIVE' : 'DEMO';
+      document.getElementById('configStatus').textContent = isBackendMode() ? 'Verbunden' : 'Demo-Modus (lokal)';
+      document.getElementById('liveIndicator').textContent = isBackendMode() ? 'LIVE' : 'DEMO';
       updateDemoBadges();
     }
 
@@ -2046,7 +2056,7 @@
     function openGoLive() { document.getElementById('goliveOverlay').classList.add('open'); }
     function closeGoLive() { document.getElementById('goliveOverlay').classList.remove('open'); }
     function updateDemoBadges() {
-      var show = !isSupabaseMode();
+      var show = !isBackendMode();
       document.querySelectorAll('.demo-badge').forEach(function(b) { b.style.display = show ? 'inline-flex' : 'none'; });
       var banner = document.getElementById('demoBanner');
       if (banner) banner.style.display = show ? 'inline-flex' : 'none';
@@ -2145,26 +2155,26 @@
     }
 
     // === Config Sheet ===
-    var SUPABASE_DEFAULTS = {
+    var API_DEFAULTS = {
       baseUrl: 'https://api.casa2035.de',
       token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzU1MDQ3NjUsImV4cCI6MTkzMzE4NDc2NX0.4wpQjYlTgmja6vSbLaVVHAGdRJMXIlDSWripkEaoXCk',
-      n8nUrl: 'https://api.casa2035.de/webhook/'
+      backendUrl: 'https://api.casa2035.de/webhook/'
     };
     function openConfigSheet() {
-      document.getElementById('cfgUrl').value = config.baseUrl || SUPABASE_DEFAULTS.baseUrl;
-      document.getElementById('cfgToken').value = config.token || SUPABASE_DEFAULTS.token;
-      document.getElementById('cfgN8n').value = config.n8nUrl || SUPABASE_DEFAULTS.n8nUrl;
+      document.getElementById('cfgUrl').value = config.baseUrl || API_DEFAULTS.baseUrl;
+      document.getElementById('cfgToken').value = config.token || API_DEFAULTS.token;
+      document.getElementById('cfgBackend').value = config.backendUrl || API_DEFAULTS.backendUrl;
       openSheet('configSheet');
     }
     function saveConfig() {
       config.baseUrl = document.getElementById('cfgUrl').value.replace(/\/+$/, '');
       config.token = document.getElementById('cfgToken').value.trim();
-      config.n8nUrl = document.getElementById('cfgN8n').value.trim();
+      config.backendUrl = document.getElementById('cfgBackend').value.trim();
       localStorage.setItem('casa2035_config', JSON.stringify(config));
       closeSheet('configSheet');
       showToast('Verbindung gespeichert', 'success');
       applyUserUI();
-      if (isSupabaseMode()) fetchAll();
+      if (isBackendMode()) fetchAll();
     }
 
     // === Profile Settings ===
@@ -2231,16 +2241,16 @@
 
     // === Fetch All Data ===
     async function fetchAll() {
-      if (!isSupabaseMode()) { loadDemoData(); return; }
+      if (!isBackendMode()) { loadDemoData(); return; }
       try {
         var [events, termine, services, lager, kunden, beratungen, rechnungen] = await Promise.all([
-          sbGet('anfragen_log', 'order=erstellt_am.desc&limit=50').catch(function() { return []; }),
-          sbGet('terminvorschlaege', 'order=beginn.asc&limit=200').catch(function() { return []; }),
-          sbGet('services_preisliste', 'order=name.asc').catch(function() { return []; }),
-          sbGet('lager', 'order=produktname.asc').catch(function() { return []; }),
-          sbGet('kunden', 'order=name.asc').catch(function() { return []; }),
-          sbGet('beratungen', 'order=timestamp.desc&limit=50').catch(function() { return []; }),
-          sbGet('rechnungen', 'order=erstellt_am.desc&limit=50').catch(function() { return []; })
+          apiGet('anfragen_log', 'order=erstellt_am.desc&limit=50').catch(function() { return []; }),
+          apiGet('terminvorschlaege', 'order=beginn.asc&limit=200').catch(function() { return []; }),
+          apiGet('services_preisliste', 'order=name.asc').catch(function() { return []; }),
+          apiGet('lager', 'order=produktname.asc').catch(function() { return []; }),
+          apiGet('kunden', 'order=name.asc').catch(function() { return []; }),
+          apiGet('beratungen', 'order=timestamp.desc&limit=50').catch(function() { return []; }),
+          apiGet('rechnungen', 'order=erstellt_am.desc&limit=50').catch(function() { return []; })
         ]);
 
         // Wenn wichtige Tabs (Termine, Kunden) leer → Demo-Modus fuer Vorfuehrung
@@ -2923,9 +2933,9 @@
       var zahlart = document.getElementById('reZahlart').value;
       var trinkgeld = parseFloat(document.getElementById('reTrinkgeld').value) || 0;
 
-      if (isSupabaseMode()) {
+      if (isBackendMode()) {
         try {
-          await sbRpc('rechnung_erstellen', {
+          await apiRpc('rechnung_erstellen', {
             p_kunde: kunde, p_stylist: stylist, p_service: sel.value,
             p_netto: netto, p_mwst: mwst, p_brutto: brutto,
             p_zahlart: zahlart, p_trinkgeld: trinkgeld,
@@ -2967,9 +2977,9 @@
       if (!beschr || netto <= 0) { showToast('Bitte Beschreibung und Betrag eingeben', 'error'); return; }
       var mwstSatz = parseFloat(document.getElementById('auMwst').value) || 0;
       var brutto = Math.round(netto * (1 + mwstSatz) * 100) / 100;
-      if (isSupabaseMode()) {
+      if (isBackendMode()) {
         try {
-          await sbPost('ausgaben', { kategorie: kat, beschreibung: beschr, netto: netto, mwst_satz: mwstSatz, brutto: brutto, zahlart: document.getElementById('auZahlart').value, beleg_nr: document.getElementById('auBeleg').value.trim() });
+          await apiPost('ausgaben', { kategorie: kat, beschreibung: beschr, netto: netto, mwst_satz: mwstSatz, brutto: brutto, zahlart: document.getElementById('auZahlart').value, beleg_nr: document.getElementById('auBeleg').value.trim() });
           showToast('Ausgabe gebucht: ' + fmtEur(brutto) + ' EUR', 'success');
         } catch(e) { showToast('Fehler: ' + e.message, 'error'); }
       } else {
@@ -3022,9 +3032,9 @@
         bemerkung: document.getElementById('taBemerkung').value.trim(),
         erstellt_von: USERS[currentUser] ? USERS[currentUser].name : currentUser
       };
-      if (isSupabaseMode()) {
+      if (isBackendMode()) {
         try {
-          await sbRpc('tagesabschluss_erstellen', data);
+          await apiRpc('tagesabschluss_erstellen', data);
           showToast('Tagesabschluss gespeichert (GoBD-konform)', 'success');
         } catch(e) { showToast('Fehler: ' + e.message, 'error'); }
       } else {
@@ -3091,10 +3101,17 @@
           + '<span>~' + verbrauchProWoche + '/Woche</span>'
           + '<span style="font-weight:600;color:' + (reichweiteTage <= 7 ? 'var(--danger)' : reichweiteTage <= 14 ? 'var(--warning)' : 'var(--text-dim)') + '">' + (reichweiteTage > 0 ? 'Reicht noch ' + reichweiteTage + ' Tage' : 'Leer!') + '</span></div>';
 
-        if (isLow && perms.lagerBestellen) {
+        if (perms.lagerBestellen) {
           var btn = document.createElement('button');
-          btn.style.cssText = 'width:100%;margin-top:10px;padding:8px;background:var(--gold-gradient);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
-          btn.textContent = 'Jetzt nachbestellen';
+          if (isLow) {
+            btn.style.cssText = 'width:100%;margin-top:10px;padding:8px;background:var(--gold-gradient);color:#fff;border:none;border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif';
+            btn.textContent = 'Jetzt nachbestellen';
+          } else {
+            btn.style.cssText = 'width:100%;margin-top:10px;padding:8px;background:transparent;color:var(--gold);border:1px solid var(--border-accent);border-radius:var(--radius-sm);font-size:11px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;transition:all .2s';
+            btn.textContent = 'Nachbestellen';
+            btn.onmouseenter = function() { this.style.background = 'var(--gold-glow)'; };
+            btn.onmouseleave = function() { this.style.background = 'transparent'; };
+          }
           (function(prodName) {
             btn.onclick = function(ev) { ev.stopPropagation(); openNachbestellungSheet(); };
           })(p.Produkt || p.Name || '');
@@ -3176,8 +3193,8 @@
       var produkt = document.getElementById('nbProdukt').value;
       var menge = parseInt(document.getElementById('nbMenge').value) || 0;
       if (!produkt || menge <= 0) { showToast('Bitte Produkt und Menge eingeben', 'error'); return; }
-      if (isSupabaseMode()) {
-        try { await sbPost('nachbestellungen', { produkt: produkt, menge: menge, notiz: document.getElementById('nbNotiz').value.trim(), status: 'bestellt' }); }
+      if (isBackendMode()) {
+        try { await apiPost('nachbestellungen', { produkt: produkt, menge: menge, notiz: document.getElementById('nbNotiz').value.trim(), status: 'bestellt' }); }
         catch(e) { showToast('Fehler: ' + e.message, 'error'); return; }
       }
       showToast('Bestellung aufgegeben: ' + menge + 'x ' + produkt, 'success');
@@ -3319,14 +3336,30 @@
         var colors = ['#C9A84C','#e06b8f','#6b8fe0','#8f6be0'];
         var initial = (b.Kundenname || 'U').substring(0, 2).toUpperCase();
         var avatarColor = colors[initial.charCodeAt(0) % colors.length];
+        var isBeantwortet = b.Status === 'beantwortet';
+        var statusBadge = isBeantwortet ? '<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--success-bg);color:var(--success)">Beantwortet</span>' : '<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--warning-bg);color:var(--warning)">Offen</span>';
+        var antwortHTML = '';
+        if (isBeantwortet && b.Verlauf && b.Verlauf.length > 0) {
+          var lastReply = null;
+          for (var i = b.Verlauf.length - 1; i >= 0; i--) { if (b.Verlauf[i].von === 'salon') { lastReply = b.Verlauf[i]; break; } }
+          if (lastReply) {
+            antwortHTML = '<div style="margin-top:6px;padding:8px;background:var(--gold-glow);border:1px solid var(--border-accent);border-radius:var(--radius-sm);font-size:11px;color:var(--text-secondary);line-height:1.4">'
+              + '<span style="font-size:9px;font-weight:700;color:var(--gold);display:block;margin-bottom:2px">Antwort — ' + fmtTime(lastReply.zeit) + '</span>'
+              + esc((lastReply.text || '').substring(0, 120)) + (lastReply.text && lastReply.text.length > 120 ? '...' : '')
+              + '</div>';
+          }
+        }
         card.innerHTML = '<div class="beratung-header">'
           + '<div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:' + avatarColor + ';display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700">' + esc(initial) + '</div>'
-          + '<div><div class="beratung-name">' + esc(b.Kundenname || 'Unbekannt') + demoDot() + '</div></div></div>'
+          + '<div><div class="beratung-name">' + esc(b.Kundenname || 'Unbekannt') + demoDot() + '</div>' + statusBadge + '</div></div>'
           + '<div style="display:flex;align-items:center;gap:6px"><span class="beratung-time">' + fmtTime(b.Timestamp) + '</span>'
           + (b.Kanal ? '<span class="kanal-badge" style="background:' + getKanalColor(b.Kanal) + '20;color:' + getKanalColor(b.Kanal) + '">' + esc(b.Kanal) + '</span>' : '') + '</div></div>'
           + '<div class="beratung-msg">' + esc(b.Nachricht || '') + '</div>'
+          + antwortHTML
           + '<div class="beratung-actions">'
-          + '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openAntwortSheet(' + beratungenCache.indexOf(b) + ')">Antworten</button>'
+          + (isBeantwortet
+            ? '<button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openAntwortSheet(' + beratungenCache.indexOf(b) + ')">Erneut antworten</button>'
+            : '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openAntwortSheet(' + beratungenCache.indexOf(b) + ')">Antworten</button>')
           + '<button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();openTerminFromBeratung(' + beratungenCache.indexOf(b) + ')">Termin</button>'
           + '</div>';
         list.appendChild(card);
@@ -3785,16 +3818,83 @@
         });
       }
 
-      html += '<div style="display:flex;gap:8px;margin-top:16px">';
+      // Notiz-Feld
+      if (statusLabel !== 'storniert' && statusLabel !== 'abgeschlossen') {
+        html += '<div style="margin-top:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:4px">Interne Notiz</div>';
+        html += '<textarea id="terminNotiz" rows="2" placeholder="Notiz hinzufuegen..." style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif;resize:none;box-sizing:border-box">' + esc(t.Notiz || '') + '</textarea></div>';
+      }
+
+      // Ueberlappungs-Vorschlaege
+      if (statusLabel !== 'storniert' && statusLabel !== 'abgeschlossen') {
+        var todayStr = (t.Start_ISO || '').split('T')[0];
+        var sameStylistTermine = termineCache.filter(function(x) { return x.Stylist === t.Stylist && (x.Start_ISO||'').indexOf(todayStr) === 0 && x !== t && x.Status !== 'storniert'; });
+        var isOverlapping = false;
+        var tStart = new Date(t.Start_ISO).getTime();
+        var tEnd = tStart + (parseInt(t.Dauer_Min) || 30) * 60000;
+        sameStylistTermine.forEach(function(x) {
+          var xS = new Date(x.Start_ISO).getTime();
+          var xE = xS + (parseInt(x.Dauer_Min) || 30) * 60000;
+          if (tStart < xE && xS < tEnd) isOverlapping = true;
+        });
+        if (isOverlapping) {
+          html += '<div style="margin-top:12px;padding:10px;background:var(--warning-bg);border:1px solid rgba(196,138,26,0.3);border-radius:var(--radius-sm)">';
+          html += '<div style="font-size:11px;font-weight:700;color:var(--warning);margin-bottom:6px">&#9888; Terminueberschneidung erkannt</div>';
+          var allStylists = Object.values(USERS).filter(function(u) { return u.rolle === 'FRM' || u.rolle === 'STY' || u.rolle === 'CHF'; });
+          var suggestions = [];
+          allStylists.forEach(function(alt) {
+            if (alt.name === t.Stylist) return;
+            var altTermine = termineCache.filter(function(x) { return x.Stylist === alt.name && (x.Start_ISO||'').indexOf(todayStr) === 0 && x.Status !== 'storniert'; });
+            var altFree = true;
+            altTermine.forEach(function(x) {
+              var xS = new Date(x.Start_ISO).getTime();
+              var xE = xS + (parseInt(x.Dauer_Min) || 30) * 60000;
+              if (tStart < xE && xS < tEnd) altFree = false;
+            });
+            if (altFree) suggestions.push({ type: 'stylist', name: alt.name, farbe: alt.farbe, time: fmtTime(t.Start_ISO) });
+          });
+          var nextSlots = [30, 60, 90];
+          nextSlots.forEach(function(offset) {
+            var newStart = new Date(tStart + offset * 60000);
+            var newEnd = new Date(newStart.getTime() + (parseInt(t.Dauer_Min) || 30) * 60000);
+            var slotFree = true;
+            sameStylistTermine.forEach(function(x) {
+              var xS = new Date(x.Start_ISO).getTime();
+              var xE = xS + (parseInt(x.Dauer_Min) || 30) * 60000;
+              if (newStart.getTime() < xE && xS < newEnd.getTime()) slotFree = false;
+            });
+            if (slotFree && newEnd.getHours() < 20) {
+              suggestions.push({ type: 'time', time: fmtTime(newStart.toISOString()), iso: newStart.toISOString() });
+            }
+          });
+          if (suggestions.length > 0) {
+            suggestions.slice(0, 3).forEach(function(s) {
+              if (s.type === 'stylist') {
+                html += '<button class="btn btn-secondary btn-sm" style="width:100%;margin-top:4px;text-align:left;display:flex;align-items:center;gap:6px" onclick="terminUmbuchen(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\',\'' + esc(s.name) + '\',null)">';
+                html += '<span style="width:8px;height:8px;border-radius:50%;background:' + s.farbe + '"></span> Zu ' + esc(s.name) + ' verschieben (' + s.time + ')</button>';
+              } else {
+                html += '<button class="btn btn-secondary btn-sm" style="width:100%;margin-top:4px;text-align:left" onclick="terminUmbuchen(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\',null,\'' + s.iso + '\')">';
+                html += '&#128337; Auf ' + s.time + ' verschieben</button>';
+              }
+            });
+          } else {
+            html += '<div style="font-size:11px;color:var(--text-dim)">Keine automatischen Vorschlaege verfuegbar. Bitte manuell verschieben.</div>';
+          }
+          html += '</div>';
+        }
+      }
+
+      // Action Buttons
+      html += '<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">';
       if (statusLabel === 'offen') {
-        html += '<button class="btn btn-primary" style="flex:1" onclick="terminBestaetigen(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\')">Bestaetigen</button>';
+        html += '<button class="btn btn-primary" style="flex:1;min-width:120px" onclick="terminBestaetigen(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\')">&#10003; Bestaetigen</button>';
       } else if (statusLabel === 'bestaetigt') {
-        html += '<button class="btn btn-primary" style="flex:1;opacity:0.5" disabled>Bereits bestaetigt</button>';
+        html += '<button class="btn btn-primary" style="flex:1;min-width:120px;opacity:0.5" disabled>&#10003; Bestaetigt</button>';
       } else {
-        html += '<button class="btn btn-primary" style="flex:1;opacity:0.5" disabled>' + esc(statusLabel) + '</button>';
+        html += '<button class="btn btn-primary" style="flex:1;min-width:120px;opacity:0.5" disabled>' + esc(statusLabel) + '</button>';
       }
       if (statusLabel !== 'storniert' && statusLabel !== 'abgeschlossen') {
-        html += '<button class="btn btn-danger" onclick="terminStornieren(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\')">Stornieren</button>';
+        html += '<button class="btn btn-secondary" style="flex:1;min-width:100px" onclick="openTerminVerschieben(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\')">&#128337; Verschieben</button>';
+        html += '<button class="btn btn-danger" style="min-width:80px" onclick="terminStornieren(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\')">Stornieren</button>';
       }
       html += '</div>';
       inner.innerHTML = html;
@@ -3835,6 +3935,86 @@
       closeSheet('detailSheet');
     }
 
+    function terminUmbuchen(startISO, kundenname, neuerStylist, neueZeit) {
+      var found = termineCache.find(function(t) { return t.Start_ISO === startISO && t.Kundenname === kundenname; });
+      if (!found) return;
+      if (neuerStylist) {
+        var alterStylist = found.Stylist;
+        found.Stylist = neuerStylist;
+        renderTermine(termineCache);
+        showToast('Termin umgebucht: ' + kundenname + ' jetzt bei ' + neuerStylist, 'success');
+      } else if (neueZeit) {
+        found.Start_ISO = neueZeit;
+        var d = new Date(neueZeit);
+        d.setMinutes(d.getMinutes() + (parseInt(found.Dauer_Min) || 30));
+        found.Ende_ISO = d.toISOString();
+        renderTermine(termineCache);
+        showToast('Termin verschoben: ' + kundenname + ' auf ' + fmtTime(neueZeit), 'success');
+      }
+      closeSheet('detailSheet');
+    }
+
+    function openTerminVerschieben(startISO, kundenname) {
+      var found = termineCache.find(function(t) { return t.Start_ISO === startISO && t.Kundenname === kundenname; });
+      if (!found) return;
+      var inner = document.getElementById('detailInner');
+      var curDate = (found.Start_ISO || '').split('T')[0];
+      var curTime = fmtTime(found.Start_ISO);
+
+      var stylistOptions = '';
+      Object.values(USERS).forEach(function(u) {
+        if (u.rolle === 'FRM' || u.rolle === 'STY' || u.rolle === 'CHF') {
+          stylistOptions += '<option value="' + esc(u.name) + '"' + (u.name === found.Stylist ? ' selected' : '') + '>' + esc(u.name) + ' (' + esc(u.titel || '') + ')</option>';
+        }
+      });
+
+      var slotOptions = '';
+      for (var h = 8; h <= 19; h++) {
+        for (var m = 0; m < 60; m += 30) {
+          var hh = (h < 10 ? '0' : '') + h;
+          var mm = m === 0 ? '00' : '30';
+          var label = hh + ':' + mm;
+          slotOptions += '<option value="' + label + '"' + (curTime === label ? ' selected' : '') + '>' + label + '</option>';
+        }
+      }
+
+      var tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+      var maxDate = new Date(); maxDate.setDate(maxDate.getDate() + 30);
+
+      inner.innerHTML = '<div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:4px">Termin verschieben</div>'
+        + '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:16px">' + esc(found.Service || '') + ' — ' + esc(kundenname) + '</div>'
+        + '<div style="display:grid;gap:12px">'
+        + '<div><label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Datum</label>'
+        + '<input type="date" id="verschiebenDatum" value="' + curDate + '" min="' + tomorrow.toISOString().split('T')[0] + '" max="' + maxDate.toISOString().split('T')[0] + '" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:14px;font-family:Inter,sans-serif;box-sizing:border-box"></div>'
+        + '<div><label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Uhrzeit</label>'
+        + '<select id="verschiebenZeit" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:14px;font-family:Inter,sans-serif">' + slotOptions + '</select></div>'
+        + '<div><label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Stylistin</label>'
+        + '<select id="verschiebenStylist" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:14px;font-family:Inter,sans-serif">' + stylistOptions + '</select></div>'
+        + '</div>'
+        + '<div id="verschiebenSlots" style="margin-top:12px"></div>'
+        + '<div style="display:flex;gap:8px;margin-top:16px">'
+        + '<button class="btn btn-primary" style="flex:1" onclick="doTerminVerschieben(\'' + esc(startISO) + '\',\'' + esc(kundenname) + '\')">Verschieben</button>'
+        + '<button class="btn btn-secondary" onclick="openTerminDetail(termineCache.find(function(t){return t.Start_ISO===\'' + esc(startISO) + '\'&&t.Kundenname===\'' + esc(kundenname) + '\'}))">Zurueck</button></div>';
+      openSheet('detailSheet');
+    }
+
+    function doTerminVerschieben(startISO, kundenname) {
+      var found = termineCache.find(function(t) { return t.Start_ISO === startISO && t.Kundenname === kundenname; });
+      if (!found) return;
+      var datum = document.getElementById('verschiebenDatum').value;
+      var zeit = document.getElementById('verschiebenZeit').value;
+      var stylist = document.getElementById('verschiebenStylist').value;
+      var neueISO = datum + 'T' + zeit + ':00';
+      found.Start_ISO = neueISO;
+      var d = new Date(neueISO);
+      d.setMinutes(d.getMinutes() + (parseInt(found.Dauer_Min) || 30));
+      found.Ende_ISO = d.toISOString();
+      found.Stylist = stylist;
+      renderTermine(termineCache);
+      closeSheet('detailSheet');
+      showToast('Termin verschoben: ' + kundenname + ' auf ' + datum + ' ' + zeit + ' bei ' + stylist, 'success');
+    }
+
     var selectedIstFarbe = null;
     var selectedZielFarbe = null;
 
@@ -3867,20 +4047,29 @@
       intro.textContent = 'Fotografiere das Haar — die KI erkennt den aktuellen Farbton. Waehle dann den Wunschton und zeige die Farbe direkt deinem Kunden.';
       wrapper.appendChild(intro);
 
-      // Photo upload
-      var uploadArea = document.createElement('div');
-      uploadArea.style.cssText = 'background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;margin-bottom:14px';
-      var fcIcon = document.createElement('div'); fcIcon.style.cssText = 'font-size:24px;margin-bottom:4px'; fcIcon.textContent = '\uD83D\uDCF7';
-      var fcTitle = document.createElement('div'); fcTitle.style.cssText = 'font-size:13px;font-weight:600'; fcTitle.textContent = 'Haar fotografieren';
-      var fcHint = document.createElement('div'); fcHint.style.cssText = 'font-size:11px;color:var(--text-dim)'; fcHint.textContent = 'KI erkennt den Ist-Farbton automatisch';
-      uploadArea.appendChild(fcIcon); uploadArea.appendChild(fcTitle); uploadArea.appendChild(fcHint);
-      var fileInput = document.createElement('input');
-      fileInput.type = 'file'; fileInput.id = 'farbcodeUpload'; fileInput.accept = 'image/*';
-      fileInput.setAttribute('capture', 'environment'); fileInput.style.display = 'none';
-      fileInput.onchange = function() { previewFarbcode(this.files); };
-      uploadArea.appendChild(fileInput);
-      uploadArea.onclick = function(ev) { if (ev.target !== fileInput) fileInput.click(); };
-      wrapper.appendChild(uploadArea);
+      // Photo upload — Dual: Kamera + Datei
+      var fcUploadRow = document.createElement('div');
+      fcUploadRow.style.cssText = 'display:flex;gap:8px;margin-bottom:14px';
+      var fcCamArea = document.createElement('div');
+      fcCamArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
+      fcCamArea.innerHTML = '<div style="font-size:20px;margin-bottom:4px">&#128247;</div><div style="font-size:11px;font-weight:600">Kamera</div><div style="font-size:9px;color:var(--text-dim)">Haar fotografieren</div>';
+      var fcCamInput = document.createElement('input');
+      fcCamInput.type = 'file'; fcCamInput.id = 'farbcodeCamInput'; fcCamInput.accept = 'image/*';
+      fcCamInput.setAttribute('capture', 'environment'); fcCamInput.style.display = 'none';
+      fcCamInput.onchange = function() { previewFarbcode(this.files); };
+      fcCamArea.appendChild(fcCamInput);
+      fcCamArea.onclick = function(ev) { if (ev.target !== fcCamInput) fcCamInput.click(); };
+      var fcFileArea = document.createElement('div');
+      fcFileArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
+      fcFileArea.innerHTML = '<div style="font-size:20px;margin-bottom:4px">&#128444;</div><div style="font-size:11px;font-weight:600">Galerie / Datei</div><div style="font-size:9px;color:var(--text-dim)">Bestehendes Foto</div>';
+      var fcFileInput = document.createElement('input');
+      fcFileInput.type = 'file'; fcFileInput.id = 'farbcodeUpload'; fcFileInput.accept = 'image/*';
+      fcFileInput.style.display = 'none';
+      fcFileInput.onchange = function() { previewFarbcode(this.files); };
+      fcFileArea.appendChild(fcFileInput);
+      fcFileArea.onclick = function(ev) { if (ev.target !== fcFileInput) fcFileInput.click(); };
+      fcUploadRow.appendChild(fcCamArea); fcUploadRow.appendChild(fcFileArea);
+      wrapper.appendChild(fcUploadRow);
 
       var previewRow = document.createElement('div');
       previewRow.id = 'farbcodePreview';
@@ -4029,18 +4218,32 @@
       intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
       intro.textContent = '3-5 Fotos vom Haar aufnehmen \u2014 KI analysiert Struktur, Schaedigung, Porositaet und gibt Pflegeempfehlung.';
       wrapper.appendChild(intro);
-      var haUploadArea = document.createElement('div');
-      haUploadArea.style.cssText = 'background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;margin-bottom:10px';
-      var haIcon = document.createElement('div'); haIcon.style.cssText = 'font-size:24px;margin-bottom:4px'; haIcon.textContent = '\uD83D\uDCF7';
-      var haTitle = document.createElement('div'); haTitle.style.cssText = 'font-size:13px;font-weight:600'; haTitle.textContent = 'Fotos aufnehmen (3-5 Bilder)';
-      var haHint = document.createElement('div'); haHint.style.cssText = 'font-size:11px;color:var(--text-dim)'; haHint.textContent = 'Vorne, hinten, Seite, Scheitel, Ansatz';
+      var haUploadRow = document.createElement('div');
+      haUploadRow.style.cssText = 'display:flex;gap:8px;margin-bottom:10px';
+      var haCamArea = document.createElement('div');
+      haCamArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
+      haCamArea.innerHTML = '<div style="font-size:20px;margin-bottom:4px">&#128247;</div><div style="font-size:11px;font-weight:600">Kamera</div>';
+      var haCamInput = document.createElement('input');
+      haCamInput.type = 'file'; haCamInput.id = 'haaranalyseCamInput'; haCamInput.accept = 'image/*';
+      haCamInput.setAttribute('capture', 'environment'); haCamInput.style.display = 'none';
+      haCamInput.onchange = function() { previewHaaranalysePhotos(this.files); };
+      haCamArea.appendChild(haCamInput);
+      haCamArea.onclick = function(ev) { if (ev.target !== haCamInput) haCamInput.click(); };
+      var haFileArea = document.createElement('div');
+      haFileArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
+      haFileArea.innerHTML = '<div style="font-size:20px;margin-bottom:4px">&#128444;</div><div style="font-size:11px;font-weight:600">Galerie / Datei</div>';
       var haFileInput = document.createElement('input');
       haFileInput.type = 'file'; haFileInput.id = 'haaranalyseUpload'; haFileInput.accept = 'image/*';
-      haFileInput.setAttribute('capture', 'environment'); haFileInput.multiple = true; haFileInput.style.display = 'none';
+      haFileInput.multiple = true; haFileInput.style.display = 'none';
       haFileInput.onchange = function() { previewHaaranalysePhotos(this.files); };
-      haUploadArea.appendChild(haIcon); haUploadArea.appendChild(haTitle); haUploadArea.appendChild(haHint); haUploadArea.appendChild(haFileInput);
-      haUploadArea.onclick = function(ev) { if (ev.target !== haFileInput) haFileInput.click(); };
-      wrapper.appendChild(haUploadArea);
+      haFileArea.appendChild(haFileInput);
+      haFileArea.onclick = function(ev) { if (ev.target !== haFileInput) haFileInput.click(); };
+      haUploadRow.appendChild(haCamArea); haUploadRow.appendChild(haFileArea);
+      wrapper.appendChild(haUploadRow);
+      var haUploadHint = document.createElement('div');
+      haUploadHint.style.cssText = 'font-size:10px;color:var(--text-dim);margin-bottom:8px;text-align:center';
+      haUploadHint.textContent = '3-5 Bilder: Vorne, hinten, Seite, Scheitel, Ansatz';
+      wrapper.appendChild(haUploadHint);
       var haGallery = document.createElement('div');
       haGallery.id = 'haaranalyseGallery'; haGallery.style.cssText = 'display:none;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px';
       wrapper.appendChild(haGallery);
@@ -4103,8 +4306,9 @@
           reader.readAsDataURL(file);
         })(files[i]);
       }
-      // Reset input so same file can be selected again
-      document.getElementById('haaranalyseUpload').value = '';
+      // Reset inputs so same file can be selected again
+      var haUpEl = document.getElementById('haaranalyseUpload'); if (haUpEl) haUpEl.value = '';
+      var haCamEl = document.getElementById('haaranalyseCamInput'); if (haCamEl) haCamEl.value = '';
     }
 
     function startProfiAnalyse() {
@@ -4138,27 +4342,59 @@
       }, 2000);
     }
 
+    var wunschfrisurPhotos = [];
     function buildWunschfrisurTool(wrapper) {
-      wrapper.innerHTML = '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5">Wunschbild + aktuelle Frisur hochladen — KI prueft Machbarkeit und empfiehlt passende Techniken.</div>'
-        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
-        + '<div style="background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 10px;text-align:center;cursor:pointer" onclick="document.getElementById(\'wunschUpload\').click()">'
-        + '<input type="file" id="wunschUpload" accept="image/*" capture="environment" style="display:none" onchange="previewWunsch(this.files,\'wunschPreviewImg\')">'
-        + '<div style="font-size:20px;margin-bottom:4px">&#128444;</div>'
-        + '<div style="font-size:12px;font-weight:600">Wunschbild</div></div>'
-        + '<div style="background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 10px;text-align:center;cursor:pointer" onclick="document.getElementById(\'aktuelleUpload\').click()">'
-        + '<input type="file" id="aktuelleUpload" accept="image/*" capture="environment" style="display:none" onchange="previewWunsch(this.files,\'aktuellePreviewImg\')">'
+      wunschfrisurPhotos = [];
+      wrapper.innerHTML = '<div style="margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5">3-5 Bilder hochladen: Wunschfrisur, aktuelle Frisur, verschiedene Winkel — KI prueft Machbarkeit und empfiehlt passende Techniken.</div>'
+        + '<div style="display:flex;gap:8px;margin-bottom:10px">'
+        + '<div style="flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer" onclick="document.getElementById(\'wfCameraInput\').click()">'
+        + '<input type="file" id="wfCameraInput" accept="image/*" capture="environment" style="display:none" onchange="addWunschfrisurPhotos(this.files)">'
         + '<div style="font-size:20px;margin-bottom:4px">&#128247;</div>'
-        + '<div style="font-size:12px;font-weight:600">Aktuelle Frisur</div></div></div>'
-        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">'
-        + '<div id="wunschPreview" style="display:none;text-align:center"><img id="wunschPreviewImg" alt="Wunschfrisur Vorschau" style="max-width:100%;max-height:120px;border-radius:var(--radius);border:1px solid var(--border)"><div style="font-size:9px;color:var(--text-dim)">Wunsch</div></div>'
-        + '<div id="aktuellePreview" style="display:none;text-align:center"><img id="aktuellePreviewImg" alt="Aktuelle Frisur Vorschau" style="max-width:100%;max-height:120px;border-radius:var(--radius);border:1px solid var(--border)"><div style="font-size:9px;color:var(--text-dim)">Aktuell</div></div></div>'
+        + '<div style="font-size:11px;font-weight:600">Kamera</div></div>'
+        + '<div style="flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer" onclick="document.getElementById(\'wfFileInput\').click()">'
+        + '<input type="file" id="wfFileInput" accept="image/*" multiple style="display:none" onchange="addWunschfrisurPhotos(this.files)">'
+        + '<div style="font-size:20px;margin-bottom:4px">&#128444;</div>'
+        + '<div style="font-size:11px;font-weight:600">Galerie / Datei</div></div></div>'
+        + '<div style="font-size:10px;color:var(--text-dim);margin-bottom:8px;text-align:center">3-5 Bilder: Wunsch vorne, aktuell vorne, Seite, hinten</div>'
+        + '<div id="wfGallery" style="display:none;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px"></div>'
         + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">'
         + '<input type="text" id="wfName" placeholder="Kundenname" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif">'
         + '<select id="wfHaartyp" style="padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">'
         + '<option value="">Haartyp</option><option>Fein &amp; glatt</option><option>Normal &amp; wellig</option><option>Dick &amp; lockig</option><option>Naturkraus</option></select></div>'
-        + '<textarea id="wfNotiz" placeholder="Aktuelle Laenge, Vorbehandlungen, Wuensche..." rows="2" style="width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none;margin-bottom:12px"></textarea>'
+        + '<textarea id="wfNotiz" placeholder="Aktuelle Laenge, Vorbehandlungen, Wuensche..." rows="2" style="width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none;margin-bottom:12px;box-sizing:border-box"></textarea>'
         + '<button class="btn btn-primary btn-block" onclick="checkMachbarkeit()">Machbarkeits-Check starten</button>'
         + '<div id="machbarkeitResult" style="display:none;margin-top:14px"></div>';
+    }
+
+    function addWunschfrisurPhotos(files) {
+      if (!files || !files.length) return;
+      var gallery = document.getElementById('wfGallery');
+      gallery.style.display = 'grid';
+      var remaining = 5 - wunschfrisurPhotos.length;
+      if (remaining <= 0) { showToast('Maximal 5 Fotos', 'info'); return; }
+      for (var i = 0; i < Math.min(files.length, remaining); i++) {
+        (function(file) {
+          var reader = new FileReader();
+          reader.onload = function(e) {
+            wunschfrisurPhotos.push(e.target.result);
+            var wrap = document.createElement('div');
+            wrap.style.cssText = 'position:relative';
+            var img = document.createElement('img');
+            img.src = e.target.result; img.alt = 'Foto ' + wunschfrisurPhotos.length;
+            img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border)';
+            wrap.appendChild(img);
+            var del = document.createElement('div');
+            del.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;font-size:11px;line-height:18px;text-align:center;cursor:pointer';
+            del.textContent = '\u00D7';
+            del.onclick = function(ev) { ev.stopPropagation(); var idx = wunschfrisurPhotos.indexOf(e.target.result); if (idx > -1) wunschfrisurPhotos.splice(idx, 1); wrap.remove(); if (!wunschfrisurPhotos.length) gallery.style.display = 'none'; };
+            wrap.appendChild(del);
+            gallery.appendChild(wrap);
+          };
+          reader.readAsDataURL(file);
+        })(files[i]);
+      }
+      document.getElementById('wfCameraInput').value = '';
+      document.getElementById('wfFileInput').value = '';
     }
 
     function previewWunsch(files, imgId) {
@@ -4298,7 +4534,7 @@
     function renderAdminHealth() {
       var el = document.getElementById('adminHealth');
       if (!el) return;
-      var connected = typeof isSupabaseMode === 'function' && isSupabaseMode();
+      var connected = typeof isBackendMode === 'function' && isBackendMode();
       var terminCount = (termineCache || []).length;
       var kundenCount = (kundenCache || []).length;
       var today = new Date().toISOString().split('T')[0];
@@ -4328,7 +4564,7 @@
       var el = document.getElementById('adminActions');
       if (!el) return;
       var actions = [];
-      var connected = typeof isSupabaseMode === 'function' && isSupabaseMode();
+      var connected = typeof isBackendMode === 'function' && isBackendMode();
 
       // Verbindungs-Check
       if (!connected) {
@@ -4392,7 +4628,7 @@
     function renderAdminChecks() {
       var el = document.getElementById('adminChecks');
       if (!el) return;
-      var connected = typeof isSupabaseMode === 'function' && isSupabaseMode();
+      var connected = typeof isBackendMode === 'function' && isBackendMode();
       var checks = [
         { name: 'Backend-Verbindung', ok: connected, detail: connected ? 'Verbunden' : 'Nicht verbunden' },
         { name: 'SSL-Verschluesselung', ok: true, detail: 'Aktiv (HTTPS)' },
@@ -4447,7 +4683,7 @@
       var logs = [
         { time: timeAgo(0), icon: '&#128994;', msg: 'Admin-Login erfolgreich' },
         { time: timeAgo(2), icon: '&#128202;', msg: 'Dashboard geladen — ' + (isDemoMode ? 'Demo-Modus' : 'Echtbetrieb') },
-        { time: timeAgo(5), icon: '&#128279;', msg: 'Backend-Verbindungscheck: ' + (typeof isSupabaseMode === 'function' && isSupabaseMode() ? 'OK' : 'Demo-Modus') },
+        { time: timeAgo(5), icon: '&#128279;', msg: 'Backend-Verbindungscheck: ' + (typeof isBackendMode === 'function' && isBackendMode() ? 'OK' : 'Demo-Modus') },
         { time: timeAgo(5), icon: '&#128197;', msg: (termineCache || []).length + ' Termine geladen' },
         { time: timeAgo(5), icon: '&#128100;', msg: (kundenCache || []).length + ' Kunden geladen' },
         { time: timeAgo(5), icon: '&#128230;', msg: (lagerCache || []).length + ' Produkte im Lager' },
@@ -4474,7 +4710,7 @@
       var report = 'CASA 2035 — System-Report\n';
       report += 'Erstellt: ' + now.toLocaleDateString('de-DE') + ' ' + now.toLocaleTimeString('de-DE') + '\n';
       report += '='.repeat(40) + '\n\n';
-      report += 'Backend: ' + (typeof isSupabaseMode === 'function' && isSupabaseMode() ? 'Verbunden' : 'Demo-Modus') + '\n';
+      report += 'Backend: ' + (typeof isBackendMode === 'function' && isBackendMode() ? 'Verbunden' : 'Demo-Modus') + '\n';
       report += 'Modus: ' + (isDemoMode ? 'Demo-Daten' : 'Echtbetrieb') + '\n';
       report += 'Termine: ' + (termineCache || []).length + '\n';
       report += 'Kunden: ' + (kundenCache || []).length + '\n';
@@ -4648,11 +4884,14 @@
       suggestions.slice(0, 4).forEach(function(s) {
         var card = document.createElement('div');
         card.className = 'ki-suggestion-card touch-scale';
-        card.onclick = s.click;
+        card.style.cursor = 'pointer';
         card.innerHTML = '<div class="ki-icon">' + s.icon + '</div>'
           + '<div class="ki-body"><div class="ki-title">' + s.title + ' <span class="ki-badge">KI</span></div>'
           + '<div class="ki-desc">' + s.desc + '</div>'
           + '<div class="ki-action">' + s.action + '</div></div>';
+        (function(suggestion) {
+          card.onclick = function() { openKiHintDetail({ icon: suggestion.icon, title: suggestion.title, desc: suggestion.desc, navigateClick: suggestion.click }); };
+        })(s);
         container.appendChild(card);
       });
 
@@ -4778,10 +5017,12 @@
 
       if (outOfStock.length > 0) {
         var names = outOfStock.slice(0,3).map(function(p) { return p.Produkt || p.Name; }).join(', ');
-        hints.push({ icon: '&#9888;', title: outOfStock.length + ' Produkte ausverkauft!', desc: names + ' — Sofort nachbestellen. Kunden fragen nach!', prio: 'danger' });
+        var oosData = outOfStock.map(function(p) { return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>' + esc(p.Produkt || p.Name) + '</span><span style="color:var(--danger);font-weight:600">0 Stk.</span></div>'; }).join('');
+        hints.push({ icon: '&#9888;', title: outOfStock.length + ' Produkte ausverkauft!', desc: names + ' — Sofort nachbestellen. Kunden fragen nach!', prio: 'danger', daten: oosData });
       }
       if (lowStock.length > 0) {
-        hints.push({ icon: '&#128230;', title: lowStock.length + ' Produkte unter Mindestbestand', desc: 'Sammelbestellung empfohlen — Lieferzeiten beachten (LA Biosthetique: 3-5 Werktage).' });
+        var lsData = lowStock.map(function(p) { return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>' + esc(p.Produkt || p.Name) + '</span><span style="color:var(--warning);font-weight:600">' + (p.Bestand || 0) + '/' + (p.Min_Bestand || 3) + ' Stk.</span></div>'; }).join('');
+        hints.push({ icon: '&#128230;', title: lowStock.length + ' Produkte unter Mindestbestand', desc: 'Sammelbestellung empfohlen — Lieferzeiten beachten (LA Biosthetique: 3-5 Werktage).', daten: lsData });
       }
       if (highValue.length > 0) {
         var hv = highValue[0];
@@ -4802,16 +5043,122 @@
       hints.slice(0, max || 3).forEach(function(h) {
         var card = document.createElement('div');
         card.className = 'ki-suggestion-card touch-scale';
+        card.style.cursor = 'pointer';
         if (h.prio === 'danger') card.style.borderLeftColor = 'var(--danger)';
         card.innerHTML = '<div class="ki-icon">' + h.icon + '</div>'
           + '<div class="ki-body"><div class="ki-title">' + h.title + ' <span class="ki-badge">KI</span></div>'
-          + '<div class="ki-desc">' + h.desc + '</div></div>';
-        if (h.click) card.onclick = h.click;
+          + '<div class="ki-desc">' + h.desc + '</div>'
+          + '<div class="ki-action" style="font-size:10px;color:var(--gold);font-weight:600;margin-top:4px">Details &amp; Chat &#8250;</div></div>';
+        (function(hint) {
+          card.onclick = function() { openKiHintDetail(hint); };
+        })(h);
         container.appendChild(card);
       });
       if (hints.length === 0) {
         container.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text-dim);font-size:11px">Alles im gruenen Bereich — keine KI-Hinweise.</div>';
       }
+    }
+
+    // === KI-Hinweis Detail Pop-up mit Chat ===
+    var kiHintChatHistory = [];
+    function openKiHintDetail(hint) {
+      var inner = document.getElementById('kiHintInner');
+      kiHintChatHistory = [];
+      var detail = hint.detail || generateKiHintDetail(hint);
+      var empfehlung = hint.empfehlung || generateKiHintEmpfehlung(hint);
+
+      inner.innerHTML = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">'
+        + '<div style="width:40px;height:40px;border-radius:12px;background:var(--gold-glow);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;font-size:20px">' + hint.icon + '</div>'
+        + '<div style="flex:1"><div style="font-family:Playfair Display,serif;font-size:18px;font-weight:700">' + hint.title + '</div>'
+        + '<div style="font-size:10px;color:var(--gold);font-weight:600"><span class="ki-badge">KI</span> KI-Analyse</div></div></div>'
+        + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;margin-bottom:12px">'
+        + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:6px">Detaillierte Analyse</div>'
+        + '<div style="font-size:13px;color:var(--text-secondary);line-height:1.6">' + esc(detail) + '</div></div>'
+        + '<div style="background:var(--success-bg);border:1px solid rgba(45,138,78,0.15);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px">'
+        + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--success);margin-bottom:6px">&#10024; Handlungsempfehlung</div>'
+        + '<div style="font-size:13px;color:var(--text);line-height:1.6">' + esc(empfehlung) + '</div></div>'
+        + (hint.daten ? '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px">'
+          + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:6px">Relevante Daten</div>'
+          + '<div style="font-size:12px;color:var(--text-secondary);line-height:1.5">' + hint.daten + '</div></div>' : '')
+        + '<div style="border-top:1px solid var(--border);padding-top:12px">'
+        + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gold);margin-bottom:8px">&#128172; KI-Assistent — Fragen stellen</div>'
+        + '<div id="kiHintChatMessages" style="max-height:180px;overflow-y:auto;margin-bottom:8px;display:flex;flex-direction:column;gap:6px"></div>'
+        + '<div style="display:flex;gap:6px">'
+        + '<input type="text" id="kiHintChatInput" placeholder="Frage zum Hinweis stellen..." style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif" onkeydown="if(event.key===\'Enter\')sendKiHintChat()">'
+        + '<button class="btn btn-primary btn-sm" onclick="sendKiHintChat()" style="white-space:nowrap">Fragen</button></div>'
+        + '<div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap">'
+        + '<button class="btn btn-secondary btn-sm" style="font-size:10px" onclick="document.getElementById(\'kiHintChatInput\').value=\'Was soll ich zuerst tun?\';sendKiHintChat()">Was zuerst tun?</button>'
+        + '<button class="btn btn-secondary btn-sm" style="font-size:10px" onclick="document.getElementById(\'kiHintChatInput\').value=\'Welche Kosten entstehen?\';sendKiHintChat()">Kosten?</button>'
+        + '<button class="btn btn-secondary btn-sm" style="font-size:10px" onclick="document.getElementById(\'kiHintChatInput\').value=\'Gibt es Alternativen?\';sendKiHintChat()">Alternativen?</button>'
+        + '</div></div>';
+      openSheet('kiHintSheet');
+    }
+
+    function generateKiHintDetail(hint) {
+      var t = (hint.title || '').toLowerCase();
+      if (t.indexOf('nachbestellen') > -1 || t.indexOf('mindestbestand') > -1 || t.indexOf('ausverkauft') > -1) {
+        return 'Die KI hat Ihren aktuellen Lagerbestand analysiert und festgestellt, dass mehrere Produkte unter den definierten Mindestbestand gefallen sind. Bei den aktuellen Verbrauchsraten besteht das Risiko, dass diese Produkte innerhalb der naechsten 1-2 Wochen komplett aufgebraucht sind. Eine rechtzeitige Nachbestellung verhindert Lieferengpaesse und stellt sicher, dass Sie Ihren Kunden weiterhin alle Services anbieten koennen.';
+      }
+      if (t.indexOf('termin') > -1 || t.indexOf('luecke') > -1 || t.indexOf('ueberschneidung') > -1) {
+        return 'Die KI hat Ihren Terminkalender analysiert und Optimierungspotenzial erkannt. Terminluecken koennen fuer Walk-In-Kunden oder Nachholtermine genutzt werden. Bei Ueberschneidungen empfiehlt sich eine sofortige Umplanung, um Wartezeiten zu vermeiden und die Kundenzufriedenheit zu sichern.';
+      }
+      if (t.indexOf('follow') > -1 || t.indexOf('kontakt') > -1 || t.indexOf('kunde') > -1) {
+        return 'Die KI hat Kunden identifiziert, die fuer eine Kontaktaufnahme faellig sind. Regelmaessige Follow-Ups erhoehen die Kundenbindung nachweislich um bis zu 40%. Eine persoenliche Nachricht per WhatsApp oder ein kurzer Anruf wirkt am staerksten.';
+      }
+      if (t.indexOf('umsatz') > -1 || t.indexOf('bonwert') > -1 || t.indexOf('kasse') > -1 || t.indexOf('tagesabschluss') > -1) {
+        return 'Die KI ueberwacht Ihre Tagesumsaetze und Kassenbewegungen in Echtzeit. Durch gezielte Empfehlungen wie Produktverkauf bei jedem Besuch oder Upselling bei Farbbehandlungen koennen Sie Ihren durchschnittlichen Bonwert deutlich steigern.';
+      }
+      if (t.indexOf('upsell') > -1 || t.indexOf('olaplex') > -1) {
+        return 'Bei Farbbehandlungen ist Olaplex No.1 als Zusatzschutz besonders empfehlenswert. Kunden schaetzen die professionelle Beratung und sind bereit, fuer den Haarschutz einen Aufpreis zu zahlen. Erfahrungswerte zeigen eine Annahmequote von ca. 60% bei aktiver Empfehlung.';
+      }
+      if (t.indexOf('ruhig') > -1 || t.indexOf('weiterbildung') > -1) {
+        return 'Ruhige Tage sind ideal fuer Aufgaben, die im Alltagsstress oft zu kurz kommen: Lager pruefen, Schaufenster umdekorieren, Social-Media-Content erstellen oder Weiterbildung. Nutzen Sie die Zeit produktiv!';
+      }
+      if (t.indexOf('antwort') > -1 || t.indexOf('wartet') > -1) {
+        return 'Schnelle Antwortzeiten sind entscheidend fuer die Kundenzufriedenheit. Studien zeigen: Kunden, die innerhalb von 30 Minuten eine Antwort erhalten, buchen 3x haeufiger einen Termin als bei laengerer Wartezeit.';
+      }
+      if (t.indexOf('vip') > -1) {
+        return 'VIP-Kunden sind das Rueckgrat Ihres Salons. Ein personalisierter Geburtstagsgruss mit kleinem Gutschein staerkt die Bindung enorm. Diese Kunden empfehlen Ihren Salon durchschnittlich 4x haeufiger weiter.';
+      }
+      if (t.indexOf('farb') > -1) {
+        return 'Mehrere Farbtermine am selben Tag bieten die Chance, Farbe und Entwickler vorab vorzubereiten. Das spart pro Termin ca. 15 Minuten Arbeitszeit und sorgt fuer einen reibungsloseren Ablauf.';
+      }
+      return 'Die KI hat diesen Hinweis basierend auf Ihren aktuellen Salondaten generiert. Durch regelmaessige Analyse von Terminen, Lagerbestaenden, Kundendaten und Umsaetzen erkennt das System Muster und gibt proaktive Empfehlungen.';
+    }
+
+    function generateKiHintEmpfehlung(hint) {
+      var t = (hint.title || '').toLowerCase();
+      if (t.indexOf('nachbestellen') > -1 || t.indexOf('mindestbestand') > -1) return 'Erstellen Sie jetzt eine Sammelbestellung fuer alle kritischen Produkte. LA Biosthetique liefert in 3-5 Werktagen. Tipp: Bestellen Sie 20% ueber Mindestbestand fuer einen Sicherheitspuffer.';
+      if (t.indexOf('ausverkauft') > -1) return 'Sofort nachbestellen! Pruefen Sie, ob ein Alternativprodukt voruebergehend eingesetzt werden kann, bis die Lieferung eintrifft.';
+      if (t.indexOf('ueberschneidung') > -1) return 'Pruefen Sie die betroffenen Termine und verschieben Sie einen davon zu einer freien Kollegin oder auf einen spaeten Slot.';
+      if (t.indexOf('luecke') > -1) return 'Nutzen Sie die Luecke fuer Walk-In-Kunden. Alternativ: Social-Media-Post mit "Spontan-Termin verfuegbar!" veroeffentlichen.';
+      if (t.indexOf('follow') > -1) return 'Senden Sie heute noch eine persoenliche WhatsApp-Nachricht an die ersten 3 Kunden auf der Follow-Up-Liste.';
+      if (t.indexOf('tagesabschluss') > -1) return 'Schliessen Sie die Kasse jetzt ab. GoBD-Pflicht: Tagesabschluss muss taeglich dokumentiert werden.';
+      if (t.indexOf('upsell') > -1 || t.indexOf('olaplex') > -1) return 'Empfehlen Sie bei jedem Farbtermin heute aktiv Olaplex No.1. Bereiten Sie das Produkt vorab vor und erklaeren Sie den Schutzeffekt in einem Satz.';
+      return 'Nehmen Sie sich 5 Minuten Zeit, um diesen Hinweis zu pruefen und die empfohlene Massnahme umzusetzen.';
+    }
+
+    function sendKiHintChat() {
+      var input = document.getElementById('kiHintChatInput');
+      var q = (input.value || '').trim();
+      if (!q) return;
+      input.value = '';
+      var msgs = document.getElementById('kiHintChatMessages');
+      // User message
+      msgs.innerHTML += '<div style="display:flex;justify-content:flex-end"><div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:12px;line-height:1.4;background:var(--gold-glow);border:1px solid var(--border-accent);color:var(--text)">' + esc(q) + '</div></div>';
+      msgs.scrollTop = msgs.scrollHeight;
+      // Typing indicator
+      var typingId = 'kiTyping' + Date.now();
+      msgs.innerHTML += '<div id="' + typingId + '" style="display:flex;justify-content:flex-start"><div style="padding:8px 12px;border-radius:12px;font-size:12px;background:var(--surface);border:1px solid var(--border);color:var(--text-dim)"><span class="ki-badge">KI</span> Antwort wird generiert...</div></div>';
+      msgs.scrollTop = msgs.scrollHeight;
+      // Simulate response
+      setTimeout(function() {
+        var el = document.getElementById(typingId);
+        if (el) el.remove();
+        var answer = getKiDemoResponse(currentPage, q);
+        msgs.innerHTML += '<div style="display:flex;justify-content:flex-start"><div style="max-width:85%;padding:8px 12px;border-radius:12px;font-size:12px;line-height:1.5;background:var(--surface);border:1px solid var(--border);color:var(--text-secondary)"><span class="ki-badge" style="margin-right:4px">KI</span>' + esc(answer) + '</div></div>';
+        msgs.scrollTop = msgs.scrollHeight;
+      }, 1200 + Math.random() * 800);
     }
 
     // === KI Antwort-Generierung fuer Beratung ===
@@ -5115,8 +5462,8 @@
         { Kundenname: 'Maria Testkundin', Nachricht: 'Hallo, ich moechte gerne einen Termin fuer Haarschnitt & Styling. Haben Sie naechste Woche noch was frei?', Kanal: 'email', Timestamp: iso(9, 30), Status: 'offen' },
         { Kundenname: 'Stefan Braun', Nachricht: 'Hi, ich braeuchte einen Maskulin Schnitt + Bartpflege. Am liebsten Samstag.', Kanal: 'instagram', Timestamp: iso(9, 2), Status: 'offen' },
         { Kundenname: 'Sophie Klein', Nachricht: 'Danke fuer die Beratung letzte Woche! Wuerde gerne das Olaplex-Treatment buchen.', Kanal: 'whatsapp', Timestamp: iso(8, 15), Status: 'offen' },
-        { Kundenname: 'Anna Schmidt', Nachricht: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', Kanal: 'whatsapp', Timestamp: isoDay(-1, 16, 30), Status: 'beantwortet' },
-        { Kundenname: 'Lisa Wagner', Nachricht: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', Kanal: 'email', Timestamp: isoDay(-2, 11, 0), Status: 'beantwortet' }
+        { Kundenname: 'Anna Schmidt', Nachricht: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', Kanal: 'whatsapp', Timestamp: isoDay(-1, 16, 30), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', zeit: isoDay(-1, 16, 30) }, { von: 'salon', text: 'Hallo Anna! Klar, ich habe am Donnerstag um 14:00 noch einen Platz frei. Soll ich den fuer dich reservieren? Die Auffrischung dauert ca. 2,5 Stunden.', zeit: isoDay(-1, 17, 15) }] },
+        { Kundenname: 'Lisa Wagner', Nachricht: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', Kanal: 'email', Timestamp: isoDay(-2, 11, 0), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', zeit: isoDay(-2, 11, 0) }, { von: 'salon', text: 'Hallo Lisa, kein Problem — Ihr Termin am Freitag ist storniert. Moechten Sie gleich einen neuen Termin vereinbaren?', zeit: isoDay(-2, 11, 45) }] }
       ]);
 
       // Cockpit NACH allen Caches rendern
@@ -5401,8 +5748,8 @@
       var stored = JSON.parse(localStorage.getItem('casa_dashboard_feedback') || '[]');
       var storeCopy = { feedback: text, type: fbSelectedType, rating: fbRating, page: 'dashboard', currentPage: currentPageName, timestamp: payload.timestamp };
       stored.push(storeCopy); localStorage.setItem('casa_dashboard_feedback', JSON.stringify(stored));
-      if (typeof isSupabaseMode === 'function' && isSupabaseMode()) {
-        sbPost('feedback', { text: text, typ: fbSelectedType, bewertung: fbRating || null, quelle: 'dashboard', seite: currentPageName, viewport: payload.viewport, erstellt_am: payload.timestamp, status: 'neu' }).catch(function() {});
+      if (typeof isBackendMode === 'function' && isBackendMode()) {
+        apiPost('feedback', { text: text, typ: fbSelectedType, bewertung: fbRating || null, quelle: 'dashboard', seite: currentPageName, viewport: payload.viewport, erstellt_am: payload.timestamp, status: 'neu' }).catch(function() {});
       }
       // Send to webhook (routes to Notion)
       fetch('https://api.casa2035.de/webhook/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ source: 'dashboard', type: fbSelectedType, rating: fbRating, text: text, page: currentPageName, viewport: payload.viewport, timestamp: payload.timestamp, notion_db: NOTION_FEEDBACK_DB, screenshot: fbScreenshotData ? true : false }) }).catch(function() {});
