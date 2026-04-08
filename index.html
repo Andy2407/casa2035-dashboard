@@ -2,7 +2,7 @@
 <html lang="de" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#0a0a0a">
@@ -175,6 +175,14 @@
     @keyframes data-pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
     @keyframes borderTrace { 0% { background-position: 0% 0%; } 100% { background-position: 200% 0%; } }
     @keyframes typewriter { from { width: 0; } to { width: 100%; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
 
     .stagger > * { animation: slideUp 500ms var(--ease) both; }
     .stagger > *:nth-child(1) { animation-delay: 0ms; }
@@ -1144,7 +1152,7 @@
       </div>
       <div class="header-right">
         <span class="live-dot" id="liveIndicator">DEMO</span>
-        <button class="theme-toggle" onclick="toggleTheme()" title="Theme wechseln">
+        <button class="theme-toggle" onclick="toggleTheme()" title="Theme wechseln" aria-label="Farbschema wechseln">
           <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
         <div style="position:relative" id="avatarWrap">
@@ -1182,7 +1190,7 @@
         <h3 class="serif" id="heroTitle">Willkommen zurueck</h3>
         <p id="heroSubtitle">Dein Salon auf einen Blick</p>
         <div class="hero-time" id="heroTime"></div>
-        <div class="demo-banner" id="demoBanner" onclick="openGoLive()" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius-full);background:linear-gradient(135deg,rgba(196,138,26,0.15),rgba(224,168,46,0.1));border:1px solid rgba(196,138,26,0.25);cursor:pointer;font-size:11px;font-weight:600;color:var(--warning);transition:all 200ms">
+        <div class="demo-banner" id="demoBanner" onclick="event.stopPropagation();openGoLive()" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius-full);background:linear-gradient(135deg,rgba(196,138,26,0.15),rgba(224,168,46,0.1));border:1px solid rgba(196,138,26,0.25);cursor:pointer;font-size:11px;font-weight:600;color:var(--warning);transition:all 200ms">
           <span class="demo-badge" style="margin:0;width:18px;height:18px;font-size:9px">D</span>
           Demo-Modus — 5/17 Go-Live Punkte erledigt
         </div>
@@ -1216,7 +1224,7 @@
       </div>
       <!-- JARVIS COCKPIT 2035 -->
       <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
-        <span>Cockpit <span class="demo-badge" onclick="openGoLive()" title="Demo-Daten">D</span></span>
+        <span>Cockpit <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></span>
         <span style="font-size:9px;font-weight:600;color:var(--gold);letter-spacing:1.5px;animation:data-pulse 2s infinite">LIVE DATA</span>
       </div>
       <div class="cockpit-grid stagger" id="cockpitGrid">
@@ -1292,13 +1300,13 @@
       <div class="section-title">KI-Vorschlaege</div>
       <div class="ki-suggestions stagger" id="kiSuggestions"></div>
 
-      <div class="section-title">Aktuelle Ereignisse <span class="demo-badge" onclick="openGoLive()" title="Demo-Daten — Klicken fuer Go-Live Status">D</span></div>
+      <div class="section-title">Aktuelle Ereignisse <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten — Klicken fuer Go-Live Status">D</span></div>
       <div class="event-list stagger" id="eventList"></div>
     </div>
 
     <!-- PAGE: Termine -->
     <div class="page" id="pageTermine">
-      <div class="section-title" style="margin-top:0">TERMINE <span class="demo-badge" onclick="openGoLive()" title="Demo-Daten">D</span></div>
+      <div class="section-title" style="margin-top:0">TERMINE <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></div>
       <div class="date-nav">
         <button onclick="changeTerminDate(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"/></svg></button>
         <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer" title="Zurueck zu Heute">Heute</div>
@@ -1318,7 +1326,7 @@
 
     <!-- PAGE: Kasse -->
     <div class="page" id="pageKasse">
-      <div class="section-title" style="margin-top:0">KASSE <span class="demo-badge" onclick="openGoLive()" title="Demo-Daten">D</span></div>
+      <div class="section-title" style="margin-top:0">KASSE <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></div>
       <div class="kasse-summary">
         <div class="kasse-box"><div class="value tabular" id="kasseTagesUmsatz">0,00</div><div class="label">Tagesumsatz</div></div>
         <div class="kasse-box"><div class="value tabular" id="kasseBar">0,00</div><div class="label">Bar</div></div>
@@ -1342,7 +1350,7 @@
 
     <!-- PAGE: Kunden (NEW) -->
     <div class="page" id="pageKunden">
-      <div class="section-title" style="margin-top:0">KUNDEN <span class="demo-badge" onclick="openGoLive()" title="Demo-Daten">D</span></div>
+      <div class="section-title" style="margin-top:0">KUNDEN <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></div>
       <div class="stats-grid" style="margin-bottom:12px">
         <div class="stat-card">
           <div class="stat-value tabular" id="kundenTotal">0</div>
@@ -1370,7 +1378,7 @@
 
     <!-- PAGE: Lager -->
     <div class="page" id="pageLager">
-      <div class="section-title" style="margin-top:0">LAGER <span class="demo-badge" onclick="openGoLive()" title="Demo-Daten">D</span></div>
+      <div class="section-title" style="margin-top:0">LAGER <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></div>
       <div class="lager-stats">
         <div class="lager-stat-box"><div class="value" id="lagerTotal">0</div><div class="label">Produkte</div></div>
         <div class="lager-stat-box"><div class="value" style="color:var(--success)" id="lagerOk">0</div><div class="label">OK</div></div>
@@ -1414,7 +1422,7 @@
 
     <!-- PAGE: Beratung -->
     <div class="page" id="pageBeratung">
-      <div class="section-title" style="margin-top:0">BERATUNG <span class="demo-badge" onclick="openGoLive()" title="Demo-Daten">D</span></div>
+      <div class="section-title" style="margin-top:0">BERATUNG <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></div>
       <div class="action-grid">
         <div class="action-card" onclick="showKiTool('farbcode')"><div class="icon">&#127912;</div><div class="title">Farbcode</div><div class="desc">Mischungsformel berechnen</div></div>
         <div class="action-card" onclick="showKiTool('haaranalyse')"><div class="icon">&#128269;</div><div class="title">Haaranalyse</div><div class="desc">KI-Diagnostik starten</div></div>
@@ -1507,7 +1515,7 @@
         <div class="admin-quick-actions">
           <button class="admin-qbtn" onclick="runSystemCheck()">&#128270; System pruefen</button>
           <button class="admin-qbtn" onclick="openConfigSheet()">&#128279; Verbindung</button>
-          <button class="admin-qbtn" onclick="openGoLive()">&#128640; Go-Live Status</button>
+          <button class="admin-qbtn" onclick="event.stopPropagation();openGoLive()">&#128640; Go-Live Status</button>
           <button class="admin-qbtn" onclick="exportSystemReport()">&#128196; Report exportieren</button>
         </div>
         <!-- System-Log -->
@@ -1522,7 +1530,7 @@
   </main>
 
   <!-- Bottom Navigation -->
-  <nav class="bottom-nav" id="bottomNav" style="display:none">
+  <nav class="bottom-nav" id="bottomNav" role="navigation" aria-label="Hauptnavigation" style="display:none">
     <div class="nav-item active" onclick="showPage('dashboard')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
       <span class="nav-label">Salon</span>
@@ -1556,13 +1564,13 @@
   <!-- FAB -->
   <div class="fab-wrap" id="fabWrap" style="display:none">
     <div class="fab-menu" id="fabMenu"></div>
-    <button class="fab" id="fabBtn" onclick="toggleFab()">
+    <button class="fab" id="fabBtn" onclick="toggleFab()" aria-label="Schnellaktion">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
   </div>
 
   <!-- KI Assist Panel -->
-  <div class="ki-assist-panel" id="kiAssistPanel">
+  <div class="ki-assist-panel" id="kiAssistPanel" role="dialog" aria-label="KI-Assistent">
     <div class="ki-header">
       <h4>KI-Assistent</h4>
       <button style="background:rgba(255,255,255,0.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px" onclick="toggleKiAssist()">&times;</button>
@@ -1888,6 +1896,7 @@
     }
 
     function animateValue(el, start, end, duration) {
+      if (start === end) { el.textContent = end; return; }
       var range = end - start;
       var current = start;
       var stepTime = Math.abs(Math.floor(duration / Math.max(Math.abs(range), 1)));
@@ -1971,21 +1980,21 @@
       var activePage = document.querySelector('.page.active');
       var pageId = 'page' + page.charAt(0).toUpperCase() + page.slice(1);
       var el = document.getElementById(pageId);
+      window.scrollTo(0, 0);
       if (activePage && el && activePage !== el) {
         activePage.style.opacity = '0';
-        activePage.style.transform = 'translateY(-8px)';
         setTimeout(function() {
           document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); p.style.opacity = ''; p.style.transform = ''; });
           el.classList.add('active');
           el.style.opacity = '0';
-          el.style.transform = 'translateY(8px)';
+          el.style.transform = 'translateY(6px)';
           requestAnimationFrame(function() {
-            el.style.transition = 'opacity 250ms ease, transform 250ms ease';
+            el.style.transition = 'opacity 200ms ease, transform 200ms ease';
             el.style.opacity = '1';
             el.style.transform = 'translateY(0)';
-            setTimeout(function() { el.style.transition = ''; }, 260);
+            setTimeout(function() { el.style.transition = ''; }, 210);
           });
-        }, 120);
+        }, 80);
       } else {
         document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
         if (el) el.classList.add('active');
@@ -2001,7 +2010,6 @@
       if (page === 'einstellungen' && (perms.systemTab || (USERS[currentUser] && USERS[currentUser].isAdmin))) {
         renderAdminZentrale();
       }
-      window.scrollTo(0, 0);
     }
 
     // === Profile Dropdown ===
@@ -2197,6 +2205,7 @@
     var kundenCache = [];
     var bestellungenCache = [];
     var kasseCache = [];
+    var haaranalysePhotos = [];
 
     // === Backend → Dashboard Spalten-Mapping ===
     function mapServices(rows) {
@@ -2239,7 +2248,7 @@
         var hatKunden = (kunden||[]).length > 0;
         var hatLager = (lager||[]).length > 0;
         if (!hatTermine && !hatKunden && !hatLager) {
-          console.log('Backend verbunden aber Kerndaten leer — Demo-Modus');
+          /* Backend connected but core data empty — demo mode */
           showToast('Verbunden — Demo-Modus fuer Vorfuehrung', 'info');
           loadDemoData();
           document.getElementById('liveIndicator').textContent = 'DEMO';
@@ -2265,7 +2274,7 @@
         isDemoMode = false;
         document.getElementById('liveIndicator').textContent = 'LIVE';
       } catch(e) {
-        console.log('Fetch error, falling back to demo:', e);
+        /* fetch error — falling back to demo */
         showToast('Verbindung fehlgeschlagen — Demo-Modus aktiv', 'warning');
         loadDemoData();
       }
