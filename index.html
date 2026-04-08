@@ -473,7 +473,7 @@
     }
 
     /* === FAB (Floating Action Button) === */
-    .fab-wrap { position: fixed; bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px); right: 16px; z-index: 150; }
+    .fab-wrap { position: fixed; bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px); right: max(20px, calc(env(safe-area-inset-right, 0px) + 12px)); z-index: 150; }
     .fab {
       width: 52px; height: 52px; border-radius: 50%;
       background: var(--gold-gradient); color: #fff;
@@ -744,8 +744,9 @@
     .admin-panel h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
 
     /* === Termin Date Picker === */
-    .date-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .date-nav .date-label { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; }
+    .date-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; position: relative; }
+    .date-nav .date-label { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 600; flex: 1; text-align: center; }
+    .date-nav-right { display: flex; align-items: center; gap: 6px; }
     .date-nav button {
       width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border);
       background: var(--surface); cursor: pointer; display: flex; align-items: center; justify-content: center;
@@ -1053,21 +1054,26 @@
       .theme-toggle { width: 24px; height: 24px; }
       .theme-toggle svg { width: 12px; height: 12px; }
       .badge { min-width: 12px; height: 12px; font-size: 7px; top: -2px; right: -2px; }
-      /* Nav versteckt sich beim Scrollen */
+      /* Nav IMMER sichtbar — nie verstecken beim Scrollen */
       .bottom-nav {
         height: var(--nav-height);
         padding-bottom: 0;
-        transition: transform 250ms ease, opacity 250ms ease;
+        /* Einheitliche Breite: volle Breite abzgl. safe-area */
+        left: env(safe-area-inset-left, 0px);
+        right: env(safe-area-inset-right, 0px);
+        width: auto;
       }
+      /* Landscape: Nav NICHT verstecken */
       .bottom-nav.landscape-hidden {
-        transform: translateY(100%);
-        opacity: 0;
-        pointer-events: none;
+        transform: none;
+        opacity: 1;
+        pointer-events: auto;
       }
       .nav-item { padding: 1px 8px; gap: 0; }
       .nav-item svg { width: 16px; height: 16px; }
       .nav-item .nav-label { display: none; }
-      main { padding: 0 10px; }
+      /* Content mit safe-area Padding */
+      main { padding: 0 max(10px, env(safe-area-inset-right, 10px)) 0 max(10px, env(safe-area-inset-left, 10px)); }
       .page { padding: 4px 0; }
       .section-title { margin: 6px 0 4px; font-size: 9px; }
       .hero-card { padding: 8px; margin-bottom: 6px; border-radius: var(--radius-sm); }
@@ -1081,10 +1087,11 @@
       .stat-label { font-size: 8px; }
       .cockpit-card { padding: 8px; }
       .cockpit-card h3 { font-size: 11px !important; }
-      .fab-wrap { bottom: calc(var(--nav-height) + 4px); }
+      /* FAB + Feedback weiter nach innen (Kamera/Mikro-Abdeckung) */
+      .fab-wrap { bottom: calc(var(--nav-height) + 4px); right: max(20px, calc(env(safe-area-inset-right, 0px) + 8px)); }
       .fab { width: 36px; height: 36px; }
       .fab svg { width: 16px; height: 16px; }
-      #dashFeedbackFab { display: none; }
+      #dashFeedbackFab { left: max(20px, calc(env(safe-area-inset-left, 0px) + 8px)) !important; width: 36px !important; height: 36px !important; }
       /* Termine kompakt */
       .termin-card { padding: 6px 8px !important; }
       .termin-card .termin-time-block .time { font-size: 13px; }
@@ -1097,10 +1104,13 @@
       .staff-chip { font-size: 10px; padding: 3px 8px; }
       .termin-view-toggle { margin-bottom: 4px; }
       .termin-view-btn { font-size: 10px; padding: 3px 10px; }
-      /* Tagesansicht Kalender Breite */
-      .day-view-grid { font-size: 10px; }
-      .day-hour-label { font-size: 9px; min-width: 32px; padding: 2px 4px; }
+      /* Tagesansicht Kalender BREITER */
+      .day-view-grid { font-size: 10px; width: 100%; }
+      .day-hour-label { font-size: 9px; min-width: 28px; padding: 2px 3px; }
       .day-termin-block { font-size: 9px; padding: 2px 4px; }
+      /* Wochenansicht breiter */
+      .week-view-grid { width: 100%; overflow-x: auto; }
+      .week-view-grid table { min-width: 100%; }
       /* KI-Hinweise kompakt */
       .ki-suggestion-card { padding: 6px; margin-bottom: 3px; }
       .ki-suggestion-card .ki-icon { width: 24px; height: 24px; font-size: 12px; }
@@ -1141,15 +1151,16 @@
       .header-salon { font-size: 12px; }
       .bottom-nav { height: 32px; }
       .nav-item svg { width: 14px; height: 14px; }
-      main { padding: 0 6px; }
+      main { padding: 0 max(6px, env(safe-area-inset-right, 6px)) 0 max(6px, env(safe-area-inset-left, 6px)); }
       .hero-card { padding: 6px; margin-bottom: 4px; }
       .hero-card h2 { font-size: 13px !important; }
       .stats-grid { gap: 3px; }
       .stat-card { padding: 4px 6px; }
       .stat-value { font-size: 14px; }
-      .fab-wrap { bottom: calc(32px + 4px); }
+      .fab-wrap { bottom: calc(32px + 4px); right: max(20px, calc(env(safe-area-inset-right, 0px) + 8px)); }
       .fab { width: 32px; height: 32px; }
       .fab svg { width: 14px; height: 14px; }
+      #dashFeedbackFab { left: max(20px, calc(env(safe-area-inset-left, 0px) + 8px)) !important; }
     }
 
     /* === KI-Vorschlaege === */
@@ -1432,8 +1443,10 @@
       <div class="date-nav">
         <button onclick="changeTerminDate(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"/></svg></button>
         <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer" title="Zurueck zu Heute">Heute</div>
-        <button onclick="changeTerminDate(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg></button>
-        <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()">Heute</button>
+        <div class="date-nav-right">
+          <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()">Heute</button>
+          <button onclick="changeTerminDate(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
       </div>
       <div class="staff-filter" id="terminStaffFilter"></div>
       <div class="termin-view-toggle">
@@ -2444,6 +2457,14 @@
             else karteTotal += betrag;
           });
           renderFinanzen({ tagesUmsatz: barTotal + karteTotal, barEinnahmen: barTotal, karteEinnahmen: karteTotal });
+        }
+        // Wenn nach Mapping keine sinnvollen Daten: Demo-Fallback
+        var hatMappedTermine = (termineCache || []).some(function(t) { return t.Start_ISO; });
+        if (!hatMappedTermine && !hatKunden) {
+          showToast('Daten unvollstaendig — Demo-Modus aktiv', 'info');
+          loadDemoData();
+          document.getElementById('liveIndicator').textContent = 'DEMO';
+          return;
         }
         renderCockpit();
         renderKiSuggestions();
@@ -3949,7 +3970,7 @@
     function openTerminDetail(t) {
       var inner = document.getElementById('detailInner');
       var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
-      var recipe = serviceProdukte[t.Service] || null;
+      var recipe = findRecipe(t.Service);
 
       var statusLabel = t.Status || 'bestaetigt';
       var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt'));
@@ -4006,37 +4027,46 @@
       var kiTerminHints = [];
       // Farbtermin-Hinweis
       if (/farb|balayage|straeh|glossing/i.test(t.Service || '')) {
-        kiTerminHints.push({ icon: '&#127912;', title: 'Farbtermin — Olaplex empfehlen', desc: 'Strukturschutz mit Olaplex No. 1 + No. 2 anbieten. Upselling-Potenzial: +25 EUR.' });
-        kiTerminHints.push({ icon: '&#128247;', title: 'Vorher/Nachher-Foto machen', desc: 'Perfekt fuer Instagram & Google-Bewertung. Foto VOR dem Faerben nicht vergessen!' });
+        kiTerminHints.push({ icon: '&#127912;', title: 'Farbtermin — Olaplex empfehlen', desc: 'Strukturschutz mit Olaplex No. 1 + No. 2 anbieten.', detail: 'Upselling-Potenzial: +25 EUR pro Behandlung. Olaplex schuetzt die Haarstruktur waehrend der chemischen Behandlung und reduziert Haarbruch um bis zu 68%. Kunden mit Olaplex kommen haeufiger zurueck (bessere Haarqualitaet = mehr Vertrauen).' });
+        kiTerminHints.push({ icon: '&#128247;', title: 'Vorher/Nachher-Foto machen', desc: 'Perfekt fuer Instagram & Google-Bewertung.', detail: 'Foto VOR dem Faerben nicht vergessen! Gute Beleuchtung, gleicher Winkel. Kunden fragen: "Darf ich das Ergebnis fuer unsere Seite verwenden?" — 80% sagen ja. Bringt durchschnittlich 2-3 Neukunden pro Post.' });
       }
       // Neukunden-Hinweis
       var kundenMatch = kundenCache.find(function(k) { return (k.Name || k.name) === t.Kundenname; });
       if (kundenMatch && (kundenMatch.Besuche || 0) <= 2) {
-        kiTerminHints.push({ icon: '&#11088;', title: 'Neukundin — Willkommens-Erlebnis', desc: 'Erster/zweiter Besuch! Extra aufmerksam sein: Getraenk anbieten, Salonrundgang, Pflegetipps mitgeben.' });
+        kiTerminHints.push({ icon: '&#11088;', title: 'Neukundin — Willkommens-Erlebnis', desc: 'Erster/zweiter Besuch! Extra aufmerksam sein.', detail: 'Getraenk anbieten, kurzen Salonrundgang machen, Pflegetipps mitgeben. Am Ende Visitenkarte + 10%-Gutschein fuer naechsten Besuch. Fragen: "Wie haben Sie uns gefunden?" — wichtig fuer Marketing-Auswertung.' });
       }
       if (kundenMatch && kundenMatch.VIP) {
-        kiTerminHints.push({ icon: '&#128081;', title: 'VIP-Kundin', desc: 'Stammkundin mit ' + (kundenMatch.Besuche || 0) + ' Besuchen. Persoenliche Ansprache, Lieblingsprodukte bereitstellen.' });
+        kiTerminHints.push({ icon: '&#128081;', title: 'VIP-Kundin', desc: 'Stammkundin mit ' + (kundenMatch.Besuche || 0) + ' Besuchen.', detail: 'Persoenliche Ansprache, Lieblingsprodukte bereitstellen. Fragen: "Sind Sie mit Ihrem aktuellen Pflegeprodukt zufrieden?" — Nachbestellungspotenzial pruefen. Ggf. neues Produkt zum Testen anbieten (Probiergroesse).' });
       }
       // Zeitdruck-Hinweis
       if ((parseInt(t.Dauer_Min) || 0) >= 90) {
-        kiTerminHints.push({ icon: '&#9200;', title: 'Langer Termin — ' + t.Dauer_Min + ' Min', desc: 'Getraenk + Zeitschrift anbieten. Einwirkzeiten fuer Beratung/Produktempfehlung nutzen.' });
+        kiTerminHints.push({ icon: '&#9200;', title: 'Langer Termin — ' + t.Dauer_Min + ' Min', desc: 'Getraenk + Zeitschrift anbieten.', detail: 'Einwirkzeiten fuer Beratung und Produktempfehlungen nutzen. Kaffee/Tee/Wasser anbieten. Bei >120 Min: Kleinen Snack bereitstellen. Waehrend Einwirkzeit: "Ich kann Ihnen in der Zwischenzeit zeigen, welche Pflegeprodukte perfekt zu Ihrem Haartyp passen."' });
       }
       // Produktempfehlung
       if (/schnitt|feminin|maskulin|styling/i.test(t.Service || '')) {
-        kiTerminHints.push({ icon: '&#128161;', title: 'Pflegeprodukt empfehlen', desc: 'Passendes Styling-Produkt fuer zuhause mitgeben — steigert Umsatz + Kundenzufriedenheit.' });
+        kiTerminHints.push({ icon: '&#128161;', title: 'Pflegeprodukt empfehlen', desc: 'Passendes Styling-Produkt fuer zuhause mitgeben.', detail: 'Steigert Umsatz + Kundenzufriedenheit. Beim Foehnen zeigen: "Dieses Produkt benutze ich gerade — damit koennen Sie das Ergebnis zuhause nachstylen." Kunden kaufen 3x haeufiger, wenn sie das Produkt im Einsatz sehen.' });
       }
       // Fallback
       if (kiTerminHints.length < 2) {
-        kiTerminHints.push({ icon: '&#128172;', title: 'Feedback einholen', desc: 'Am Ende fragen: "Sind Sie zufrieden?" — zeigt Wertschaetzung und bringt Google-Bewertungen.' });
+        kiTerminHints.push({ icon: '&#128172;', title: 'Feedback einholen', desc: 'Am Ende fragen: "Sind Sie zufrieden?"', detail: 'Zeigt Wertschaetzung und bringt Google-Bewertungen. Timing: Genau wenn der Kunde das Ergebnis im Spiegel sieht. "Wenn Sie zufrieden sind, wuerden wir uns ueber eine Google-Bewertung freuen — das hilft anderen Kunden, uns zu finden."' });
       }
-      // KI-Empfehlungen rendern
+      // KI-Empfehlungen rendern — klickbar mit Detail + KI fragen
       html += '<div style="margin-top:12px">';
       html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:6px;display:flex;align-items:center;gap:4px"><span style="font-size:12px">&#129302;</span> KI-Empfehlungen</div>';
-      kiTerminHints.slice(0, 3).forEach(function(h) {
-        html += '<div style="display:flex;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--gold);border-radius:var(--radius-sm);margin-bottom:4px;font-size:11px;line-height:1.4">';
+      kiTerminHints.slice(0, 4).forEach(function(h, idx) {
+        var detailId = 'kiEmpDetail_' + idx;
+        html += '<div style="background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--gold);border-radius:var(--radius-sm);margin-bottom:4px;overflow:hidden;cursor:pointer" onclick="(function(){var d=document.getElementById(\'' + detailId + '\');d.style.display=d.style.display===\'none\'?\'block\':\'none\';})()">';
+        html += '<div style="display:flex;gap:8px;padding:8px 10px;font-size:11px;line-height:1.4;align-items:center">';
         html += '<span style="font-size:14px;flex-shrink:0">' + h.icon + '</span>';
-        html += '<div><strong>' + h.title + '</strong> <span class="ki-badge" style="font-size:8px">KI</span><br><span style="color:var(--text-secondary)">' + h.desc + '</span></div>';
+        html += '<div style="flex:1"><strong>' + h.title + '</strong> <span class="ki-badge" style="font-size:8px">KI</span></div>';
+        html += '<span style="font-size:10px;color:var(--text-dim);flex-shrink:0">&#9660;</span>';
         html += '</div>';
+        // Aufklappbarer Detail-Bereich
+        html += '<div id="' + detailId + '" style="display:none;padding:6px 10px 10px 36px;border-top:1px solid var(--border);font-size:11px;line-height:1.5">';
+        html += '<div style="color:var(--text-secondary);margin-bottom:8px">' + h.desc + '</div>';
+        if (h.detail) html += '<div style="color:var(--text);margin-bottom:8px;font-size:10px;background:var(--bg-warm);padding:6px 8px;border-radius:6px">' + h.detail + '</div>';
+        html += '<button onclick="event.stopPropagation();toggleKiAssist();setTimeout(function(){var inp=document.getElementById(\'kiInput\');if(inp){inp.value=\'' + esc(h.title).replace(/'/g, "\\'") + ' — was genau empfiehlst du fuer ' + esc(t.Kundenname || '').replace(/'/g, "\\'") + '?\';inp.focus();}},300)" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--gold);border-radius:16px;background:var(--gold-glow);color:var(--gold);font-size:10px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif"><span style="font-size:12px">&#129302;</span> KI fragen</button>';
+        html += '</div></div>';
       });
       html += '</div>';
 
@@ -5466,7 +5496,7 @@
       // Naechster Termin Vorbereitung
       var nextTermin = todayTermine.find(function(t) { return new Date(t.Start_ISO) > now; });
       if (nextTermin) {
-        var recipe = serviceProdukte[nextTermin.Service];
+        var recipe = findRecipe(nextTermin.Service);
         var produktHint = recipe ? recipe.produkte.slice(0, 2).map(function(p) { return p.name; }).join(', ') : 'Standardprodukte';
         suggestions.push({
           icon: '&#128197;', title: 'Naechster Termin: ' + fmtTime(nextTermin.Start_ISO) + ' ' + esc(nextTermin.Service),
@@ -6021,8 +6051,25 @@
       'Glossing': {
         aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Glossing auftragen',dauer_min:5},{schritt:'Einwirkzeit',dauer_min:15,einwirkzeit:true},{schritt:'Auswaschen + Pflege',dauer_min:10}],
         produkte: [{name:'Glossing-Behandlung',menge:'30 ml'},{name:'Pflegekur',menge:'15 ml'}]
+      },
+      'Farbbehandlung + Olaplex': {
+        aufgaben: [{schritt:'Farbberatung',dauer_min:5},{schritt:'Farbe anmischen',dauer_min:5},{schritt:'Auftragen (Ansatz + Laengen)',dauer_min:20},{schritt:'Einwirkzeit',dauer_min:30,einwirkzeit:true},{schritt:'Auswaschen + Emulgieren',dauer_min:8},{schritt:'Olaplex No. 1 + No. 2',dauer_min:20,einwirkzeit:true},{schritt:'Pflege + Foehnen',dauer_min:15}],
+        produkte: [{name:'Haarfarbe (lt. Farbcode)',menge:'60 ml',mischung:'1:1 mit Oxid'},{name:'Oxid (lt. Stufe)',menge:'60 ml'},{name:'Olaplex No. 1',menge:'3.75 ml',mischung:'In Farbe einmischen'},{name:'Olaplex No. 2',menge:'15 ml',mischung:'Nach Auswaschen, 10 Min einwirken'},{name:'Handschuhe',menge:'1 Paar'},{name:'Pflegekur Color',menge:'20 ml'}]
       }
     };
+
+    // Fuzzy-Match: Rezeptur auch bei leicht abweichenden Service-Namen finden
+    function findRecipe(serviceName) {
+      if (!serviceName) return null;
+      if (serviceProdukte[serviceName]) return serviceProdukte[serviceName];
+      // Teilstring-Match
+      var sLow = serviceName.toLowerCase();
+      var keys = Object.keys(serviceProdukte);
+      for (var i = 0; i < keys.length; i++) {
+        if (sLow.indexOf(keys[i].toLowerCase()) !== -1 || keys[i].toLowerCase().indexOf(sLow) !== -1) return serviceProdukte[keys[i]];
+      }
+      return null;
+    }
 
     // === Demo Data Generator (seeded random for consistency) ===
     function loadDemoData() {
@@ -6246,15 +6293,12 @@
       }
       function hideChrome() {
         var hdr = document.getElementById('appHeader');
-        var nav = document.getElementById('bottomNav');
         if (hdr) hdr.classList.add('landscape-hidden');
-        if (nav) nav.classList.add('landscape-hidden');
+        // Nav-Leiste bleibt IMMER sichtbar — nie verstecken
       }
       function showChrome() {
         var hdr = document.getElementById('appHeader');
-        var nav = document.getElementById('bottomNav');
         if (hdr) hdr.classList.remove('landscape-hidden');
-        if (nav) nav.classList.remove('landscape-hidden');
       }
       function scheduleHide() {
         clearTimeout(hideTimer);
@@ -6287,6 +6331,30 @@
       });
     })();
 
+    // === Swipe-Navigation fuer Termine (Tag/Liste/Woche) ===
+    (function() {
+      var startX = 0, startY = 0, swiping = false;
+      var terminPage = document.getElementById('pageTermine');
+      if (!terminPage) return;
+      terminPage.addEventListener('touchstart', function(e) {
+        if (e.target.closest('.sheet-overlay, .termin-card, .fab-wrap, button, a, input, textarea, select')) return;
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        swiping = true;
+      }, { passive: true });
+      terminPage.addEventListener('touchend', function(e) {
+        if (!swiping) return;
+        swiping = false;
+        var endX = e.changedTouches[0].clientX;
+        var endY = e.changedTouches[0].clientY;
+        var dx = endX - startX;
+        var dy = endY - startY;
+        if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
+        if (dx < 0) changeTerminDate(1);  // Links swipen = naechster Tag/Woche
+        else changeTerminDate(-1);         // Rechts swipen = vorheriger Tag/Woche
+      }, { passive: true });
+    })();
+
     // Close sheets on backdrop click
     document.querySelectorAll('.sheet-overlay').forEach(function(overlay) {
       overlay.addEventListener('click', function(e) {
@@ -6314,7 +6382,7 @@
   <!-- Feedback Widget -->
   <style>
     #dashFeedbackFab {
-      position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 74px); left: 16px; z-index: 100;
+      position: fixed; bottom: calc(env(safe-area-inset-bottom, 0px) + 74px); left: max(20px, calc(env(safe-area-inset-left, 0px) + 12px)); z-index: 100;
       width: 44px; height: 44px; border-radius: 50%;
       background: var(--gold-gradient); color: #fff;
       display: flex; align-items: center; justify-content: center; cursor: pointer;
