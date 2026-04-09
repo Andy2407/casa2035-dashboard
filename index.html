@@ -4487,12 +4487,7 @@
       reader.onload = function(e) {
         document.getElementById('farbcodeImg').src = e.target.result;
         document.getElementById('farbcodePreview').style.display = 'block';
-        // Simulate KI detection
-        var detectedStufe = Math.floor(Math.random() * 5) + 4; // 4-8
-        selectedIstFarbe = HAAR_FARBEN[detectedStufe - 1];
-        var tiles = document.querySelectorAll('#farbIstGrid > div');
-        tiles.forEach(function(t, i) { t.style.borderColor = i === (detectedStufe - 1) ? 'var(--gold)' : 'transparent'; });
-        showToast('KI erkannt: Stufe ' + detectedStufe + ' (' + selectedIstFarbe.name + ')', 'success');
+        showToast('Foto geladen — bitte Ist-Farbton manuell waehlen oder KI nutzen.', 'info');
       };
       reader.readAsDataURL(files[0]);
     }
@@ -4502,16 +4497,15 @@
       var diff = selectedZielFarbe.stufe - selectedIstFarbe.stufe;
       var result = document.getElementById('farbFormelResult');
       result.style.display = 'block';
-      // Deterministic formula (NO LLM!)
+
+      // Deterministic formula (NO LLM! — Regel 2)
       var oxidStufe, mischung, einwirkzeit, hinweis;
       if (diff > 0) {
-        // Aufhellung
         oxidStufe = diff <= 2 ? '6%' : diff <= 4 ? '9%' : '12%';
         mischung = diff <= 3 ? '1:1' : '1:2 (doppelte Menge Oxid)';
         einwirkzeit = diff <= 2 ? '25-30' : diff <= 4 ? '35-40' : '45';
         hinweis = diff > 3 ? 'ACHTUNG: Starke Aufhellung! Strandtest empfohlen. Olaplex Nr. 1 dringend empfohlen.' : 'Moderate Aufhellung — Olaplex Nr. 1 empfohlen fuer Strukturschutz.';
       } else if (diff < 0) {
-        // Tonung/Dunkler
         oxidStufe = '3% (Tonung)';
         mischung = '1:1';
         einwirkzeit = '20-25';
@@ -4523,18 +4517,81 @@
         hinweis = 'Gleiche Stufe — Farbauffrischung / Glanz.';
       }
 
-      result.innerHTML = '<div style="background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px">'
-        + '<div style="font-family:Playfair Display,serif;font-size:16px;font-weight:700;margin-bottom:10px;color:var(--gold)">Mischungsformel</div>'
-        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
-        + '<div style="font-size:12px"><strong>Ist:</strong> Stufe ' + selectedIstFarbe.stufe + ' (' + selectedIstFarbe.name + ')</div>'
-        + '<div style="font-size:12px"><strong>Ziel:</strong> Stufe ' + selectedZielFarbe.stufe + ' (' + selectedZielFarbe.name + ')</div>'
-        + '<div style="font-size:12px"><strong>Oxid:</strong> ' + oxidStufe + '</div>'
-        + '<div style="font-size:12px"><strong>Mischung:</strong> ' + mischung + '</div>'
-        + '<div style="font-size:12px"><strong>Einwirkzeit:</strong> ' + einwirkzeit + ' Min</div>'
-        + '<div style="font-size:12px"><strong>Differenz:</strong> ' + (diff > 0 ? '+' : '') + diff + ' Stufen</div></div>'
-        + '<div style="font-size:11px;color:var(--text-secondary);line-height:1.5;padding:8px;background:var(--surface);border-radius:var(--radius-sm)">' + hinweis + '</div>'
-        + '<div style="font-size:9px;color:var(--text-micro);margin-top:8px;text-align:center">Berechnung deterministisch im Code — kein LLM</div></div>';
-      // Show Vorher/Nachher KI preview
+      // Deterministisches Ergebnis anzeigen (DOM-basiert, kein innerHTML mit User-Daten)
+      result.textContent = '';
+      var card = document.createElement('div');
+      card.style.cssText = 'background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px';
+      var title = document.createElement('div');
+      title.style.cssText = 'font-family:Playfair Display,serif;font-size:16px;font-weight:700;margin-bottom:10px;color:var(--gold)';
+      title.textContent = 'Mischungsformel';
+      card.appendChild(title);
+      var grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px';
+      var gridItems = [
+        ['Ist:', 'Stufe ' + selectedIstFarbe.stufe + ' (' + selectedIstFarbe.name + ')'],
+        ['Ziel:', 'Stufe ' + selectedZielFarbe.stufe + ' (' + selectedZielFarbe.name + ')'],
+        ['Oxid:', oxidStufe], ['Mischung:', mischung],
+        ['Einwirkzeit:', einwirkzeit + ' Min'], ['Differenz:', (diff > 0 ? '+' : '') + diff + ' Stufen']
+      ];
+      gridItems.forEach(function(item) {
+        var el = document.createElement('div'); el.style.cssText = 'font-size:12px';
+        var b = document.createElement('strong'); b.textContent = item[0]; el.appendChild(b);
+        el.appendChild(document.createTextNode(' ' + item[1])); grid.appendChild(el);
+      });
+      card.appendChild(grid);
+      var hinweisEl = document.createElement('div');
+      hinweisEl.style.cssText = 'font-size:11px;color:var(--text-secondary);line-height:1.5;padding:8px;background:var(--surface);border-radius:var(--radius-sm)';
+      hinweisEl.textContent = hinweis;
+      card.appendChild(hinweisEl);
+      var codeHint = document.createElement('div');
+      codeHint.style.cssText = 'font-size:9px;color:var(--text-micro);margin-top:8px;text-align:center';
+      codeHint.textContent = 'Berechnung deterministisch im Code';
+      card.appendChild(codeHint);
+      result.appendChild(card);
+
+      // Zusaetzlich: KI-Empfehlung vom Webhook holen
+      var farbcodeImg = document.getElementById('farbcodeImg');
+      var mediaUrl = (farbcodeImg && farbcodeImg.src && farbcodeImg.src.startsWith('data:')) ? farbcodeImg.src : null;
+      var payload = {
+        typ: 'farbcode',
+        kanal: 'dashboard',
+        salon_id: '26230de8-a46e-4610-937c-c302547b5a73',
+        ist_stufe: selectedIstFarbe.stufe,
+        ist_name: selectedIstFarbe.name,
+        ziel_stufe: selectedZielFarbe.stufe,
+        ziel_name: selectedZielFarbe.name,
+        differenz: diff,
+        media_url: mediaUrl,
+        timestamp: new Date().toISOString(),
+        message_id: 'dash_fc_' + Date.now()
+      };
+      var backendUrl = (config && config.backendUrl) || API_DEFAULTS.backendUrl;
+      fetch(backendUrl + 'wf03d-farbcode', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function(res) { return res.json(); })
+      .then(function(data) {
+        var kiText = data.antwort || data.message || data.ergebnis || '';
+        if (kiText) {
+          var kiCard = document.createElement('div');
+          kiCard.style.cssText = 'margin-top:12px;padding:14px;background:linear-gradient(135deg,rgba(184,150,46,0.06),rgba(184,150,46,0.02));border:1px solid var(--border-accent);border-radius:var(--radius)';
+          var kiTitle = document.createElement('div');
+          kiTitle.style.cssText = 'font-family:Playfair Display,serif;font-size:14px;font-weight:700;margin-bottom:8px;color:var(--gold)';
+          kiTitle.textContent = 'KI-Empfehlung';
+          kiCard.appendChild(kiTitle);
+          var kiBody = document.createElement('div');
+          kiBody.style.cssText = 'font-size:12px;line-height:1.6;color:var(--text-secondary);white-space:pre-line';
+          kiBody.textContent = kiText;
+          kiCard.appendChild(kiBody);
+          var kiNote = document.createElement('div');
+          kiNote.style.cssText = 'font-size:9px;color:var(--text-dim);margin-top:8px;text-align:center';
+          kiNote.textContent = 'KI-gestuetzte Empfehlung (Pixtral). Professionelle Beurteilung durch Stylisten empfohlen.';
+          kiCard.appendChild(kiNote);
+          result.appendChild(kiCard);
+        }
+      }).catch(function() { /* Formel steht bereits — KI-Empfehlung ist optional */ });
+
+      // Vorher/Nachher Vorschau
       var vnDiv = document.getElementById('farbKiVorschau');
       if (vnDiv) {
         vnDiv.style.display = 'block';
@@ -4769,80 +4826,56 @@
     function startProfiAnalyse() {
       var result = document.getElementById('haaranalyseResult');
       result.style.display = 'block';
-      // Build loading skeleton with DOM (no innerHTML with user data)
       result.textContent = '';
       var loadWrap = document.createElement('div');
       loadWrap.style.cssText = 'text-align:center;padding:20px';
       var skel1 = document.createElement('div'); skel1.className = 'skeleton'; skel1.style.cssText = 'width:100%;height:12px;margin-bottom:8px'; loadWrap.appendChild(skel1);
       var skel2 = document.createElement('div'); skel2.className = 'skeleton'; skel2.style.cssText = 'width:80%;height:12px;margin-bottom:8px'; loadWrap.appendChild(skel2);
-      var loadText = document.createElement('div'); loadText.style.cssText = 'font-size:11px;color:var(--text-dim)'; loadText.textContent = 'KI analysiert... (simuliert)'; loadWrap.appendChild(loadText);
+      var loadText = document.createElement('div'); loadText.style.cssText = 'font-size:11px;color:var(--text-dim)'; loadText.textContent = 'KI analysiert Haar...'; loadWrap.appendChild(loadText);
       result.appendChild(loadWrap);
 
-      setTimeout(function() {
-        var params = [
-          { name: 'Haartyp', value: 'Wellig (2B)', score: 7 },
-          { name: 'Schaedigung', value: 'Leicht (Spitzen)', score: 6 },
-          { name: 'Kopfhaut', value: 'Normal, leicht trocken', score: 7 },
-          { name: 'Porositaet', value: 'Mittel', score: 8 },
-          { name: 'Dichte', value: 'Normal bis dicht', score: 7 },
-          { name: 'Elastizitaet', value: 'Gut', score: 8 },
-          { name: 'Farbhistorie', value: 'Balayage (3 Monate)', score: 6 },
-          { name: 'Feuchtigkeitsgehalt', value: 'Leicht reduziert', score: 5 }
-        ];
-        var avgScore = Math.round(params.reduce(function(s, p) { return s + p.score; }, 0) / params.length * 10);
-
-        // Build result with DOM API
+      var kundeName = (document.getElementById('haKundeName') || {}).value || '';
+      var kundeEmail = (document.getElementById('haKundeEmail') || {}).value || '';
+      var payload = {
+        typ: 'haaranalyse_profi',
+        kanal: 'dashboard',
+        salon_id: '26230de8-a46e-4610-937c-c302547b5a73',
+        name: kundeName,
+        email: kundeEmail,
+        fotos: haaranalysePhotos.slice(0, 5),
+        anzahl_fotos: haaranalysePhotos.length,
+        timestamp: new Date().toISOString(),
+        message_id: 'dash_ha_' + Date.now()
+      };
+      var backendUrl = (config && config.backendUrl) || API_DEFAULTS.backendUrl;
+      fetch(backendUrl + 'haaranalyse-profi', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function(res) { return res.json(); })
+      .then(function(data) {
         result.textContent = '';
+        var ergebnis = data.antwort || data.message || data.ergebnis || 'Analyse abgeschlossen. Details folgen per E-Mail.';
         var rTitle = document.createElement('div');
         rTitle.style.cssText = 'font-family:Playfair Display,serif;font-size:16px;font-weight:700;margin-bottom:8px';
-        rTitle.textContent = 'Analyseergebnis';
+        rTitle.textContent = 'Analyseergebnis (KI)';
         result.appendChild(rTitle);
-
-        var scoreWrap = document.createElement('div');
-        scoreWrap.style.cssText = 'text-align:center;margin-bottom:12px';
-        var scoreVal = document.createElement('div');
-        scoreVal.style.cssText = 'font-size:36px;font-weight:700;color:var(--gold);font-family:Playfair Display,serif';
-        scoreVal.textContent = avgScore + '%';
-        scoreWrap.appendChild(scoreVal);
-        var scoreLabel = document.createElement('div');
-        scoreLabel.style.cssText = 'font-size:11px;color:var(--text-dim)';
-        scoreLabel.textContent = 'Haar-Gesundheit';
-        scoreWrap.appendChild(scoreLabel);
-        result.appendChild(scoreWrap);
-
-        params.forEach(function(p) {
-          var barColor = p.score >= 7 ? 'var(--success)' : p.score >= 5 ? 'var(--warning)' : 'var(--danger)';
-          var row = document.createElement('div');
-          row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:4px 0';
-          var nameEl = document.createElement('span');
-          nameEl.style.cssText = 'font-size:11px;font-weight:600;min-width:100px';
-          nameEl.textContent = p.name;
-          row.appendChild(nameEl);
-          var barOuter = document.createElement('div');
-          barOuter.style.cssText = 'flex:1;height:4px;background:var(--bg-warm);border-radius:2px;overflow:hidden';
-          var barInner = document.createElement('div');
-          barInner.style.cssText = 'height:100%;width:' + (p.score * 10) + '%;background:' + barColor + ';border-radius:2px';
-          barOuter.appendChild(barInner);
-          row.appendChild(barOuter);
-          var valEl = document.createElement('span');
-          valEl.style.cssText = 'font-size:10px;color:var(--text-dim);min-width:80px;text-align:right';
-          valEl.textContent = p.value;
-          row.appendChild(valEl);
-          result.appendChild(row);
-        });
-
-        var empf = document.createElement('div');
-        empf.style.cssText = 'margin-top:12px;padding:12px;background:var(--bg-warm);border-radius:var(--radius-sm);font-size:12px;line-height:1.5';
-        var empfStrong = document.createElement('strong');
-        empfStrong.textContent = 'Empfehlung: ';
-        empf.appendChild(empfStrong);
-        empf.appendChild(document.createTextNode('Feuchtigkeitskur 1x/Woche, Hitzeschutz beim Foehnen. Olaplex Nr. 3 als Home-Treatment. Naechste Balayage-Auffrischung in 4-6 Wochen.'));
-        result.appendChild(empf);
-
-        // Show Prognose section
+        var resultText = document.createElement('div');
+        resultText.style.cssText = 'font-size:13px;line-height:1.7;color:var(--text-secondary);white-space:pre-line;padding:12px;background:var(--bg-warm);border-radius:var(--radius-sm);border:1px solid var(--border-accent)';
+        resultText.textContent = ergebnis;
+        result.appendChild(resultText);
+        var kiHinweis = document.createElement('div');
+        kiHinweis.style.cssText = 'font-size:10px;color:var(--text-dim);margin-top:8px;text-align:center';
+        kiHinweis.textContent = 'KI-gestuetzte Analyse (Pixtral). Professionelle Beurteilung durch Stylisten empfohlen.';
+        result.appendChild(kiHinweis);
         var progSection = document.getElementById('haPrognose');
         if (progSection) progSection.style.display = 'block';
-      }, 2000);
+      }).catch(function(err) {
+        result.textContent = '';
+        var errMsg = document.createElement('div');
+        errMsg.style.cssText = 'padding:16px;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius-sm);font-size:12px;color:var(--danger)';
+        errMsg.textContent = 'Verbindungsfehler. Bitte sicherstellen, dass der Server erreichbar ist.';
+        result.appendChild(errMsg);
+      });
     }
 
     var wfAktuellePhotos = [];
@@ -5058,45 +5091,57 @@
       var loadWrap = document.createElement('div');
       loadWrap.style.cssText = 'text-align:center;padding:20px';
       var skel = document.createElement('div'); skel.className = 'skeleton'; skel.style.cssText = 'width:100%;height:12px;margin-bottom:8px'; loadWrap.appendChild(skel);
-      var loadMsg = document.createElement('div'); loadMsg.style.cssText = 'font-size:11px;color:var(--text-dim)'; loadMsg.textContent = 'Machbarkeit wird geprueft...'; loadWrap.appendChild(loadMsg);
+      var loadMsg = document.createElement('div'); loadMsg.style.cssText = 'font-size:11px;color:var(--text-dim)'; loadMsg.textContent = 'KI prueft Machbarkeit...'; loadWrap.appendChild(loadMsg);
       result.appendChild(loadWrap);
-      setTimeout(function() {
-        var score = 87;
+
+      var wfName = (document.getElementById('wfName') || {}).value || '';
+      var wfHaartyp = (document.getElementById('wfHaartyp') || {}).value || '';
+      var wfNotiz = (document.getElementById('wfNotiz') || {}).value || '';
+      var payload = {
+        typ: 'wunschfrisur',
+        kanal: 'dashboard',
+        salon_id: '26230de8-a46e-4610-937c-c302547b5a73',
+        name: wfName,
+        haartyp: wfHaartyp,
+        notiz: wfNotiz,
+        fotos_aktuell: wfAktuellePhotos.slice(0, 3),
+        fotos_wunsch: wfWunschPhotos.slice(0, 3),
+        anzahl_fotos: wfAktuellePhotos.length + wfWunschPhotos.length,
+        timestamp: new Date().toISOString(),
+        message_id: 'dash_wf_' + Date.now()
+      };
+      var backendUrl = (config && config.backendUrl) || API_DEFAULTS.backendUrl;
+      fetch(backendUrl + 'wunschfrisur', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function(res) { return res.json(); })
+      .then(function(data) {
         result.textContent = '';
+        var ergebnis = data.antwort || data.message || data.ergebnis || 'Machbarkeits-Check abgeschlossen.';
         var card = document.createElement('div');
         card.style.cssText = 'background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px';
-        var scoreWrap = document.createElement('div');
-        scoreWrap.style.cssText = 'text-align:center;margin-bottom:12px';
-        var scoreVal = document.createElement('div');
-        scoreVal.style.cssText = 'font-size:40px;font-weight:700;color:var(--success);font-family:Playfair Display,serif';
-        scoreVal.textContent = score + '%';
-        scoreWrap.appendChild(scoreVal);
-        var scoreLabel = document.createElement('div');
-        scoreLabel.style.cssText = 'font-size:12px;color:var(--text-dim)';
-        scoreLabel.textContent = 'Machbarkeit';
-        scoreWrap.appendChild(scoreLabel);
-        card.appendChild(scoreWrap);
-        var details = document.createElement('div');
-        details.style.cssText = 'font-size:12px;line-height:1.6';
-        var items = [
-          {color:'var(--success)',text:'\u2713 Gut machbar: Schnittform, Styling-Technik'},
-          {color:'var(--warning)',text:'\u26A0 Bedingt: Farbton erfordert 2 Sitzungen bei dunklem Ausgangston'},
-          {color:'var(--text)',text:'Empfohlene Technik: Balayage + Glossing'},
-          {color:'var(--text)',text:'Geschaetzte Dauer: 150 Min (2 Termine bei starker Aufhellung)'}
-        ];
-        items.forEach(function(it) {
-          var line = document.createElement('div');
-          line.style.cssText = 'margin-bottom:6px';
-          line.textContent = it.text;
-          if (it.color !== 'var(--text)') line.style.color = it.color;
-          details.appendChild(line);
-        });
-        card.appendChild(details);
+        var rTitle = document.createElement('div');
+        rTitle.style.cssText = 'font-family:Playfair Display,serif;font-size:16px;font-weight:700;margin-bottom:10px;color:var(--gold)';
+        rTitle.textContent = 'Machbarkeits-Ergebnis (KI)';
+        card.appendChild(rTitle);
+        var resultText = document.createElement('div');
+        resultText.style.cssText = 'font-size:13px;line-height:1.7;color:var(--text-secondary);white-space:pre-line';
+        resultText.textContent = ergebnis;
+        card.appendChild(resultText);
+        var kiHinweis = document.createElement('div');
+        kiHinweis.style.cssText = 'font-size:10px;color:var(--text-dim);margin-top:10px;text-align:center';
+        kiHinweis.textContent = 'KI-gestuetzte Analyse (Pixtral). Professionelle Beurteilung durch Stylisten empfohlen.';
+        card.appendChild(kiHinweis);
         result.appendChild(card);
-        // Show KI preview
         var kiPreview = document.getElementById('wfKiPreview');
         if (kiPreview) kiPreview.style.display = 'block';
-      }, 2500);
+      }).catch(function(err) {
+        result.textContent = '';
+        var errMsg = document.createElement('div');
+        errMsg.style.cssText = 'padding:16px;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.3);border-radius:var(--radius-sm);font-size:12px;color:var(--danger)';
+        errMsg.textContent = 'Verbindungsfehler. Bitte sicherstellen, dass der Server erreichbar ist.';
+        result.appendChild(errMsg);
+      });
     }
 
     // === Salon-Regeln CRUD ===
