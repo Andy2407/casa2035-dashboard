@@ -18,7 +18,10 @@
     /* =============================================================
        Casa 2035 — Vision 2035 Dashboard
        Premium Noir — Gold + Schwarz + Weiss | Dark Mode Default
-       Stand: 07.04.2026 | Agent: @leitung + @designer + @frontend
+       Stand: 10.04.2026 | Version 2.1 | Agent: @db-entwickler
+       v2.1: Kunden-Timeline (kunden_verlauf), Anfragen-Tab (anfragen_log),
+             Stylist-Zuweisung + Stylist_Wunsch, Rollen-Filter STY/AZU,
+             Lightbox, Voice-Player im Verlauf
        ============================================================= */
 
     :root {
@@ -1579,6 +1582,25 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input class="search-input" id="beratungSearch" placeholder="Anfrage suchen..." oninput="filterBeratungen()">
       </div>
+      <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+        <select id="beratungKanalFilter" onchange="filterBeratungen()" style="flex:1;min-width:120px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">
+          <option value="">Alle Kanaele</option>
+          <option value="whatsapp">WhatsApp</option>
+          <option value="email">E-Mail</option>
+          <option value="instagram">Instagram</option>
+          <option value="facebook">Facebook</option>
+          <option value="homepage">Homepage</option>
+        </select>
+        <select id="beratungRoutedFilter" onchange="filterBeratungen()" style="flex:1;min-width:120px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">
+          <option value="">Alle Routings</option>
+          <option value="wf-02a">WF-02a Termin</option>
+          <option value="wf-02b">WF-02b Bestaetigung</option>
+          <option value="wf-03a">WF-03a Wunschfrisur</option>
+          <option value="wf-03b">WF-03b Haaranalyse</option>
+          <option value="wf-03c">WF-03c Schnell-Check</option>
+          <option value="manuell">Manuell</option>
+        </select>
+      </div>
       <div class="event-list" id="beratungList"></div>
     </div>
 
@@ -2367,9 +2389,11 @@
           Service: r.dienstleistung || r.Service || r.service || '',
           Kundenname: r.kundenname || r.Kundenname || '',
           Stylist: r.mitarbeiter || r.Stylist || 'Rena',
+          Stylist_Wunsch: r.stylist_wunsch || r.Stylist_Wunsch || '',
           Status: r.status || r.Status || 'bestaetigt',
           Preis: r.preis || r.gesamtpreis_netto || r.Preis || 0,
-          Dauer_Min: r.dauer_min || r.gesamtdauer_min || r.Dauer_Min || 0
+          Dauer_Min: r.dauer_min || r.gesamtdauer_min || r.Dauer_Min || 0,
+          id: r.id
         });
       });
     }
@@ -2380,7 +2404,7 @@
     }
     function mapKunden(rows) {
       return rows.map(function(r) {
-        return Object.assign({}, r, { Name: r.name || r.Name, Email: r.email || r.Email, Telefon: r.telefon || r.kontakt || r.Telefon, Besuche: r.anzahl_besuche || r.Besuche || 0, VIP: r.vip || r.VIP || false, Follow_Up: r.follow_up || r.Follow_Up || false, Letzter_Besuch: r.letzter_besuch || r.Letzter_Besuch, Umsatz: r.umsatz || r.Umsatz || 0 });
+        return Object.assign({}, r, { id: r.id, kunden_id: r.kunden_id || r.KundenID || '', Name: r.name || r.Name, Email: r.email || r.Email, Telefon: r.telefon || r.kontakt || r.Telefon, Besuche: r.anzahl_besuche || r.Besuche || 0, VIP: r.vip || r.VIP || false, Follow_Up: r.follow_up || r.Follow_Up || false, Letzter_Besuch: r.letzter_besuch || r.Letzter_Besuch, Umsatz: r.umsatz || r.Umsatz || 0 });
       });
     }
     function mapBeratungen(rows) {
@@ -2393,6 +2417,30 @@
           Status: r.status || r.Status || 'offen',
           Verlauf: r.verlauf || r.Verlauf || []
         });
+      });
+    }
+    function mapAnfragen(rows) {
+      return rows.map(function(r) {
+        var meta = r.metadaten || {};
+        if (typeof meta === 'string') { try { meta = JSON.parse(meta); } catch(e) { meta = {}; } }
+        return {
+          id: r.id,
+          absender: r.absender || '',
+          Kundenname: r.name || r.absender || 'Unbekannt',
+          name: r.name || '',
+          Kanal: r.kanal || '',
+          kanal: r.kanal || '',
+          typ: r.typ || '',
+          betreff: r.betreff || '',
+          Nachricht: r.nachricht || r.betreff || '',
+          nachricht: r.nachricht || '',
+          routed_to: meta.routed_to || '',
+          metadaten: meta,
+          Status: r.status || 'offen',
+          Timestamp: r.erstellt_am || r.timestamp || '',
+          erstellt_am: r.erstellt_am || '',
+          Verlauf: []
+        };
       });
     }
     function mapRechnungen(rows) {
@@ -2417,7 +2465,7 @@
           apiGet('services_preisliste', 'order=name.asc').catch(function() { return []; }),
           apiGet('lager', 'order=produktname.asc').catch(function() { return []; }),
           apiGet('kunden', 'order=name.asc').catch(function() { return []; }),
-          apiGet('beratungen', 'order=timestamp.desc&limit=50').catch(function() { return []; }),
+          apiGet('anfragen_log', 'order=erstellt_am.desc&limit=200').catch(function() { return []; }),
           apiGet('rechnungen', 'order=erstellt_am.desc&limit=50').catch(function() { return []; })
         ]);
 
@@ -2435,10 +2483,17 @@
 
         // Spalten mappen fuer Dashboard-Kompatibilitaet
         termine = mapTermine(termine || []);
+        // Rollen-Filter clientseitig (RLS ist aktuell FOR ALL)
+        if (currentRolle === 'STY' || currentRolle === 'AZU') {
+          var meName = currentUser && USERS[currentUser] ? USERS[currentUser].name : '';
+          if (meName) {
+            termine = termine.filter(function(t) { return t.Stylist === meName; });
+          }
+        }
         services = mapServices(services || []);
         lager = mapLager(lager || []);
         kunden = mapKunden(kunden || []);
-        beratungen = mapBeratungen(beratungen || []);
+        beratungen = mapAnfragen(beratungen || []);
         rechnungen = mapRechnungen(rechnungen || []);
 
         if (Array.isArray(events) && events.length > 0) { eventsCache = events; renderEvents(events); }
@@ -3455,8 +3510,145 @@
         + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;text-align:center"><div style="font-family:Playfair Display,serif;font-size:18px;font-weight:700;color:var(--gold)">' + fmtEur(k.Umsatz || k.umsatz || 0) + '</div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;margin-top:2px">Umsatz</div></div>'
         + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;text-align:center"><div style="font-size:14px;font-weight:700">' + (k.Letzter_Besuch ? fmtDate(k.Letzter_Besuch) : '--') + '</div><div style="font-size:10px;color:var(--text-dim);text-transform:uppercase;margin-top:2px">Letzter Besuch</div></div></div>'
         + (k.Notiz || k.notiz ? '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text-secondary);line-height:1.5;margin-bottom:12px"><strong>Notiz:</strong> ' + esc(k.Notiz || k.notiz) + '</div>' : '')
-        + (k.Lieblings_Service || k.lieblings_service ? '<div style="font-size:12px;color:var(--text-dim);margin-bottom:8px">Lieblingsservice: <strong>' + esc(k.Lieblings_Service || k.lieblings_service) + '</strong></div>' : '');
+        + (k.Lieblings_Service || k.lieblings_service ? '<div style="font-size:12px;color:var(--text-dim);margin-bottom:8px">Lieblingsservice: <strong>' + esc(k.Lieblings_Service || k.lieblings_service) + '</strong></div>' : '')
+        + '<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px">'
+        + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gold);margin-bottom:8px">Verlauf &amp; Nachrichten</div>'
+        + '<div id="kundeVerlaufContainer" style="min-height:40px;font-size:12px;color:var(--text-dim)">Lade Verlauf...</div>'
+        + '</div>';
       openSheet('detailSheet');
+      if (k.id && isBackendMode()) {
+        loadKundenVerlauf(k.id).then(function(verlauf) {
+          renderKundeTimeline(verlauf || []);
+        }).catch(function(err) {
+          var c = document.getElementById('kundeVerlaufContainer');
+          if (c) c.textContent = 'Kein Verlauf verfuegbar';
+        });
+      } else {
+        var cvl = document.getElementById('kundeVerlaufContainer');
+        if (cvl) cvl.textContent = 'Verlauf nur im Backend-Modus verfuegbar';
+      }
+    }
+
+    // === Kunden-Verlauf Timeline ===
+    async function loadKundenVerlauf(kundeUuid) {
+      if (!kundeUuid) return [];
+      try {
+        return await apiGet('kunden_verlauf', 'kunde_id=eq.' + encodeURIComponent(kundeUuid) + '&order=erstellt_am.desc&limit=100');
+      } catch(e) { return []; }
+    }
+    function renderKundeTimeline(verlauf) {
+      var c = document.getElementById('kundeVerlaufContainer');
+      if (!c) return;
+      c.textContent = '';
+      if (!verlauf || verlauf.length === 0) {
+        var empty = document.createElement('div');
+        empty.style.cssText = 'color:var(--text-dim);font-size:11px;padding:8px 0';
+        empty.textContent = 'Noch kein Verlauf vorhanden';
+        c.appendChild(empty);
+        return;
+      }
+      var typBadgeColor = { nachricht:'var(--info)', termin:'var(--gold)', beratung:'var(--gold)', haaranalyse:'var(--gold)', wunschfrisur:'var(--gold)', farbcode:'var(--gold)', rechnung:'var(--success)', storno:'var(--danger)', notiz:'var(--text-dim)' };
+      var wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;flex-direction:column;gap:8px;max-height:400px;overflow-y:auto;padding-right:4px';
+      verlauf.forEach(function(v) {
+        var typ = v.typ || 'notiz';
+        var color = typBadgeColor[typ] || 'var(--text-dim)';
+        var when = v.erstellt_am ? new Date(v.erstellt_am) : null;
+        var whenStr = when ? when.toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' + when.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'}) : '';
+        var stylist = v.stylist_name || '';
+        var text = '';
+        var input = v.input_daten || {};
+        var output = v.output_daten || {};
+        if (typeof input === 'string') { try { input = JSON.parse(input); } catch(e) { input = {}; } }
+        if (typeof output === 'string') { try { output = JSON.parse(output); } catch(e) { output = {}; } }
+        if (input && input.text) text = input.text;
+        else if (input && input.nachricht) text = input.nachricht;
+        else if (output && output.text) text = output.text;
+        else if (output && output.antwort) text = output.antwort;
+        else if (v.beschreibung) text = v.beschreibung;
+
+        var card = document.createElement('div');
+        card.style.cssText = 'background:var(--surface);border:1px solid var(--border);border-left:3px solid ' + color + ';border-radius:var(--radius-sm);padding:10px 12px';
+        var head = document.createElement('div');
+        head.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;gap:8px';
+        var badge = document.createElement('span');
+        badge.style.cssText = 'font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:4px;background:' + color + '20;color:' + color;
+        badge.textContent = typ;
+        head.appendChild(badge);
+        var whenEl = document.createElement('span');
+        whenEl.style.cssText = 'font-size:10px;color:var(--text-dim)';
+        whenEl.textContent = whenStr;
+        head.appendChild(whenEl);
+        card.appendChild(head);
+
+        if (text) {
+          var txt = document.createElement('div');
+          txt.style.cssText = 'font-size:12px;color:var(--text);line-height:1.4;margin-bottom:6px';
+          txt.textContent = text;
+          card.appendChild(txt);
+        }
+        if (v.bilder_urls && Array.isArray(v.bilder_urls) && v.bilder_urls.length > 0) {
+          var imgWrap = document.createElement('div');
+          imgWrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;margin-top:6px';
+          v.bilder_urls.forEach(function(url) {
+            var img = document.createElement('img');
+            img.src = url;
+            img.alt = 'Foto';
+            img.style.cssText = 'width:52px;height:52px;object-fit:cover;border-radius:6px;border:1px solid var(--border);cursor:pointer';
+            img.onclick = function() { openLightbox(url); };
+            imgWrap.appendChild(img);
+          });
+          card.appendChild(imgWrap);
+        }
+        if (v.voice_url) {
+          var audio = document.createElement('audio');
+          audio.controls = true;
+          audio.src = v.voice_url;
+          audio.style.cssText = 'width:100%;margin-top:6px;height:32px';
+          card.appendChild(audio);
+        }
+        if (stylist) {
+          var sEl = document.createElement('div');
+          sEl.style.cssText = 'font-size:10px;color:var(--text-dim);margin-top:6px;font-style:italic';
+          sEl.textContent = '— ' + stylist;
+          card.appendChild(sEl);
+        }
+        wrap.appendChild(card);
+      });
+      c.appendChild(wrap);
+    }
+    function openLightbox(url) {
+      var old = document.getElementById('casaLightbox');
+      if (old) old.remove();
+      var div = document.createElement('div');
+      div.id = 'casaLightbox';
+      div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;padding:20px';
+      var img = document.createElement('img');
+      img.src = url;
+      img.alt = 'Vollbild';
+      img.style.cssText = 'max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,0.6)';
+      div.appendChild(img);
+      var btn = document.createElement('button');
+      btn.style.cssText = 'position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.12);color:#fff;border:none;font-size:22px;cursor:pointer';
+      btn.textContent = '\u00d7';
+      div.appendChild(btn);
+      div.onclick = function() { div.remove(); };
+      document.body.appendChild(div);
+    }
+    async function terminZuweisen(terminId, stylistName) {
+      if (!terminId || !stylistName) return;
+      try {
+        if (isBackendMode()) {
+          await apiPatch('terminvorschlaege', 'id=eq.' + encodeURIComponent(terminId), { mitarbeiter: stylistName });
+        }
+        var found = termineCache.find(function(t) { return t.id === terminId; });
+        if (found) { found.Stylist = stylistName; found.mitarbeiter = stylistName; }
+        renderTermine(termineCache);
+        showToast('Termin zugewiesen an ' + stylistName, 'success');
+        closeSheet('detailSheet');
+      } catch(e) {
+        showToast('Fehler: ' + e.message, 'danger');
+      }
     }
 
     function openNeuerKunde() {
@@ -3507,10 +3699,16 @@
     }
     function filterBeratungen() {
       var q = (document.getElementById('beratungSearch').value || '').toLowerCase();
+      var kanalSel = document.getElementById('beratungKanalFilter');
+      var routedSel = document.getElementById('beratungRoutedFilter');
+      var kanalVal = kanalSel ? (kanalSel.value || '') : '';
+      var routedVal = routedSel ? (routedSel.value || '') : '';
       var filtered = beratungenCache.filter(function(b) {
-        var matchText = !q || ((b.Kundenname || '') + ' ' + (b.Nachricht || '')).toLowerCase().indexOf(q) !== -1;
-        var matchFilter = currentBeratungFilter === 'alle' || (currentBeratungFilter === 'offen' && (b.Status === 'offen' || b.Status === 'ungelesen')) || (currentBeratungFilter === 'beantwortet' && b.Status === 'beantwortet');
-        return matchText && matchFilter;
+        var matchText = !q || ((b.Kundenname || '') + ' ' + (b.Nachricht || '') + ' ' + (b.betreff || '')).toLowerCase().indexOf(q) !== -1;
+        var matchFilter = currentBeratungFilter === 'alle' || (currentBeratungFilter === 'offen' && (b.Status === 'offen' || b.Status === 'ungelesen' || b.Status === 'neu')) || (currentBeratungFilter === 'beantwortet' && b.Status === 'beantwortet');
+        var matchKanal = !kanalVal || (b.Kanal || '').toLowerCase() === kanalVal.toLowerCase();
+        var matchRouted = !routedVal || (b.routed_to || '') === routedVal;
+        return matchText && matchFilter && matchKanal && matchRouted;
       });
       renderBeratungenList(filtered);
     }
@@ -3537,11 +3735,15 @@
               + '</div>';
           }
         }
+        var routedBadge = b.routed_to ? '<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--gold-glow);color:var(--gold);margin-left:4px">' + esc(b.routed_to) + '</span>' : '';
+        var typBadge = b.typ ? '<span style="font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--info-bg);color:var(--info);margin-left:4px">' + esc(b.typ) + '</span>' : '';
+        var betreffLine = b.betreff ? '<div style="font-size:11px;font-weight:600;color:var(--text);margin-top:4px">' + esc(b.betreff) + '</div>' : '';
         card.innerHTML = '<div class="beratung-header">'
           + '<div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;border-radius:50%;background:' + avatarColor + ';display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700">' + esc(initial) + '</div>'
-          + '<div><div class="beratung-name">' + esc(b.Kundenname || 'Unbekannt') + demoDot() + '</div>' + statusBadge + '</div></div>'
+          + '<div><div class="beratung-name">' + esc(b.Kundenname || 'Unbekannt') + demoDot() + '</div>' + statusBadge + typBadge + routedBadge + '</div></div>'
           + '<div style="display:flex;align-items:center;gap:6px"><span class="beratung-time">' + fmtTime(b.Timestamp) + '</span>'
           + (b.Kanal ? '<span class="kanal-badge" style="background:' + getKanalColor(b.Kanal) + '20;color:' + getKanalColor(b.Kanal) + '">' + esc(b.Kanal) + '</span>' : '') + '</div></div>'
+          + betreffLine
           + '<div class="beratung-msg">' + esc(b.Nachricht || '') + '</div>'
           + antwortHTML
           + '<div class="beratung-actions">'
@@ -3985,6 +4187,35 @@
       html += '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="font-size:16px;font-weight:700">' + (t.Dauer_Min || '?') + ' Min</div><div style="font-size:9px;color:var(--text-dim);text-transform:uppercase">Dauer</div></div>';
       html += '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:10px;text-align:center"><div style="display:flex;align-items:center;justify-content:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:' + (u ? u.farbe : 'var(--text-dim)') + '"></span><span style="font-size:13px;font-weight:600">' + esc(t.Stylist || '') + '</span></div><div style="font-size:9px;color:var(--text-dim);text-transform:uppercase">Stylist</div></div>';
       html += '</div>';
+
+      // Stylist-Wunsch Badge
+      if (t.Stylist_Wunsch && t.Stylist_Wunsch !== t.Stylist) {
+        html += '<div style="margin-bottom:12px;padding:8px 12px;background:var(--warning-bg);border:1px solid rgba(196,138,26,0.3);border-radius:var(--radius-sm);font-size:11px;color:var(--warning);display:flex;align-items:center;gap:6px">';
+        html += '<span style="font-size:13px">&#11088;</span> Kundenwunsch: <strong>' + esc(t.Stylist_Wunsch) + '</strong> (aktuell zugewiesen: ' + esc(t.Stylist || '—') + ')';
+        html += '</div>';
+      }
+
+      // FRM/CHF: Stylist-Zuweisung
+      if ((currentRolle === 'FRM' || currentRolle === 'CHF') && t.id) {
+        var stylistNames = [];
+        Object.values(USERS).forEach(function(uu) {
+          if (uu.rolle === 'CHF' || uu.rolle === 'FRM' || uu.rolle === 'STY') {
+            if (stylistNames.indexOf(uu.name) === -1) stylistNames.push(uu.name);
+          }
+        });
+        (termineCache || []).forEach(function(tx) {
+          if (tx.Stylist && stylistNames.indexOf(tx.Stylist) === -1) stylistNames.push(tx.Stylist);
+        });
+        html += '<div style="margin-bottom:12px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">';
+        html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:6px">Stylist zuweisen</div>';
+        html += '<select id="terminZuweisenSelect" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif;margin-bottom:6px">';
+        stylistNames.forEach(function(n) {
+          html += '<option value="' + esc(n) + '"' + (n === t.Stylist ? ' selected' : '') + '>' + esc(n) + '</option>';
+        });
+        html += '</select>';
+        html += '<button class="btn btn-secondary btn-sm" style="width:100%" onclick="terminZuweisen(\'' + esc(t.id) + '\',document.getElementById(\'terminZuweisenSelect\').value)">Zuweisen</button>';
+        html += '</div>';
+      }
 
       // === REZEPTUR & ABLAUFPLAN ===
       html += '<div style="margin-top:16px;border:1px solid var(--border-accent);border-left:3px solid var(--gold);border-radius:var(--radius-sm);background:var(--gold-glow);overflow:hidden">';
