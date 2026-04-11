@@ -201,14 +201,15 @@
     .touch-scale:active { transform: scale(0.97); }
     .skeleton { background: linear-gradient(90deg, var(--surface) 25%, var(--surface-hover) 50%, var(--surface) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
 
-    /* === Header === */
+    /* === Header (FB-24: iOS safe-area fix) === */
     .header {
       position: sticky; top: 0; z-index: 100;
-      padding: 14px 20px 12px;
+      padding: calc(env(safe-area-inset-top, 0px) + 14px) max(20px, env(safe-area-inset-right, 20px)) 12px max(20px, env(safe-area-inset-left, 20px));
       background: rgba(250,248,246,0.92);
       backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
       border-bottom: 1px solid var(--border);
     }
+    [data-theme="dark"] .header { background: rgba(10,10,10,0.92); }
     .header-top { display: flex; justify-content: space-between; align-items: center; }
     .header-left { display: flex; flex-direction: column; gap: 0; }
     .header-greeting { font-size: 10px; font-weight: 600; color: var(--text-dim); letter-spacing: 1.2px; text-transform: uppercase; }
@@ -277,23 +278,21 @@
 
     /* === Hero Card (Home) === */
     .hero-card {
-      background: var(--gold-gradient); border-radius: var(--radius-lg); padding: 20px;
-      color: #fff; margin-bottom: 16px; position: relative; overflow: hidden;
-      transition: transform 300ms var(--ease), box-shadow 300ms var(--ease);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--gold);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      color: var(--text);
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 200ms var(--ease), box-shadow 200ms var(--ease);
     }
-    .hero-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-gold); }
-    .hero-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 50%);
-    }
-    .hero-card::after {
-      content: ''; position: absolute; top: -2px; left: 0; right: 0; height: 2px;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.6) 50%, transparent 100%);
-      background-size: 200% 100%; animation: borderTrace 3s linear infinite;
-    }
-    .hero-card h3 { font-family: 'Playfair Display', serif; font-size: 18px; margin-bottom: 4px; position: relative; }
-    .hero-card p { font-size: 12px; opacity: 0.9; position: relative; }
-    .hero-card .hero-time { font-size: 10px; font-weight: 600; opacity: 0.85; font-variant-numeric: tabular-nums; position: relative; margin-top: 4px; letter-spacing: 0.5px; }
+    .hero-card:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+    .hero-card h3 { font-family: 'Playfair Display', serif; font-size: 16px; margin: 0 0 2px; color: var(--text); font-weight: 600; }
+    .hero-card p { font-size: 11px; color: var(--text-dim); margin: 0; }
+    .hero-card .hero-time { font-size: 10px; font-weight: 600; color: var(--gold); font-variant-numeric: tabular-nums; margin-top: 4px; letter-spacing: 0.5px; }
 
     /* === Smart Hints (Home) === */
     .smart-hints { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
@@ -1036,11 +1035,11 @@
 
     /* === iPhone Landscape: Kompakt-Modus === */
     @media (max-height: 500px) and (orientation: landscape) {
-      :root { --nav-height: 36px; --safe-top: 0px; }
+      :root { --nav-height: 36px; --safe-top: env(safe-area-inset-top, 0px); }
       body { padding-top: 0; }
-      /* Header versteckt sich beim Scrollen */
+      /* Header versteckt sich beim Scrollen — Safe-Area fuer Notch/Dynamic Island */
       .header {
-        padding: 2px 12px;
+        padding: calc(env(safe-area-inset-top, 0px) + 2px) max(12px, env(safe-area-inset-right, 12px)) 2px max(12px, env(safe-area-inset-left, 12px));
         position: sticky; top: 0;
         transition: transform 250ms ease, opacity 250ms ease;
         z-index: 100;
@@ -4398,6 +4397,41 @@
       { stufe: 9, name: 'Sehr hellblond', hex: '#ddc080' },
       { stufe: 10, name: 'Platinblond', hex: '#f0daa0' }
     ];
+
+    // === Globale File-Picker Hilfsfunktion (FB-22) ===
+    // Robust auf iOS Safari + Android Chrome: stopPropagation + Drag&Drop + Keyboard
+    function attachFilePicker(area, input, onFiles) {
+      // Input absolut versteckt aber aktiv (besser als display:none auf iOS)
+      input.style.position = 'absolute';
+      input.style.left = '-9999px';
+      input.style.opacity = '0';
+      input.style.width = '1px';
+      input.style.height = '1px';
+      input.style.pointerEvents = 'none';
+      input.style.display = '';
+      // Click auf Area triggert File-Picker
+      area.addEventListener('click', function(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        try { input.click(); } catch(e) {}
+      });
+      // Tastatur-Bedienung
+      area.setAttribute('tabindex', '0');
+      area.setAttribute('role', 'button');
+      area.addEventListener('keydown', function(ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); try { input.click(); } catch(e) {} }
+      });
+      // Drag & Drop
+      area.addEventListener('dragover', function(ev) { ev.preventDefault(); ev.stopPropagation(); area.style.borderColor = 'var(--gold)'; });
+      area.addEventListener('dragleave', function(ev) { ev.preventDefault(); ev.stopPropagation(); area.style.borderColor = ''; });
+      area.addEventListener('drop', function(ev) {
+        ev.preventDefault(); ev.stopPropagation(); area.style.borderColor = '';
+        if (ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files.length && typeof onFiles === 'function') {
+          onFiles(ev.dataTransfer.files);
+        }
+      });
+    }
+
     function terminBestaetigen(startISO, kundenname) {
       var found = termineCache.find(function(t) { return t.Start_ISO === startISO && t.Kundenname === kundenname; });
       if (found) {
@@ -4558,11 +4592,11 @@
       var fcCamSub = document.createElement('div'); fcCamSub.style.cssText = 'font-size:9px;color:var(--text-dim)'; fcCamSub.textContent = 'Haar fotografieren';
       fcCamArea.appendChild(fcCamIcon); fcCamArea.appendChild(fcCamLabel); fcCamArea.appendChild(fcCamSub);
       var fcCamInput = document.createElement('input');
-      fcCamInput.type = 'file'; fcCamInput.id = 'farbcodeCamInput'; fcCamInput.accept = 'image/*';
-      fcCamInput.setAttribute('capture', 'environment'); fcCamInput.style.display = 'none';
+      fcCamInput.type = 'file'; fcCamInput.id = 'farbcodeCamInput'; fcCamInput.accept = 'image/*,image/heic,image/heif';
+      fcCamInput.setAttribute('capture', 'environment');
       fcCamInput.onchange = function() { previewFarbcode(this.files); };
       fcCamArea.appendChild(fcCamInput);
-      fcCamArea.onclick = function(ev) { if (ev.target !== fcCamInput) fcCamInput.click(); };
+      attachFilePicker(fcCamArea, fcCamInput, function(files) { previewFarbcode(files); });
       var fcFileArea = document.createElement('div');
       fcFileArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
       var fcFileIcon = document.createElement('div'); fcFileIcon.style.cssText = 'font-size:20px;margin-bottom:4px'; fcFileIcon.textContent = '\u{1F5BC}';
@@ -4570,11 +4604,10 @@
       var fcFileSub = document.createElement('div'); fcFileSub.style.cssText = 'font-size:9px;color:var(--text-dim)'; fcFileSub.textContent = 'Bestehendes Foto';
       fcFileArea.appendChild(fcFileIcon); fcFileArea.appendChild(fcFileLabel); fcFileArea.appendChild(fcFileSub);
       var fcFileInput = document.createElement('input');
-      fcFileInput.type = 'file'; fcFileInput.id = 'farbcodeUpload'; fcFileInput.accept = 'image/*';
-      fcFileInput.style.display = 'none';
+      fcFileInput.type = 'file'; fcFileInput.id = 'farbcodeUpload'; fcFileInput.accept = 'image/*,image/heic,image/heif';
       fcFileInput.onchange = function() { previewFarbcode(this.files); };
       fcFileArea.appendChild(fcFileInput);
-      fcFileArea.onclick = function(ev) { if (ev.target !== fcFileInput) fcFileInput.click(); };
+      attachFilePicker(fcFileArea, fcFileInput, function(files) { previewFarbcode(files); });
       fcUploadRow.appendChild(fcCamArea); fcUploadRow.appendChild(fcFileArea);
       wrapper.appendChild(fcUploadRow);
 
@@ -4587,31 +4620,39 @@
       previewRow.appendChild(previewImg);
       wrapper.appendChild(previewRow);
 
-      // IST section
-      var istTitle = document.createElement('div');
-      istTitle.style.cssText = 'font-size:12px;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px';
-      istTitle.textContent = 'Aktueller Farbton (Ist)';
-      wrapper.appendChild(istTitle);
+      // IST section — kompakt aufklappbar (FB-18)
+      var istDetails = document.createElement('details');
+      istDetails.open = true;
+      istDetails.style.cssText = 'margin-bottom:10px';
+      var istSum = document.createElement('summary');
+      istSum.style.cssText = 'font-size:11px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;cursor:pointer;color:var(--text)';
+      istSum.textContent = 'Aktueller Farbton (Ist)';
+      istDetails.appendChild(istSum);
       var istGrid = document.createElement('div');
       istGrid.id = 'farbIstGrid';
-      istGrid.style.cssText = 'display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:12px';
+      istGrid.style.cssText = 'display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-top:6px';
       HAAR_FARBEN.forEach(function(f) { istGrid.appendChild(createFarbTile(f, 'ist')); });
-      wrapper.appendChild(istGrid);
+      istDetails.appendChild(istGrid);
+      wrapper.appendChild(istDetails);
 
       var arrow = document.createElement('div');
-      arrow.style.cssText = 'text-align:center;margin:4px 0 8px;font-size:14px;color:var(--gold)';
+      arrow.style.cssText = 'text-align:center;margin:2px 0 6px;font-size:12px;color:var(--gold)';
       arrow.textContent = '↓ Wunschfarbe waehlen ↓';
       wrapper.appendChild(arrow);
 
-      var zielTitle = document.createElement('div');
-      zielTitle.style.cssText = 'font-size:12px;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px';
-      zielTitle.textContent = 'Wunsch-Farbton (Ziel)';
-      wrapper.appendChild(zielTitle);
+      var zielDetails = document.createElement('details');
+      zielDetails.open = true;
+      zielDetails.style.cssText = 'margin-bottom:12px';
+      var zielSum = document.createElement('summary');
+      zielSum.style.cssText = 'font-size:11px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;cursor:pointer;color:var(--text)';
+      zielSum.textContent = 'Wunsch-Farbton (Ziel)';
+      zielDetails.appendChild(zielSum);
       var zielGrid = document.createElement('div');
       zielGrid.id = 'farbZielGrid';
-      zielGrid.style.cssText = 'display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:14px';
+      zielGrid.style.cssText = 'display:grid;grid-template-columns:repeat(10,1fr);gap:3px;margin-top:6px';
       HAAR_FARBEN.forEach(function(f) { zielGrid.appendChild(createFarbTile(f, 'ziel')); });
-      wrapper.appendChild(zielGrid);
+      zielDetails.appendChild(zielGrid);
+      wrapper.appendChild(zielDetails);
 
       // Preview + Formula
       var vorschauDiv = document.createElement('div');
@@ -4686,10 +4727,15 @@
 
     function createFarbTile(f, type) {
       var tile = document.createElement('div');
-      tile.style.cssText = 'text-align:center;cursor:pointer;padding:6px 2px;border-radius:var(--radius-sm);border:2px solid transparent;transition:all 200ms';
-      tile.innerHTML = '<div style="width:100%;aspect-ratio:1;border-radius:8px;background:' + f.hex + ';margin-bottom:2px;border:1px solid rgba(255,255,255,0.1)"></div>'
-        + '<div style="font-size:8px;font-weight:700">' + f.stufe + '</div>'
-        + '<div style="font-size:7px;color:var(--text-dim)">' + f.name + '</div>';
+      tile.style.cssText = 'text-align:center;cursor:pointer;padding:2px 1px;border-radius:var(--radius-sm);border:2px solid transparent;transition:all 200ms';
+      tile.title = 'Stufe ' + f.stufe + ' - ' + f.name;
+      var swatch = document.createElement('div');
+      swatch.style.cssText = 'width:100%;aspect-ratio:1;border-radius:5px;background:' + f.hex + ';margin-bottom:1px;border:1px solid rgba(255,255,255,0.1)';
+      tile.appendChild(swatch);
+      var lvl = document.createElement('div');
+      lvl.style.cssText = 'font-size:8px;font-weight:700;line-height:1';
+      lvl.textContent = String(f.stufe);
+      tile.appendChild(lvl);
       tile.onclick = function() { selectFarbTile(f, type, tile); };
       return tile;
     }
@@ -4895,22 +4941,22 @@
       var haCamLabel = document.createElement('div'); haCamLabel.style.cssText = 'font-size:11px;font-weight:600'; haCamLabel.textContent = 'Kamera';
       haCamArea.appendChild(haCamIcon); haCamArea.appendChild(haCamLabel);
       var haCamInput = document.createElement('input');
-      haCamInput.type = 'file'; haCamInput.id = 'haaranalyseCamInput'; haCamInput.accept = 'image/*';
-      haCamInput.setAttribute('capture', 'environment'); haCamInput.style.display = 'none';
+      haCamInput.type = 'file'; haCamInput.id = 'haaranalyseCamInput'; haCamInput.accept = 'image/*,image/heic,image/heif';
+      haCamInput.setAttribute('capture', 'environment');
       haCamInput.onchange = function() { previewHaaranalysePhotos(this.files); };
       haCamArea.appendChild(haCamInput);
-      haCamArea.onclick = function(ev) { if (ev.target !== haCamInput) haCamInput.click(); };
+      attachFilePicker(haCamArea, haCamInput, function(files) { previewHaaranalysePhotos(files); });
       var haFileArea = document.createElement('div');
       haFileArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
       var haFileIcon = document.createElement('div'); haFileIcon.style.cssText = 'font-size:20px;margin-bottom:4px'; haFileIcon.textContent = '\u{1F5BC}';
       var haFileLabel = document.createElement('div'); haFileLabel.style.cssText = 'font-size:11px;font-weight:600'; haFileLabel.textContent = 'Galerie / Datei';
       haFileArea.appendChild(haFileIcon); haFileArea.appendChild(haFileLabel);
       var haFileInput = document.createElement('input');
-      haFileInput.type = 'file'; haFileInput.id = 'haaranalyseUpload'; haFileInput.accept = 'image/*';
-      haFileInput.multiple = true; haFileInput.style.display = 'none';
+      haFileInput.type = 'file'; haFileInput.id = 'haaranalyseUpload'; haFileInput.accept = 'image/*,image/heic,image/heif';
+      haFileInput.multiple = true;
       haFileInput.onchange = function() { previewHaaranalysePhotos(this.files); };
       haFileArea.appendChild(haFileInput);
-      haFileArea.onclick = function(ev) { if (ev.target !== haFileInput) haFileInput.click(); };
+      attachFilePicker(haFileArea, haFileInput, function(files) { previewHaaranalysePhotos(files); });
       haUploadRow.appendChild(haCamArea); haUploadRow.appendChild(haFileArea);
       wrapper.appendChild(haUploadRow);
       var haUploadHint = document.createElement('div');
@@ -5326,28 +5372,28 @@
       var camArea = document.createElement('div');
       camArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:12px 8px;text-align:center;cursor:pointer';
       var camInput = document.createElement('input');
-      camInput.type = 'file'; camInput.id = camId; camInput.accept = 'image/*';
-      camInput.setAttribute('capture', 'environment'); camInput.style.display = 'none';
+      camInput.type = 'file'; camInput.id = camId; camInput.accept = 'image/*,image/heic,image/heif';
+      camInput.setAttribute('capture', 'environment');
       camInput.onchange = function() { addWfPhotos(this.files, type); };
       var camIcon = document.createElement('div');
       camIcon.style.cssText = 'font-size:18px'; camIcon.textContent = '\u{1F4F7}';
       var camLabel = document.createElement('div');
       camLabel.style.cssText = 'font-size:10px;font-weight:600'; camLabel.textContent = 'Kamera';
       camArea.appendChild(camInput); camArea.appendChild(camIcon); camArea.appendChild(camLabel);
-      camArea.onclick = function(ev) { if (ev.target !== camInput) camInput.click(); };
+      attachFilePicker(camArea, camInput, function(files) { addWfPhotos(files, type); });
 
       var fileArea = document.createElement('div');
       fileArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:12px 8px;text-align:center;cursor:pointer';
       var fileInput = document.createElement('input');
-      fileInput.type = 'file'; fileInput.id = fileId; fileInput.accept = 'image/*';
-      fileInput.multiple = true; fileInput.style.display = 'none';
+      fileInput.type = 'file'; fileInput.id = fileId; fileInput.accept = 'image/*,image/heic,image/heif';
+      fileInput.multiple = true;
       fileInput.onchange = function() { addWfPhotos(this.files, type); };
       var fileIcon = document.createElement('div');
       fileIcon.style.cssText = 'font-size:18px'; fileIcon.textContent = '\u{1F5BC}';
       var fileLabel = document.createElement('div');
       fileLabel.style.cssText = 'font-size:10px;font-weight:600'; fileLabel.textContent = 'Galerie';
       fileArea.appendChild(fileInput); fileArea.appendChild(fileIcon); fileArea.appendChild(fileLabel);
-      fileArea.onclick = function(ev) { if (ev.target !== fileInput) fileInput.click(); };
+      attachFilePicker(fileArea, fileInput, function(files) { addWfPhotos(files, type); });
 
       row.appendChild(camArea); row.appendChild(fileArea);
       parent.appendChild(row);
@@ -5887,9 +5933,10 @@
       recognition.onresult = function(event) {
         var transcript = '';
         for (var i = 0; i < event.results.length; i++) {
-          transcript += event.results[i][0].transcript;
+          transcript += event.results[i][0].transcript + ' ';
         }
-        input.value = originalVal + (originalVal ? ' ' : '') + transcript;
+        var clean = (typeof applyVoicePunctuation === 'function') ? applyVoicePunctuation(transcript) : transcript.trim();
+        input.value = originalVal + (originalVal ? ' ' : '') + clean;
       };
       recognition.onend = function() {
         if (activeRecognition === recognition) {
@@ -6704,6 +6751,29 @@
       fetchAll();
     }
 
+    // =============================================================
+    // FB-19: Globaler Keyboard-Dismiss (iOS/Android)
+    // Touch auf leere Flaeche schliesst aktive Tastatur
+    // =============================================================
+    (function() {
+      function isFormField(el) {
+        if (!el) return false;
+        var tag = (el.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select' || tag === 'button') return true;
+        if (el.isContentEditable) return true;
+        return false;
+      }
+      function dismissKb(e) {
+        var ae = document.activeElement;
+        if (!isFormField(ae)) return;
+        var target = e.target;
+        if (target && (isFormField(target) || target.closest('input,textarea,select,button,label,[contenteditable]'))) return;
+        try { ae.blur(); } catch(_) {}
+      }
+      document.addEventListener('touchend', dismissKb, { passive: true });
+      document.addEventListener('mousedown', dismissKb);
+    })();
+
     // Auto-login check
     document.addEventListener('DOMContentLoaded', function() {
       // Apply saved theme
@@ -7173,42 +7243,86 @@
       });
     }
 
+    // Persistenter Mic-Permission Cache (FB-19): nach erstem Grant nicht mehr neu fragen
+    var fbMicGranted = false;
+    // Voice Interpunktions-Heuristik (FB-14/29): "punkt"/"komma"/"fragezeichen" -> Zeichen
+    function applyVoicePunctuation(text) {
+      if (!text) return text;
+      return text
+        .replace(/\s+(neuer absatz|absatz)/gi, '\n\n')
+        .replace(/\s+(fragezeichen|frage zeichen)/gi, '?')
+        .replace(/\s+(ausrufezeichen|ausrufe zeichen)/gi, '!')
+        .replace(/\s+(komma)/gi, ',')
+        .replace(/\s+(semikolon)/gi, ';')
+        .replace(/\s+(doppelpunkt)/gi, ':')
+        .replace(/\s+(punkt)\b/gi, '.')
+        .replace(/\s+([,.!?;:])/g, '$1')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+    }
     function toggleFbVoice() {
       if (fbVoiceRecording) { stopFbVoice(); return; }
       var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SR) { showToast('Spracherkennung nicht unterstuetzt', 'error'); return; }
       var btn = document.getElementById('fbVoiceBtn');
       var status = document.getElementById('fbVoiceStatus');
-      navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
-        stream.getTracks().forEach(function(t) { t.stop(); });
+      function startRec() {
         fbVoiceRecording = true;
         fbTextBeforeVoice = document.getElementById('dashFeedbackText').value;
         btn.style.borderColor = 'var(--danger)'; btn.style.color = 'var(--danger)'; btn.style.background = 'var(--danger-bg)';
-        status.style.display = 'block'; status.textContent = 'Sprich jetzt...';
+        status.style.display = 'block'; status.textContent = 'Sprich jetzt... (Klick auf Mic stoppt)';
         var rec = new SR();
         rec.lang = 'de-DE'; rec.continuous = true; rec.interimResults = true;
         fbSpeechRecorder = rec;
         rec.onresult = function(e) {
           var t = '';
-          for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+          for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript + ' ';
+          var clean = applyVoicePunctuation(t);
           var ta = document.getElementById('dashFeedbackText');
-          ta.value = fbTextBeforeVoice ? fbTextBeforeVoice + ' ' + t : t;
+          ta.value = fbTextBeforeVoice ? fbTextBeforeVoice + ' ' + clean : clean;
           updateFbCounter();
         };
-        rec.onerror = function() { stopFbVoice(); };
-        rec.onend = function() { if (fbVoiceRecording) stopFbVoice(); };
-        rec.start();
-        setTimeout(function() { if (fbVoiceRecording) stopFbVoice(); }, 30000);
+        rec.onerror = function(e) {
+          if (e && e.error === 'not-allowed') { fbMicGranted = false; }
+          if (e && e.error === 'no-speech') { return; }
+          stopFbVoice();
+        };
+        // Auto-restart wenn Browser nach Pause stoppt — nur User darf via Button stoppen
+        rec.onend = function() {
+          if (fbVoiceRecording) {
+            try { rec.start(); } catch(err) { stopFbVoice(); }
+          }
+        };
+        try { rec.start(); } catch(err) { stopFbVoice(); }
+      }
+      if (fbMicGranted) { startRec(); return; }
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+        stream.getTracks().forEach(function(t) { t.stop(); });
+        fbMicGranted = true;
+        startRec();
       }).catch(function() { showToast('Mikrofon-Zugriff verweigert', 'error'); });
     }
 
     function stopFbVoice() {
       fbVoiceRecording = false;
       var btn = document.getElementById('fbVoiceBtn');
-      btn.style.borderColor = ''; btn.style.color = ''; btn.style.background = '';
-      document.getElementById('fbVoiceStatus').style.display = 'none';
+      if (btn) { btn.style.borderColor = ''; btn.style.color = ''; btn.style.background = ''; }
+      var stEl = document.getElementById('fbVoiceStatus'); if (stEl) stEl.style.display = 'none';
       if (fbSpeechRecorder) { try { fbSpeechRecorder.stop(); } catch(e) {} fbSpeechRecorder = null; }
     }
+
+    // === FB-19: Keyboard-Dismiss bei Tap ausserhalb (mobile) ===
+    document.addEventListener('click', function(ev) {
+      var ae = document.activeElement;
+      if (!ae) return;
+      var isInput = (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.tagName === 'SELECT');
+      if (!isInput) return;
+      if (ae === ev.target) return;
+      // Nicht blurren wenn Tap auf einen anderen Input
+      var t = ev.target;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.closest && (t.closest('input,textarea,select,label,button')))) return;
+      try { ae.blur(); } catch(e) {}
+    }, true);
 
     var SUPABASE_URL = 'https://api.casa2035.de';
     var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzc1NTA0NzY1LCJleHAiOjE5MzMxODQ3NjV9.5YsRP4FLKHp7hTae7-RAyi13ofRfSGmjm8P2Ved2Wu4';
