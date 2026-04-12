@@ -2599,15 +2599,18 @@
           services.forEach(function(s) { svcMap[(s.Service || '').toLowerCase()] = parseFloat(s.Preis) || 0; });
           termine.forEach(function(t) {
             if (!t.Preis || t.Preis === 0) {
-              // Service kann Kombi sein: "Damenhaarschnitt, Styling / Foehnen"
-              var parts = (t.Service || '').split(',').map(function(p) { return p.trim(); });
-              var total = 0;
-              parts.forEach(function(p) {
-                var key = p.toLowerCase();
-                if (svcMap[key]) total += svcMap[key];
-              });
-              t.Preis = total;
-              t.preis = total;
+              var svcName = (t.Service || '').toLowerCase();
+              // 1. Exakter Match
+              if (svcMap[svcName]) {
+                t.Preis = svcMap[svcName];
+              } else {
+                // 2. Kombi-Service: "Damenhaarschnitt, Styling / Foehnen"
+                var parts = (t.Service || '').split(',').map(function(p) { return p.trim(); });
+                var total = 0;
+                parts.forEach(function(p) { if (svcMap[p.toLowerCase()]) total += svcMap[p.toLowerCase()]; });
+                t.Preis = total;
+              }
+              t.preis = t.Preis;
             }
           });
         }
