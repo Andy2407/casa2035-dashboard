@@ -1183,6 +1183,60 @@
     .ki-suggestion-card .ki-action { font-size: 10px; color: var(--gold); font-weight: 600; margin-top: 4px; }
     .ki-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 700; color: var(--gold); background: var(--gold-glow); padding: 2px 6px; border-radius: var(--radius-full); }
 
+    /* === Jarvis Voice Command === */
+    .jarvis-btn {
+      width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--border);
+      background: var(--surface); color: var(--text-dim); display: flex; align-items: center;
+      justify-content: center; cursor: pointer; transition: all 300ms var(--ease); flex-shrink: 0;
+      position: relative;
+    }
+    .jarvis-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .jarvis-btn.listening {
+      border-color: var(--gold); color: var(--gold); background: var(--gold-glow);
+      box-shadow: 0 0 20px rgba(201,168,76,0.3), 0 0 40px rgba(201,168,76,0.1);
+      animation: jarvisPulse 1.5s ease-in-out infinite;
+    }
+    @keyframes jarvisPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(201,168,76,0.3); }
+      50% { box-shadow: 0 0 30px rgba(201,168,76,0.5), 0 0 60px rgba(201,168,76,0.2); }
+    }
+    .jarvis-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 300ms var(--ease);
+    }
+    .jarvis-overlay.active { opacity: 1; pointer-events: all; }
+    .jarvis-ring {
+      width: 160px; height: 160px; border-radius: 50%; position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .jarvis-ring::before, .jarvis-ring::after {
+      content: ''; position: absolute; border-radius: 50%;
+      border: 2px solid var(--gold); opacity: 0.3;
+    }
+    .jarvis-ring::before { inset: -10px; animation: jarvisRing 2s linear infinite; }
+    .jarvis-ring::after { inset: -22px; animation: jarvisRing 3s linear infinite reverse; border-style: dashed; }
+    @keyframes jarvisRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .jarvis-ring svg { width: 48px; height: 48px; color: var(--gold); }
+    .jarvis-transcript {
+      margin-top: 32px; font-size: 18px; font-weight: 600; color: #fff; text-align: center;
+      min-height: 28px; max-width: 80%;
+    }
+    .jarvis-hint {
+      margin-top: 12px; font-size: 12px; color: var(--text-dim); text-align: center;
+    }
+    .jarvis-response {
+      margin-top: 20px; font-size: 15px; color: var(--gold); text-align: center;
+      max-width: 80%; min-height: 24px; font-weight: 500;
+    }
+    .jarvis-close {
+      position: absolute; top: 20px; right: 20px; width: 40px; height: 40px;
+      border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); background: none;
+      color: var(--text-dim); font-size: 20px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center;
+    }
+
     /* === Voice Input === */
     .voice-btn {
       width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--border);
@@ -1205,6 +1259,17 @@
 <body>
   <!-- Toast Container -->
   <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Jarvis Voice Overlay -->
+  <div class="jarvis-overlay" id="jarvisOverlay">
+    <button class="jarvis-close" onclick="closeJarvis()">&times;</button>
+    <div class="jarvis-ring">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </div>
+    <div class="jarvis-transcript" id="jarvisTranscript">Ich hoere zu...</div>
+    <div class="jarvis-response" id="jarvisResponse"></div>
+    <div class="jarvis-hint">Sage z.B. &laquo;Zeig Termine&raquo; &middot; &laquo;Wieviel Umsatz&raquo; &middot; &laquo;Neuer Termin&raquo;</div>
+  </div>
 
   <!-- Go-Live Checklist Overlay -->
   <div class="golive-overlay" id="goliveOverlay" onclick="if(event.target===this)closeGoLive()">
@@ -1287,6 +1352,9 @@
       </div>
       <div class="header-right">
         <span class="live-dot" id="liveIndicator">DEMO</span>
+        <button class="jarvis-btn" id="jarvisBtn" onclick="toggleJarvis()" title="Sprachsteuerung (Jarvis)" aria-label="Sprachsteuerung">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
         <button class="theme-toggle" onclick="toggleTheme()" title="Theme wechseln" aria-label="Farbschema wechseln">
           <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
@@ -5957,6 +6025,182 @@
       recognition.start();
       showToast('Sprechen Sie jetzt...', 'info');
     }
+
+    // === JARVIS Voice Command System ===
+    var jarvisRecognition = null;
+    var jarvisActive = false;
+
+    function toggleJarvis() {
+      if (jarvisActive) { closeJarvis(); return; }
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        showToast('Spracherkennung wird von diesem Browser nicht unterstuetzt.', 'warning');
+        return;
+      }
+      openJarvis();
+    }
+
+    function openJarvis() {
+      jarvisActive = true;
+      document.getElementById('jarvisBtn').classList.add('listening');
+      document.getElementById('jarvisOverlay').classList.add('active');
+      document.getElementById('jarvisTranscript').textContent = 'Ich hoere zu...';
+      document.getElementById('jarvisResponse').textContent = '';
+      startJarvisListening();
+    }
+
+    function closeJarvis() {
+      jarvisActive = false;
+      document.getElementById('jarvisBtn').classList.remove('listening');
+      document.getElementById('jarvisOverlay').classList.remove('active');
+      if (jarvisRecognition) { jarvisRecognition.abort(); jarvisRecognition = null; }
+    }
+
+    function startJarvisListening() {
+      if (jarvisRecognition) { jarvisRecognition.abort(); jarvisRecognition = null; }
+      var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      var rec = new SR();
+      rec.lang = 'de-DE';
+      rec.continuous = false;
+      rec.interimResults = true;
+      rec.maxAlternatives = 3;
+      jarvisRecognition = rec;
+
+      rec.onresult = function(e) {
+        var transcript = '';
+        for (var i = e.resultIndex; i < e.results.length; i++) {
+          transcript += e.results[i][0].transcript;
+        }
+        document.getElementById('jarvisTranscript').textContent = transcript || 'Ich hoere zu...';
+        if (e.results[e.results.length - 1].isFinal) {
+          processJarvisCommand(transcript.trim().toLowerCase());
+        }
+      };
+
+      rec.onend = function() {
+        if (jarvisActive && !jarvisRecognition) return;
+        if (jarvisActive) {
+          setTimeout(function() {
+            if (jarvisActive) startJarvisListening();
+          }, 300);
+        }
+      };
+
+      rec.onerror = function(e) {
+        if (e.error === 'not-allowed') {
+          showToast('Mikrofon-Zugriff verweigert.', 'warning');
+          closeJarvis();
+        } else if (e.error === 'no-speech') {
+          document.getElementById('jarvisTranscript').textContent = 'Ich hoere zu...';
+        }
+      };
+
+      rec.start();
+    }
+
+    function processJarvisCommand(text) {
+      var response = '';
+      var action = null;
+
+      // Navigation commands
+      if (/termin|kalender|buchung/.test(text) && !/neu|erstell|anlege/.test(text)) {
+        var todayStr = new Date().toISOString().split('T')[0];
+        var count = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(todayStr) === 0; }).length;
+        response = count + ' Termine heute. Oeffne Terminuebersicht.';
+        action = function() { showPage('termine'); };
+      }
+      else if (/kasse|umsatz|geld|einnahm|revenue/.test(text) && !/neu/.test(text)) {
+        var umsatz = document.getElementById('statUmsatz') ? document.getElementById('statUmsatz').textContent : '0';
+        response = 'Tagesumsatz: ' + umsatz + ' Euro. Oeffne Kasse.';
+        action = function() { showPage('kasse'); };
+      }
+      else if (/kunde|kunden|crm|kundschaft/.test(text) && !/neu/.test(text)) {
+        var anz = kundenCache ? kundenCache.length : 0;
+        response = anz + ' Kunden in der Datenbank. Oeffne Kunden.';
+        action = function() { showPage('kunden'); };
+      }
+      else if (/lager|produkt|bestand|vorrat|nachbestell/.test(text)) {
+        var alarm = document.getElementById('statLagerAlarm') ? document.getElementById('statLagerAlarm').textContent : '0';
+        response = alarm + ' Produkte unter Mindestbestand. Oeffne Lager.';
+        action = function() { showPage('lager'); };
+      }
+      else if (/beratung|anfrage|haaranalyse|wunschfrisur|farbcode/.test(text)) {
+        response = 'Oeffne Beratung.';
+        action = function() { showPage('beratung'); };
+      }
+      else if (/einstell|config|verbind|backend/.test(text)) {
+        response = 'Oeffne Einstellungen.';
+        action = function() { showPage('einstellungen'); };
+      }
+      else if (/start|home|dashboard|cockpit|uebersicht/.test(text)) {
+        response = 'Zurueck zur Uebersicht.';
+        action = function() { showPage('dashboard'); };
+      }
+      // Action commands
+      else if (/neu.*termin|termin.*anlegen|termin.*erstell|termin.*buchen/.test(text)) {
+        response = 'Oeffne neuen Termin.';
+        action = function() { showPage('termine'); setTimeout(function() { if (typeof openNewTerminSheet === 'function') openNewTerminSheet(); }, 300); };
+      }
+      else if (/neu.*rechnung|rechnung.*erstell/.test(text)) {
+        response = 'Oeffne neue Rechnung.';
+        action = function() { showPage('kasse'); setTimeout(function() { if (typeof openRechnungSheet === 'function') openRechnungSheet(); }, 300); };
+      }
+      else if (/tagesabschluss|tag.*abschlies/.test(text)) {
+        response = 'Oeffne Tagesabschluss.';
+        action = function() { showPage('kasse'); setTimeout(function() { if (typeof openTagesabschlussSheet === 'function') openTagesabschlussSheet(); }, 300); };
+      }
+      // Data queries
+      else if (/wie ?viel.*umsatz|umsatz.*heute|was.*umsatz/.test(text)) {
+        var u2 = document.getElementById('statUmsatz') ? document.getElementById('statUmsatz').textContent : '0';
+        response = 'Der heutige Tagesumsatz betraegt ' + u2 + ' Euro.';
+      }
+      else if (/wie ?viel.*termin|termin.*heute|was.*termin/.test(text)) {
+        var td = new Date().toISOString().split('T')[0];
+        var tc = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(td) === 0; }).length;
+        response = 'Heute sind ' + tc + ' Termine eingetragen.';
+      }
+      else if (/wie ?viel.*kunde|kund.*gesamt/.test(text)) {
+        var kc = kundenCache ? kundenCache.length : 0;
+        response = kc + ' Kunden in der Datenbank.';
+      }
+      // Fallback
+      else {
+        response = 'Ich habe "' + text + '" nicht verstanden. Versuche: Termine, Kasse, Kunden, Lager, Beratung.';
+      }
+
+      document.getElementById('jarvisResponse').textContent = response;
+
+      // Text-to-Speech
+      if ('speechSynthesis' in window) {
+        var utter = new SpeechSynthesisUtterance(response);
+        utter.lang = 'de-DE';
+        utter.rate = 1.05;
+        utter.pitch = 0.95;
+        window.speechSynthesis.speak(utter);
+      }
+
+      // Execute action after brief pause
+      if (action) {
+        setTimeout(function() {
+          closeJarvis();
+          action();
+        }, 1200);
+      } else {
+        // Keep listening for follow-up
+        setTimeout(function() {
+          if (jarvisActive) {
+            document.getElementById('jarvisTranscript').textContent = 'Ich hoere zu...';
+          }
+        }, 2500);
+      }
+    }
+
+    // Keyboard shortcut: press J to toggle Jarvis
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'j' && !e.ctrlKey && !e.metaKey && !e.altKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        toggleJarvis();
+      }
+    });
 
     // === KI-Vorschlaege fuer Home/Cockpit ===
     function renderKiSuggestions() {
