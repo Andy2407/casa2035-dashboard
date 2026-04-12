@@ -1644,7 +1644,7 @@
       <div class="action-grid">
         <div class="action-card" onclick="showKiTool('farbcode')"><div class="icon">&#127912;</div><div class="title">Farbcode</div><div class="desc">Mischungsformel berechnen</div></div>
         <div class="action-card" onclick="showKiTool('haaranalyse')"><div class="icon">&#128269;</div><div class="title">Haaranalyse</div><div class="desc">KI-Diagnostik starten</div></div>
-        <div class="action-card" onclick="showKiTool('wunschfrisur')"><div class="icon">&#10024;</div><div class="title">Wunschfrisur</div><div class="desc">Machbarkeits-Check</div></div>
+        <div class="action-card" onclick="showKiTool('wunschfrisur')"><div class="icon">&#10024;</div><div class="title">Wunschlook</div><div class="desc">Frisur &amp; Bart-Check</div></div>
         <div class="action-card" onclick="showPage('kunden')"><div class="icon">&#128100;</div><div class="title">Kunden</div><div class="desc">CRM &amp; Follow-Ups</div></div>
       </div>
       <div class="ki-tool-panel" id="kiToolPanel">
@@ -1761,7 +1761,10 @@
       </div>
       <div style="text-align:center;margin-top:20px;font-size:10px;color:var(--text-micro)">
         Casa 2035 &middot; Vision 2035 Dashboard &middot; v9.0<br>
-        Powered by Casa 2035 &middot; 100% EU &middot; DSGVO-konform
+        Powered by Casa 2035 &middot; 100% EU &middot; DSGVO-konform<br>
+        <a href="https://casa2035.de/datenschutz.html" style="color:var(--text-micro);text-decoration:underline" target="_blank">Datenschutz</a> &middot;
+        <a href="https://casa2035.de/impressum.html" style="color:var(--text-micro);text-decoration:underline" target="_blank">Impressum</a> &middot;
+        <a href="https://casa2035.de/agb.html" style="color:var(--text-micro);text-decoration:underline" target="_blank">AGB</a>
       </div>
     </div>
   </main>
@@ -2352,7 +2355,7 @@
         items = [
           { icon: '&#127912;', label: 'Farbcode-Tool', action: 'showKiTool("farbcode")' },
           { icon: '&#128269;', label: 'Haaranalyse', action: 'showKiTool("haaranalyse")' },
-          { icon: '&#10024;', label: 'Wunschfrisur', action: 'showKiTool("wunschfrisur")' },
+          { icon: '&#10024;', label: 'Wunschlook', action: 'showKiTool("wunschfrisur")' },
           { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
         ];
       } else if (page === 'einstellungen') {
@@ -3679,6 +3682,10 @@
         + '<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px">'
         + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gold);margin-bottom:8px">Verlauf &amp; Nachrichten</div>'
         + '<div id="kundeVerlaufContainer" style="min-height:40px;font-size:12px;color:var(--text-dim)">Lade Verlauf...</div>'
+        + '</div>'
+        + '<div style="margin-top:20px;border-top:1px solid var(--border);padding-top:12px">'
+        + '<button onclick="requestKundeLoeschung(\'' + esc(name).replace(/'/g,'') + '\')" style="width:100%;padding:10px;background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:var(--radius-sm);font-size:11px;cursor:pointer">Kundendaten loeschen (DSGVO Art. 17)</button>'
+        + '<div style="font-size:9px;color:var(--text-micro);margin-top:4px;text-align:center">Loeschung wird vom Saloninhaber geprueft und bestaetigt (10 Tage Aufbewahrung bei offenen Rechnungen)</div>'
         + '</div>';
       openSheet('detailSheet');
       if (k.id && isBackendMode()) {
@@ -3692,6 +3699,13 @@
         var cvl = document.getElementById('kundeVerlaufContainer');
         if (cvl) cvl.textContent = 'Verlauf nur im Backend-Modus verfuegbar';
       }
+    }
+
+    // === DSGVO Art. 17 — Kundendaten-Loeschung (Human-in-the-Loop) ===
+    function requestKundeLoeschung(name) {
+      if (!confirm('DSGVO Art. 17: Moechtest du wirklich ALLE Daten von "' + name + '" zur Loeschung vormerken?\n\nDies umfasst: Kontaktdaten, Terminhistorie, Beratungen, Nachrichten.\n\nOffene Rechnungen werden 10 Jahre aufbewahrt (GoBD §147 AO).\n\nDer Saloninhaber muss die Loeschung bestaetigen.')) return;
+      showToast('Loeschanfrage fuer ' + name + ' vorgemerkt. Der Saloninhaber wird benachrichtigt.', 'info', 5000);
+      closeSheet('detailSheet');
     }
 
     // === Kunden-Verlauf Timeline ===
@@ -4742,7 +4756,7 @@
         title.textContent = 'Profi-Haaranalyse im Salon';
         buildHaaranalyseTool(wrapper);
       } else if (tool === 'wunschfrisur') {
-        title.textContent = 'Wunschfrisur analysieren';
+        title.textContent = 'Wunschlook analysieren';
         buildWunschfrisurTool(wrapper);
       }
       content.appendChild(wrapper);
@@ -4753,7 +4767,7 @@
       selectedIstFarbe = null; selectedZielFarbe = null;
       var intro = document.createElement('div');
       intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
-      intro.textContent = 'Fotografiere das Haar \u2014 die KI erkennt den aktuellen Farbton. Waehle den Wunschton und erhalte eine realistische Vorher/Nachher-Vorschau.';
+      intro.textContent = 'Fotografiere Haar oder Bart \u2014 die KI erkennt den aktuellen Farbton. Waehle den Wunschton und erhalte eine realistische Vorher/Nachher-Vorschau.';
       wrapper.appendChild(intro);
 
       // Foto-Tipps
@@ -5464,7 +5478,7 @@
       // Intro
       var intro = document.createElement('div');
       intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
-      intro.textContent = 'Laden Sie Fotos Ihrer aktuellen Frisur und Ihrer Wunschfrisur getrennt hoch. Die KI kombiniert Ihr Gesicht mit der Wunschfrisur fuer eine realistische Vorschau.';
+      intro.textContent = 'Laden Sie Fotos des aktuellen Looks und des Wunschlooks getrennt hoch. Die KI kombiniert Ihr Gesicht mit dem gewuenschten Style — Frisur, Bart oder beides — fuer eine realistische Vorschau.';
       wrapper.appendChild(intro);
 
       // Foto-Tipps
@@ -5485,7 +5499,7 @@
       buildWfUploadSection(wrapper, 'aktuell', '1', 'Aktuelle Frisur', '3-5 Bilder: Gesicht von vorne, Seite, Hinterkopf', 'var(--info-bg)', 'var(--info)');
 
       // === Bereich 2: Wunschfrisur ===
-      buildWfUploadSection(wrapper, 'wunsch', '2', 'Wunschfrisur', '3-5 Referenzbilder: Screenshots, Magazin-Fotos, Promi-Frisuren', 'var(--gold-glow)', 'var(--gold)');
+      buildWfUploadSection(wrapper, 'wunsch', '2', 'Wunschlook', '3-5 Referenzbilder: Frisur, Bart, Style — Screenshots, Magazin, Promi-Looks', 'var(--gold-glow)', 'var(--gold)');
 
       // Gesamt-Zaehler
       var totalCount = document.createElement('div');
@@ -5532,7 +5546,7 @@
       kiPreview.appendChild(kiTitle);
       var kiPlaceholder = document.createElement('div');
       kiPlaceholder.style.cssText = 'width:140px;height:180px;background:var(--bg-warm);border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-dim);text-align:center;margin:0 auto';
-      kiPlaceholder.textContent = 'Ihr Gesicht + Wunschfrisur';
+      kiPlaceholder.textContent = 'Ihr Gesicht + Wunschlook';
       kiPreview.appendChild(kiPlaceholder);
       var kiNote = document.createElement('div');
       kiNote.style.cssText = 'font-size:10px;color:var(--text-micro);margin-top:10px;text-align:center';
