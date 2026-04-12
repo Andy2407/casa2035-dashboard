@@ -679,10 +679,17 @@
       .page.active { display: block !important; }
     }
 
+    /* === Termine Toolbar (sticky) === */
+    .termine-toolbar {
+      position: sticky; top: 0; z-index: 50;
+      background: var(--bg); padding: 8px 0 6px;
+      border-bottom: 1px solid var(--border);
+      margin: 0 -16px; padding-left: 16px; padding-right: 16px;
+    }
     /* === Termin Day/Week Views === */
     .termin-view-toggle { display: flex; gap: 0; margin-bottom: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
     .termin-view-btn {
-      flex: 1; padding: 8px; text-align: center; font-size: 12px; font-weight: 600;
+      flex: 1; padding: 5px 8px; text-align: center; font-size: 11px; font-weight: 600;
       cursor: pointer; background: var(--surface); color: var(--text-dim);
       border: none; transition: all 200ms;
     }
@@ -1104,8 +1111,9 @@
       .date-label { font-size: 12px; }
       .staff-filter { gap: 3px; margin-bottom: 4px; }
       .staff-chip { font-size: 10px; padding: 3px 8px; }
-      .termin-view-toggle { margin-bottom: 4px; }
-      .termin-view-btn { font-size: 10px; padding: 3px 10px; }
+      .termine-toolbar { padding: 4px 12px 4px; margin: 0 -12px; }
+      .termin-view-toggle { margin-bottom: 0; }
+      .termin-view-btn { font-size: 10px; padding: 3px 8px; }
       /* Tagesansicht Kalender BREITER */
       .day-view-grid { font-size: 10px; width: 100%; }
       .day-hour-label { font-size: 9px; min-width: 28px; padding: 2px 3px; }
@@ -1509,20 +1517,24 @@
 
     <!-- PAGE: Termine -->
     <div class="page" id="pageTermine">
-      <div class="section-title" style="margin-top:0">TERMINE <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></div>
-      <div class="date-nav">
-        <button onclick="changeTerminDate(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"/></svg></button>
-        <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer" title="Zurueck zu Heute">Heute</div>
-        <div class="date-nav-right">
-          <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()">Heute</button>
-          <button onclick="changeTerminDate(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg></button>
+      <div class="termine-toolbar" id="termineToolbar">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="section-title" style="margin:0;font-size:13px">TERMINE <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></div>
+          <div class="termin-view-toggle" style="margin:0;border:none">
+            <button class="termin-view-btn active" onclick="setTerminView('list')" id="tvList">Liste</button>
+            <button class="termin-view-btn" onclick="setTerminView('day')" id="tvDay">Tag</button>
+            <button class="termin-view-btn" onclick="setTerminView('week')" id="tvWeek">Woche</button>
+          </div>
         </div>
-      </div>
-      <div class="staff-filter" id="terminStaffFilter"></div>
-      <div class="termin-view-toggle">
-        <button class="termin-view-btn active" onclick="setTerminView('list')" id="tvList">Liste</button>
-        <button class="termin-view-btn" onclick="setTerminView('day')" id="tvDay">Tag</button>
-        <button class="termin-view-btn" onclick="setTerminView('week')" id="tvWeek">Woche</button>
+        <div class="date-nav" style="margin-bottom:0;padding:4px 0">
+          <button onclick="changeTerminDate(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer;font-size:13px" title="Zurueck zu Heute">Heute</div>
+          <div class="date-nav-right">
+            <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()">Heute</button>
+            <button onclick="changeTerminDate(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg></button>
+          </div>
+        </div>
+        <div class="staff-filter" id="terminStaffFilter" style="margin-bottom:0"></div>
       </div>
       <div id="terminContent"></div>
       <div class="section-title" style="margin-top:16px">KI-Hinweise</div>
@@ -2542,15 +2554,16 @@
     async function fetchAll() {
       if (!isBackendMode()) { loadDemoData(); return; }
       try {
-        var [events, termine, services, lager, kunden, beratungen, rechnungen, ausgaben] = await Promise.all([
+        var [events, termine, services, lager, kunden, beratungen, rechnungen, ausgaben, rezepturen] = await Promise.all([
           apiGet('anfragen_log', 'order=erstellt_am.desc&limit=50').catch(function() { return []; }),
-          apiGet('terminvorschlaege', 'order=beginn.asc&limit=200').catch(function() { return []; }),
+          apiGet('terminvorschlaege', 'order=beginn.asc&limit=500').catch(function() { return []; }),
           apiGet('services_preisliste', 'order=name.asc').catch(function() { return []; }),
           apiGet('lager', 'order=produktname.asc').catch(function() { return []; }),
           apiGet('kunden', 'order=name.asc').catch(function() { return []; }),
           apiGet('anfragen_log', 'order=erstellt_am.desc&limit=200').catch(function() { return []; }),
           apiGet('rechnungen', 'order=erstellt_am.desc&limit=50').catch(function() { return []; }),
-          apiGet('ausgaben', 'order=erstellt_am.desc&limit=50').catch(function() { return []; })
+          apiGet('ausgaben', 'order=erstellt_am.desc&limit=50').catch(function() { return []; }),
+          apiGet('service_rezepturen', 'order=service_name.asc').catch(function() { return []; })
         ]);
 
         // Wenn wichtige Tabs (Termine, Kunden) leer → Demo-Modus fuer Vorfuehrung
@@ -2608,6 +2621,18 @@
           loadDemoData();
           document.getElementById('liveIndicator').textContent = 'DEMO';
           return;
+        }
+        // Rezepturen aus Supabase in lokalen Cache laden
+        if (Array.isArray(rezepturen) && rezepturen.length > 0) {
+          rezepturen.forEach(function(r) {
+            if (r.service_name && r.aufgaben) {
+              serviceProdukte[r.service_name] = {
+                aufgaben: r.aufgaben,
+                produkte: r.produkte || []
+              };
+              if (r.hinweise) serviceProdukte[r.service_name].hinweise = r.hinweise;
+            }
+          });
         }
         renderCockpit();
         renderKiSuggestions();
@@ -2940,8 +2965,10 @@
         var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
         var statusLabel = t.Status || 'bestaetigt';
         var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt'));
+        var hasRecipe = !!findRecipe(t.Service);
         card.innerHTML = '<div class="termin-time-block"><div class="time">' + fmtTime(t.Start_ISO) + '</div><div class="mins">' + (t.Dauer_Min || '?') + ' Min</div></div>'
           + '<div class="termin-body"><div class="termin-service">' + esc(t.Service || 'Termin')
+          + (hasRecipe ? ' <span title="Rezeptur hinterlegt" style="font-size:11px;opacity:0.6">&#128203;</span>' : '')
           + (overlaps[idx] ? '<span class="termin-overlap-badge">&#9888; Ueberlappung</span>' : '') + '</div>'
           + '<div class="termin-kunde">' + esc(t.Kundenname || t.Kunde || '') + '</div>'
           + '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">'
@@ -3015,9 +3042,10 @@
         block.style.right = 'auto';
         block.style.borderLeftColor = u ? u.farbe : 'var(--gold)';
         var statusDot = t.Status === 'bestaetigt' ? '#2d8a4e' : (t.Status === 'offen' ? '#c48a1a' : '#686058');
+        var dayRecipe = findRecipe(t.Service);
         block.innerHTML = '<div style="font-weight:600;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
           + '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + statusDot + ';margin-right:3px;vertical-align:middle"></span>'
-          + fmtTime(t.Start_ISO) + ' ' + esc(t.Service || '') + '</div>'
+          + fmtTime(t.Start_ISO) + ' ' + esc(t.Service || '') + (dayRecipe ? ' &#128203;' : '') + '</div>'
           + '<div style="font-size:9px;color:var(--text-dim)">' + esc(t.Stylist || '') + ' — ' + esc(t.Kundenname || '') + demoDot() + '</div>';
         block.onclick = function() { openTerminDetail(t); };
         slot.appendChild(block);
@@ -3093,7 +3121,8 @@
           chip.style.borderLeftColor = u ? u.farbe : 'var(--gold)';
           var timeStr = fmtTime(t.Start_ISO);
           var svcStr = esc((t.Service || '').substring(0, 10));
-          chip.textContent = timeStr + ' ' + svcStr;
+          var weekRecipe = findRecipe(t.Service);
+          chip.innerHTML = timeStr + ' ' + svcStr + (weekRecipe ? ' &#128203;' : '');
           chip.title = timeStr + ' ' + esc(t.Service || '') + ' — ' + esc(t.Kundenname || '');
           chip.onclick = function() { openTerminDetail(t); };
           cells[startH].appendChild(chip);
