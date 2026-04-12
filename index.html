@@ -2593,6 +2593,25 @@
         beratungen = mapAnfragen(beratungen || []);
         rechnungen = mapRechnungen(rechnungen || []);
 
+        // Preis aus services_preisliste nachschlagen (Termine haben keinen eigenen Preis)
+        if (services.length > 0 && termine.length > 0) {
+          var svcMap = {};
+          services.forEach(function(s) { svcMap[(s.Service || '').toLowerCase()] = parseFloat(s.Preis) || 0; });
+          termine.forEach(function(t) {
+            if (!t.Preis || t.Preis === 0) {
+              // Service kann Kombi sein: "Damenhaarschnitt, Styling / Foehnen"
+              var parts = (t.Service || '').split(',').map(function(p) { return p.trim(); });
+              var total = 0;
+              parts.forEach(function(p) {
+                var key = p.toLowerCase();
+                if (svcMap[key]) total += svcMap[key];
+              });
+              t.Preis = total;
+              t.preis = total;
+            }
+          });
+        }
+
         if (Array.isArray(events) && events.length > 0) { eventsCache = events; renderEvents(events); }
         if (Array.isArray(termine) && termine.length > 0) { termineCache = termine; renderTermine(termine); }
         if (Array.isArray(services) && services.length > 0) { servicesCache = services; renderServices(services); }
