@@ -6233,80 +6233,297 @@
       rec.start();
     }
 
+    // === JARVIS KI-Kontext ===
+    var jarvisContext = { lastAction: null, pendingConfirm: null, conversationHistory: [] };
+    var JARVIS_GREETINGS = [
+      'Selbstverstaendlich.', 'Sofort.', 'Alles klar.', 'Wird erledigt.', 'Bin dran.', 'Kein Problem.'
+    ];
+    function jarvisGreet() { return JARVIS_GREETINGS[Math.floor(Math.random() * JARVIS_GREETINGS.length)]; }
+
+    // Kunden-Suche per Name (Fuzzy)
+    function jarvisFindKunde(text) {
+      if (!kundenCache || !kundenCache.length) return null;
+      var words = text.toLowerCase().split(/\s+/);
+      var best = null; var bestScore = 0;
+      kundenCache.forEach(function(k) {
+        var name = (k.Name || k.name || '').toLowerCase();
+        var score = 0;
+        words.forEach(function(w) { if (w.length > 2 && name.indexOf(w) !== -1) score += w.length; });
+        if (score > bestScore) { bestScore = score; best = k; }
+      });
+      return bestScore >= 3 ? best : null;
+    }
+
+    // Service-Erkennung aus Text
+    function jarvisFindService(text) {
+      var t = text.toLowerCase();
+      var svcList = (typeof services !== 'undefined' && services.length) ? services : [
+        {Service:'Damenhaarschnitt',Preis:55},{Service:'Herrenhaarschnitt',Preis:35},{Service:'Herrenschnitt + Bartpflege',Preis:45},
+        {Service:'Balayage',Preis:120},{Service:'Farbbehandlung Komplett',Preis:85},{Service:'Haarverlaengerung (Beratung)',Preis:0},
+        {Service:'Haarpflege-Treatment',Preis:35},{Service:'Kopfmassage',Preis:20},{Service:'Waschen, Schneiden, Foehnen',Preis:65},
+        {Service:'Brautfrisur',Preis:95},{Service:'Styling / Foehnen',Preis:25}
+      ];
+      var found = [];
+      svcList.forEach(function(s) {
+        var sn = (s.Service || s.name || '').toLowerCase();
+        // Exakter oder Teil-Match
+        if (t.indexOf(sn) !== -1) { found.push(s); return; }
+        // Keyword-Matching
+        if (/damen.*schnitt|damenhaar/.test(t) && /damen/.test(sn)) found.push(s);
+        else if (/herren.*schnitt|herrenhaar/.test(t) && /herren/.test(sn) && !/bart/.test(sn)) found.push(s);
+        else if (/bart/.test(t) && /bart/.test(sn)) found.push(s);
+        else if (/balayage|bala/.test(t) && /balayage/.test(sn)) found.push(s);
+        else if (/farb|faerb|colora/.test(t) && /farb/.test(sn)) found.push(s);
+        else if (/waschen.*schneiden|schneiden.*foehnen/.test(t) && /waschen/.test(sn)) found.push(s);
+        else if (/braut|hochzeit/.test(t) && /braut/.test(sn)) found.push(s);
+        else if (/styling|foehnen/.test(t) && /styling/.test(sn)) found.push(s);
+        else if (/pflege|treatment|kur/.test(t) && /pflege/.test(sn)) found.push(s);
+        else if (/massage|kopf/.test(t) && /massage/.test(sn)) found.push(s);
+      });
+      // Deduplizieren
+      var unique = []; var seen = {};
+      found.forEach(function(f) { var k = f.Service || f.name; if (!seen[k]) { seen[k] = true; unique.push(f); }});
+      return unique;
+    }
+
+    // Zahlart erkennen
+    function jarvisFindZahlart(text) {
+      if (/bar\b|cash/.test(text)) return 'bar';
+      if (/karte|ec|kredit|card/.test(text)) return 'karte';
+      if (/ueberweis|transfer/.test(text)) return 'ueberweisung';
+      return null;
+    }
+
     function processJarvisCommand(text) {
       var response = '';
       var action = null;
+      var keepListening = true;
+      jarvisContext.conversationHistory.push({ role: 'user', text: text });
 
-      // Navigation commands
-      if (/termin|kalender|buchung/.test(text) && !/neu|erstell|anlege/.test(text)) {
+      // === Bestaetigung auf vorherige Aktion ===
+      if (jarvisContext.pendingConfirm && /^(ja|passt|genau|machen|ok|bestaetig|korrekt|stimmt|richtig|jawohl)/.test(text)) {
+        response = jarvisGreet() + ' ' + jarvisContext.pendingConfirm.confirmMsg;
+        action = jarvisContext.pendingConfirm.action;
+        jarvisContext.pendingConfirm = null;
+        keepListening = false;
+      }
+      else if (jarvisContext.pendingConfirm && /^(nein|stop|abbruch|cancel|nicht|falsch)/.test(text)) {
+        response = 'Alles klar, abgebrochen.';
+        jarvisContext.pendingConfirm = null;
+      }
+
+      // === RECHNUNG erstellen (Smart: Kunde + Service + Zahlart aus Sprache) ===
+      else if (/rechnung|abrechnung|kassier|bezahl|abkassier/.test(text)) {
+        var kunde = jarvisFindKunde(text);
+        var svcs = jarvisFindService(text);
+        var zahlart = jarvisFindZahlart(text);
+        if (kunde && svcs.length > 0) {
+          var svcNames = svcs.map(function(s) { return s.Service || s.name; }).join(', ');
+          var total = 0; svcs.forEach(function(s) { total += parseFloat(s.Preis || s.preis || 0); });
+          var brutto = Math.round(total * 1.19 * 100) / 100;
+          response = jarvisGreet() + ' Rechnung fuer ' + (kunde.Name || kunde.name) + ': ' + svcNames + '. Brutto ' + brutto.toFixed(2).replace('.', ',') + ' Euro' + (zahlart ? ', ' + zahlart : '') + '. Soll ich buchen?';
+          jarvisContext.pendingConfirm = {
+            confirmMsg: 'Rechnung wird erstellt.',
+            action: function() {
+              showPage('kasse');
+              setTimeout(function() {
+                if (typeof openRechnungSheet === 'function') openRechnungSheet();
+                // Pre-fill Rechnung
+                setTimeout(function() {
+                  var kundeInput = document.getElementById('kasseKunde');
+                  if (kundeInput) kundeInput.value = kunde.Name || kunde.name;
+                  var svcSel = document.getElementById('kasseService');
+                  if (svcSel && svcs[0]) {
+                    for (var i = 0; i < svcSel.options.length; i++) {
+                      if (svcSel.options[i].value === (svcs[0].Service || svcs[0].name)) { svcSel.selectedIndex = i; break; }
+                    }
+                  }
+                  if (zahlart) {
+                    var zahlSel = document.getElementById('kasseZahlart');
+                    if (zahlSel) zahlSel.value = zahlart;
+                  }
+                  if (typeof updateKassePreview === 'function') updateKassePreview();
+                }, 300);
+              }, 300);
+            }
+          };
+        } else if (svcs.length > 0 && !kunde) {
+          response = 'Service erkannt: ' + svcs.map(function(s){return s.Service||s.name}).join(', ') + '. Fuer welchen Kunden?';
+        } else {
+          response = jarvisGreet() + ' Oeffne die Kasse fuer eine neue Rechnung.';
+          action = function() { showPage('kasse'); setTimeout(function() { if (typeof openRechnungSheet === 'function') openRechnungSheet(); }, 300); };
+          keepListening = false;
+        }
+      }
+
+      // === TERMIN erstellen ===
+      else if (/neu.*termin|termin.*anlegen|termin.*erstell|termin.*buchen|termin.*machen/.test(text)) {
+        var tKunde = jarvisFindKunde(text);
+        var tSvcs = jarvisFindService(text);
+        if (tKunde && tSvcs.length > 0) {
+          response = jarvisGreet() + ' Termin fuer ' + (tKunde.Name || tKunde.name) + ': ' + tSvcs.map(function(s){return s.Service||s.name}).join(', ') + '. Oeffne Terminbuchung.';
+        } else {
+          response = jarvisGreet() + ' Oeffne Terminbuchung.';
+        }
+        action = function() { showPage('termine'); setTimeout(function() { if (typeof openNewTerminSheet === 'function') openNewTerminSheet(); }, 300); };
+        keepListening = false;
+      }
+
+      // === TAGESABSCHLUSS ===
+      else if (/tagesabschluss|tag.*abschlies|feierabend|laden.*zu|schluss.*machen/.test(text)) {
+        var u3 = document.getElementById('statUmsatz') ? document.getElementById('statUmsatz').textContent : '0';
+        response = 'Tagesumsatz ' + u3 + ' Euro. Oeffne den Tagesabschluss zur Pruefung.';
+        action = function() { showPage('kasse'); setTimeout(function() { if (typeof openTagesabschluss === 'function') openTagesabschluss(); }, 300); };
+        keepListening = false;
+      }
+
+      // === DATEV Export ===
+      else if (/datev|steuerberater|export|steuer/.test(text)) {
+        response = jarvisGreet() + ' Oeffne den DATEV-Export fuer deinen Steuerberater.';
+        action = function() { showPage('kasse'); setTimeout(function() { if (typeof openDatevExport === 'function') openDatevExport(); }, 300); };
+        keepListening = false;
+      }
+
+      // === Navigation ===
+      else if (/termin|kalender|buchung/.test(text)) {
         var todayStr = new Date().toISOString().split('T')[0];
         var count = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(todayStr) === 0; }).length;
-        response = count + ' Termine heute. Oeffne Terminuebersicht.';
+        response = count + ' Termine heute. Oeffne die Uebersicht.';
         action = function() { showPage('termine'); };
+        keepListening = false;
       }
-      else if (/kasse|umsatz|geld|einnahm|revenue/.test(text) && !/neu/.test(text)) {
+      else if (/kasse|umsatz|geld|einnahm/.test(text)) {
         var umsatz = document.getElementById('statUmsatz') ? document.getElementById('statUmsatz').textContent : '0';
-        response = 'Tagesumsatz: ' + umsatz + ' Euro. Oeffne Kasse.';
+        response = 'Tagesumsatz: ' + umsatz + ' Euro. Oeffne die Kasse.';
         action = function() { showPage('kasse'); };
+        keepListening = false;
       }
-      else if (/kunde|kunden|crm|kundschaft/.test(text) && !/neu/.test(text)) {
-        var anz = kundenCache ? kundenCache.length : 0;
-        response = anz + ' Kunden in der Datenbank. Oeffne Kunden.';
-        action = function() { showPage('kunden'); };
+      else if (/kunde|kunden|crm|kundschaft/.test(text)) {
+        // Suche spezifischen Kunden
+        var suchKunde = jarvisFindKunde(text);
+        if (suchKunde && !/wie ?viel|anzahl|gesamt/.test(text)) {
+          var kName = suchKunde.Name || suchKunde.name;
+          var kBesuche = parseInt(suchKunde.Besuche || suchKunde.besuche || 0);
+          response = kName + ': ' + kBesuche + ' Besuche, Umsatz ' + fmtEur(suchKunde.Umsatz || suchKunde.umsatz || 0) + ' Euro. Oeffne das Profil.';
+          action = function() { showPage('kunden'); setTimeout(function() { openKundeDetail(suchKunde); }, 500); };
+        } else {
+          var anz = kundenCache ? kundenCache.length : 0;
+          response = anz + ' Kunden in der Datenbank.';
+          action = function() { showPage('kunden'); };
+        }
+        keepListening = false;
       }
       else if (/lager|produkt|bestand|vorrat|nachbestell/.test(text)) {
-        var alarm = document.getElementById('statLagerAlarm') ? document.getElementById('statLagerAlarm').textContent : '0';
-        response = alarm + ' Produkte unter Mindestbestand. Oeffne Lager.';
+        var lowStock = lagerCache.filter(function(p) { return (parseInt(p.Bestand) || 0) <= (parseInt(p.Min_Bestand) || 3); });
+        response = lowStock.length > 0 ? 'Achtung: ' + lowStock.length + ' Produkte unter Mindestbestand! Oeffne Lager.' : 'Lager ist gut bestuckt. Alles im gruenen Bereich.';
         action = function() { showPage('lager'); };
+        keepListening = false;
       }
-      else if (/beratung|anfrage|haaranalyse|wunschfrisur|farbcode/.test(text)) {
-        response = 'Oeffne Beratung.';
+      else if (/beratung|anfrage|haaranalyse|wunsch|farbcode/.test(text)) {
+        var openAnf = beratungenCache.filter(function(b) { return b.Status === 'offen'; });
+        response = openAnf.length > 0 ? openAnf.length + ' offene Anfragen. Oeffne Beratung.' : 'Keine offenen Anfragen. Oeffne Beratung.';
         action = function() { showPage('beratung'); };
+        keepListening = false;
       }
       else if (/einstell|config|verbind|backend/.test(text)) {
         response = 'Oeffne Einstellungen.';
         action = function() { showPage('einstellungen'); };
+        keepListening = false;
       }
-      else if (/start|home|dashboard|cockpit|uebersicht/.test(text)) {
+      else if (/start|home|dashboard|cockpit|uebersicht|zurueck/.test(text)) {
         response = 'Zurueck zur Uebersicht.';
         action = function() { showPage('dashboard'); };
-      }
-      // Action commands
-      else if (/neu.*termin|termin.*anlegen|termin.*erstell|termin.*buchen/.test(text)) {
-        response = 'Oeffne neuen Termin.';
-        action = function() { showPage('termine'); setTimeout(function() { if (typeof openNewTerminSheet === 'function') openNewTerminSheet(); }, 300); };
-      }
-      else if (/neu.*rechnung|rechnung.*erstell/.test(text)) {
-        response = 'Oeffne neue Rechnung.';
-        action = function() { showPage('kasse'); setTimeout(function() { if (typeof openRechnungSheet === 'function') openRechnungSheet(); }, 300); };
-      }
-      else if (/tagesabschluss|tag.*abschlies/.test(text)) {
-        response = 'Oeffne Tagesabschluss.';
-        action = function() { showPage('kasse'); setTimeout(function() { if (typeof openTagesabschlussSheet === 'function') openTagesabschlussSheet(); }, 300); };
-      }
-      // Data queries
-      else if (/wie ?viel.*umsatz|umsatz.*heute|was.*umsatz/.test(text)) {
-        var u2 = document.getElementById('statUmsatz') ? document.getElementById('statUmsatz').textContent : '0';
-        response = 'Der heutige Tagesumsatz betraegt ' + u2 + ' Euro.';
-      }
-      else if (/wie ?viel.*termin|termin.*heute|was.*termin/.test(text)) {
-        var td = new Date().toISOString().split('T')[0];
-        var tc = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(td) === 0; }).length;
-        response = 'Heute sind ' + tc + ' Termine eingetragen.';
-      }
-      else if (/wie ?viel.*kunde|kund.*gesamt/.test(text)) {
-        var kc = kundenCache ? kundenCache.length : 0;
-        response = kc + ' Kunden in der Datenbank.';
-      }
-      // Fallback
-      else {
-        response = 'Ich habe "' + text + '" nicht verstanden. Versuche: Termine, Kasse, Kunden, Lager, Beratung.';
+        keepListening = false;
       }
 
+      // === Daten-Abfragen ===
+      else if (/wie ?viel.*umsatz|umsatz.*heute|was.*umsatz|was.*verdient/.test(text)) {
+        var u2 = document.getElementById('statUmsatz') ? document.getElementById('statUmsatz').textContent : '0';
+        response = 'Heutiger Tagesumsatz: ' + u2 + ' Euro.';
+      }
+      else if (/wie ?viel.*termin|termin.*heute|was.*termin|was.*ansteht/.test(text)) {
+        var td = new Date().toISOString().split('T')[0];
+        var tc = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(td) === 0; }).length;
+        var naechster = null;
+        var jetzt = new Date();
+        termineCache.forEach(function(t) {
+          var start = new Date(t.Start_ISO || '');
+          if (start > jetzt && (!naechster || start < new Date(naechster.Start_ISO))) naechster = t;
+        });
+        response = tc + ' Termine heute.';
+        if (naechster) response += ' Naechster: ' + (naechster.Kunde || naechster.kunde || 'Unbekannt') + ' um ' + new Date(naechster.Start_ISO).toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'}) + '.';
+      }
+      else if (/naechster.*termin|wer.*kommt.*als.*naechst|wer.*dran/.test(text)) {
+        var jetzt2 = new Date();
+        var next = null;
+        termineCache.forEach(function(t) {
+          var start = new Date(t.Start_ISO || '');
+          if (start > jetzt2 && (!next || start < new Date(next.Start_ISO))) next = t;
+        });
+        if (next) {
+          response = 'Naechster Termin: ' + (next.Kunde || next.kunde || 'Unbekannt') + ', ' + (next.Service || next.service || '') + ' um ' + new Date(next.Start_ISO).toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'}) + '.';
+        } else {
+          response = 'Keine weiteren Termine heute.';
+        }
+      }
+
+      // === Hilfe ===
+      else if (/hilfe|help|was.*kannst|befehle|commands/.test(text)) {
+        response = 'Ich kann: Termine zeigen, Rechnungen erstellen, Kunden suchen, Umsatz abfragen, Tagesabschluss machen, DATEV exportieren, Lagerbestand pruefen. Sag einfach was du brauchst.';
+      }
+
+      // === Gruss ===
+      else if (/hallo|hi |hey|guten|morgen|moin|servus/.test(text)) {
+        var h = new Date().getHours();
+        var gruss = h < 12 ? 'Guten Morgen' : h < 17 ? 'Guten Tag' : 'Guten Abend';
+        var uName = currentUser || 'Chef';
+        response = gruss + ', ' + uName + '. Was kann ich fuer dich tun?';
+      }
+
+      // === WF-05 KI-Assistent Fallback (Mistral via n8n) ===
+      else if (text.length > 5) {
+        // Versuche LLM-Antwort via WF-05
+        response = 'Moment, ich denke nach...';
+        document.getElementById('jarvisResponse').textContent = response;
+        jarvisCallLLM(text);
+        return; // async, kein weiterer Code hier
+      }
+
+      // === Fallback ===
+      else {
+        response = 'Ich habe dich nicht verstanden. Sag zum Beispiel: "Zeig mir die Termine" oder "Erstell eine Rechnung fuer Maria".';
+      }
+
+      jarvisRespond(response, action, keepListening);
+    }
+
+    // LLM-Fallback via WF-05
+    function jarvisCallLLM(text) {
+      var url = (typeof backendUrl !== 'undefined' && backendUrl) ? backendUrl + 'wf05-ki-assistent' : null;
+      if (!url) {
+        jarvisRespond('LLM-Verbindung nicht verfuegbar. Versuche konkrete Befehle wie "Zeig Termine" oder "Rechnung erstellen".', null, true);
+        return;
+      }
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'CASA_Auth': '4800df27365d67597b68e663342921' },
+        body: JSON.stringify({ frage: text, kontext: { seite: currentPage, user: currentUser, salon_id: salonId || '' } })
+      }).then(function(r) { return r.json(); }).then(function(data) {
+        var antwort = data.antwort || data.response || data.text || 'Ich konnte keine Antwort generieren.';
+        jarvisRespond(antwort, null, true);
+      }).catch(function() {
+        jarvisRespond('Ich kann gerade nicht auf die KI zugreifen. Probiere es mit einem direkten Befehl.', null, true);
+      });
+    }
+
+    // Zentrale Antwort-Funktion
+    function jarvisRespond(response, action, keepListening) {
       document.getElementById('jarvisResponse').textContent = response;
+      jarvisContext.conversationHistory.push({ role: 'jarvis', text: response });
 
       // Text-to-Speech
       if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
         var utter = new SpeechSynthesisUtterance(response);
         utter.lang = 'de-DE';
         utter.rate = 1.05;
@@ -6314,14 +6531,12 @@
         window.speechSynthesis.speak(utter);
       }
 
-      // Execute action after brief pause
       if (action) {
         setTimeout(function() {
           closeJarvis();
           action();
-        }, 1200);
-      } else {
-        // Keep listening for follow-up
+        }, 1500);
+      } else if (keepListening) {
         setTimeout(function() {
           if (jarvisActive) {
             document.getElementById('jarvisTranscript').textContent = 'Ich hoere zu...';
