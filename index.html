@@ -4814,7 +4814,7 @@
 
       // IST section — kompakt aufklappbar (FB-18)
       var istDetails = document.createElement('details');
-      istDetails.open = true;
+      istDetails.open = false;
       istDetails.style.cssText = 'margin-bottom:10px';
       var istSum = document.createElement('summary');
       istSum.style.cssText = 'font-size:11px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;cursor:pointer;color:var(--text)';
@@ -4833,7 +4833,7 @@
       wrapper.appendChild(arrow);
 
       var zielDetails = document.createElement('details');
-      zielDetails.open = true;
+      zielDetails.open = false;
       zielDetails.style.cssText = 'margin-bottom:12px';
       var zielSum = document.createElement('summary');
       zielSum.style.cssText = 'font-size:11px;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.3px;cursor:pointer;color:var(--text)';
@@ -4919,13 +4919,13 @@
 
     function createFarbTile(f, type) {
       var tile = document.createElement('div');
-      tile.style.cssText = 'text-align:center;cursor:pointer;padding:2px 1px;border-radius:var(--radius-sm);border:2px solid transparent;transition:all 200ms';
+      tile.style.cssText = 'text-align:center;cursor:pointer;padding:1px;border-radius:3px;border:2px solid transparent;transition:all 200ms';
       tile.title = 'Stufe ' + f.stufe + ' - ' + f.name;
       var swatch = document.createElement('div');
-      swatch.style.cssText = 'width:100%;aspect-ratio:1;border-radius:5px;background:' + f.hex + ';margin-bottom:1px;border:1px solid rgba(255,255,255,0.1)';
+      swatch.style.cssText = 'width:100%;aspect-ratio:1;border-radius:3px;background:' + f.hex + ';margin-bottom:0;border:1px solid rgba(255,255,255,0.1)';
       tile.appendChild(swatch);
       var lvl = document.createElement('div');
-      lvl.style.cssText = 'font-size:8px;font-weight:700;line-height:1';
+      lvl.style.cssText = 'font-size:7px;font-weight:700;line-height:1.2';
       lvl.textContent = String(f.stufe);
       tile.appendChild(lvl);
       tile.onclick = function() { selectFarbTile(f, type, tile); };
@@ -7616,7 +7616,7 @@
     // Voice Interpunktions-Heuristik (FB-14/29): "punkt"/"komma"/"fragezeichen" -> Zeichen
     function applyVoicePunctuation(text) {
       if (!text) return text;
-      return text
+      var t = text
         .replace(/\s+(neuer absatz|absatz)/gi, '\n\n')
         .replace(/\s+(fragezeichen|frage zeichen)/gi, '?')
         .replace(/\s+(ausrufezeichen|ausrufe zeichen)/gi, '!')
@@ -7627,6 +7627,13 @@
         .replace(/\s+([,.!?;:])/g, '$1')
         .replace(/\s{2,}/g, ' ')
         .trim();
+      // Satz-Anfang gross schreiben
+      t = t.replace(/(^|[.!?]\s+)([a-zaeoeue])/g, function(m, pre, c) { return pre + c.toUpperCase(); });
+      // Erster Buchstabe immer gross
+      if (t.length > 0) t = t.charAt(0).toUpperCase() + t.slice(1);
+      // Punkt am Ende wenn keiner da
+      if (t.length > 2 && !/[.!?]$/.test(t)) t += '.';
+      return t;
     }
     function toggleFbVoice() {
       if (fbVoiceRecording) { stopFbVoice(); return; }
