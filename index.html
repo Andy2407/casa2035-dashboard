@@ -378,7 +378,7 @@
 
     /* === Kasse === */
     .kasse-summary {
-      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px;
     }
     .kasse-box {
       background: var(--surface); border: 1px solid var(--border);
@@ -1536,6 +1536,7 @@
         <div class="kasse-box"><div class="value tabular" id="kasseTagesUmsatz">0,00</div><div class="label">Tagesumsatz</div></div>
         <div class="kasse-box"><div class="value tabular" id="kasseBar">0,00</div><div class="label">Bar</div></div>
         <div class="kasse-box"><div class="value tabular" id="kasseKarte">0,00</div><div class="label">Karte</div></div>
+        <div class="kasse-box"><div class="value tabular" id="kasseAusgaben" style="color:var(--danger)">0,00</div><div class="label">Ausgaben</div></div>
       </div>
       <div class="ring-chart-wrap"><svg id="kasseRingChart" viewBox="0 0 120 120" width="120" height="120"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="8"/><circle id="ringBar" cx="60" cy="60" r="52" fill="none" stroke="var(--gold)" stroke-width="8" stroke-dasharray="0 326.73" stroke-linecap="round" transform="rotate(-90 60 60)" style="transition:stroke-dasharray .8s ease"/><circle id="ringKarte" cx="60" cy="60" r="52" fill="none" stroke="var(--info)" stroke-width="8" stroke-dasharray="0 326.73" stroke-linecap="round" transform="rotate(-90 60 60)" style="transition:stroke-dasharray .8s ease"/><text x="60" y="56" text-anchor="middle" fill="var(--text)" font-family="Playfair Display,serif" font-size="14" font-weight="700" id="ringTotal">0</text><text x="60" y="70" text-anchor="middle" fill="var(--text-dim)" font-size="8" font-weight="600">EUR GESAMT</text></svg></div>
       <div class="action-grid">
@@ -2524,18 +2525,32 @@
       });
     }
 
+    function mapAusgaben(rows) {
+      return rows.map(function(a) {
+        return Object.assign({}, a, {
+          Kunde: a.beschreibung || a.Beschreibung || '',
+          Service: a.kategorie || a.Kategorie || '',
+          Betrag: a.brutto || a.Betrag || 0,
+          Zahlart: a.zahlart || a.Zahlart || 'bar',
+          typ: 'ausgabe',
+          datum: a.erstellt_am || a.datum || ''
+        });
+      });
+    }
+
     // === Fetch All Data ===
     async function fetchAll() {
       if (!isBackendMode()) { loadDemoData(); return; }
       try {
-        var [events, termine, services, lager, kunden, beratungen, rechnungen] = await Promise.all([
+        var [events, termine, services, lager, kunden, beratungen, rechnungen, ausgaben] = await Promise.all([
           apiGet('anfragen_log', 'order=erstellt_am.desc&limit=50').catch(function() { return []; }),
           apiGet('terminvorschlaege', 'order=beginn.asc&limit=200').catch(function() { return []; }),
           apiGet('services_preisliste', 'order=name.asc').catch(function() { return []; }),
           apiGet('lager', 'order=produktname.asc').catch(function() { return []; }),
           apiGet('kunden', 'order=name.asc').catch(function() { return []; }),
           apiGet('anfragen_log', 'order=erstellt_am.desc&limit=200').catch(function() { return []; }),
-          apiGet('rechnungen', 'order=erstellt_am.desc&limit=50').catch(function() { return []; })
+          apiGet('rechnungen', 'order=erstellt_am.desc&limit=50').catch(function() { return []; }),
+          apiGet('ausgaben', 'order=erstellt_am.desc&limit=50').catch(function() { return []; })
         ]);
 
         // Wenn wichtige Tabs (Termine, Kunden) leer → Demo-Modus fuer Vorfuehrung
@@ -2571,16 +2586,20 @@
         if (Array.isArray(lager) && lager.length > 0) { renderLagerTab(lager); }
         if (Array.isArray(kunden) && kunden.length > 0) { kundenCache = kunden; renderKunden(kunden); }
         if (Array.isArray(beratungen) && beratungen.length > 0) { renderBeratungen(beratungen); }
-        if (Array.isArray(rechnungen) && rechnungen.length > 0) {
-          renderKasseEntries(rechnungen);
-          // Finanzen aus Rechnungen berechnen
-          var barTotal = 0, karteTotal = 0;
+        // Kasse: Rechnungen (Einnahmen) + Ausgaben zusammenfuehren
+        ausgaben = mapAusgaben(ausgaben || []);
+        var alleKasseEntries = (rechnungen || []).concat(ausgaben || []);
+        if (alleKasseEntries.length > 0) {
+          renderKasseEntries(alleKasseEntries);
+          // Finanzen aus Rechnungen + Ausgaben berechnen
+          var barTotal = 0, karteTotal = 0, ausgabenTotal = 0;
           rechnungen.forEach(function(r) {
             var betrag = parseFloat(r.Betrag || r.brutto || 0);
             if ((r.Zahlart || r.zahlungsart || '') === 'bar') barTotal += betrag;
             else karteTotal += betrag;
           });
-          renderFinanzen({ tagesUmsatz: barTotal + karteTotal, barEinnahmen: barTotal, karteEinnahmen: karteTotal });
+          ausgaben.forEach(function(a) { ausgabenTotal += parseFloat(a.Betrag || a.brutto || 0); });
+          renderFinanzen({ tagesUmsatz: barTotal + karteTotal - ausgabenTotal, barEinnahmen: barTotal, karteEinnahmen: karteTotal, ausgabenGesamt: ausgabenTotal });
         }
         // Wenn nach Mapping keine sinnvollen Daten: Demo-Fallback
         var hatMappedTermine = (termineCache || []).some(function(t) { return t.Start_ISO; });
@@ -3131,9 +3150,11 @@
       var tagesUmsatz = parseFloat(data.tagesUmsatz || 0);
       var barEin = parseFloat(data.barEinnahmen || 0);
       var karteEin = parseFloat(data.karteEinnahmen || 0);
+      var ausgaben = parseFloat(data.ausgabenGesamt || 0);
       document.getElementById('kasseTagesUmsatz').textContent = fmtEur(tagesUmsatz);
       document.getElementById('kasseBar').textContent = fmtEur(barEin);
       document.getElementById('kasseKarte').textContent = fmtEur(karteEin);
+      document.getElementById('kasseAusgaben').textContent = fmtEur(ausgaben);
       document.getElementById('statUmsatz').textContent = fmtEur(tagesUmsatz);
       document.getElementById('ringTotal').textContent = fmtEur(tagesUmsatz);
       // Ring chart
@@ -3154,10 +3175,34 @@
       entries.forEach(function(e) {
         var div = document.createElement('div');
         div.className = 'kasse-entry';
-        div.innerHTML = '<div class="left"><div class="name">' + esc(e.Kunde || e.name || '') + '</div>'
-          + '<div class="detail">' + esc(e.Service || e.service || '') + ' &middot; ' + esc(e.Zahlart || e.zahlart || '') + '</div></div>'
-          + '<div class="amount" style="color:' + (e.typ === 'ausgabe' ? 'var(--danger)' : 'var(--gold)') + '">'
-          + (e.typ === 'ausgabe' ? '-' : '+') + fmtEur(e.Betrag || e.betrag) + ' &euro;' + demoDot() + '</div>';
+        var beleg = e.rechnungsnummer || e.beleg_nr || '';
+        var zeitStr = '';
+        if (e.erstellt_am || e.datum) {
+          var d = new Date(e.erstellt_am || e.datum);
+          zeitStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+        }
+        // All user data sanitized through esc() — existing pattern in entire dashboard
+        var detailParts = [esc(e.Service || e.service || '')];
+        if (e.Zahlart || e.zahlart) detailParts.push(esc(e.Zahlart || e.zahlart));
+        if (beleg) detailParts.push(esc(beleg));
+        if (zeitStr) detailParts.push(zeitStr);
+
+        var nameEl = document.createElement('div');
+        nameEl.className = 'name';
+        nameEl.textContent = e.Kunde || e.name || '';
+        var detailEl = document.createElement('div');
+        detailEl.className = 'detail';
+        detailEl.textContent = detailParts.join(' · ');
+        var leftEl = document.createElement('div');
+        leftEl.className = 'left';
+        leftEl.appendChild(nameEl);
+        leftEl.appendChild(detailEl);
+        var amountEl = document.createElement('div');
+        amountEl.className = 'amount';
+        amountEl.style.color = e.typ === 'ausgabe' ? 'var(--danger)' : 'var(--gold)';
+        amountEl.textContent = (e.typ === 'ausgabe' ? '-' : '+') + fmtEur(e.Betrag || e.betrag) + ' \u20AC';
+        div.appendChild(leftEl);
+        div.appendChild(amountEl);
         container.appendChild(div);
       });
       renderKiKasseHints();
@@ -4117,13 +4162,31 @@
       document.getElementById('datevXmlBtn').style.borderColor = fmt === 'xml' ? 'var(--gold)' : 'var(--border)';
       document.getElementById('datevXmlBtn').style.color = fmt === 'xml' ? 'var(--gold)' : 'var(--text-dim)';
     }
-    function exportDatev() {
+    async function exportDatev() {
       var von = document.getElementById('datevVon').value;
       var bis = document.getElementById('datevBis').value;
       if (!von || !bis) { showToast('Bitte Zeitraum waehlen', 'error'); return; }
 
-      // Collect entries from kasse cache (demo) or fetch from backend
-      var entries = kasseCache.filter(function(e) { return true; }); // In demo mode, export all
+      var entries = [];
+      if (isBackendMode()) {
+        try {
+          var [reRows, auRows] = await Promise.all([
+            apiGet('rechnungen', 'erstellt_am=gte.' + von + '&erstellt_am=lte.' + bis + 'T23:59:59&order=erstellt_am.asc').catch(function() { return []; }),
+            apiGet('ausgaben', 'erstellt_am=gte.' + von + '&erstellt_am=lte.' + bis + 'T23:59:59&order=erstellt_am.asc').catch(function() { return []; })
+          ]);
+          entries = mapRechnungen(reRows || []).concat(mapAusgaben(auRows || []));
+        } catch(e) {
+          showToast('Fehler beim Laden: ' + e.message, 'error');
+          return;
+        }
+      } else {
+        entries = kasseCache;
+      }
+
+      if (entries.length === 0) {
+        showToast('Keine Buchungen im Zeitraum ' + von + ' bis ' + bis, 'warning');
+        return;
+      }
 
       if (datevFormat === 'csv') {
         exportDatevCsv(entries, von, bis);
@@ -4131,21 +4194,24 @@
         exportDatevXml(entries, von, bis);
       }
       closeSheet('datevSheet');
-      showToast('DATEV-Export erstellt (' + datevFormat.toUpperCase() + ')', 'success');
+      showToast('DATEV-Export: ' + entries.length + ' Buchungen (' + datevFormat.toUpperCase() + ')', 'success');
     }
 
     function exportDatevCsv(entries, von, bis) {
-      // DATEV-Buchungsstapel Format
+      // DATEV-Buchungsstapel Format (SKR04)
       var header = '"Umsatz (ohne Soll/Haben-Kz)";"Soll/Haben-Kennzeichen";"WKZ Umsatz";"Kurs";"Basis-Umsatz";"WKZ Basis-Umsatz";"Konto";"Gegenkonto (ohne BU-Schluessel)";"BU-Schluessel";"Belegdatum";"Belegfeld 1";"Belegfeld 2";"Skonto";"Buchungstext"';
       var rows = [header];
       entries.forEach(function(e, idx) {
         var betrag = parseFloat(e.Betrag || e.betrag || 0);
         var isAusgabe = e.typ === 'ausgabe';
-        var konto = isAusgabe ? '4900' : '8400'; // Aufwand / Erloese 19%
+        // SKR04: 4400=Erloese 19%, 6300=sonstige Aufwendungen
+        var konto = isAusgabe ? '6300' : '4400';
         var gegen = isAusgabe ? '1200' : ((e.Zahlart || e.zahlart) === 'bar' ? '1000' : '1200');
         var shKz = isAusgabe ? 'S' : 'H';
-        var datum = String(new Date().getDate()).padStart(2, '0') + String(new Date().getMonth() + 1).padStart(2, '0');
-        var beleg = 'RE-' + String(idx + 1).padStart(4, '0');
+        // Datum aus DB verwenden (DDMM Format fuer DATEV)
+        var d = new Date(e.erstellt_am || e.datum || new Date());
+        var datum = String(d.getDate()).padStart(2, '0') + String(d.getMonth() + 1).padStart(2, '0');
+        var beleg = e.rechnungsnummer || e.beleg_nr || (isAusgabe ? 'AU-' : 'RE-') + String(idx + 1).padStart(4, '0');
         var text = (e.Kunde || e.name || e.Service || e.service || 'Buchung').substring(0, 60);
         rows.push('"' + betrag.toFixed(2).replace('.', ',') + '";"' + shKz + '";"EUR";"";"";"";"' + konto + '";"' + gegen + '";"";"' + datum + '";"' + beleg + '";"";"";' + '"' + text + '"');
       });
@@ -4153,19 +4219,24 @@
     }
 
     function exportDatevXml(entries, von, bis) {
-      // GDPdU-kompatibles XML (vereinfacht)
+      // GDPdU-kompatibles XML (§147 AO)
       var xml = '<?xml version="1.0" encoding="UTF-8"?>\n<DataSet xmlns="urn:gdpdu">\n';
       xml += '  <Version>1.0</Version>\n';
-      xml += '  <DataSupplier>\n    <Name>Casa 2035 - Rena Rados Friseure</Name>\n    <Location>Muenchen</Location>\n  </DataSupplier>\n';
+      xml += '  <DataSupplier>\n    <Name>Casa 2035</Name>\n    <Location>Muenchen</Location>\n  </DataSupplier>\n';
       xml += '  <Media>\n    <Name>Buchungsdaten</Name>\n';
+      xml += '    <Period>\n      <From>' + von + '</From>\n      <To>' + bis + '</To>\n    </Period>\n';
       entries.forEach(function(e, idx) {
         var betrag = parseFloat(e.Betrag || e.betrag || 0);
+        var d = new Date(e.erstellt_am || e.datum || new Date());
+        var beleg = e.rechnungsnummer || e.beleg_nr || '';
         xml += '    <Entry>\n';
         xml += '      <Index>' + (idx + 1) + '</Index>\n';
-        xml += '      <Date>' + new Date().toISOString().split('T')[0] + '</Date>\n';
+        xml += '      <Date>' + d.toISOString().split('T')[0] + '</Date>\n';
         xml += '      <Amount>' + betrag.toFixed(2) + '</Amount>\n';
         xml += '      <Currency>EUR</Currency>\n';
         xml += '      <Type>' + (e.typ === 'ausgabe' ? 'Ausgabe' : 'Einnahme') + '</Type>\n';
+        xml += '      <Account>' + (e.typ === 'ausgabe' ? '6300' : '4400') + '</Account>\n';
+        xml += '      <Reference>' + esc(beleg) + '</Reference>\n';
         xml += '      <Description>' + esc(e.Kunde || e.name || e.Service || '') + '</Description>\n';
         xml += '      <PaymentMethod>' + esc(e.Zahlart || e.zahlart || '') + '</PaymentMethod>\n';
         xml += '      <TaxRate>19</TaxRate>\n';
