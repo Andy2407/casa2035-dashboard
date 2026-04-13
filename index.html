@@ -152,7 +152,7 @@
       color: var(--text);
       min-height: 100dvh;
       padding-top: var(--safe-top);
-      padding-bottom: calc(var(--nav-height) + var(--safe-bottom));
+      padding-bottom: calc(var(--nav-height) + max(env(safe-area-inset-bottom, 0px), var(--safe-bottom)) + 8px);
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
       overscroll-behavior: none;
@@ -453,7 +453,8 @@
     /* === Bottom Navigation === */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0;
-      height: var(--nav-height); padding-bottom: var(--safe-bottom);
+      height: auto; min-height: var(--nav-height);
+      padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-bottom));
       background: rgba(250,248,246,0.92);
       backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
       border-top: 1px solid var(--border);
@@ -682,7 +683,9 @@
     /* === Termine Toolbar (sticky) === */
     .termine-toolbar {
       position: sticky; top: 0; z-index: 50;
-      background: var(--bg); padding: 8px 0 6px;
+      background: var(--bg);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      padding: 8px 0 6px;
       border-bottom: 1px solid var(--border);
       margin: 0 -16px; padding-left: 16px; padding-right: 16px;
     }
@@ -1974,8 +1977,9 @@
   </div>
 
   <div class="sheet-overlay" id="detailSheet">
-    <div class="sheet" style="max-height:92vh">
+    <div class="sheet" style="max-height:92vh;position:relative">
       <div class="sheet-handle"></div>
+      <button onclick="closeSheet('detailSheet')" style="position:absolute;top:12px;right:16px;width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;line-height:1">&times;</button>
       <div id="detailInner"></div>
       <div class="sheet-actions" style="margin-top:12px">
         <button class="btn btn-secondary" onclick="closeSheet('detailSheet')">Schliessen</button>
@@ -2658,7 +2662,8 @@
             else karteTotal += betrag;
           });
           ausgaben.forEach(function(a) { ausgabenTotal += parseFloat(a.Betrag || a.brutto || 0); });
-          renderFinanzen({ tagesUmsatz: barTotal + karteTotal - ausgabenTotal, barEinnahmen: barTotal, karteEinnahmen: karteTotal, ausgabenGesamt: ausgabenTotal });
+          var nettoUmsatz = barTotal + karteTotal - ausgabenTotal;
+          renderFinanzen({ tagesUmsatz: Math.max(0, nettoUmsatz), realUmsatz: nettoUmsatz, barEinnahmen: barTotal, karteEinnahmen: karteTotal, ausgabenGesamt: ausgabenTotal });
         }
         // Wenn nach Mapping keine sinnvollen Daten: Demo-Fallback
         var hatMappedTermine = (termineCache || []).some(function(t) { return t.Start_ISO; });
@@ -2988,10 +2993,11 @@
 
       var filtered = termine.filter(function(t) {
         var match = (t.Start_ISO || '').indexOf(dateStr) === 0;
-        if (terminStaffFilter !== 'alle') match = match && t.Stylist === terminStaffFilter;
-        if (!perms.alleTermine && currentUser) {
-          var uName = USERS[currentUser].name;
-          match = match && t.Stylist === uName;
+        if (terminStaffFilter !== 'alle') {
+          match = match && t.Stylist === terminStaffFilter;
+        } else if (!perms.alleTermine && currentUser) {
+          var uName = USERS[currentUser] ? USERS[currentUser].name : '';
+          if (uName) match = match && t.Stylist === uName;
         }
         return match;
       }).sort(function(a, b) { return (a.Start_ISO || '').localeCompare(b.Start_ISO || ''); });
