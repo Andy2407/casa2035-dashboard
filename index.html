@@ -5076,19 +5076,32 @@
         message_id: 'dash_fc_' + Date.now()
       };
       var backendUrl = (config && config.backendUrl) || API_DEFAULTS.backendUrl;
-      fetch(backendUrl + 'wf03d-farbcode', {
+      fetch(backendUrl + 'farbcode', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       }).then(function(res) { return res.json(); })
       .then(function(data) {
-        var kiText = data.antwort || data.message || data.ergebnis || '';
+        var kiText = data.empfehlung_text || data.antwort || data.message || data.ergebnis || '';
         if (kiText) {
           var kiCard = document.createElement('div');
           kiCard.style.cssText = 'margin-top:12px;padding:14px;background:linear-gradient(135deg,rgba(184,150,46,0.06),rgba(184,150,46,0.02));border:1px solid var(--border-accent);border-radius:var(--radius)';
-          var kiTitle = document.createElement('div');
-          kiTitle.style.cssText = 'font-family:Playfair Display,serif;font-size:14px;font-weight:700;margin-bottom:8px;color:var(--gold)';
-          kiTitle.textContent = 'KI-Empfehlung';
-          kiCard.appendChild(kiTitle);
+          // Vorher/Nachher Bild wenn KI-Bild zurueckkommt
+          var ki64 = data.ki_bild_nachher;
+          if (ki64) {
+            var compareDiv = document.createElement('div');
+            compareDiv.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px';
+            var vorherImg = document.getElementById('farbcodeImg');
+            var vorherSrc = vorherImg && vorherImg.src && vorherImg.src.startsWith('data:') ? vorherImg.src : '';
+            compareDiv.innerHTML = '<div style="text-align:center"><div style="font-size:10px;font-weight:600;color:var(--text-dim);margin-bottom:4px;text-transform:uppercase">Vorher</div>'
+              + (vorherSrc ? '<img src="' + vorherSrc + '" style="width:100%;max-width:120px;height:150px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border)">' : '<div style="width:100%;max-width:120px;height:150px;background:var(--bg-warm);border-radius:var(--radius-sm);border:1px solid var(--border);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text-dim)">Kein Foto</div>') + '</div>'
+              + '<div style="text-align:center"><div style="font-size:10px;font-weight:600;color:var(--gold);margin-bottom:4px;text-transform:uppercase">Nachher (KI)</div>'
+              + '<img src="data:image/jpeg;base64,' + ki64 + '" style="width:100%;max-width:120px;height:150px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border-accent)" alt="KI Farbsimulation"></div>';
+            kiCard.appendChild(compareDiv);
+          }
+          var kiTitleEl = document.createElement('div');
+          kiTitleEl.style.cssText = 'font-family:Playfair Display,serif;font-size:14px;font-weight:700;margin-bottom:8px;color:var(--gold)';
+          kiTitleEl.textContent = 'KI-Empfehlung';
+          kiCard.appendChild(kiTitleEl);
           var kiBody = document.createElement('div');
           kiBody.style.cssText = 'font-size:12px;line-height:1.6;color:var(--text-secondary);white-space:pre-line';
           kiBody.textContent = kiText;
@@ -5563,7 +5576,7 @@
       result.id = 'machbarkeitResult'; result.style.cssText = 'display:none;margin-top:14px';
       wrapper.appendChild(result);
 
-      // KI-Vorschau Platzhalter
+      // KI-Vorschau Panel (Vorher/Nachher)
       var kiPreview = document.createElement('div');
       kiPreview.id = 'wfKiPreview';
       kiPreview.style.cssText = 'display:none;margin-top:14px;padding:16px;background:linear-gradient(135deg,rgba(201,168,76,0.06),rgba(201,168,76,0.02));border:1px solid var(--border-accent);border-radius:var(--radius)';
@@ -5571,13 +5584,23 @@
       kiTitle.style.cssText = 'font-family:Playfair Display,serif;font-size:15px;font-weight:700;margin-bottom:10px;color:var(--gold)';
       kiTitle.textContent = 'KI-generierte Vorschau';
       kiPreview.appendChild(kiTitle);
-      var kiPlaceholder = document.createElement('div');
-      kiPlaceholder.style.cssText = 'width:140px;height:180px;background:var(--bg-warm);border-radius:var(--radius-sm);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-dim);text-align:center;margin:0 auto';
-      kiPlaceholder.textContent = 'Ihr Gesicht + Wunschlook';
-      kiPreview.appendChild(kiPlaceholder);
+      // Vorher/Nachher Vergleich
+      var kiCompare = document.createElement('div');
+      kiCompare.id = 'wfKiCompare';
+      kiCompare.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:10px';
+      var kiVorher = document.createElement('div');
+      kiVorher.style.cssText = 'text-align:center';
+      kiVorher.innerHTML = '<div style="font-size:10px;font-weight:600;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Vorher</div>'
+        + '<img id="wfKiVorherImg" style="width:100%;max-width:150px;height:180px;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-warm)" src="" alt="Vorher">';
+      var kiNachher = document.createElement('div');
+      kiNachher.style.cssText = 'text-align:center';
+      kiNachher.innerHTML = '<div style="font-size:10px;font-weight:600;color:var(--gold);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">Nachher (KI)</div>'
+        + '<div id="wfKiNachherWrap" style="width:100%;max-width:150px;height:180px;border-radius:var(--radius-sm);border:1px solid var(--border-accent);background:var(--bg-warm);display:flex;align-items:center;justify-content:center;margin:0 auto;font-size:10px;color:var(--text-dim);text-align:center;padding:8px;box-sizing:border-box">&#x2728; Wird generiert, sobald GPU-Server aktiv</div>';
+      kiCompare.appendChild(kiVorher); kiCompare.appendChild(kiNachher);
+      kiPreview.appendChild(kiCompare);
       var kiNote = document.createElement('div');
       kiNote.style.cssText = 'font-size:10px;color:var(--text-micro);margin-top:10px;text-align:center';
-      kiNote.textContent = 'Dein Gesicht bleibt 100% echt \u2014 nur die Frisur wird generiert';
+      kiNote.textContent = 'Ihr Gesicht bleibt 100% echt \u2014 nur die Frisur wird KI-generiert \u2014 DSGVO-konform, kein Speichern';
       kiPreview.appendChild(kiNote);
       wrapper.appendChild(kiPreview);
     }
@@ -5809,14 +5832,37 @@
       })
       .then(function(data) {
         renderMachbarkeitResult(result, data, false);
-        var kiPreview = document.getElementById('wfKiPreview');
-        if (kiPreview) kiPreview.style.display = 'block';
+        showKiVorherNachher(data);
       }).catch(function(err) {
         // DEMO-Fallback
         renderMachbarkeitResult(result, DEMO_MACHBARKEIT, true);
-        var kiPreview = document.getElementById('wfKiPreview');
-        if (kiPreview) kiPreview.style.display = 'block';
+        showKiVorherNachher(null);
       });
+    }
+
+    // === KI-Bild Vorher/Nachher anzeigen ===
+    function showKiVorherNachher(data) {
+      var kiPreview = document.getElementById('wfKiPreview');
+      if (!kiPreview) return;
+      kiPreview.style.display = 'block';
+      // Vorher-Bild: erstes hochgeladenes Foto
+      var vorherImg = document.getElementById('wfKiVorherImg');
+      if (vorherImg && wfAktuellePhotos.length > 0) {
+        vorherImg.src = wfAktuellePhotos[0];
+        vorherImg.style.display = 'block';
+      }
+      // Nachher-Bild: KI-Ergebnis wenn verfuegbar
+      var nachherWrap = document.getElementById('wfKiNachherWrap');
+      if (!nachherWrap) return;
+      var ki64 = data && data.daten && data.daten.ki_bild_base64;
+      if (ki64) {
+        var img = document.createElement('img');
+        img.src = 'data:image/jpeg;base64,' + ki64;
+        img.alt = 'KI-generierte Wunschfrisur';
+        img.style.cssText = 'width:100%;max-width:150px;height:180px;object-fit:cover;border-radius:var(--radius-sm)';
+        nachherWrap.textContent = '';
+        nachherWrap.appendChild(img);
+      }
     }
 
     // === Salon-Regeln CRUD ===
