@@ -922,6 +922,20 @@
       transition: all 300ms var(--ease);
       position: relative; overflow: hidden; cursor: pointer;
     }
+    /* Widget Edit Mode */
+    .cockpit-grid.editing .cockpit-card { cursor: grab; border: 2px dashed var(--gold); animation: widget-pulse 1.5s ease infinite; }
+    .cockpit-grid.editing .cockpit-card:active { cursor: grabbing; opacity: 0.7; }
+    .cockpit-grid.editing .cockpit-card.dragging { opacity: 0.4; transform: scale(0.95); }
+    .cockpit-grid.editing .cockpit-card.drag-over { border-color: var(--success); background: rgba(45,138,78,0.1); }
+    @keyframes widget-pulse { 0%,100% { border-color: var(--gold); } 50% { border-color: rgba(201,168,76,0.3); } }
+    .widget-hide-btn { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; background: var(--danger); color: #fff; border: none; font-size: 12px; cursor: pointer; display: none; z-index: 5; line-height: 22px; text-align: center; }
+    .cockpit-grid.editing .widget-hide-btn { display: block; }
+    .widget-drag-handle { position: absolute; top: 4px; left: 4px; font-size: 14px; color: var(--gold); display: none; z-index: 5; pointer-events: none; }
+    .cockpit-grid.editing .widget-drag-handle { display: block; }
+    .cockpit-edit-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .cockpit-edit-bar .edit-btn { font-size: 10px; padding: 4px 10px; border-radius: var(--radius-full); border: 1px solid var(--border-accent); background: transparent; color: var(--gold); cursor: pointer; font-weight: 600; }
+    .cockpit-edit-bar .edit-btn:hover { background: var(--gold-glow); }
+    .cockpit-edit-bar .edit-btn.active { background: var(--gold); color: var(--bg); }
     .cockpit-card::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
       background: linear-gradient(90deg, transparent, var(--gold), transparent);
@@ -1436,11 +1450,18 @@
       <!-- JARVIS COCKPIT 2035 -->
       <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
         <span>Cockpit <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></span>
-        <span id="liveDataLabel" style="font-size:9px;font-weight:600;color:var(--gold);letter-spacing:1.5px;animation:data-pulse 2s infinite;display:none">LIVE DATA</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span id="liveDataLabel" style="font-size:9px;font-weight:600;color:var(--gold);letter-spacing:1.5px;animation:data-pulse 2s infinite;display:none">LIVE DATA</span>
+          <button class="edit-btn" id="cockpitEditBtn" onclick="toggleCockpitEdit()" style="font-size:9px;padding:3px 8px;border-radius:var(--radius-full);border:1px solid var(--border-accent);background:transparent;color:var(--text-dim);cursor:pointer;font-weight:600" title="Cockpit anpassen">&#9881; Anpassen</button>
+        </div>
+      </div>
+      <div id="hiddenWidgetsBar" style="display:none;margin-bottom:10px;padding:8px 12px;background:var(--surface);border:1px solid var(--border-accent);border-radius:var(--radius-sm);font-size:11px;color:var(--text-dim)">
+        <span style="font-weight:600;color:var(--gold);margin-right:6px">Ausgeblendet:</span>
+        <span id="hiddenWidgetsList"></span>
       </div>
       <div class="cockpit-grid stagger" id="cockpitGrid">
         <!-- Wochen-Umsatz Chart -->
-        <div class="cockpit-card cockpit-wide" onclick="showPage('kasse')" style="--stagger:0">
+        <div class="cockpit-card cockpit-wide" data-widget="weekRevenue" data-widget-name="Wochen-Umsatz" onclick="if(!cockpitEditing)showPage('kasse')" style="--stagger:0" draggable="false"><span class="widget-drag-handle">&#9776;</span><button class="widget-hide-btn" onclick="event.stopPropagation();hideWidget('weekRevenue')">&times;</button>
           <div class="cockpit-title">Wochen-Umsatz <span class="cockpit-trend up" id="weekTrend">+12%</span></div>
           <div class="bar-chart" id="weekRevenueChart">
             <div class="bar-col"><div class="bar" id="bar0" style="height:40%"></div><span>Mo</span></div>
@@ -1453,7 +1474,7 @@
           <div class="bar-legend"><span id="weekTotal">Gesamt: 0 EUR</span></div>
         </div>
         <!-- Kanal-Verteilung -->
-        <div class="cockpit-card" onclick="showPage('beratung')" style="--stagger:1">
+        <div class="cockpit-card" data-widget="channels" data-widget-name="Kanaele" onclick="if(!cockpitEditing)showPage('beratung')" style="--stagger:1" draggable="false"><span class="widget-drag-handle">&#9776;</span><button class="widget-hide-btn" onclick="event.stopPropagation();hideWidget('channels')">&times;</button>
           <div class="cockpit-title">Kanaele</div>
           <div class="channel-bars" id="channelBars">
             <div class="ch-row"><span class="ch-label">WhatsApp</span><div class="ch-track"><div class="ch-fill" style="width:42%;background:#25D366"></div></div><span class="ch-pct">42%</span></div>
@@ -1464,7 +1485,7 @@
           </div>
         </div>
         <!-- Team-Performance -->
-        <div class="cockpit-card" onclick="showPage('termine')" style="--stagger:2">
+        <div class="cockpit-card" data-widget="teamPerformance" data-widget-name="Team-Performance" onclick="if(!cockpitEditing)showPage('termine')" style="--stagger:2" draggable="false"><span class="widget-drag-handle">&#9776;</span><button class="widget-hide-btn" onclick="event.stopPropagation();hideWidget('teamPerformance')">&times;</button>
           <div class="cockpit-title">Team-Performance</div>
           <div class="team-perf" id="teamPerf">
             <div class="perf-row"><div class="perf-avatar" style="background:#C9A84C">RR</div><div class="perf-info"><div class="perf-name">Rena</div><div class="perf-track"><div class="perf-fill" style="width:85%"></div></div></div><span class="perf-val" id="perfRena">0 EUR</span></div>
@@ -1474,7 +1495,7 @@
           </div>
         </div>
         <!-- Salon-Puls -->
-        <div class="cockpit-card cockpit-center" onclick="showPage('termine')" style="--stagger:3">
+        <div class="cockpit-card cockpit-center" data-widget="salonPuls" data-widget-name="Salon-Puls" onclick="if(!cockpitEditing)showPage('termine')" style="--stagger:3" draggable="false"><span class="widget-drag-handle">&#9776;</span><button class="widget-hide-btn" onclick="event.stopPropagation();hideWidget('salonPuls')">&times;</button>
           <div class="cockpit-title">Salon-Puls</div>
           <div class="pulse-ring-wrap">
             <svg viewBox="0 0 120 120" class="pulse-ring">
@@ -1489,14 +1510,14 @@
           </div>
         </div>
         <!-- Top-Services (neben Salon-Puls) -->
-        <div class="cockpit-card" onclick="showPage('kasse')" style="--stagger:4">
+        <div class="cockpit-card" data-widget="topServices" data-widget-name="Top-Services" onclick="if(!cockpitEditing)showPage('kasse')" style="--stagger:4" draggable="false"><span class="widget-drag-handle">&#9776;</span><button class="widget-hide-btn" onclick="event.stopPropagation();hideWidget('topServices')">&times;</button>
           <div class="cockpit-title">Top-Services heute</div>
           <div class="top-services" id="topServices">
             <div class="ts-row"><span class="ts-rank">1</span><span class="ts-name">—</span><span class="ts-count">0x</span><span class="ts-rev">0 EUR</span></div>
           </div>
         </div>
         <!-- Kunden-Trend Sparkline -->
-        <div class="cockpit-card cockpit-wide" onclick="showPage('kunden')" style="--stagger:5">
+        <div class="cockpit-card cockpit-wide" data-widget="kundenTrend" data-widget-name="Kundenbesuche" onclick="if(!cockpitEditing)showPage('kunden')" style="--stagger:5" draggable="false"><span class="widget-drag-handle">&#9776;</span><button class="widget-hide-btn" onclick="event.stopPropagation();hideWidget('kundenTrend')">&times;</button>
           <div class="cockpit-title">Kundenbesuche (30 Tage) <span class="cockpit-trend up" id="kundenTrend">+8%</span></div>
           <svg class="sparkline" id="kundenSparkline" viewBox="0 0 300 60" preserveAspectRatio="none">
             <defs><linearGradient id="sparkGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="var(--gold)" stop-opacity="0.3"/><stop offset="100%" stop-color="var(--gold)" stop-opacity="0"/></linearGradient></defs>
@@ -6553,6 +6574,249 @@
       }
     });
 
+    // === WIDGET-PERSONALISIERUNG (Cockpit) ===
+    var cockpitEditing = false;
+    var WIDGET_ORDER_KEY = 'casa2035_widget_order_';
+    var WIDGET_HIDDEN_KEY = 'casa2035_widget_hidden_';
+    var dragSrcEl = null;
+
+    function getWidgetStorageKey(suffix) {
+      var user = (currentUser && currentUser.Kuerzel) ? currentUser.Kuerzel : 'default';
+      return suffix + user;
+    }
+
+    function toggleCockpitEdit() {
+      cockpitEditing = !cockpitEditing;
+      var grid = document.querySelector('.cockpit-grid');
+      var btn = document.getElementById('cockpitEditBtn');
+      var bar = document.getElementById('hiddenWidgetsBar');
+      if (!grid) return;
+      if (cockpitEditing) {
+        grid.classList.add('editing');
+        btn.textContent = '\u2713 Fertig';
+        btn.style.background = 'var(--gold)';
+        btn.style.color = '#000';
+        // Enable dragging (Desktop + Touch)
+        grid.querySelectorAll('.cockpit-card[data-widget]').forEach(function(card) {
+          card.setAttribute('draggable', 'true');
+          card.addEventListener('dragstart', handleDragStart);
+          card.addEventListener('dragover', handleDragOver);
+          card.addEventListener('drop', handleDrop);
+          card.addEventListener('dragend', handleDragEnd);
+          card.addEventListener('touchstart', handleTouchStart, { passive: true });
+          card.addEventListener('touchmove', handleTouchMove, { passive: false });
+          card.addEventListener('touchend', handleTouchEnd, { passive: true });
+        });
+        updateHiddenBar();
+      } else {
+        grid.classList.remove('editing');
+        btn.innerHTML = '&#9881; Anpassen';
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--text-dim)';
+        bar.style.display = 'none';
+        // Disable dragging
+        grid.querySelectorAll('.cockpit-card[data-widget]').forEach(function(card) {
+          card.setAttribute('draggable', 'false');
+          card.removeEventListener('dragstart', handleDragStart);
+          card.removeEventListener('dragover', handleDragOver);
+          card.removeEventListener('drop', handleDrop);
+          card.removeEventListener('dragend', handleDragEnd);
+          card.removeEventListener('touchstart', handleTouchStart);
+          card.removeEventListener('touchmove', handleTouchMove);
+          card.removeEventListener('touchend', handleTouchEnd);
+        });
+        saveCockpitLayout();
+      }
+    }
+
+    function handleDragStart(e) {
+      dragSrcEl = this;
+      this.style.opacity = '0.4';
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', this.getAttribute('data-widget'));
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      this.classList.add('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      this.classList.remove('drag-over');
+      if (dragSrcEl !== this && dragSrcEl) {
+        var grid = this.parentNode;
+        var allCards = Array.from(grid.querySelectorAll('.cockpit-card[data-widget]'));
+        var fromIdx = allCards.indexOf(dragSrcEl);
+        var toIdx = allCards.indexOf(this);
+        if (fromIdx < toIdx) {
+          grid.insertBefore(dragSrcEl, this.nextSibling);
+        } else {
+          grid.insertBefore(dragSrcEl, this);
+        }
+      }
+    }
+
+    function handleDragEnd(e) {
+      this.style.opacity = '1';
+      document.querySelectorAll('.cockpit-card').forEach(function(c) { c.classList.remove('drag-over'); });
+    }
+
+    // Touch-Drag fuer iPhone/iPad
+    var touchDragEl = null;
+    var touchClone = null;
+    var touchOffsetX = 0, touchOffsetY = 0;
+
+    function handleTouchStart(e) {
+      if (!cockpitEditing) return;
+      var touch = e.touches[0];
+      touchDragEl = this;
+      touchOffsetX = touch.clientX - touchDragEl.getBoundingClientRect().left;
+      touchOffsetY = touch.clientY - touchDragEl.getBoundingClientRect().top;
+      touchDragEl.style.opacity = '0.4';
+      // Create floating clone
+      touchClone = touchDragEl.cloneNode(true);
+      touchClone.style.cssText = 'position:fixed;z-index:9999;pointer-events:none;opacity:0.85;width:' + touchDragEl.offsetWidth + 'px;border-radius:var(--radius-md);box-shadow:0 8px 32px rgba(0,0,0,0.5);transform:scale(1.05);';
+      touchClone.style.left = (touch.clientX - touchOffsetX) + 'px';
+      touchClone.style.top = (touch.clientY - touchOffsetY) + 'px';
+      document.body.appendChild(touchClone);
+    }
+
+    function handleTouchMove(e) {
+      if (!cockpitEditing || !touchDragEl || !touchClone) return;
+      e.preventDefault();
+      var touch = e.touches[0];
+      touchClone.style.left = (touch.clientX - touchOffsetX) + 'px';
+      touchClone.style.top = (touch.clientY - touchOffsetY) + 'px';
+      // Find card under finger
+      touchClone.style.display = 'none';
+      var elUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+      touchClone.style.display = '';
+      var targetCard = elUnder ? elUnder.closest('.cockpit-card[data-widget]') : null;
+      document.querySelectorAll('.cockpit-card').forEach(function(c) { c.classList.remove('drag-over'); });
+      if (targetCard && targetCard !== touchDragEl) targetCard.classList.add('drag-over');
+    }
+
+    function handleTouchEnd(e) {
+      if (!cockpitEditing || !touchDragEl) return;
+      var touch = e.changedTouches[0];
+      if (touchClone) { touchClone.remove(); touchClone = null; }
+      touchDragEl.style.opacity = '1';
+      // Find drop target
+      var elUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+      var targetCard = elUnder ? elUnder.closest('.cockpit-card[data-widget]') : null;
+      document.querySelectorAll('.cockpit-card').forEach(function(c) { c.classList.remove('drag-over'); });
+      if (targetCard && targetCard !== touchDragEl) {
+        var grid = touchDragEl.parentNode;
+        var allCards = Array.from(grid.querySelectorAll('.cockpit-card[data-widget]'));
+        var fromIdx = allCards.indexOf(touchDragEl);
+        var toIdx = allCards.indexOf(targetCard);
+        if (fromIdx < toIdx) {
+          grid.insertBefore(touchDragEl, targetCard.nextSibling);
+        } else {
+          grid.insertBefore(touchDragEl, targetCard);
+        }
+        saveCockpitLayout();
+      }
+      touchDragEl = null;
+    }
+
+    function hideWidget(id) {
+      var card = document.querySelector('[data-widget="' + id + '"]');
+      if (card) {
+        card.style.display = 'none';
+        card.setAttribute('data-hidden', 'true');
+      }
+      updateHiddenBar();
+      saveCockpitLayout();
+    }
+
+    function showWidget(id) {
+      var card = document.querySelector('[data-widget="' + id + '"]');
+      if (card) {
+        card.style.display = '';
+        card.removeAttribute('data-hidden');
+      }
+      updateHiddenBar();
+      saveCockpitLayout();
+    }
+
+    function updateHiddenBar() {
+      var bar = document.getElementById('hiddenWidgetsBar');
+      if (!bar) return;
+      var hidden = document.querySelectorAll('.cockpit-card[data-hidden="true"]');
+      if (hidden.length === 0) {
+        bar.style.display = 'none';
+        return;
+      }
+      bar.style.display = 'block';
+      bar.innerHTML = '<span style="font-weight:600">Ausgeblendet: </span>';
+      hidden.forEach(function(card) {
+        var wid = card.getAttribute('data-widget');
+        var wname = card.getAttribute('data-widget-name');
+        var chip = document.createElement('button');
+        chip.textContent = '+ ' + wname;
+        chip.style.cssText = 'margin:2px 4px;padding:3px 10px;border-radius:var(--radius-full);border:1px solid var(--gold);background:var(--gold-glow);color:var(--gold);font-size:10px;cursor:pointer;font-weight:600';
+        chip.onclick = function() { showWidget(wid); };
+        bar.appendChild(chip);
+      });
+    }
+
+    function saveCockpitLayout() {
+      var grid = document.querySelector('.cockpit-grid');
+      if (!grid) return;
+      var cards = grid.querySelectorAll('.cockpit-card[data-widget]');
+      var order = [];
+      var hidden = [];
+      cards.forEach(function(c) {
+        var wid = c.getAttribute('data-widget');
+        order.push(wid);
+        if (c.getAttribute('data-hidden') === 'true') hidden.push(wid);
+      });
+      try {
+        localStorage.setItem(getWidgetStorageKey(WIDGET_ORDER_KEY), JSON.stringify(order));
+        localStorage.setItem(getWidgetStorageKey(WIDGET_HIDDEN_KEY), JSON.stringify(hidden));
+      } catch(e) {}
+    }
+
+    function loadCockpitLayout() {
+      var grid = document.querySelector('.cockpit-grid');
+      if (!grid) return;
+      try {
+        var orderStr = localStorage.getItem(getWidgetStorageKey(WIDGET_ORDER_KEY));
+        var hiddenStr = localStorage.getItem(getWidgetStorageKey(WIDGET_HIDDEN_KEY));
+        if (!orderStr) return;
+        var order = JSON.parse(orderStr);
+        var hidden = hiddenStr ? JSON.parse(hiddenStr) : [];
+        // Reorder cards
+        var fragment = document.createDocumentFragment();
+        order.forEach(function(wid) {
+          var card = grid.querySelector('[data-widget="' + wid + '"]');
+          if (card) {
+            if (hidden.indexOf(wid) !== -1) {
+              card.style.display = 'none';
+              card.setAttribute('data-hidden', 'true');
+            } else {
+              card.style.display = '';
+              card.removeAttribute('data-hidden');
+            }
+            fragment.appendChild(card);
+          }
+        });
+        // Append any cards not in saved order
+        grid.querySelectorAll('.cockpit-card[data-widget]').forEach(function(c) {
+          if (!c.parentNode || c.parentNode === grid) {
+            if (order.indexOf(c.getAttribute('data-widget')) === -1) {
+              fragment.appendChild(c);
+            }
+          }
+        });
+        grid.appendChild(fragment);
+      } catch(e) {}
+    }
+
     // === KI-Vorschlaege fuer Home/Cockpit ===
     function renderKiSuggestions() {
       var container = document.getElementById('kiSuggestions');
@@ -7345,6 +7609,7 @@
       renderSalonRegeln();
       renderRegelVorschlaege();
       if (perms.personalTab) renderPersonalPerms();
+      loadCockpitLayout();
       fetchAll();
     }
 
