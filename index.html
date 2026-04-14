@@ -3822,6 +3822,26 @@
       });
       c.appendChild(wrap);
     }
+    // === KI-Verlauf: Eintrag in kunden_verlauf speichern (DSGVO-konform) ===
+    function saveKiVerlauf(typ, kundeName, inputDaten, outputDaten) {
+      if (!isBackendMode()) return;
+      var kunde = null;
+      if (kundeName) {
+        var q = kundeName.toLowerCase().trim();
+        kunde = kundenCache.find(function(k) { return (k.Name || k.name || '').toLowerCase().trim() === q; });
+      }
+      var titel = { wunschfrisur: 'Wunschlook analysiert', haaranalyse: 'Haaranalyse durchgefuehrt', farbcode: 'Farbcode berechnet' }[typ] || typ;
+      var beschreibung = (inputDaten && inputDaten.notiz) || (inputDaten && inputDaten.haartyp) || '';
+      var eintrag = {
+        salon_id: '26230de8-a46e-4610-937c-c302547b5a73',
+        typ: typ, titel: titel, beschreibung: beschreibung,
+        input_daten: inputDaten || {}, output_daten: outputDaten || {},
+        bilder_urls: [], erstellt_am: new Date().toISOString()
+      };
+      if (kunde && kunde.id) eintrag.kunde_id = kunde.id;
+      apiPost('kunden_verlauf', eintrag).catch(function() {});
+    }
+
     function openLightbox(url) {
       var old = document.getElementById('casaLightbox');
       if (old) old.remove();
@@ -4784,6 +4804,14 @@
 
     function buildFarbcodeTool(wrapper) {
       selectedIstFarbe = null; selectedZielFarbe = null;
+      var fcKundeRow = document.createElement('div');
+      fcKundeRow.style.cssText = 'margin-bottom:12px';
+      var fcKundeInput = document.createElement('input');
+      fcKundeInput.type = 'text'; fcKundeInput.id = 'fcKundeName';
+      fcKundeInput.placeholder = 'Kundenname (optional, fuer Verlauf)';
+      fcKundeInput.style.cssText = 'width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-warm);font-size:12px;color:var(--text);box-sizing:border-box';
+      fcKundeRow.appendChild(fcKundeInput);
+      wrapper.appendChild(fcKundeRow);
       var intro = document.createElement('div');
       intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
       intro.textContent = 'Fotografiere Haar oder Bart \u2014 die KI erkennt den aktuellen Farbton. Waehle den Wunschton und erhalte eine realistische Vorher/Nachher-Vorschau.';
@@ -5068,11 +5096,13 @@
         message_id: 'dash_fc_' + Date.now()
       };
       var backendUrl = (config && config.backendUrl) || API_DEFAULTS.backendUrl;
+      var fcKundeName = (document.getElementById('fcKundeName') || {}).value || '';
       fetch(backendUrl + 'farbcode', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       }).then(function(res) { return res.json(); })
       .then(function(data) {
+        saveKiVerlauf('farbcode', fcKundeName, { ist: selectedIstFarbe.name, ziel: selectedZielFarbe.name, differenz: diff }, data);
         var kiText = data.empfehlung_text || data.antwort || data.message || data.ergebnis || '';
         if (kiText) {
           var kiCard = document.createElement('div');
@@ -5492,6 +5522,7 @@
         renderHaaranalyseResult(result, data, false);
         var progSection = document.getElementById('haPrognose');
         if (progSection) progSection.style.display = 'block';
+        saveKiVerlauf('haaranalyse', kundeName, { name: kundeName, email: kundeEmail, anzahl_fotos: haaranalysePhotos.length }, data);
       }).catch(function(err) {
         // DEMO-Fallback: Webhook nicht erreichbar → Demo-Daten anzeigen
         renderHaaranalyseResult(result, DEMO_HAARANALYSE, true);
@@ -5825,6 +5856,7 @@
       .then(function(data) {
         renderMachbarkeitResult(result, data, false);
         showKiVorherNachher(data);
+        saveKiVerlauf('wunschfrisur', wfName, { name: wfName, haartyp: wfHaartyp, notiz: wfNotiz, anzahl_fotos: payload.anzahl_fotos }, data);
       }).catch(function(err) {
         // DEMO-Fallback
         renderMachbarkeitResult(result, DEMO_MACHBARKEIT, true);
