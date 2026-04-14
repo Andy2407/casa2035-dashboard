@@ -2040,12 +2040,14 @@
     // =============================================================
 
     // === Users & Auth ===
+    // Display-Daten nur (kein Passwort!). Passwort-Check laeuft serverseitig
+    // via Supabase Auth (auth.users, bcrypt). Passwoerter: siehe SECRETS/VAULT
     var USERS = {
-      'rena':  { pw: 'Peter&Ruediger13', rolle: 'CHF', name: 'Rena', nachname: 'Rados', titel: 'Inhaberin & Friseurmeisterin', isAdmin: false, kuerzel: 'RR', farbe: '#C9A84C' },
-      'sarah': { pw: 'Peter&Ruediger13', rolle: 'FRM', name: 'Sarah', nachname: 'Mueller', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'SM', farbe: '#e06b8f' },
-      'julia': { pw: 'Peter&Ruediger13', rolle: 'FRM', name: 'Julia', nachname: 'Weber', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'JW', farbe: '#6b8fe0' },
-      'lena':  { pw: 'Peter&Ruediger13', rolle: 'STY', name: 'Lena', nachname: 'Fischer', titel: 'Stylistin', isAdmin: false, kuerzel: 'LF', farbe: '#8f6be0' },
-      'admin': { pw: 'Peter&Ruediger13', rolle: 'CHF', name: 'Andreas', nachname: 'Schengel', titel: 'Administrator', isAdmin: true, kuerzel: 'AS', farbe: '#2eb87a' }
+      'rena':  { rolle: 'CHF', name: 'Rena', nachname: 'Rados', titel: 'Inhaberin & Friseurmeisterin', isAdmin: false, kuerzel: 'RR', farbe: '#C9A84C' },
+      'sarah': { rolle: 'FRM', name: 'Sarah', nachname: 'Mueller', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'SM', farbe: '#e06b8f' },
+      'julia': { rolle: 'FRM', name: 'Julia', nachname: 'Weber', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'JW', farbe: '#6b8fe0' },
+      'lena':  { rolle: 'STY', name: 'Lena', nachname: 'Fischer', titel: 'Stylistin', isAdmin: false, kuerzel: 'LF', farbe: '#8f6be0' },
+      'admin': { rolle: 'CHF', name: 'Andreas', nachname: 'Schengel', titel: 'Administrator', isAdmin: true, kuerzel: 'AS', farbe: '#2eb87a' }
     };
 
     var userCustomizations = JSON.parse(localStorage.getItem('casa_user_custom') || '{}');
@@ -2075,27 +2077,40 @@
     var config = JSON.parse(localStorage.getItem('casa2035_config') || 'null') || { baseUrl: '', token: '', userId: '', backendUrl: '' };
     function isBackendMode() { return config.baseUrl && config.baseUrl.indexOf('api.casa2035.de') !== -1; }
 
+    // Auth-Header-Helper: apikey=anonKey (oeffentlich, RLS-geschuetzt),
+    // Bearer=User-JWT aus sessionStorage (nach Login). Ohne Login: Bearer=anonKey.
+    function authHeaders(extra) {
+      var userJwt = sessionStorage.getItem('casa_token') || API_DEFAULTS.anonKey;
+      var h = {
+        'apikey': API_DEFAULTS.anonKey,
+        'Authorization': 'Bearer ' + userJwt,
+        'Content-Type': 'application/json'
+      };
+      if (extra) Object.keys(extra).forEach(function(k){ h[k] = extra[k]; });
+      return h;
+    }
+
     async function apiGet(table, params) {
       var url = config.baseUrl + '/rest/v1/' + table + (params ? '?' + params : '');
-      var r = await fetch(url, { headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json' } });
+      var r = await fetch(url, { headers: authHeaders() });
       if (!r.ok) throw new Error('Server ' + r.status + ': ' + table);
       return r.json();
     }
     async function apiPost(table, data) {
       var url = config.baseUrl + '/rest/v1/' + table;
-      var r = await fetch(url, { method: 'POST', headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, body: JSON.stringify(data) });
+      var r = await fetch(url, { method: 'POST', headers: authHeaders({ 'Prefer': 'return=representation' }), body: JSON.stringify(data) });
       if (!r.ok) throw new Error('Server ' + r.status + ': ' + table);
       return r.json();
     }
     async function apiPatch(table, params, data) {
       var url = config.baseUrl + '/rest/v1/' + table + '?' + params;
-      var r = await fetch(url, { method: 'PATCH', headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json', 'Prefer': 'return=representation' }, body: JSON.stringify(data) });
+      var r = await fetch(url, { method: 'PATCH', headers: authHeaders({ 'Prefer': 'return=representation' }), body: JSON.stringify(data) });
       if (!r.ok) throw new Error('Server ' + r.status + ': ' + table);
       return r.json();
     }
     async function apiRpc(fn, params) {
       var url = config.baseUrl + '/rest/v1/rpc/' + fn;
-      var r = await fetch(url, { method: 'POST', headers: { 'apikey': config.token, 'Authorization': 'Bearer ' + config.token, 'Content-Type': 'application/json' }, body: JSON.stringify(params || {}) });
+      var r = await fetch(url, { method: 'POST', headers: authHeaders(), body: JSON.stringify(params || {}) });
       if (!r.ok) throw new Error('Server ' + r.status + ': ' + fn);
       return r.json();
     }
@@ -2184,40 +2199,91 @@
       }, stepTime);
     }
 
-    // === Login/Logout ===
-    function doLogin() {
+    // === Login/Logout (Supabase Auth, ab 15.04.2026) ===
+    function showLoginError(msg) {
+      var el = document.getElementById('loginError');
+      if (el) { el.style.display = 'block'; el.textContent = msg; }
+    }
+    async function doLogin() {
       var uname = document.getElementById('loginUser').value;
       var pw = document.getElementById('loginPw').value;
-      if (!uname || !USERS[uname]) { document.getElementById('loginError').style.display = 'block'; document.getElementById('loginError').textContent = 'Bitte Benutzer waehlen'; return; }
-      if (pw !== USERS[uname].pw) { document.getElementById('loginError').style.display = 'block'; document.getElementById('loginError').textContent = 'Falsches Passwort'; return; }
-      currentUser = uname;
-      currentRolle = USERS[uname].rolle;
-      perms = ROLE_PERMS[currentRolle] || ROLE_PERMS.AZU;
-      if (USERS[uname].isAdmin) {
-        perms = JSON.parse(JSON.stringify(ROLE_PERMS.CHF));
-        Object.keys(perms).forEach(function(k) { perms[k] = true; });
-      }
-      sessionStorage.setItem('casa_user', uname);
-      document.getElementById('loginOverlay').classList.add('hidden');
-      document.getElementById('appHeader').style.display = '';
-      document.getElementById('appMain').style.display = '';
-      document.getElementById('bottomNav').style.display = '';
-      document.getElementById('fabWrap').style.display = '';
-      if (!isBackendMode() && API_DEFAULTS.baseUrl) {
+      if (!uname || !USERS[uname]) { showLoginError('Bitte Benutzer waehlen'); return; }
+      if (!pw) { showLoginError('Bitte Passwort eingeben'); return; }
+      try {
+        var resp = await fetch(API_DEFAULTS.baseUrl + '/auth/v1/token?grant_type=password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': API_DEFAULTS.anonKey },
+          body: JSON.stringify({ email: uname + '@casa2035.local', password: pw })
+        });
+        if (!resp.ok) {
+          var errJson = await resp.json().catch(function(){ return {}; });
+          showLoginError(errJson.msg || errJson.error_description || 'Falsches Passwort');
+          return;
+        }
+        var data = await resp.json();
+        var meta = (data.user && data.user.user_metadata) || {};
+        currentUser = meta.username || uname;
+        currentRolle = meta.rolle || USERS[uname].rolle;
+        perms = ROLE_PERMS[currentRolle] || ROLE_PERMS.AZU;
+        if (meta.isAdmin) {
+          perms = JSON.parse(JSON.stringify(ROLE_PERMS.CHF));
+          Object.keys(perms).forEach(function(k) { perms[k] = true; });
+        }
+        // Session ablegen (access_token + refresh_token + user_metadata)
+        sessionStorage.setItem('casa_user', currentUser);
+        sessionStorage.setItem('casa_token', data.access_token);
+        sessionStorage.setItem('casa_refresh', data.refresh_token || '');
+        sessionStorage.setItem('casa_meta', JSON.stringify(meta));
+        sessionStorage.setItem('casa_user_id', (data.user && data.user.id) || '');
+        // Config aktualisieren (Backend-Modus an)
         config.baseUrl = API_DEFAULTS.baseUrl;
-        config.token = API_DEFAULTS.token;
+        config.token = data.access_token; // Legacy-Kompat
         config.backendUrl = API_DEFAULTS.backendUrl;
+        config.userId = (data.user && data.user.id) || '';
         localStorage.setItem('casa2035_config', JSON.stringify(config));
+        // UI
+        document.getElementById('loginOverlay').classList.add('hidden');
+        document.getElementById('appHeader').style.display = '';
+        document.getElementById('appMain').style.display = '';
+        document.getElementById('bottomNav').style.display = '';
+        var fab = document.getElementById('fabWrap'); if (fab) fab.style.display = '';
+        applyUserUI();
+        initApp();
+      } catch (e) {
+        showLoginError('Verbindungsfehler: ' + (e && e.message ? e.message : e));
       }
-      applyUserUI();
-      initApp();
     }
-
     function doLogout() {
       sessionStorage.removeItem('casa_user');
+      sessionStorage.removeItem('casa_token');
+      sessionStorage.removeItem('casa_refresh');
+      sessionStorage.removeItem('casa_meta');
+      sessionStorage.removeItem('casa_user_id');
       currentUser = null;
       currentRolle = null;
       location.reload();
+    }
+    // Session-Restore beim Seitenaufruf (wenn gueltiger Token in sessionStorage)
+    function tryRestoreSession() {
+      var tok = sessionStorage.getItem('casa_token');
+      var user = sessionStorage.getItem('casa_user');
+      var metaStr = sessionStorage.getItem('casa_meta');
+      if (!tok || !user || !metaStr) return false;
+      try {
+        var meta = JSON.parse(metaStr);
+        currentUser = user;
+        currentRolle = meta.rolle || 'AZU';
+        perms = ROLE_PERMS[currentRolle] || ROLE_PERMS.AZU;
+        if (meta.isAdmin) {
+          perms = JSON.parse(JSON.stringify(ROLE_PERMS.CHF));
+          Object.keys(perms).forEach(function(k) { perms[k] = true; });
+        }
+        config.baseUrl = API_DEFAULTS.baseUrl;
+        config.token = tok;
+        config.backendUrl = API_DEFAULTS.backendUrl;
+        config.userId = sessionStorage.getItem('casa_user_id') || '';
+        return true;
+      } catch (e) { return false; }
     }
 
     function applyUserUI() {
@@ -2422,9 +2488,12 @@
     }
 
     // === Config Sheet ===
+    // anonKey = oeffentlicher Supabase Anon-Key (RLS-geschuetzt, darf im Frontend liegen)
+    // token = User-JWT nach Supabase Auth Login (nur im sessionStorage, pro Session)
     var API_DEFAULTS = {
       baseUrl: 'https://api.casa2035.de',
-      token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzU1MDQ3NjUsImV4cCI6MTkzMzE4NDc2NX0.4wpQjYlTgmja6vSbLaVVHAGdRJMXIlDSWripkEaoXCk',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzc1NTA0NzY1LCJleHAiOjE5MzMxODQ3NjV9.5YsRP4FLKHp7hTae7-RAyi13ofRfSGmjm8P2Ved2Wu4',
+      token: '', // wird nach Login mit User-JWT befuellt
       backendUrl: 'https://api.casa2035.de/webhook/',
       kiBase: 'https://api.casa2035.de/ki'
     };
@@ -7755,12 +7824,15 @@
       if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
       else document.documentElement.setAttribute('data-theme', 'dark'); // Default dark
 
-      // Auto-login from session
-      var saved = sessionStorage.getItem('casa_user');
-      if (saved && USERS[saved]) {
-        document.getElementById('loginUser').value = saved;
-        document.getElementById('loginPw').value = USERS[saved].pw;
-        doLogin();
+      // Auto-login from session (Supabase Auth JWT)
+      if (tryRestoreSession()) {
+        document.getElementById('loginOverlay').classList.add('hidden');
+        document.getElementById('appHeader').style.display = '';
+        document.getElementById('appMain').style.display = '';
+        document.getElementById('bottomNav').style.display = '';
+        var fab = document.getElementById('fabWrap'); if (fab) fab.style.display = '';
+        applyUserUI();
+        initApp();
       }
 
       // Service Worker

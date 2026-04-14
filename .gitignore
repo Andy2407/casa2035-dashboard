@@ -1,3 +1,36 @@
-icons/IMG_7886.PNG
+# CASA 2035 — Secrets & Vault
+# NIEMALS committen!
+SECRETS/
+SECRETS/**
+CASA2035_PASSWORT.txt
+**/CASA2035_PASSWORT.txt
+*.md.enc
+*.env
+.env
+.env.*
+*_SECRET.md
+*_ZUGANGSDATEN.md
+*_ZUGANGSDATEN_*.md
+ZUGANGSDATEN_*.md
+Zugangsdaten*.md
+
+# macOS
 .DS_Store
-.claude/
+._*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+
+# Build artefacts
+dist/
+build/
+*.log
+
