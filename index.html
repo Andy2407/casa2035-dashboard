@@ -2425,8 +2425,22 @@
     var API_DEFAULTS = {
       baseUrl: 'https://api.casa2035.de',
       token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiaXNzIjoic3VwYWJhc2UiLCJpYXQiOjE3NzU1MDQ3NjUsImV4cCI6MTkzMzE4NDc2NX0.4wpQjYlTgmja6vSbLaVVHAGdRJMXIlDSWripkEaoXCk',
-      backendUrl: 'https://api.casa2035.de/webhook/'
+      backendUrl: 'https://api.casa2035.de/webhook/',
+      kiBase: 'https://api.casa2035.de/ki'
     };
+
+    // === KI-Bild Direct-Call Helper (umgeht n8n fuer Bildgenerierung) ===
+    function callKiEndpoint(pfad, body) {
+      var base = (config && config.kiBase) || API_DEFAULTS.kiBase;
+      return fetch(base + pfad, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body || {})
+      }).then(function(r) {
+        if (!r.ok) return r.json().then(function(e) { throw new Error(e.detail || ('HTTP ' + r.status)); });
+        return r.json();
+      });
+    }
     function openConfigSheet() {
       document.getElementById('cfgUrl').value = config.baseUrl || API_DEFAULTS.baseUrl;
       document.getElementById('cfgToken').value = config.token || API_DEFAULTS.token;
@@ -5097,11 +5111,25 @@
       };
       var backendUrl = (config && config.backendUrl) || API_DEFAULTS.backendUrl;
       var fcKundeName = (document.getElementById('fcKundeName') || {}).value || '';
-      fetch(backendUrl + 'farbcode', {
+      // Parallele Aufrufe: n8n (RAG/Logging) + /ki/ (echte Hair-Segmentation + Color-Shift)
+      var n8nCall = fetch(backendUrl + 'farbcode', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).then(function(res) { return res.json(); })
-      .then(function(data) {
+      }).then(function(res) { return res.ok ? res.json() : {}; }).catch(function() { return {}; });
+      var kiCall = (mediaUrl ? callKiEndpoint('/api/farbcode', {
+        foto_base64: mediaUrl,
+        ist_stufe: selectedIstFarbe.stufe,
+        ziel_stufe: selectedZielFarbe.stufe,
+        ist_name: selectedIstFarbe.name,
+        ziel_name: selectedZielFarbe.name
+      }).catch(function() { return null; }) : Promise.resolve(null));
+      Promise.all([n8nCall, kiCall]).then(function(results) {
+        var data = results[0] || {};
+        var kiData = results[1];
+        // /ki/ liefert echtes Bild — ueberschreibt n8n placeholder
+        if (kiData && kiData.ki_bild_nachher) data.ki_bild_nachher = kiData.ki_bild_nachher;
+        if (kiData && kiData.empfehlung_text && !data.empfehlung_text) data.empfehlung_text = kiData.empfehlung_text;
+        if (kiData && kiData.analyse) data.ki_analyse = kiData.analyse;
         saveKiVerlauf('farbcode', fcKundeName, { ist: selectedIstFarbe.name, ziel: selectedZielFarbe.name, differenz: diff }, data);
         var kiText = data.empfehlung_text || data.antwort || data.message || data.ergebnis || '';
         if (kiText) {
@@ -5511,23 +5539,27 @@
         message_id: 'dash_ha_' + Date.now()
       };
       var backendUrl = (config && config.backendUrl) || API_DEFAULTS.backendUrl;
-      fetch(backendUrl + 'haaranalyse-profi', {
+      var n8nCall = fetch(backendUrl + 'haaranalyse-profi', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).then(function(res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.json();
-      })
-      .then(function(data) {
-        renderHaaranalyseResult(result, data, false);
+      }).then(function(res) { return res.ok ? res.json() : null; }).catch(function() { return null; });
+      var kiCall = callKiEndpoint('/api/prognose', { fotos_aktuell: haaranalysePhotos }).catch(function() { return null; });
+      Promise.all([n8nCall, kiCall]).then(function(results) {
+        var n8nData = results[0];
+        var kiData = results[1];
+        if (!n8nData && !kiData) {
+          renderHaaranalyseResult(result, DEMO_HAARANALYSE, true);
+          var ps0 = document.getElementById('haPrognose');
+          if (ps0) ps0.style.display = 'block';
+          return;
+        }
+        var merged = n8nData || {};
+        if (kiData && kiData.prognose) merged.prognose_bilder = kiData.prognose;
+        if (kiData && kiData.labels) merged.prognose_labels = kiData.labels;
+        renderHaaranalyseResult(result, merged, false);
         var progSection = document.getElementById('haPrognose');
         if (progSection) progSection.style.display = 'block';
-        saveKiVerlauf('haaranalyse', kundeName, { name: kundeName, email: kundeEmail, anzahl_fotos: haaranalysePhotos.length }, data);
-      }).catch(function(err) {
-        // DEMO-Fallback: Webhook nicht erreichbar → Demo-Daten anzeigen
-        renderHaaranalyseResult(result, DEMO_HAARANALYSE, true);
-        var progSection = document.getElementById('haPrognose');
-        if (progSection) progSection.style.display = 'block';
+        saveKiVerlauf('haaranalyse', kundeName, { name: kundeName, email: kundeEmail, anzahl_fotos: haaranalysePhotos.length }, merged);
       });
     }
 
@@ -5846,21 +5878,25 @@
         message_id: 'dash_wf_' + Date.now()
       };
       var backendUrl = (config && config.backendUrl) || API_DEFAULTS.backendUrl;
-      fetch(backendUrl + 'wunschfrisur', {
+      // Parallele Aufrufe: n8n (RAG/Logging) + /ki/ (Bildgenerierung)
+      var n8nCall = fetch(backendUrl + 'wunschfrisur', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).then(function(res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.json();
-      })
-      .then(function(data) {
-        renderMachbarkeitResult(result, data, false);
-        showKiVorherNachher(data);
-        saveKiVerlauf('wunschfrisur', wfName, { name: wfName, haartyp: wfHaartyp, notiz: wfNotiz, anzahl_fotos: payload.anzahl_fotos }, data);
-      }).catch(function(err) {
-        // DEMO-Fallback
-        renderMachbarkeitResult(result, DEMO_MACHBARKEIT, true);
-        showKiVorherNachher(null);
+      }).then(function(res) { return res.ok ? res.json() : null; }).catch(function() { return null; });
+      var kiCall = callKiEndpoint('/api/wunschfrisur', { fotos_aktuell: wfAktuellePhotos, fotos_wunsch: wfWunschPhotos, name: wfName, haartyp: wfHaartyp, notiz: wfNotiz }).catch(function() { return null; });
+      Promise.all([n8nCall, kiCall]).then(function(results) {
+        var n8nData = results[0];
+        var kiData = results[1];
+        // Merge: prefer ki_bild from /ki/, prefer textual analysis from n8n
+        var merged = n8nData || { daten: {} };
+        merged.daten = merged.daten || {};
+        if (kiData && kiData.ki_bild_base64) merged.daten.ki_bild_base64 = kiData.ki_bild_base64;
+        if (kiData && kiData.analyse) merged.daten.ki_analyse = kiData.analyse;
+        if (kiData && kiData.empfehlung_text && !merged.daten.analyse_text) merged.daten.analyse_text = kiData.empfehlung_text;
+        var isDemo = !n8nData && !kiData;
+        renderMachbarkeitResult(result, isDemo ? DEMO_MACHBARKEIT : merged, isDemo);
+        showKiVorherNachher(merged);
+        saveKiVerlauf('wunschfrisur', wfName, { name: wfName, haartyp: wfHaartyp, notiz: wfNotiz, anzahl_fotos: payload.anzahl_fotos }, merged);
       });
     }
 
