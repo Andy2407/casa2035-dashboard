@@ -709,9 +709,9 @@
     }
     .day-termin-block:hover { box-shadow: var(--shadow-soft); z-index: 2; }
     .week-view-wrapper { display: flex; overflow-x: auto; }
-    .week-time-axis { width: 40px; flex-shrink: 0; padding-top: 30px; }
+    .week-time-axis { width: 40px; flex-shrink: 0; padding-top: 30px; position: sticky; left: 0; z-index: 3; background: var(--surface); }
     .week-time-label { height: 48px; font-size: 10px; color: var(--text-dim); text-align: right; padding-right: 6px; font-variant-numeric: tabular-nums; line-height: 48px; }
-    .week-view-grid { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; min-width: 0; }
+    .week-view-grid { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; min-width: 480px; }
     .week-day-col { min-width: 0; border-left: 1px solid var(--border); }
     .week-day-header { font-size: 11px; font-weight: 700; text-align: center; padding: 6px; color: var(--text-dim); border-bottom: 1px solid var(--border); height: 30px; }
     .week-day-header.today { color: var(--gold); }
@@ -1135,9 +1135,8 @@
       .day-view-grid { font-size: 10px; width: 100%; }
       .day-hour-label { font-size: 9px; min-width: 28px; padding: 2px 3px; }
       .day-termin-block { font-size: 9px; padding: 2px 4px; }
-      /* Wochenansicht breiter */
-      .week-view-grid { width: 100%; overflow-x: auto; }
-      .week-view-grid table { min-width: 100%; }
+      /* Wochenansicht: Scrollbar im Wrapper, Achse bleibt sticky */
+      .week-view-grid { min-width: 360px; }
       /* KI-Hinweise kompakt */
       .ki-suggestion-card { padding: 6px; margin-bottom: 3px; }
       .ki-suggestion-card .ki-icon { width: 24px; height: 24px; font-size: 12px; }
@@ -4631,29 +4630,16 @@
       { stufe: 10, name: 'Platinblond', hex: '#f0daa0' }
     ];
 
-    // === Globale File-Picker Hilfsfunktion (FB-22) ===
-    // Robust auf iOS Safari + Android Chrome: stopPropagation + Drag&Drop + Keyboard
+    // === Globale File-Picker Hilfsfunktion (FB-22, v2) ===
+    // Transparent-Overlay-Ansatz: Input deckt die gesamte Area ab — iOS Safari + Android + Desktop
     function attachFilePicker(area, input, onFiles) {
-      // Input absolut versteckt aber aktiv (besser als display:none auf iOS)
-      input.style.position = 'absolute';
-      input.style.left = '-9999px';
-      input.style.opacity = '0';
-      input.style.width = '1px';
-      input.style.height = '1px';
-      input.style.pointerEvents = 'none';
-      input.style.display = '';
-      // Click auf Area triggert File-Picker
-      area.addEventListener('click', function(ev) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        try { input.click(); } catch(e) {}
-      });
-      // Tastatur-Bedienung
-      area.setAttribute('tabindex', '0');
-      area.setAttribute('role', 'button');
-      area.addEventListener('keydown', function(ev) {
-        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); try { input.click(); } catch(e) {} }
-      });
+      // Area braucht position:relative damit der absolute Input darin bleibt
+      if (window.getComputedStyle(area).position === 'static') area.style.position = 'relative';
+      area.style.overflow = 'hidden';
+      // Input als unsichtbare Overlay-Schicht ueber der gesamten Area
+      input.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:10;font-size:0';
+      // Input ans Ende verschieben (ueber Icons/Labels im DOM)
+      area.appendChild(input);
       // Drag & Drop
       area.addEventListener('dragover', function(ev) { ev.preventDefault(); ev.stopPropagation(); area.style.borderColor = 'var(--gold)'; });
       area.addEventListener('dragleave', function(ev) { ev.preventDefault(); ev.stopPropagation(); area.style.borderColor = ''; });
@@ -4662,6 +4648,12 @@
         if (ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files.length && typeof onFiles === 'function') {
           onFiles(ev.dataTransfer.files);
         }
+      });
+      // Tastatur-Bedienung (Fallback fuer Screen-Reader / Tab-Navigation)
+      area.setAttribute('tabindex', '0');
+      area.setAttribute('role', 'button');
+      area.addEventListener('keydown', function(ev) {
+        if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); try { input.click(); } catch(e) {} }
       });
     }
 
