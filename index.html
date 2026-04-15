@@ -6036,35 +6036,66 @@
       var camId = type === 'aktuell' ? 'wfAktuellCam' : 'wfWunschCam';
       var fileId = type === 'aktuell' ? 'wfAktuellFile' : 'wfWunschFile';
 
+      // FB-54: EIN Upload-Button mit Popup-Menue "Foto aufnehmen" / "Aus Galerie waehlen"
       var row = document.createElement('div');
-      row.style.cssText = 'display:flex;gap:8px;margin-bottom:8px';
-      var camArea = document.createElement('div');
-      camArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:12px 8px;text-align:center;cursor:pointer';
+      row.style.cssText = 'position:relative;margin-bottom:8px';
+
       var camInput = document.createElement('input');
       camInput.type = 'file'; camInput.id = camId; camInput.accept = 'image/*,image/heic,image/heif';
       camInput.setAttribute('capture', 'environment');
+      camInput.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
       camInput.onchange = function() { addWfPhotos(this.files, type); };
-      var camIcon = document.createElement('div');
-      camIcon.style.cssText = 'font-size:18px'; camIcon.textContent = '\u{1F4F7}';
-      var camLabel = document.createElement('div');
-      camLabel.style.cssText = 'font-size:10px;font-weight:600'; camLabel.textContent = 'Kamera';
-      camArea.appendChild(camInput); camArea.appendChild(camIcon); camArea.appendChild(camLabel);
-      attachFilePicker(camArea, camInput, function(files) { addWfPhotos(files, type); });
 
-      var fileArea = document.createElement('div');
-      fileArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:12px 8px;text-align:center;cursor:pointer';
       var fileInput = document.createElement('input');
       fileInput.type = 'file'; fileInput.id = fileId; fileInput.accept = 'image/*,image/heic,image/heif';
       fileInput.multiple = true;
+      fileInput.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
       fileInput.onchange = function() { addWfPhotos(this.files, type); };
-      var fileIcon = document.createElement('div');
-      fileIcon.style.cssText = 'font-size:18px'; fileIcon.textContent = '\u{1F5BC}';
-      var fileLabel = document.createElement('div');
-      fileLabel.style.cssText = 'font-size:10px;font-weight:600'; fileLabel.textContent = 'Galerie';
-      fileArea.appendChild(fileInput); fileArea.appendChild(fileIcon); fileArea.appendChild(fileLabel);
-      attachFilePicker(fileArea, fileInput, function(files) { addWfPhotos(files, type); });
 
-      row.appendChild(camArea); row.appendChild(fileArea);
+      var mainBtn = document.createElement('button');
+      mainBtn.type = 'button';
+      mainBtn.style.cssText = 'width:100%;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);transition:border-color 150ms';
+      mainBtn.innerHTML = '\u{1F4F8} <span>Foto hinzufuegen</span>';
+
+      var menu = document.createElement('div');
+      menu.style.cssText = 'display:none;position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.18);z-index:20;overflow:hidden';
+
+      var menuCam = document.createElement('button');
+      menuCam.type = 'button';
+      menuCam.style.cssText = 'width:100%;padding:14px 16px;border:0;background:transparent;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
+      menuCam.innerHTML = '\u{1F4F7} <span>Foto aufnehmen</span>';
+      menuCam.onmouseenter = function(){ this.style.background='var(--bg-warm)'; };
+      menuCam.onmouseleave = function(){ this.style.background='transparent'; };
+      menuCam.onclick = function(ev){ ev.stopPropagation(); menu.style.display='none'; camInput.click(); };
+
+      var menuFile = document.createElement('button');
+      menuFile.type = 'button';
+      menuFile.style.cssText = 'width:100%;padding:14px 16px;border:0;border-top:1px solid var(--border);background:transparent;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
+      menuFile.innerHTML = '\u{1F5BC}\uFE0F <span>Aus Galerie waehlen</span>';
+      menuFile.onmouseenter = function(){ this.style.background='var(--bg-warm)'; };
+      menuFile.onmouseleave = function(){ this.style.background='transparent'; };
+      menuFile.onclick = function(ev){ ev.stopPropagation(); menu.style.display='none'; fileInput.click(); };
+
+      menu.appendChild(menuCam); menu.appendChild(menuFile);
+
+      mainBtn.onclick = function(ev){
+        ev.stopPropagation();
+        var isOpen = menu.style.display === 'block';
+        // Schliesse alle anderen Menues
+        document.querySelectorAll('[data-wf-upload-menu]').forEach(function(m){ m.style.display='none'; });
+        menu.style.display = isOpen ? 'none' : 'block';
+      };
+      menu.setAttribute('data-wf-upload-menu','1');
+
+      // Klick ausserhalb = schliessen
+      if (!window.__wfMenuCloser) {
+        window.__wfMenuCloser = true;
+        document.addEventListener('click', function(){
+          document.querySelectorAll('[data-wf-upload-menu]').forEach(function(m){ m.style.display='none'; });
+        });
+      }
+
+      row.appendChild(camInput); row.appendChild(fileInput); row.appendChild(mainBtn); row.appendChild(menu);
       parent.appendChild(row);
 
       var gallery = document.createElement('div');
@@ -8624,7 +8655,7 @@
     .fb-stars { display: flex; gap: 4px; margin-bottom: 12px; }
     .fb-star { width: 24px; height: 24px; cursor: pointer; color: var(--border); transition: all 150ms; }
     .fb-star.active { color: #f5a623; }
-    .fb-textarea { width: 100%; min-height: 60px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12px; font-family: Inter, sans-serif; resize: vertical; outline: none; background: var(--bg-warm); color: var(--text); }
+    .fb-textarea { width: 100%; min-height: 60px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 16px; font-family: Inter, sans-serif; resize: vertical; outline: none; background: var(--bg-warm); color: var(--text); -webkit-text-size-adjust: 100%; }
     .fb-textarea:focus { border-color: var(--gold); }
     .fb-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
     .fb-counter { font-size: 10px; color: var(--text-dim); }
