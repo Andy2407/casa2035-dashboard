@@ -6714,7 +6714,7 @@
     }
 
     // === JARVIS KI-Kontext ===
-    var jarvisContext = { lastAction: null, pendingConfirm: null, conversationHistory: [] };
+    var jarvisContext = { lastAction: null, pendingConfirm: null, conversationHistory: [], isSpeaking: false };
     var JARVIS_GREETINGS = [
       'Selbstverstaendlich.', 'Sofort.', 'Alles klar.', 'Wird erledigt.', 'Bin dran.', 'Kein Problem.'
     ];
@@ -6775,6 +6775,8 @@
     }
 
     function processJarvisCommand(text) {
+      // FB-49: Guard - ignore commands while Jarvis is speaking
+      if (jarvisContext.isSpeaking) return;
       var response = '';
       var action = null;
       var keepListening = true;
@@ -6900,6 +6902,20 @@
         } else {
           response = 'Fuer welchen Kunden soll der Termin storniert werden?';
         }
+      }
+
+      // === TERMINE HEUTE (FB-49: explizit setzen + sprechen) ===
+      else if (/termin.*heute|heute.*termin/.test(text)) {
+        var hDate = new Date();
+        var hStr = hDate.toISOString().split('T')[0];
+        var hCount = (termineCache || []).filter(function(t) { return (t.Start_ISO || '').indexOf(hStr) === 0; }).length;
+        response = 'Zeige Termine am heutigen Tag. ' + hCount + ' Termine heute.';
+        action = function() {
+          if (typeof terminViewDate !== 'undefined') { terminViewDate = hDate; }
+          showPage('termine');
+          setTimeout(function() { if (typeof renderTermine === 'function') renderTermine(termineCache); if (typeof jarvisScrollToFirstTermin === 'function') jarvisScrollToFirstTermin(); }, 350);
+        };
+        keepListening = false;
       }
 
       // === TERMINE MORGEN / UEBERMORGEN ===
@@ -7090,9 +7106,9 @@
         return; // async, kein weiterer Code hier
       }
 
-      // === Fallback ===
+      // === Fallback (FB-49 Spec) ===
       else {
-        response = 'Ich habe dich nicht verstanden. Sag zum Beispiel: "Zeig mir die Termine" oder "Erstell eine Rechnung fuer Maria".';
+        response = 'Das habe ich nicht verstanden. Sag Hilfe fuer Befehle.';
       }
 
       jarvisRespond(response, action, keepListening);
@@ -7122,13 +7138,16 @@
       document.getElementById('jarvisResponse').textContent = response;
       jarvisContext.conversationHistory.push({ role: 'jarvis', text: response });
 
-      // Text-to-Speech
+      // Text-to-Speech (FB-49: Sprech-Guard gegen Intent-Mehrfachausloesung)
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         var utter = new SpeechSynthesisUtterance(response);
         utter.lang = 'de-DE';
-        utter.rate = 1.05;
+        utter.rate = 1.0;
         utter.pitch = 0.95;
+        jarvisContext.isSpeaking = true;
+        utter.onend = function() { jarvisContext.isSpeaking = false; };
+        utter.onerror = function() { jarvisContext.isSpeaking = false; };
         window.speechSynthesis.speak(utter);
       }
 
