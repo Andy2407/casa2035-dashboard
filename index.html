@@ -1743,6 +1743,20 @@
       <div class="section-title">KI-Hinweise</div>
       <div id="kiKasseHints" class="ki-suggestions stagger"></div>
       <div class="section-title">Heutige Buchungen</div>
+      <!-- F6 Bug 7: Filter-UI fuer Rechnungs-Liste (Datum, Stylist, Zahlart) -->
+      <div id="kasseFilterBar" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+        <input type="date" id="kasseFilterDatum" onchange="filterKasseEntries()" style="flex:1;min-width:120px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif" title="Datum-Filter">
+        <select id="kasseFilterStylist" onchange="filterKasseEntries()" style="flex:1;min-width:120px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">
+          <option value="">Alle Stylisten</option>
+        </select>
+        <select id="kasseFilterZahlart" onchange="filterKasseEntries()" style="flex:1;min-width:100px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">
+          <option value="">Alle Zahlarten</option>
+          <option value="bar">Bar</option>
+          <option value="karte">EC-Karte</option>
+          <option value="kredit">Kreditkarte</option>
+        </select>
+        <button onclick="kasseFilterReset()" style="padding:6px 10px;border:1px solid var(--border);background:var(--surface);color:var(--text-dim);border-radius:var(--radius-sm);font-size:11px;cursor:pointer">Reset</button>
+      </div>
       <div id="kasseEntries"></div>
       <!-- Umsatz pro Mitarbeiter -->
       <div class="section-title" id="umsatzProMaTitle" style="display:none">Umsatz pro Mitarbeiter</div>
@@ -1766,11 +1780,19 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input class="search-input" id="kundenSearch" placeholder="Kunde suchen..." oninput="filterKunden()">
       </div>
+      <!-- F6 Bug 12: Filter Spec-konform Neu/Stamm/VIP/Inaktiv (alte alle/vip/followup/neu erweitert) -->
       <div class="filter-bar" id="kundenFilter">
         <button class="filter-btn active" onclick="setKundenFilter('alle')">Alle</button>
+        <button class="filter-btn" onclick="setKundenFilter('neu')">Neu</button>
+        <button class="filter-btn" onclick="setKundenFilter('stamm')">Stamm</button>
         <button class="filter-btn" onclick="setKundenFilter('vip')">VIP</button>
+        <button class="filter-btn" onclick="setKundenFilter('inaktiv')">Inaktiv</button>
         <button class="filter-btn" onclick="setKundenFilter('followup')">Follow-Up</button>
-        <button class="filter-btn" onclick="setKundenFilter('neu')">Neue</button>
+      </div>
+      <!-- F6 Bug 9 + Bug 10: Anruf-Doku + Neuer-Kunde Buttons -->
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button onclick="openNeuerKundeSheet()" style="flex:1;padding:10px;background:var(--gold-gradient);color:#fff;border:none;border-radius:var(--radius-sm);font-weight:600;font-size:12px;cursor:pointer">+ Neuer Kunde</button>
+        <button onclick="openAnrufDokuSheet()" style="flex:1;padding:10px;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:var(--radius-sm);font-weight:600;font-size:12px;cursor:pointer">&#128222; Anruf dokumentieren</button>
       </div>
       <div class="section-title">KI-Hinweise</div>
       <div id="kiKundenHints" class="ki-suggestions stagger"></div>
@@ -2220,6 +2242,128 @@
     </div>
   </div>
 
+  <!-- Mitarbeiter Edit-Sheet -->
+  <div class="sheet-overlay" id="mitarbeiterSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" id="mitarbeiterSheetTitle">Mitarbeiter</div>
+      <input type="hidden" id="mitId">
+      <label>Vorname *</label>
+      <input type="text" id="mitVorname" placeholder="z.B. Sarah">
+      <label style="margin-top:8px">Nachname</label>
+      <input type="text" id="mitNachname" placeholder="z.B. Mueller">
+      <div class="sheet-row" style="margin-top:8px">
+        <div><label>Rolle *</label>
+          <select id="mitRolle">
+            <option value="CHF">Chefin</option>
+            <option value="FRM">Meisterin</option>
+            <option value="STY">Stylistin</option>
+            <option value="AZU">Azubi</option>
+          </select>
+        </div>
+        <div><label>Geschlecht *</label>
+          <select id="mitGeschlecht">
+            <option value="w">Weiblich</option>
+            <option value="m">Maennlich</option>
+            <option value="d">Divers</option>
+          </select>
+        </div>
+      </div>
+      <label style="margin-top:8px">Kann bedienen</label>
+      <div style="display:flex;gap:14px;align-items:center;font-size:13px;margin-top:4px">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="mitKannDamen" checked> Damen</label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="mitKannHerren" checked> Herren</label>
+      </div>
+      <label style="margin-top:8px"><input type="checkbox" id="mitAktiv" checked> Aktiv (sichtbar im Salon)</label>
+      <div class="sheet-actions">
+        <button class="btn btn-secondary" onclick="closeSheet('mitarbeiterSheet')">Abbrechen</button>
+        <button class="btn btn-primary" onclick="submitMitarbeiter()">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service-Preisliste Edit-Sheet -->
+  <div class="sheet-overlay" id="serviceSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" id="serviceSheetTitle">Service</div>
+      <input type="hidden" id="svcId">
+      <label>Name *</label>
+      <input type="text" id="svcName" placeholder="z.B. Damenhaarschnitt">
+      <div class="sheet-row" style="margin-top:8px">
+        <div><label>Preis (EUR) *</label><input type="number" id="svcPreis" step="0.01" min="0" placeholder="0,00"></div>
+        <div><label>Dauer (Min) *</label><input type="number" id="svcDauer" step="5" min="5" placeholder="60"></div>
+      </div>
+      <div class="sheet-row" style="margin-top:8px">
+        <div><label>Kategorie</label>
+          <select id="svcKategorie">
+            <option value="schnitt">Schnitt</option>
+            <option value="farbe">Farbe</option>
+            <option value="pflege">Pflege</option>
+            <option value="styling">Styling</option>
+            <option value="behandlung">Behandlung</option>
+            <option value="produkt">Produkt</option>
+            <option value="sonstiges">Sonstiges</option>
+          </select>
+        </div>
+        <div><label>Service-Typ</label>
+          <select id="svcServiceTyp">
+            <option value="unisex">Unisex</option>
+            <option value="damen">Damen</option>
+            <option value="herren">Herren</option>
+          </select>
+        </div>
+      </div>
+      <label style="margin-top:8px">MwSt-Satz</label>
+      <select id="svcMwst">
+        <option value="0.19">19% (Standard)</option>
+        <option value="0.07">7%</option>
+        <option value="0">0%</option>
+      </select>
+      <label style="margin-top:8px">Beschreibung</label>
+      <textarea id="svcBeschreibung" rows="2" style="resize:none" placeholder="Optional"></textarea>
+      <label style="margin-top:8px"><input type="checkbox" id="svcAktiv" checked> Aktiv (buchbar)</label>
+      <div class="sheet-actions">
+        <button class="btn btn-secondary" onclick="closeSheet('serviceSheet')">Abbrechen</button>
+        <button class="btn" id="svcDeleteBtn" onclick="deleteService()" style="display:none;background:#5a1a1a;color:#fff;border:1px solid #8a3030;border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer">Loeschen</button>
+        <button class="btn btn-primary" onclick="submitService()">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Karriere/Stelle Edit-Sheet -->
+  <div class="sheet-overlay" id="karriereSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" id="karriereSheetTitle">Stellenangebot</div>
+      <input type="hidden" id="karId">
+      <label>Titel *</label>
+      <input type="text" id="karTitel" placeholder="z.B. Friseurmeister/in (m/w/d)">
+      <label style="margin-top:8px">Anstellungsart</label>
+      <select id="karAnstellung">
+        <option value="vollzeit">Vollzeit</option>
+        <option value="teilzeit">Teilzeit</option>
+        <option value="ausbildung">Ausbildung</option>
+        <option value="aushilfe">Aushilfe</option>
+        <option value="freelance">Freelance</option>
+      </select>
+      <label style="margin-top:8px">Beschreibung *</label>
+      <textarea id="karBeschreibung" rows="3" style="resize:vertical" placeholder="Was erwartet die Bewerber/innen?"></textarea>
+      <label style="margin-top:8px">Anforderungen</label>
+      <textarea id="karAnforderungen" rows="3" style="resize:vertical" placeholder="z.B. abgeschlossene Ausbildung, 2 Jahre Erfahrung..."></textarea>
+      <label style="margin-top:8px">Wir bieten</label>
+      <textarea id="karWirBieten" rows="2" style="resize:vertical" placeholder="z.B. uebertarifliche Bezahlung, Weiterbildungen..."></textarea>
+      <label style="margin-top:8px">Kontakt (E-Mail oder Telefon) *</label>
+      <input type="text" id="karKontakt" placeholder="karriere@deinsalon.de oder 089-12345">
+      <label style="margin-top:8px"><input type="checkbox" id="karAktiv" checked> Aktiv (auf Webseite sichtbar)</label>
+      <div class="sheet-actions">
+        <button class="btn btn-secondary" onclick="closeSheet('karriereSheet')">Abbrechen</button>
+        <button class="btn" id="karDeleteBtn" onclick="deleteKarriere()" style="display:none;background:#5a1a1a;color:#fff;border:1px solid #8a3030;border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer">Loeschen</button>
+        <button class="btn btn-primary" onclick="submitKarriere()">Speichern</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // =============================================================
     // Casa 2035 — Vision 2035 Dashboard JavaScript
@@ -2594,6 +2738,13 @@
       document.getElementById('personalSection').style.display = perms.personalTab ? '' : 'none';
       document.getElementById('systemSection').style.display = (perms.systemTab || (USERS[currentUser] && USERS[currentUser].isAdmin)) ? '' : 'none';
       document.getElementById('salonRegelnSection').style.display = perms.salonRegeln ? '' : 'none';
+      var svcSec = document.getElementById('servicesSection');
+      if (svcSec) svcSec.style.display = (perms.personalTab || perms.systemTab) ? '' : 'none';
+      var lhint = document.getElementById('logoutUserHint');
+      if (lhint && currentUser) {
+        var u = USERS[currentUser] || {};
+        lhint.textContent = 'Angemeldet als ' + (u.name || currentUser) + (u.nachname ? ' ' + u.nachname : '') + ' (' + (ROLLEN_LABEL[currentRolle] || currentRolle || '?') + ')';
+      }
       if (perms.umsatzSehen) {
         document.getElementById('umsatzProMaTitle').style.display = '';
       }
@@ -2724,6 +2875,11 @@
       closeProfileDropdown();
       if (page === 'einstellungen' && (perms.systemTab || (USERS[currentUser] && USERS[currentUser].isAdmin))) {
         renderAdminZentrale();
+      }
+      if (page === 'einstellungen') {
+        try { if (typeof loadServicesList === 'function' && (perms.personalTab || perms.systemTab)) loadServicesList(); } catch(e){}
+        try { if (typeof loadKarriereList === 'function') loadKarriereList(); } catch(e){}
+        try { if (typeof renderPersonalPerms === 'function' && perms.personalTab) renderPersonalPerms(); } catch(e){}
       }
     }
 
@@ -3150,8 +3306,11 @@
             else karteTotal += betrag;
           });
           ausgaben.forEach(function(a) { ausgabenTotal += parseFloat(a.Betrag || a.brutto || 0); });
-          var nettoUmsatz = barTotal + karteTotal - ausgabenTotal;
-          renderFinanzen({ tagesUmsatz: Math.max(0, nettoUmsatz), realUmsatz: nettoUmsatz, barEinnahmen: barTotal, karteEinnahmen: karteTotal, ausgabenGesamt: ausgabenTotal });
+          // F6 Bug 4 (Tagesumsatz): Tagesumsatz = BRUTTO Einnahmen (Bar + Karte). Ausgaben separat (kasseAusgaben).
+          // Vorher wurde brutto - ausgaben angezeigt — das ist Netto-Gewinn, nicht Tagesumsatz.
+          var bruttoUmsatz = barTotal + karteTotal;
+          var nettoErgebnis = bruttoUmsatz - ausgabenTotal;
+          renderFinanzen({ tagesUmsatz: bruttoUmsatz, realUmsatz: nettoErgebnis, barEinnahmen: barTotal, karteEinnahmen: karteTotal, ausgabenGesamt: ausgabenTotal });
         }
         // Wenn nach Mapping keine sinnvollen Daten: Demo-Fallback
         var hatMappedTermine = (termineCache || []).some(function(t) { return t.Start_ISO; });
@@ -3441,12 +3600,15 @@
 
     function renderTermine(termine) {
       termineCache = termine;
-      var today = new Date(); today.setHours(0,0,0,0);
-      var todayStr = today.toISOString().split('T')[0];
+      // F6 Bug 2 (Stat-Card-Drift): localDateStr (Europe/Berlin) statt toISOString (UTC) — keine Drift spaet abends
+      var todayStr = localDateStr(new Date());
       var todayTermine = termine.filter(function(t) { return (t.Start_ISO || '').indexOf(todayStr) === 0; });
-      document.getElementById('statTermine').textContent = todayTermine.length;
+      var statEl = document.getElementById('statTermine');
+      if (statEl) statEl.textContent = todayTermine.length;
+      var statSubEl = document.getElementById('statTermineSub');
+      if (statSubEl) statSubEl.textContent = todayTermine.length === 1 ? 'Termin heute' : 'Termine heute';
 
-      // Staff-Filter oberhalb der Ansichts-Buttons
+      // Staff-Filter — F6 Bug 5 verwandt: aus DB (FB-41) statt 4 hardcoded Namen, damit Andreas etc. erscheinen
       var staffFilter = document.getElementById('terminStaffFilter');
       if (staffFilter) {
         staffFilter.textContent = '';
@@ -3455,14 +3617,11 @@
         allChip.textContent = 'Alle';
         allChip.onclick = function() { terminStaffFilter = 'alle'; renderTermine(termineCache); };
         staffFilter.appendChild(allChip);
-        var STAFF_ORDER = ['Rena', 'Sarah', 'Julia', 'Lena'];
-        STAFF_ORDER.forEach(function(name) {
-          var u = Object.values(USERS).find(function(u) { return u.name === name; });
-          if (!u) return;
+        getStylistList(['CHF','FRM','STY']).forEach(function(u) {
           var chip = document.createElement('div');
-          chip.className = 'staff-chip' + (terminStaffFilter === name ? ' active' : '');
-          chip.innerHTML = '<span class="dot" style="background:' + u.farbe + '"></span>' + esc(name);
-          chip.onclick = function() { terminStaffFilter = name; renderTermine(termineCache); };
+          chip.className = 'staff-chip' + (terminStaffFilter === u.name ? ' active' : '');
+          chip.innerHTML = '<span class="dot" style="background:' + (u.farbe || '#8899aa') + '"></span>' + esc(u.name);
+          chip.onclick = function() { terminStaffFilter = u.name; renderTermine(termineCache); };
           staffFilter.appendChild(chip);
         });
       }
@@ -3738,8 +3897,47 @@
 
     function renderKasseEntries(entries) {
       kasseCache = entries;
+      // F6 Bug 7: Stylisten-Dropdown im Filter befuellen (aus Cache)
+      var stylistSel = document.getElementById('kasseFilterStylist');
+      if (stylistSel && stylistSel.options.length <= 1) {
+        var stylists = getStylistList(['CHF','FRM','STY']);
+        stylists.forEach(function(u) {
+          var o = document.createElement('option');
+          o.value = u.name; o.textContent = u.name;
+          stylistSel.appendChild(o);
+        });
+      }
+      filterKasseEntries();
+      renderKiKasseHints();
+    }
+
+    // F6 Bug 7+8: Filterlogik + Storno-Button
+    function filterKasseEntries() {
       var container = document.getElementById('kasseEntries');
+      if (!container) return;
       container.textContent = '';
+      var fDatum = (document.getElementById('kasseFilterDatum') || {}).value || '';
+      var fStylist = (document.getElementById('kasseFilterStylist') || {}).value || '';
+      var fZahlart = (document.getElementById('kasseFilterZahlart') || {}).value || '';
+      var entries = (kasseCache || []).filter(function(e) {
+        if (fDatum) {
+          var ed = (e.erstellt_am || e.datum || '').substring(0,10);
+          if (ed !== fDatum) return false;
+        }
+        if (fStylist) {
+          var es = (e.stylist_name || e.stylist || e.Stylist || '');
+          if (es !== fStylist) return false;
+        }
+        if (fZahlart) {
+          var ez = (e.Zahlart || e.zahlart || e.zahlungsart || '');
+          if (ez !== fZahlart) return false;
+        }
+        return true;
+      });
+      if (!entries.length) {
+        container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-dim);font-size:12px">Keine Buchungen mit diesen Filtern</div>';
+        return;
+      }
       entries.forEach(function(e) {
         var div = document.createElement('div');
         div.className = 'kasse-entry';
@@ -3749,15 +3947,16 @@
           var d = new Date(e.erstellt_am || e.datum);
           zeitStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
         }
-        // All user data sanitized through esc() — existing pattern in entire dashboard
         var detailParts = [esc(e.Service || e.service || '')];
         if (e.Zahlart || e.zahlart) detailParts.push(esc(e.Zahlart || e.zahlart));
         if (beleg) detailParts.push(esc(beleg));
         if (zeitStr) detailParts.push(zeitStr);
+        if (e.status === 'storniert') detailParts.push('STORNIERT');
 
         var nameEl = document.createElement('div');
         nameEl.className = 'name';
         nameEl.textContent = e.Kunde || e.name || '';
+        if (e.status === 'storniert') nameEl.style.textDecoration = 'line-through';
         var detailEl = document.createElement('div');
         detailEl.className = 'detail';
         detailEl.textContent = detailParts.join(' · ');
@@ -3771,9 +3970,38 @@
         amountEl.textContent = (e.typ === 'ausgabe' ? '-' : '+') + fmtEur(e.Betrag || e.betrag) + ' \u20AC';
         div.appendChild(leftEl);
         div.appendChild(amountEl);
+        // F6 Bug 8: Storno-Button fuer Rechnungen (nur einnahme, nicht bereits storniert)
+        if (e.typ !== 'ausgabe' && e.status !== 'storniert' && e.id) {
+          var stornoBtn = document.createElement('button');
+          stornoBtn.textContent = 'Storno';
+          stornoBtn.style.cssText = 'margin-left:8px;padding:4px 10px;border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:var(--radius-sm);font-size:10px;cursor:pointer;font-weight:600';
+          stornoBtn.onclick = function(ev) { ev.stopPropagation(); stornoRechnung(e.id, e.Kunde || ''); };
+          div.appendChild(stornoBtn);
+        }
         container.appendChild(div);
       });
-      renderKiKasseHints();
+    }
+    function kasseFilterReset() {
+      var f1 = document.getElementById('kasseFilterDatum'); if (f1) f1.value = '';
+      var f2 = document.getElementById('kasseFilterStylist'); if (f2) f2.value = '';
+      var f3 = document.getElementById('kasseFilterZahlart'); if (f3) f3.value = '';
+      filterKasseEntries();
+    }
+    async function stornoRechnung(id, kundeName) {
+      if (!confirm('Rechnung von "' + kundeName + '" wirklich stornieren?\n\nGoBD: Stornierungen werden protokolliert (10 Jahre Aufbewahrung).')) return;
+      if (isBackendMode()) {
+        try {
+          await apiPatch('rechnungen', 'id=eq.' + encodeURIComponent(id), { status: 'storniert' });
+          showToast('Rechnung storniert', 'success');
+          // Cache lokal aktualisieren
+          (kasseCache || []).forEach(function(e) { if (e.id === id) e.status = 'storniert'; });
+          filterKasseEntries();
+        } catch(err) { showToast('Storno-Fehler: ' + err.message, 'error'); }
+      } else {
+        (kasseCache || []).forEach(function(e) { if (e.id === id) e.status = 'storniert'; });
+        filterKasseEntries();
+        showToast('Rechnung storniert (Demo)', 'success');
+      }
     }
 
     function renderUmsatzProMa(data) {
@@ -3812,7 +4040,28 @@
     }
 
     // === Rechnung ===
-    function openRechnungSheet() { updateRePreview(); openSheet('rechnungSheet'); }
+    function openRechnungSheet() {
+      // F6 Bug 5: reStylist dynamisch aus DB (FB-41) — alle Stylisten inkl. Andreas, nicht nur 4 hardcoded
+      var sel = document.getElementById('reStylist');
+      if (sel) {
+        var prev = sel.value;
+        var stylists = getStylistList(['CHF','FRM','STY']);
+        if (stylists && stylists.length) {
+          sel.textContent = '';
+          stylists.forEach(function(u) {
+            var o = document.createElement('option');
+            o.value = u.name; o.textContent = u.name + (u.titel ? ' (' + u.titel + ')' : '');
+            sel.appendChild(o);
+          });
+          // Vorauswahl: aktueller User, sonst vorherige Auswahl
+          var meName = (currentUser && USERS[currentUser]) ? USERS[currentUser].name : '';
+          if (meName && stylists.some(function(s){return s.name===meName;})) sel.value = meName;
+          else if (prev && stylists.some(function(s){return s.name===prev;})) sel.value = prev;
+        }
+      }
+      updateRePreview();
+      openSheet('rechnungSheet');
+    }
     function updateRePreview() {
       var svc = document.getElementById('reService');
       var sel = svc.options[svc.selectedIndex];
@@ -4102,10 +4351,24 @@
 
     function openNachbestellungSheet() {
       var inner = document.getElementById('detailInner');
+      // F6 Bug 6: Lieferanten-Auswahl (aus Lager-Marken oder Standard-Liste)
+      var lieferantenSet = {};
+      (lagerCache || []).forEach(function(p) {
+        var l = p.Lieferant || p.lieferant || p.Marke || p.marke || '';
+        if (l) lieferantenSet[l] = true;
+      });
+      var lieferanten = Object.keys(lieferantenSet);
+      // Standard-Lieferanten falls leer (Friseur-Branche)
+      if (!lieferanten.length) lieferanten = ['LA Biosthetique', 'Wella', 'Schwarzkopf', 'L\'Oreal Professionnel', 'Olaplex', 'Kerastase', 'Davines', 'Sonstiger'];
+      var lieferantOptions = lieferanten.map(function(l) { return '<option value="' + esc(l) + '">' + esc(l) + '</option>'; }).join('');
       inner.innerHTML = '<div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:12px">Nachbestellung</div>'
         + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px">Produkt *</label>'
         + '<select id="nbProdukt" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;margin-bottom:8px">'
-        + lagerCache.map(function(p) { return '<option>' + esc(p.Produkt || p.Name || '') + '</option>'; }).join('')
+        + (lagerCache || []).map(function(p) { return '<option>' + esc(p.Produkt || p.Name || '') + '</option>'; }).join('')
+        + '</select>'
+        + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px">Lieferant *</label>'
+        + '<select id="nbLieferant" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;margin-bottom:8px">'
+        + lieferantOptions
         + '</select>'
         + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:6px">Menge *</label>'
         + '<input type="number" id="nbMenge" value="10" min="1" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;margin-bottom:8px">'
@@ -4117,12 +4380,13 @@
     async function submitNachbestellung() {
       var produkt = document.getElementById('nbProdukt').value;
       var menge = parseInt(document.getElementById('nbMenge').value) || 0;
+      var lieferant = (document.getElementById('nbLieferant') || {}).value || '';
       if (!produkt || menge <= 0) { showToast('Bitte Produkt und Menge eingeben', 'error'); return; }
       if (isBackendMode()) {
-        try { await apiPost('nachbestellungen', { produkt: produkt, menge: menge, notiz: document.getElementById('nbNotiz').value.trim(), status: 'bestellt' }); }
+        try { await apiPost('nachbestellungen', { produkt: produkt, menge: menge, lieferant: lieferant, notiz: document.getElementById('nbNotiz').value.trim(), status: 'bestellt' }); }
         catch(e) { showToast('Fehler: ' + e.message, 'error'); return; }
       }
-      showToast('Bestellung aufgegeben: ' + menge + 'x ' + produkt, 'success');
+      showToast('Bestellung aufgegeben: ' + menge + 'x ' + produkt + (lieferant ? ' bei ' + lieferant : ''), 'success');
       closeSheet('detailSheet');
     }
 
@@ -6783,11 +7047,297 @@
         if (u.isAdmin) return;
         var card = document.createElement('div');
         card.className = 'settings-item';
+        var editBtn = perms.personalTab ? '<button onclick="event.stopPropagation();editMitarbeiter(\'' + esc(u.id || '') + '\')" style="background:transparent;border:none;color:var(--gold);cursor:pointer;padding:6px;font-size:14px" title="Bearbeiten">&#9998;</button>' : '';
+        var rolleHtml = '<span style="font-size:11px;font-weight:600;color:var(--text-dim);margin-right:6px">' + u.rolle + '</span>';
+        var bedHtml = '';
+        if (u.kann_damen === false || u.kann_herren === false) {
+          var who = [];
+          if (u.kann_damen !== false) who.push('D');
+          if (u.kann_herren !== false) who.push('H');
+          bedHtml = '<span style="font-size:9px;background:var(--surface-hover);color:var(--text-dim);padding:2px 5px;border-radius:4px;margin-right:6px" title="Kann bedienen">' + who.join('+') + '</span>';
+        }
         card.innerHTML = '<div class="left"><div class="avatar" style="width:32px;height:32px;background:' + u.farbe + ';font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border-radius:50%">' + u.kuerzel + '</div>'
           + '<div><div class="title">' + esc(u.name) + ' ' + esc(u.nachname || '') + '</div><div class="desc">' + (ROLLEN_LABEL[u.rolle] || u.rolle) + '</div></div></div>'
-          + '<span style="font-size:11px;font-weight:600;color:var(--text-dim)">' + u.rolle + '</span>';
+          + '<div style="display:flex;align-items:center">' + bedHtml + rolleHtml + editBtn + '</div>';
         container.appendChild(card);
       });
+    }
+
+    // === Mitarbeiter-Verwaltung (CRUD) ===
+    function openMitarbeiterSheet() {
+      document.getElementById('mitId').value = '';
+      document.getElementById('mitarbeiterSheetTitle').textContent = 'Neuer Mitarbeiter';
+      document.getElementById('mitVorname').value = '';
+      document.getElementById('mitNachname').value = '';
+      document.getElementById('mitRolle').value = 'STY';
+      document.getElementById('mitGeschlecht').value = 'w';
+      document.getElementById('mitKannDamen').checked = true;
+      document.getElementById('mitKannHerren').checked = true;
+      document.getElementById('mitAktiv').checked = true;
+      openSheet('mitarbeiterSheet');
+    }
+    function editMitarbeiter(id) {
+      if (!id) { showToast('Mitarbeiter nicht in DB - bitte zuerst speichern.', 'warning'); return; }
+      var m = (mitarbeiterCache || []).find(function(x){ return String(x.id) === String(id); });
+      if (!m) { showToast('Mitarbeiter nicht gefunden.', 'warning'); return; }
+      document.getElementById('mitId').value = m.id;
+      document.getElementById('mitarbeiterSheetTitle').textContent = 'Mitarbeiter bearbeiten';
+      document.getElementById('mitVorname').value = m.vorname || m.name || '';
+      document.getElementById('mitNachname').value = m.nachname || '';
+      document.getElementById('mitRolle').value = m.rolle || 'STY';
+      document.getElementById('mitGeschlecht').value = m.geschlecht || 'w';
+      document.getElementById('mitKannDamen').checked = m.kann_damen !== false;
+      document.getElementById('mitKannHerren').checked = m.kann_herren !== false;
+      document.getElementById('mitAktiv').checked = m.aktiv !== false;
+      openSheet('mitarbeiterSheet');
+    }
+    async function submitMitarbeiter() {
+      if (!isBackendMode()) { showToast('Backend nicht verbunden.', 'warning'); return; }
+      var id = document.getElementById('mitId').value.trim();
+      var vor = document.getElementById('mitVorname').value.trim();
+      if (!vor) { showToast('Vorname ist Pflicht.', 'warning'); return; }
+      var data = {
+        vorname: vor,
+        nachname: document.getElementById('mitNachname').value.trim(),
+        rolle: document.getElementById('mitRolle').value,
+        geschlecht: document.getElementById('mitGeschlecht').value,
+        kann_damen: document.getElementById('mitKannDamen').checked,
+        kann_herren: document.getElementById('mitKannHerren').checked,
+        aktiv: document.getElementById('mitAktiv').checked
+      };
+      try {
+        if (id) {
+          await apiPatch('mitarbeiter', 'id=eq.' + encodeURIComponent(id), data);
+        } else {
+          data.salon_id = currentSalonId();
+          await apiPost('mitarbeiter', data);
+        }
+        closeSheet('mitarbeiterSheet');
+        showToast('Mitarbeiter gespeichert.', 'success');
+        await loadMitarbeiterFromDB();
+        renderPersonalPerms();
+      } catch (e) {
+        console.error('submitMitarbeiter', e);
+        showToast('Fehler beim Speichern: ' + (e && e.message ? e.message : e), 'error');
+      }
+    }
+
+    // === Service-Preisliste-Verwaltung (CRUD) ===
+    var servicesCache = [];
+    async function loadServicesList() {
+      var box = document.getElementById('servicesList');
+      if (!box) return;
+      if (!isBackendMode()) { box.innerHTML = '<div style="padding:8px;color:var(--text-micro)">Backend nicht verbunden.</div>'; return; }
+      try {
+        var rows = await apiGet('services_preisliste', 'order=name.asc&limit=500');
+        servicesCache = Array.isArray(rows) ? rows : [];
+      } catch (e) {
+        box.innerHTML = '<div style="padding:8px;color:var(--danger)">Fehler beim Laden: ' + esc(e.message || '') + '</div>';
+        return;
+      }
+      if (!servicesCache.length) { box.innerHTML = '<div style="padding:8px;color:var(--text-micro)">Noch keine Services. Klicke "+ Service".</div>'; return; }
+      var html = '';
+      servicesCache.forEach(function(s) {
+        var aktiv = s.aktiv !== false;
+        var typBadge = s.service_typ ? '<span style="font-size:9px;background:var(--surface-hover);padding:2px 5px;border-radius:4px;margin-left:4px">' + esc(s.service_typ) + '</span>' : '';
+        var preis = (typeof s.preis === 'number' ? s.preis.toFixed(2) : s.preis || '-') + ' EUR';
+        var dauer = (s.dauer_min || s.dauer || '-') + ' Min';
+        html += '<div class="settings-item" style="opacity:' + (aktiv ? '1' : '0.5') + '">'
+          + '<div class="left"><div><div class="title">' + esc(s.name) + typBadge + '</div>'
+          + '<div class="desc">' + preis + ' &middot; ' + dauer + ' &middot; ' + esc(s.kategorie || 'sonstiges') + '</div></div></div>'
+          + '<button onclick="editService(\'' + esc(s.id) + '\')" style="background:transparent;border:none;color:var(--gold);cursor:pointer;padding:6px;font-size:14px" title="Bearbeiten">&#9998;</button>'
+          + '</div>';
+      });
+      box.innerHTML = html;
+    }
+    function openServiceSheet() {
+      document.getElementById('svcId').value = '';
+      document.getElementById('serviceSheetTitle').textContent = 'Neuer Service';
+      document.getElementById('svcName').value = '';
+      document.getElementById('svcPreis').value = '';
+      document.getElementById('svcDauer').value = '60';
+      document.getElementById('svcKategorie').value = 'schnitt';
+      document.getElementById('svcServiceTyp').value = 'unisex';
+      document.getElementById('svcMwst').value = '0.19';
+      document.getElementById('svcBeschreibung').value = '';
+      document.getElementById('svcAktiv').checked = true;
+      document.getElementById('svcDeleteBtn').style.display = 'none';
+      openSheet('serviceSheet');
+    }
+    function editService(id) {
+      var s = (servicesCache || []).find(function(x){ return String(x.id) === String(id); });
+      if (!s) { showToast('Service nicht gefunden.', 'warning'); return; }
+      document.getElementById('svcId').value = s.id;
+      document.getElementById('serviceSheetTitle').textContent = 'Service bearbeiten';
+      document.getElementById('svcName').value = s.name || '';
+      document.getElementById('svcPreis').value = s.preis || '';
+      document.getElementById('svcDauer').value = s.dauer_min || s.dauer || 60;
+      document.getElementById('svcKategorie').value = s.kategorie || 'schnitt';
+      document.getElementById('svcServiceTyp').value = s.service_typ || 'unisex';
+      document.getElementById('svcMwst').value = (typeof s.mwst_satz === 'number' ? s.mwst_satz : 0.19);
+      document.getElementById('svcBeschreibung').value = s.beschreibung || '';
+      document.getElementById('svcAktiv').checked = s.aktiv !== false;
+      document.getElementById('svcDeleteBtn').style.display = '';
+      openSheet('serviceSheet');
+    }
+    async function submitService() {
+      if (!isBackendMode()) { showToast('Backend nicht verbunden.', 'warning'); return; }
+      var id = document.getElementById('svcId').value.trim();
+      var name = document.getElementById('svcName').value.trim();
+      var preis = parseFloat(document.getElementById('svcPreis').value);
+      var dauer = parseInt(document.getElementById('svcDauer').value, 10);
+      if (!name || isNaN(preis) || isNaN(dauer)) { showToast('Name, Preis und Dauer sind Pflicht.', 'warning'); return; }
+      var data = {
+        name: name,
+        preis: preis,
+        dauer_min: dauer,
+        kategorie: document.getElementById('svcKategorie').value,
+        service_typ: document.getElementById('svcServiceTyp').value,
+        mwst_satz: parseFloat(document.getElementById('svcMwst').value),
+        beschreibung: document.getElementById('svcBeschreibung').value.trim(),
+        aktiv: document.getElementById('svcAktiv').checked
+      };
+      try {
+        if (id) {
+          await apiPatch('services_preisliste', 'id=eq.' + encodeURIComponent(id), data);
+        } else {
+          data.salon_id = currentSalonId();
+          await apiPost('services_preisliste', data);
+        }
+        closeSheet('serviceSheet');
+        showToast('Service gespeichert.', 'success');
+        loadServicesList();
+      } catch (e) {
+        console.error('submitService', e);
+        showToast('Fehler beim Speichern: ' + (e && e.message ? e.message : e), 'error');
+      }
+    }
+    async function deleteService() {
+      var id = document.getElementById('svcId').value.trim();
+      if (!id) return;
+      if (!confirm('Service wirklich loeschen? (Kann Termine mit diesem Service betreffen)')) return;
+      try {
+        await apiPatch('services_preisliste', 'id=eq.' + encodeURIComponent(id), { aktiv: false });
+        closeSheet('serviceSheet');
+        showToast('Service deaktiviert.', 'success');
+        loadServicesList();
+      } catch (e) {
+        showToast('Fehler beim Loeschen: ' + (e && e.message ? e.message : e), 'error');
+      }
+    }
+
+    // === Karriere/Stellen-Verwaltung (CRUD) ===
+    var karriereCache = [];
+    async function loadKarriereList() {
+      var box = document.getElementById('karriereList');
+      var addBtn = document.getElementById('karriereAddBtn');
+      if (!box) return;
+      if (addBtn) addBtn.style.display = (perms.personalTab || (USERS[currentUser] && USERS[currentUser].isAdmin)) ? '' : 'none';
+      if (!isBackendMode()) {
+        box.innerHTML = '<div style="padding:8px;color:var(--text-micro)">Demo-Modus &mdash; Stellen werden nach Backend-Verbindung geladen.</div>';
+        return;
+      }
+      try {
+        var rows = await apiGet('karriere_stellen', 'order=erstellt_am.desc&limit=100');
+        karriereCache = Array.isArray(rows) ? rows : [];
+      } catch (e) {
+        // Tabelle existiert evtl. noch nicht — graceful
+        if (String(e.message || '').indexOf('404') !== -1 || String(e.message || '').indexOf('relation') !== -1) {
+          box.innerHTML = '<div style="padding:8px;color:var(--text-micro)">Karriere-Modul wird beim ersten Eintrag aktiviert. Klicke "+ Stelle" um zu starten.<br><span style="font-size:10px">(DB-Tabelle <code>karriere_stellen</code> wird automatisch nachgeruestet.)</span></div>';
+          karriereCache = [];
+          return;
+        }
+        box.innerHTML = '<div style="padding:8px;color:var(--danger)">Fehler beim Laden: ' + esc(e.message || '') + '</div>';
+        return;
+      }
+      if (!karriereCache.length) {
+        box.innerHTML = '<div style="padding:8px;color:var(--text-micro)">Noch keine offenen Stellen. Klicke "+ Stelle" um eine zu erstellen.</div>';
+        return;
+      }
+      var canEdit = perms.personalTab || (USERS[currentUser] && USERS[currentUser].isAdmin);
+      var html = '';
+      karriereCache.forEach(function(k) {
+        var aktiv = k.aktiv !== false;
+        var editBtn = canEdit ? '<button onclick="editKarriere(\'' + esc(k.id) + '\')" style="background:transparent;border:none;color:var(--gold);cursor:pointer;padding:6px;font-size:14px" title="Bearbeiten">&#9998;</button>' : '';
+        html += '<div class="settings-item" style="opacity:' + (aktiv ? '1' : '0.5') + '">'
+          + '<div class="left"><div><div class="title">' + esc(k.titel) + '</div>'
+          + '<div class="desc">' + esc(k.anstellung || '') + (k.kontakt ? ' &middot; ' + esc(k.kontakt) : '') + '</div></div></div>'
+          + editBtn + '</div>';
+      });
+      box.innerHTML = html;
+    }
+    function openKarriereSheet() {
+      document.getElementById('karId').value = '';
+      document.getElementById('karriereSheetTitle').textContent = 'Neue Stelle';
+      document.getElementById('karTitel').value = '';
+      document.getElementById('karAnstellung').value = 'vollzeit';
+      document.getElementById('karBeschreibung').value = '';
+      document.getElementById('karAnforderungen').value = '';
+      document.getElementById('karWirBieten').value = '';
+      document.getElementById('karKontakt').value = '';
+      document.getElementById('karAktiv').checked = true;
+      document.getElementById('karDeleteBtn').style.display = 'none';
+      openSheet('karriereSheet');
+    }
+    function editKarriere(id) {
+      var k = (karriereCache || []).find(function(x){ return String(x.id) === String(id); });
+      if (!k) { showToast('Stelle nicht gefunden.', 'warning'); return; }
+      document.getElementById('karId').value = k.id;
+      document.getElementById('karriereSheetTitle').textContent = 'Stelle bearbeiten';
+      document.getElementById('karTitel').value = k.titel || '';
+      document.getElementById('karAnstellung').value = k.anstellung || 'vollzeit';
+      document.getElementById('karBeschreibung').value = k.beschreibung || '';
+      document.getElementById('karAnforderungen').value = k.anforderungen || '';
+      document.getElementById('karWirBieten').value = k.wir_bieten || '';
+      document.getElementById('karKontakt').value = k.kontakt || '';
+      document.getElementById('karAktiv').checked = k.aktiv !== false;
+      document.getElementById('karDeleteBtn').style.display = '';
+      openSheet('karriereSheet');
+    }
+    async function submitKarriere() {
+      if (!isBackendMode()) { showToast('Backend nicht verbunden.', 'warning'); return; }
+      var id = document.getElementById('karId').value.trim();
+      var titel = document.getElementById('karTitel').value.trim();
+      var beschr = document.getElementById('karBeschreibung').value.trim();
+      var kontakt = document.getElementById('karKontakt').value.trim();
+      if (!titel || !beschr || !kontakt) { showToast('Titel, Beschreibung und Kontakt sind Pflicht.', 'warning'); return; }
+      var data = {
+        titel: titel,
+        anstellung: document.getElementById('karAnstellung').value,
+        beschreibung: beschr,
+        anforderungen: document.getElementById('karAnforderungen').value.trim(),
+        wir_bieten: document.getElementById('karWirBieten').value.trim(),
+        kontakt: kontakt,
+        aktiv: document.getElementById('karAktiv').checked
+      };
+      try {
+        if (id) {
+          await apiPatch('karriere_stellen', 'id=eq.' + encodeURIComponent(id), data);
+        } else {
+          data.salon_id = currentSalonId();
+          data.erstellt_am = new Date().toISOString();
+          await apiPost('karriere_stellen', data);
+        }
+        closeSheet('karriereSheet');
+        showToast('Stelle gespeichert.', 'success');
+        loadKarriereList();
+      } catch (e) {
+        console.error('submitKarriere', e);
+        showToast('Fehler: ' + (e && e.message ? e.message : e) + ' (DB-Tabelle karriere_stellen evtl. noch nicht angelegt)', 'error');
+      }
+    }
+    async function deleteKarriere() {
+      var id = document.getElementById('karId').value.trim();
+      if (!id) return;
+      if (!confirm('Stelle wirklich loeschen?')) return;
+      try {
+        await apiPatch('karriere_stellen', 'id=eq.' + encodeURIComponent(id), { aktiv: false });
+        closeSheet('karriereSheet');
+        showToast('Stelle deaktiviert.', 'success');
+        loadKarriereList();
+      } catch (e) {
+        showToast('Fehler: ' + (e && e.message ? e.message : e), 'error');
+      }
     }
 
     // === KI Demo Response ===
@@ -7384,6 +7934,8 @@
 
     function toggleCockpitEdit() {
       cockpitEditing = !cockpitEditing;
+      // F6 Bug 3: Body-Class fuer globalen Edit-Mode (Indikator + ggf. Cursor)
+      document.body.classList.toggle('cockpit-edit-mode', cockpitEditing);
       var grid = document.querySelector('.cockpit-grid');
       var btn = document.getElementById('cockpitEditBtn');
       var bar = document.getElementById('hiddenWidgetsBar');
