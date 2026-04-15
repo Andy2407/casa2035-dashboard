@@ -7968,6 +7968,28 @@
       });
     });
 
+    // FB-40: Auto-X-Button oben rechts in JEDEM Sheet (wenn noch keiner da).
+    // Drei Schliess-Wege: X oben rechts (NEU), Handle runter-swipen (bleibt), Klick ausserhalb (bleibt).
+    (function() {
+      document.querySelectorAll('.sheet-overlay').forEach(function(overlay) {
+        var sheet = overlay.querySelector('.sheet');
+        if (!sheet) return;
+        if (sheet.querySelector('.sheet-x-close')) return;
+        if (getComputedStyle(sheet).position === 'static') sheet.style.position = 'relative';
+        var btn = document.createElement('button');
+        btn.className = 'sheet-x-close';
+        btn.setAttribute('aria-label', 'Schliessen');
+        btn.type = 'button';
+        btn.textContent = '\u00d7';
+        btn.style.cssText = 'position:absolute;top:10px;right:12px;width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:20;-webkit-tap-highlight-color:transparent;padding:0';
+        btn.addEventListener('click', function(ev) {
+          ev.stopPropagation();
+          closeSheet(overlay.id);
+        });
+        sheet.insertBefore(btn, sheet.firstChild);
+      });
+    })();
+
     // Close FAB on outside click
     document.addEventListener('click', function(e) {
       if (fabOpen && !e.target.closest('.fab-wrap')) closeFab();
