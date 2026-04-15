@@ -6832,12 +6832,133 @@
       else if (/neu.*termin|termin.*anlegen|termin.*erstell|termin.*buchen|termin.*machen/.test(text)) {
         var tKunde = jarvisFindKunde(text);
         var tSvcs = jarvisFindService(text);
-        if (tKunde && tSvcs.length > 0) {
-          response = jarvisGreet() + ' Termin fuer ' + (tKunde.Name || tKunde.name) + ': ' + tSvcs.map(function(s){return s.Service||s.name}).join(', ') + '. Oeffne Terminbuchung.';
+        var tKName = tKunde ? (tKunde.Name || tKunde.name) : null;
+        if (tKName && tSvcs.length > 0) {
+          response = jarvisGreet() + ' Termin fuer ' + tKName + ': ' + tSvcs.map(function(s){return s.Service||s.name}).join(', ') + '. Oeffne Terminbuchung.';
+        } else if (tKName) {
+          response = jarvisGreet() + ' Oeffne Terminbuchung fuer ' + tKName + '.';
         } else {
           response = jarvisGreet() + ' Oeffne Terminbuchung.';
         }
-        action = function() { showPage('termine'); setTimeout(function() { if (typeof openNewTerminSheet === 'function') openNewTerminSheet(); }, 300); };
+        action = function() {
+          showPage('termine');
+          setTimeout(function() {
+            if (typeof openNeuerTermin === 'function') openNeuerTermin();
+            setTimeout(function() {
+              if (tKName) {
+                var kInp = document.getElementById('terminKundeInput');
+                if (kInp) kInp.value = tKName;
+              }
+              if (tSvcs && tSvcs.length > 0) {
+                var svcSel = document.getElementById('terminSvcSelect');
+                if (svcSel) {
+                  var target = tSvcs[0].Service || tSvcs[0].name;
+                  for (var i = 0; i < svcSel.options.length; i++) {
+                    if (svcSel.options[i].value === target) { svcSel.selectedIndex = i; break; }
+                  }
+                }
+              }
+            }, 350);
+          }, 300);
+        };
+        keepListening = false;
+      }
+
+      // === TERMIN STORNIEREN (EU AI Act: Mensch entscheidet - nur Dialog oeffnen) ===
+      else if (/storni|absag|termin.*abbrech|termin.*cancel/.test(text)) {
+        var stKunde = jarvisFindKunde(text);
+        if (stKunde) {
+          var stName = stKunde.Name || stKunde.name;
+          var stJetzt = new Date();
+          var stTermin = null;
+          (termineCache || []).forEach(function(t) {
+            var name = (t.Kundenname || t.Kunde || t.kunde || '').toLowerCase();
+            var start = new Date(t.Start_ISO || '');
+            if (name.indexOf(stName.toLowerCase()) !== -1
+                && start >= stJetzt
+                && (t.Status || 'bestaetigt') !== 'storniert'
+                && (!stTermin || start < new Date(stTermin.Start_ISO))) {
+              stTermin = t;
+            }
+          });
+          if (stTermin) {
+            var stZeit = new Date(stTermin.Start_ISO).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+            response = 'Termin gefunden: ' + stName + ' am ' + stZeit + '. Oeffne Detail zur Bestaetigung.';
+            action = function() { showPage('termine'); setTimeout(function() { if (typeof openTerminDetail === 'function') openTerminDetail(stTermin); }, 400); };
+            keepListening = false;
+          } else {
+            response = 'Keinen offenen Termin fuer ' + stName + ' gefunden.';
+          }
+        } else {
+          response = 'Fuer welchen Kunden soll der Termin storniert werden?';
+        }
+      }
+
+      // === TERMINE MORGEN / UEBERMORGEN ===
+      else if (/termin.*ueber.?morgen|ueber.?morgen.*termin/.test(text)) {
+        var uDate = new Date(); uDate.setDate(uDate.getDate() + 2);
+        var uStr = uDate.toISOString().split('T')[0];
+        var uCount = (termineCache || []).filter(function(t) { return (t.Start_ISO || '').indexOf(uStr) === 0; }).length;
+        response = uCount + ' Termine uebermorgen. Oeffne Uebersicht.';
+        action = function() {
+          if (typeof terminViewDate !== 'undefined') { terminViewDate = uDate; }
+          showPage('termine');
+          setTimeout(function() { if (typeof renderTermine === 'function') renderTermine(termineCache); jarvisScrollToFirstTermin(); }, 350);
+        };
+        keepListening = false;
+      }
+      else if (/termin.*morgen|morgen.*termin/.test(text)) {
+        var mDate = new Date(); mDate.setDate(mDate.getDate() + 1);
+        var mStr = mDate.toISOString().split('T')[0];
+        var mCount = (termineCache || []).filter(function(t) { return (t.Start_ISO || '').indexOf(mStr) === 0; }).length;
+        response = mCount + ' Termine morgen. Oeffne Uebersicht.';
+        action = function() {
+          if (typeof terminViewDate !== 'undefined') { terminViewDate = mDate; }
+          showPage('termine');
+          setTimeout(function() { if (typeof renderTermine === 'function') renderTermine(termineCache); jarvisScrollToFirstTermin(); }, 350);
+        };
+        keepListening = false;
+      }
+
+      // === UMSATZ Woche / Monat ===
+      else if (/umsatz.*woche|woche.*umsatz|wochenumsatz/.test(text)) {
+        var wStart = new Date(); wStart.setDate(wStart.getDate() - ((wStart.getDay() + 6) % 7)); wStart.setHours(0,0,0,0);
+        var wSumme = 0;
+        (typeof rechnungenCache !== 'undefined' && rechnungenCache ? rechnungenCache : []).forEach(function(r) {
+          var d = new Date(r.Datum || r.datum || r.Start_ISO || 0);
+          if (d >= wStart) wSumme += parseFloat(r.Betrag || r.betrag || r.Brutto || 0);
+        });
+        response = 'Wochenumsatz: ' + wSumme.toFixed(2).replace('.', ',') + ' Euro.';
+      }
+      else if (/umsatz.*monat|monat.*umsatz|monatsumsatz/.test(text)) {
+        var moStart = new Date(); moStart.setDate(1); moStart.setHours(0,0,0,0);
+        var moSumme = 0;
+        (typeof rechnungenCache !== 'undefined' && rechnungenCache ? rechnungenCache : []).forEach(function(r) {
+          var d = new Date(r.Datum || r.datum || r.Start_ISO || 0);
+          if (d >= moStart) moSumme += parseFloat(r.Betrag || r.betrag || r.Brutto || 0);
+        });
+        response = 'Monatsumsatz: ' + moSumme.toFixed(2).replace('.', ',') + ' Euro.';
+      }
+
+      // === OFFENE ANFRAGEN (Filter direkt) ===
+      else if (/offene.*anfrage|offen.*beratung|anfragen.*offen/.test(text)) {
+        var offenCount = (beratungenCache || []).filter(function(b) { return b.Status === 'offen'; }).length;
+        response = offenCount + ' offene Anfragen. Filter wird gesetzt.';
+        action = function() {
+          showPage('beratung');
+          setTimeout(function() { if (typeof setBeratungFilter === 'function') setBeratungFilter('offen'); }, 300);
+        };
+        keepListening = false;
+      }
+
+      // === LAGER-ALARM (Filter auf unter Mindestbestand) ===
+      else if (/lager.?alarm|alarm.*lager|nachbestell|unter.*mindestbestand|niedrig.*bestand/.test(text)) {
+        var lowCount = (lagerCache || []).filter(function(p) { return (parseInt(p.Bestand) || 0) <= (parseInt(p.Min_Bestand) || 3); }).length;
+        response = lowCount + ' Produkte unter Mindestbestand. Filter wird gesetzt.';
+        action = function() {
+          showPage('lager');
+          setTimeout(function() { if (typeof setLagerFilter === 'function') setLagerFilter('low'); }, 300);
+        };
         keepListening = false;
       }
 
@@ -6941,7 +7062,7 @@
 
       // === Hilfe ===
       else if (/hilfe|help|was.*kannst|befehle|commands/.test(text)) {
-        response = 'Ich kann: Termine zeigen, Rechnungen erstellen, Kunden suchen, Umsatz abfragen, Tagesabschluss machen, DATEV exportieren, Lagerbestand pruefen. Sag einfach was du brauchst.';
+        response = 'Ich kann: Termine heute, morgen oder uebermorgen zeigen, Termine anlegen oder stornieren, Umsatz heute Woche Monat abfragen, Rechnungen erstellen, offene Anfragen und Lager-Alarm filtern, Tagesabschluss und DATEV-Export oeffnen.';
       }
 
       // === Gruss ===

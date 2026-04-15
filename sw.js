@@ -1,7 +1,9 @@
-const CACHE_NAME = 'casa2035-v4';
-const STATIC_ASSETS = ['/index.html', '/manifest.json'];
+// FB-42: Cache-Version bei jedem Release bumpen, damit PWA-Updates durchkommen
+const CACHE_NAME = 'casa2035-v6-20260415';
+const STATIC_ASSETS = ['/manifest.json'];
 
 self.addEventListener('install', (e) => {
+  // index.html nicht pre-cachen — wir wollen bei Update sofort neueste Version
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
   );
