@@ -4734,13 +4734,25 @@
     // === Globale File-Picker Hilfsfunktion (FB-22, v2) ===
     // Transparent-Overlay-Ansatz: Input deckt die gesamte Area ab — iOS Safari + Android + Desktop
     function attachFilePicker(area, input, onFiles) {
-      // Area braucht position:relative damit der absolute Input darin bleibt
+      // FB-15.04.: iOS/Touch-Fix — verhindert Doppel-Tap-Bug + 300ms Tap-Delay
       if (window.getComputedStyle(area).position === 'static') area.style.position = 'relative';
       area.style.overflow = 'hidden';
-      // Input als unsichtbare Overlay-Schicht ueber der gesamten Area
-      input.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:10;font-size:0';
-      // Input ans Ende verschieben (ueber Icons/Labels im DOM)
+      area.style.webkitTapHighlightColor = 'transparent';
+      area.style.touchAction = 'manipulation';
+      // Input als unsichtbare Overlay-Schicht ueber der gesamten Area, voll anklickbar
+      input.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:10;font-size:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation';
+      // Sicherstellen, dass der Input wirklich ein Kind der Area ist und ans Ende kommt (z-Index ueber Icons)
       area.appendChild(input);
+      // Sofortiges visuelles Feedback beim File-Wahl (bevor FileReader laeuft)
+      input.addEventListener('change', function() {
+        if (input.files && input.files.length) {
+          // Short-term visual feedback: area kurz goldig blitzen lassen (ersetzt das "nix passiert"-Gefuehl)
+          var prev = area.style.borderColor;
+          area.style.transition = 'border-color 150ms';
+          area.style.borderColor = 'var(--gold, #C9A84C)';
+          setTimeout(function() { area.style.borderColor = prev; }, 600);
+        }
+      });
       // Drag & Drop
       area.addEventListener('dragover', function(ev) { ev.preventDefault(); ev.stopPropagation(); area.style.borderColor = 'var(--gold)'; });
       area.addEventListener('dragleave', function(ev) { ev.preventDefault(); ev.stopPropagation(); area.style.borderColor = ''; });
@@ -5094,12 +5106,18 @@
 
     function previewFarbcode(files) {
       if (!files || !files[0]) return;
+      // FB-15.04.: SOFORT visuelles Feedback — kein 2-3s "nix passiert"-Gefuehl mehr
+      var prev = document.getElementById('farbcodePreview');
+      var img  = document.getElementById('farbcodeImg');
+      if (prev) prev.style.display = 'block';
+      if (img) { img.src = ''; img.style.opacity = '0.3'; }
+      showToast('Foto wird geladen...', 'info');
       var reader = new FileReader();
       reader.onload = function(e) {
-        document.getElementById('farbcodeImg').src = e.target.result;
-        document.getElementById('farbcodePreview').style.display = 'block';
-        showToast('Foto geladen — bitte Ist-Farbton manuell waehlen oder KI nutzen.', 'info');
+        if (img) { img.src = e.target.result; img.style.opacity = '1'; }
+        showToast('Foto geladen — bitte Ist-Farbton manuell waehlen oder KI nutzen.', 'success');
       };
+      reader.onerror = function() { showToast('Foto konnte nicht geladen werden.', 'error'); };
       reader.readAsDataURL(files[0]);
     }
 
@@ -5460,23 +5478,31 @@
       if (remaining <= 0) { showToast('Maximal 10 Fotos', 'info'); return; }
       for (var i = 0; i < Math.min(files.length, remaining); i++) {
         (function(file) {
+          // FB-15.04.: SOFORT Skeleton-Wrap rendern (kein 2-3s "nix passiert"-Gefuehl)
+          var wrap = document.createElement('div');
+          wrap.style.cssText = 'position:relative;animation:fadeIn 200ms ease';
+          var img = document.createElement('img');
+          img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);opacity:0.3';
+          wrap.appendChild(img);
+          var load = document.createElement('div');
+          load.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:22px;pointer-events:none';
+          load.textContent = '\u231B';
+          wrap.appendChild(load);
+          gallery.appendChild(wrap);
           var reader = new FileReader();
           reader.onload = function(e) {
             haaranalysePhotos.push(e.target.result);
-            var wrap = document.createElement('div');
-            wrap.style.cssText = 'position:relative';
-            var img = document.createElement('img');
             img.src = e.target.result;
-            img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border)';
-            wrap.appendChild(img);
+            img.style.opacity = '1';
+            load.remove();
             var del = document.createElement('div');
             del.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;font-size:11px;line-height:18px;text-align:center;cursor:pointer';
             del.textContent = '\u00D7';
             del.onclick = function(ev) { ev.stopPropagation(); var idx = haaranalysePhotos.indexOf(e.target.result); if (idx > -1) haaranalysePhotos.splice(idx, 1); wrap.remove(); if (!haaranalysePhotos.length) gallery.style.display = 'none'; updateHaCount(); };
             wrap.appendChild(del);
-            gallery.appendChild(wrap);
             updateHaCount();
           };
+          reader.onerror = function() { wrap.remove(); showToast('Foto konnte nicht geladen werden.', 'error'); };
           reader.readAsDataURL(file);
         })(files[i]);
       }
@@ -5800,23 +5826,32 @@
       if (remaining <= 0) { showToast('Maximale Anzahl erreicht', 'info'); return; }
       for (var i = 0; i < Math.min(files.length, remaining); i++) {
         (function(file, arrRef, gal) {
+          // FB-15.04.: SOFORT Skeleton — kein 2-3s Gefuehl
+          var wrap = document.createElement('div');
+          wrap.style.cssText = 'position:relative;animation:fadeIn 200ms ease';
+          var img = document.createElement('img');
+          img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);opacity:0.3';
+          img.alt = 'Foto';
+          wrap.appendChild(img);
+          var load = document.createElement('div');
+          load.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:22px;pointer-events:none';
+          load.textContent = '\u231B';
+          wrap.appendChild(load);
+          gal.appendChild(wrap);
           var reader = new FileReader();
           reader.onload = function(e) {
             arrRef.push(e.target.result);
-            var wrap = document.createElement('div');
-            wrap.style.cssText = 'position:relative';
-            var img = document.createElement('img');
-            img.src = e.target.result; img.alt = 'Foto';
-            img.style.cssText = 'width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--radius-sm);border:1px solid var(--border)';
-            wrap.appendChild(img);
+            img.src = e.target.result;
+            img.style.opacity = '1';
+            load.remove();
             var del = document.createElement('div');
             del.style.cssText = 'position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:var(--danger);color:#fff;font-size:11px;line-height:18px;text-align:center;cursor:pointer';
             del.textContent = '\u00D7';
             del.onclick = function(ev) { ev.stopPropagation(); var idx = arrRef.indexOf(e.target.result); if (idx > -1) arrRef.splice(idx, 1); wrap.remove(); if (!arrRef.length) gal.style.display = 'none'; updateWfCounts(); };
             wrap.appendChild(del);
-            gal.appendChild(wrap);
             updateWfCounts();
           };
+          reader.onerror = function() { wrap.remove(); showToast('Foto konnte nicht geladen werden.', 'error'); };
           reader.readAsDataURL(file);
         })(files[i], arr, gallery);
       }
