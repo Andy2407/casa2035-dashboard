@@ -654,7 +654,9 @@
     .toast.warning { background: var(--warning); }
 
     /* === Responsive === */
-    @media (min-width: 768px) {
+    /* FB-47: Landscape-iPhone (844x390 etc.) nutzt volle Breite, NICHT Desktop-Zentrierung.
+       Desktop-Zentrierung (max-width:600px) nur wenn KEIN Landscape-Phone (d.h. height > 500px oder orientation portrait). */
+    @media (min-width: 768px) and (min-height: 501px), (min-width: 768px) and (orientation: portrait) {
       main { max-width: 600px; margin: 0 auto; }
       .bottom-nav { max-width: 600px; left: 50%; transform: translateX(-50%); border-radius: var(--radius) var(--radius) 0 0; }
     }
@@ -679,13 +681,18 @@
     }
 
     /* === Termine Toolbar (sticky) === */
+    /* FB-36 + FB-46: Toolbar stickt UNTER dem Header (Header hat z-index 100 und sitzt bei top:0).
+       Ohne diese Top-Angabe verschwindet die KW-Anzeige hinter dem Header beim Scrollen. */
     .termine-toolbar {
-      position: sticky; top: 0; z-index: 50;
+      position: sticky; top: calc(var(--safe-top, 0px) + 52px); z-index: 50;
       background: var(--bg);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       padding: 8px 0 6px;
       border-bottom: 1px solid var(--border);
       margin: 0 -16px; padding-left: 16px; padding-right: 16px;
+    }
+    @media (max-height: 500px) and (orientation: landscape) {
+      .termine-toolbar { top: calc(env(safe-area-inset-top, 0px) + 36px); }
     }
     /* === Termin Day/Week Views === */
     .termin-view-toggle { display: flex; gap: 0; margin-bottom: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
