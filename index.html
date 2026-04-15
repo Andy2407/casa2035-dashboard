@@ -506,7 +506,8 @@
     }
 
     /* === FAB (Floating Action Button) === */
-    .fab-wrap { position: fixed; bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px); right: max(20px, calc(env(safe-area-inset-right, 0px) + 12px)); z-index: 150; }
+    .fab-wrap { position: fixed; bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px); right: max(20px, calc(env(safe-area-inset-right, 0px) + 12px)); z-index: 200; display: flex; flex-direction: column; align-items: flex-end; visibility: visible; pointer-events: auto; }
+    .fab-wrap.hidden-until-login { visibility: hidden !important; pointer-events: none !important; }
     .fab {
       width: 52px; height: 52px; border-radius: 50%;
       background: var(--gold-gradient); color: #fff;
@@ -715,6 +716,15 @@
     /* === Termine Toolbar (sticky) === */
     /* FB-36 + FB-46: Toolbar stickt UNTER dem Header (Header hat z-index 100 und sitzt bei top:0).
        Ohne diese Top-Angabe verschwindet die KW-Anzeige hinter dem Header beim Scrollen. */
+    /* F4 15.04.2026: Sticky Toolbars auch in Lager + Kasse (Suche + Filter + Aktionen bleiben beim Scrollen sichtbar) */
+    .lager-toolbar, .kasse-toolbar {
+      position: sticky; top: calc(var(--safe-top, 0px) + 52px); z-index: 50;
+      background: var(--bg);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      padding: 8px 0 6px;
+      border-bottom: 1px solid var(--border);
+      margin: 0 -16px 10px; padding-left: 16px; padding-right: 16px;
+    }
     .termine-toolbar {
       position: sticky; top: calc(var(--safe-top, 0px) + 52px); z-index: 50;
       background: var(--bg);
@@ -1112,13 +1122,17 @@
       .cockpit-wide { grid-column: 1; }
     }
 
-    /* === iOS Auto-Zoom-Fix (FB-53/45/38/42/47/46/30/36): font-size >= 16px verhindert iOS-Safari Zoom-In bei Input-Focus === */
-    @media (max-width: 768px) {
-      input[type="text"], input[type="password"], input[type="email"], input[type="tel"],
-      input[type="search"], input[type="number"], input[type="date"], input[type="time"],
-      input[type="datetime-local"], input[type="url"], textarea, select {
-        font-size: 16px !important;
-      }
+    /* === iOS Auto-Zoom-Fix (FB-53/45/38/42/47/46/30/36 + F4 15.04.2026): font-size >= 16px verhindert iOS-Safari Zoom-In bei Input-Focus.
+       F4: GLOBAL (nicht mehr media-only) + ID-Selektoren. Schlaegt Inline-style=font-size:12px/13px durch ID+!important. === */
+    input[type="text"], input[type="password"], input[type="email"], input[type="tel"],
+    input[type="search"], input[type="number"], input[type="date"], input[type="time"],
+    input[type="datetime-local"], input[type="url"], textarea, select,
+    .search-input, .ki-input, .sheet input, .sheet textarea, .sheet select,
+    #kundenSearch, #lagerSearch, #beratungSearch, #regelText, #kiAssistInput,
+    #terminDateInput, #terminTimeInput, #terminKundeInput, #nbMenge,
+    #neuerKundeName, #neuerKundeEmail, #neuerKundeTelefon,
+    #verschiebenDatum, #kiHintChatInput {
+      font-size: 16px !important;
     }
 
     /* FB-30: KI-Assist-Panel auf schmalen Viewports nicht mit FAB/Feedback-FAB kollidieren lassen */
@@ -1365,6 +1379,56 @@
       color: var(--text); cursor: pointer; transition: all 150ms; line-height: 1.3;
     }
     .ki-reply-chip:hover { background: var(--gold); color: #fff; border-color: var(--gold); }
+
+    /* =========================================================
+       PWA Standalone Mode (Homescreen-App)
+       ========================================================= */
+    @media (display-mode: standalone), (display-mode: fullscreen) {
+      :root {
+        --safe-top: env(safe-area-inset-top, 20px);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-left: env(safe-area-inset-left, 0px);
+        --safe-right: env(safe-area-inset-right, 0px);
+      }
+      body {
+        padding-top: var(--safe-top);
+        padding-bottom: var(--safe-bottom);
+        padding-left: var(--safe-left);
+        padding-right: var(--safe-right);
+        overscroll-behavior-y: none;
+      }
+      .header, #appHeader {
+        padding-top: calc(12px + var(--safe-top)) !important;
+      }
+      .bottom-nav, .tab-bar, nav.bottomnav {
+        padding-bottom: calc(8px + var(--safe-bottom)) !important;
+      }
+      .header, .bottom-nav, .tab-bar, button, .btn {
+        -webkit-user-select: none;
+        user-select: none;
+      }
+    }
+
+    /* iOS Add-to-Home-Screen Banner */
+    #iosA2HBanner {
+      position: fixed; left: 12px; right: 12px; bottom: 14px;
+      background: rgba(12,12,18,0.96); color: #fff;
+      border: 1px solid rgba(184,150,46,0.6); border-radius: 14px;
+      padding: 14px 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      z-index: 99999; font-size: 14px; line-height: 1.4;
+      display: none; animation: a2hSlideIn 400ms ease-out;
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    }
+    #iosA2HBanner.show { display: block; }
+    #iosA2HBanner .a2h-title { font-weight: 700; color: #b8962e; margin-bottom: 4px; font-size: 15px; }
+    #iosA2HBanner .a2h-close {
+      position: absolute; top: 6px; right: 8px; background: none; border: 0;
+      color: rgba(255,255,255,0.6); font-size: 22px; cursor: pointer; padding: 4px 8px;
+    }
+    @keyframes a2hSlideIn {
+      from { transform: translateY(120%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -1667,11 +1731,14 @@
         <div class="kasse-box"><div class="value tabular" id="kasseAusgaben" style="color:var(--danger)">0,00</div><div class="label">Ausgaben</div></div>
       </div>
       <div class="ring-chart-wrap"><svg id="kasseRingChart" viewBox="0 0 120 120" width="120" height="120"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--border)" stroke-width="8"/><circle id="ringBar" cx="60" cy="60" r="52" fill="none" stroke="var(--gold)" stroke-width="8" stroke-dasharray="0 326.73" stroke-linecap="round" transform="rotate(-90 60 60)" style="transition:stroke-dasharray .8s ease"/><circle id="ringKarte" cx="60" cy="60" r="52" fill="none" stroke="var(--info)" stroke-width="8" stroke-dasharray="0 326.73" stroke-linecap="round" transform="rotate(-90 60 60)" style="transition:stroke-dasharray .8s ease"/><text x="60" y="56" text-anchor="middle" fill="var(--text)" font-family="Playfair Display,serif" font-size="14" font-weight="700" id="ringTotal">0</text><text x="60" y="70" text-anchor="middle" fill="var(--text-dim)" font-size="8" font-weight="600">EUR GESAMT</text></svg></div>
-      <div class="action-grid">
-        <div class="action-card" onclick="openRechnungSheet()"><div class="icon">&#9998;</div><div class="title">Rechnung</div><div class="desc">Neue Rechnung erstellen</div></div>
-        <div class="action-card" onclick="openAusgabeSheet()"><div class="icon">&#128181;</div><div class="title">Ausgabe</div><div class="desc">Betriebsausgabe buchen</div></div>
-        <div class="action-card" onclick="openTagesabschluss()" id="tagesabschlussCard"><div class="icon">&#128202;</div><div class="title">Tagesabschluss</div><div class="desc">GoBD-konform abschliessen</div></div>
-        <div class="action-card" onclick="openDatevExport()"><div class="icon">&#128230;</div><div class="title">DATEV-Export</div><div class="desc">CSV + XML fuer Steuerberater</div></div>
+      <!-- F4 15.04.2026: Sticky Kasse-Toolbar mit Primaer-Aktionen -->
+      <div class="kasse-toolbar">
+        <div class="action-grid">
+          <div class="action-card" onclick="openRechnungSheet()"><div class="icon">&#9998;</div><div class="title">Rechnung</div><div class="desc">Neue Rechnung erstellen</div></div>
+          <div class="action-card" onclick="openAusgabeSheet()"><div class="icon">&#128181;</div><div class="title">Ausgabe</div><div class="desc">Betriebsausgabe buchen</div></div>
+          <div class="action-card" onclick="openTagesabschluss()" id="tagesabschlussCard"><div class="icon">&#128202;</div><div class="title">Tagesabschluss</div><div class="desc">GoBD-konform abschliessen</div></div>
+          <div class="action-card" onclick="openDatevExport()"><div class="icon">&#128230;</div><div class="title">DATEV-Export</div><div class="desc">CSV + XML fuer Steuerberater</div></div>
+        </div>
       </div>
       <div class="section-title">KI-Hinweise</div>
       <div id="kiKasseHints" class="ki-suggestions stagger"></div>
@@ -1846,8 +1913,28 @@
       </div>
       <!-- Personal (CHF only) -->
       <div class="settings-section" id="personalSection" style="display:none">
-        <div class="section-title">Personal &amp; Rechte</div>
+        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Personal &amp; Rechte</span>
+          <button class="btn btn-primary btn-sm" onclick="openMitarbeiterSheet()" style="font-size:11px;padding:6px 10px">+ Mitarbeiter</button>
+        </div>
         <div id="personalPerms"></div>
+      </div>
+      <!-- Services-Preisliste (CHF/FRM) -->
+      <div class="settings-section" id="servicesSection" style="display:none">
+        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Service-Preisliste</span>
+          <button class="btn btn-primary btn-sm" onclick="openServiceSheet()" style="font-size:11px;padding:6px 10px">+ Service</button>
+        </div>
+        <div id="servicesList" style="font-size:12px;color:var(--text-dim)">Lade Services...</div>
+      </div>
+      <!-- Karriere (alle Rollen sehen, CHF/FRM editieren) -->
+      <div class="settings-section" id="karriereSection">
+        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+          <span>Karriere &amp; Stellenangebote</span>
+          <button class="btn btn-primary btn-sm" id="karriereAddBtn" onclick="openKarriereSheet()" style="font-size:11px;padding:6px 10px;display:none">+ Stelle</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-micro);margin-bottom:8px">Aktuelle offene Stellen, sichtbar auf der Salon-Webseite.</div>
+        <div id="karriereList" style="font-size:12px;color:var(--text-dim)">Lade Stellen...</div>
       </div>
       <!-- System (CHF/Admin only) -->
       <div class="settings-section" id="systemSection" style="display:none">
@@ -1918,7 +2005,7 @@
   </nav>
 
   <!-- FAB -->
-  <div class="fab-wrap" id="fabWrap" style="display:none">
+  <div class="fab-wrap hidden-until-login" id="fabWrap">
     <div class="fab-menu" id="fabMenu"></div>
     <button class="fab" id="fabBtn" onclick="toggleFab()" aria-label="Schnellaktion">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -2434,7 +2521,7 @@
         document.getElementById('appHeader').style.display = '';
         document.getElementById('appMain').style.display = '';
         document.getElementById('bottomNav').style.display = '';
-        var fab = document.getElementById('fabWrap'); if (fab) fab.style.display = '';
+        var fab = document.getElementById('fabWrap'); if (fab) { fab.classList.remove('hidden-until-login'); fab.style.display = 'flex'; fab.style.visibility = 'visible'; }
         applyUserUI();
         initApp();
       } catch (e) {
@@ -8363,7 +8450,7 @@
         document.getElementById('appHeader').style.display = '';
         document.getElementById('appMain').style.display = '';
         document.getElementById('bottomNav').style.display = '';
-        var fab = document.getElementById('fabWrap'); if (fab) fab.style.display = '';
+        var fab = document.getElementById('fabWrap'); if (fab) { fab.classList.remove('hidden-until-login'); fab.style.display = 'flex'; fab.style.visibility = 'visible'; }
         applyUserUI();
         initApp();
       }
@@ -8997,6 +9084,35 @@
       });
     }
 
+  </script>
+
+  <!-- iOS Add-to-Home-Screen Banner (Capo PWA-Haertung) -->
+  <div id="iosA2HBanner" role="dialog" aria-label="App installieren">
+    <button class="a2h-close" onclick="dismissA2H()" aria-label="Schliessen">&times;</button>
+    <div class="a2h-title">Casa 2035 als App installieren</div>
+    <div>Tippe auf das Teilen-Symbol <span style="font-size:16px;">&#x1F5D2;</span> unten in Safari und dann auf <b>&laquo;Zum Home-Bildschirm&raquo;</b>. Die App startet dann ohne Browser-Leiste.</div>
+  </div>
+  <script>
+    (function(){
+      try {
+        var ua = navigator.userAgent || '';
+        var isIOS = /iPad|iPhone|iPod/.test(ua) || (ua.includes('Mac') && 'ontouchend' in document);
+        var isStandalone = window.matchMedia('(display-mode: standalone)').matches
+          || window.navigator.standalone === true;
+        var dismissed = localStorage.getItem('casa2035_a2h_dismissed');
+        if (isIOS && !isStandalone && !dismissed) {
+          setTimeout(function(){
+            var el = document.getElementById('iosA2HBanner');
+            if (el) el.classList.add('show');
+          }, 2500);
+        }
+      } catch(e) {}
+    })();
+    function dismissA2H() {
+      var el = document.getElementById('iosA2HBanner');
+      if (el) el.classList.remove('show');
+      try { localStorage.setItem('casa2035_a2h_dismissed', Date.now()); } catch(e){}
+    }
   </script>
 </body>
 </html>
