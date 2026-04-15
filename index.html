@@ -292,6 +292,29 @@
     .hero-card p { font-size: 11px; color: var(--text-dim); margin: 0; }
     .hero-card .hero-time { font-size: 10px; font-weight: 600; color: var(--gold); font-variant-numeric: tabular-nums; margin-top: 4px; letter-spacing: 0.5px; }
 
+    /* === Kontext-Hint-Leiste (FB-48, global pro Seite) === */
+    .page-hint-bar {
+      display: flex; align-items: center; gap: 10px;
+      margin: 0 0 12px;
+      padding: 8px 12px;
+      background: linear-gradient(135deg, rgba(191,160,84,0.08), rgba(191,160,84,0.03));
+      border: 1px solid rgba(191,160,84,0.28);
+      border-left: 3px solid var(--gold);
+      border-radius: var(--radius-sm);
+      font-size: 12px; line-height: 1.4; color: var(--text-secondary);
+      animation: pageHintFade 260ms var(--ease);
+    }
+    .page-hint-icon { font-size: 14px; flex-shrink: 0; filter: saturate(1.1); }
+    .page-hint-text { flex: 1; min-width: 0; }
+    .page-hint-text b { color: var(--gold); font-weight: 600; }
+    .page-hint-close {
+      background: transparent; border: none; color: var(--text-dim);
+      font-size: 18px; line-height: 1; cursor: pointer; padding: 2px 6px;
+      border-radius: 4px; flex-shrink: 0; transition: color 160ms;
+    }
+    .page-hint-close:hover { color: var(--text); }
+    @keyframes pageHintFade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
     /* === Smart Hints (Home) === */
     .smart-hints { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
     .hint-card {
@@ -1162,12 +1185,18 @@
       .termine-toolbar { padding: 4px 12px 4px; margin: 0 -12px; }
       .termin-view-toggle { margin-bottom: 0; }
       .termin-view-btn { font-size: 10px; padding: 3px 8px; }
-      /* Tagesansicht Kalender BREITER */
-      .day-view-grid { font-size: 10px; width: 100%; }
+      /* FB-45: Tagesansicht Kalender BREITER + min-height runter (sonst uebermaessiger Leer-Scroll im Landscape) */
+      .day-view-grid { font-size: 10px; width: 100%; min-height: auto; }
+      .day-hour-row { min-height: 40px; }
+      .day-hour-slots { min-height: 40px; }
       .day-hour-label { font-size: 9px; min-width: 28px; padding: 2px 3px; }
       .day-termin-block { font-size: 9px; padding: 2px 4px; }
-      /* Wochenansicht: Scrollbar im Wrapper, Achse bleibt sticky */
+      /* Wochenansicht: Scrollbar im Wrapper, Achse bleibt sticky + kompaktere Hoehen */
       .week-view-grid { min-width: 360px; }
+      .week-hour-cell { height: 36px; }
+      .week-time-label { height: 36px; line-height: 36px; }
+      .week-time-axis { padding-top: 22px; }
+      .week-day-header { height: 22px; font-size: 10px; padding: 3px; }
       /* KI-Hinweise kompakt */
       .ki-suggestion-card { padding: 6px; margin-bottom: 3px; }
       .ki-suggestion-card .ki-icon { width: 24px; height: 24px; font-size: 12px; }
@@ -1441,6 +1470,13 @@
 
   <!-- Main Content -->
   <main id="appMain" style="display:none">
+
+    <!-- Kontext-Hint-Leiste (FB-48) - kontextueller Tipp pro Seite -->
+    <div id="pageHintBar" class="page-hint-bar" style="display:none" role="note" aria-live="polite">
+      <span class="page-hint-icon">&#128161;</span>
+      <span class="page-hint-text" id="pageHintText"></span>
+      <button type="button" class="page-hint-close" onclick="dismissPageHint()" aria-label="Tipp schliessen">&times;</button>
+    </div>
 
     <!-- PAGE: Mein Salon (Home) -->
     <div class="page active" id="pageDashboard">
