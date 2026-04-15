@@ -3022,17 +3022,19 @@
           document.getElementById('liveIndicator').textContent = 'DEMO';
           return;
         }
-        // Rezepturen aus Supabase in lokalen Cache laden
+        // Rezepturen aus Supabase in dedizierten DB-Cache (Prio vor hardcoded JS-Fallback)
         if (Array.isArray(rezepturen) && rezepturen.length > 0) {
           rezepturen.forEach(function(r) {
             if (r.service_name && r.aufgaben) {
-              serviceProdukte[r.service_name] = {
-                aufgaben: r.aufgaben,
-                produkte: r.produkte || []
-              };
-              if (r.hinweise) serviceProdukte[r.service_name].hinweise = r.hinweise;
+              var entry = { aufgaben: r.aufgaben, produkte: r.produkte || [] };
+              if (r.hinweise) entry.hinweise = r.hinweise;
+              dbRezeptCache[r.service_name] = entry;
+              dbRezeptCache[r.service_name.toLowerCase()] = entry;
             }
           });
+          try { console.log('[Rezepturen] ' + rezepturen.length + ' Eintraege aus DB geladen'); } catch(e) {}
+        } else {
+          try { console.warn('[Rezepturen] Kein Eintrag aus DB erhalten'); } catch(e) {}
         }
         renderCockpit();
         renderKiSuggestions();
@@ -7957,6 +7959,8 @@
     }
 
     // === Service Produkte (fuer Termin-Detail Rezepte) ===
+    // DB-Cache (wird aus service_rezepturen Tabelle befuellt, hat Prioritaet vor hardcoded JS-Fallback)
+    var dbRezeptCache = {};
     var serviceProdukte = {
       'Damenhaarschnitt + Foehn': {
         aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Schneiden',dauer_min:25},{schritt:'Foehnen + Styling',dauer_min:15}],
@@ -8025,11 +8029,23 @@
     };
 
     // Fuzzy-Match: Rezeptur auch bei leicht abweichenden Service-Namen finden
+    // Reihenfolge: 1) DB-Cache exakt  2) DB-Cache case-insensitive/teilstring  3) hardcoded serviceProdukte exakt  4) hardcoded teilstring
     function findRecipe(serviceName) {
       if (!serviceName) return null;
-      if (serviceProdukte[serviceName]) return serviceProdukte[serviceName];
-      // Teilstring-Match
       var sLow = serviceName.toLowerCase();
+      // 1) DB exakt (case-insensitive dank doppeltem Key)
+      if (dbRezeptCache[serviceName]) return dbRezeptCache[serviceName];
+      if (dbRezeptCache[sLow]) return dbRezeptCache[sLow];
+      // 2) DB teilstring
+      var dbKeys = Object.keys(dbRezeptCache);
+      for (var j = 0; j < dbKeys.length; j++) {
+        var dk = dbKeys[j].toLowerCase();
+        if (dk === sLow) continue;
+        if (sLow.indexOf(dk) !== -1 || dk.indexOf(sLow) !== -1) return dbRezeptCache[dbKeys[j]];
+      }
+      // 3) hardcoded exakt
+      if (serviceProdukte[serviceName]) return serviceProdukte[serviceName];
+      // 4) hardcoded teilstring
       var keys = Object.keys(serviceProdukte);
       for (var i = 0; i < keys.length; i++) {
         if (sLow.indexOf(keys[i].toLowerCase()) !== -1 || keys[i].toLowerCase().indexOf(sLow) !== -1) return serviceProdukte[keys[i]];
