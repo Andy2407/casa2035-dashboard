@@ -9,9 +9,16 @@
   <meta name="theme-color" content="#0a0a0a">
   <title>Casa 2035</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180.png">
   <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
   <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Casa 2035">
+  <meta name="mobile-web-app-capable" content="yes">
   <style>
     /* =============================================================
        Casa 2035 — Vision 2035 Dashboard
@@ -2064,11 +2071,7 @@
   <div class="sheet-overlay" id="detailSheet">
     <div class="sheet" style="max-height:92vh;position:relative">
       <div class="sheet-handle"></div>
-      <button onclick="closeSheet('detailSheet')" style="position:absolute;top:12px;right:16px;width:28px;height:28px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;line-height:1">&times;</button>
       <div id="detailInner"></div>
-      <div class="sheet-actions" style="margin-top:12px">
-        <button class="btn btn-secondary" onclick="closeSheet('detailSheet')">Schliessen</button>
-      </div>
     </div>
   </div>
 
@@ -2583,6 +2586,8 @@
     }
 
     function showPage(page) {
+      // Race-Fix: offene Sheets vor Page-Wechsel schliessen (persistiert Notiz)
+      try { closeAllSheets(); } catch(e){}
       currentPage = page;
       renderPageHint(page);
       var activePage = document.querySelector('.page.active');
@@ -2647,8 +2652,40 @@
     }
 
     // === Sheet Helpers ===
-    function openSheet(id) { document.getElementById(id).classList.add('show'); }
-    function closeSheet(id) { document.getElementById(id).classList.remove('show'); }
+    function openSheet(id) { var el = document.getElementById(id); if (el) el.classList.add('show'); }
+    function closeSheet(id) {
+      var el = document.getElementById(id);
+      if (!el) return false;
+      // Auto-persist Termin-Notiz falls offen
+      if (id === 'detailSheet') { try { terminNotizSpeichern(true); } catch(e){} }
+      el.classList.remove('show');
+      return true;
+    }
+    function closeAllSheets() {
+      document.querySelectorAll('.sheet-overlay.show').forEach(function(ov){ closeSheet(ov.id); });
+    }
+    // Termin-Notiz sofort persistieren (blur + vor Sheet-Close)
+    function terminNotizSpeichern(silent) {
+      var ta = document.getElementById('terminNotiz');
+      if (!ta) return;
+      var termId = ta.getAttribute('data-termin-id');
+      var iso = ta.getAttribute('data-start-iso');
+      var kname = ta.getAttribute('data-kundenname');
+      var val = ta.value || '';
+      var found = (typeof termineCache !== 'undefined' && termineCache) ? termineCache.find(function(t){
+        if (termId && t.id === termId) return true;
+        return t.Start_ISO === iso && (t.Kundenname || '') === kname;
+      }) : null;
+      if (found) {
+        if ((found.Notiz || '') === val) return; // no change
+        found.Notiz = val;
+        if (!silent && typeof showToast === 'function') showToast('Notiz gespeichert', 'success');
+        // Optional Supabase-Update falls Backend-Mode
+        if (typeof isBackendMode === 'function' && isBackendMode() && found.id && typeof supaFetch === 'function') {
+          try { supaFetch('/rest/v1/termine?id=eq.' + encodeURIComponent(found.id), { method: 'PATCH', headers: { 'Content-Type':'application/json','Prefer':'return=minimal' }, body: JSON.stringify({ notiz: val }) }); } catch(e){}
+        }
+      }
+    }
 
     // === Go-Live Overlay + Demo Badges ===
     function openGoLive() { document.getElementById('goliveOverlay').classList.add('open'); }
@@ -4899,10 +4936,18 @@
       });
       html += '</div>';
 
-      // Notiz-Feld
+      // Notiz-Feld (persistiert onblur + closeSheet + Speichern-Button)
       if (statusLabel !== 'storniert' && statusLabel !== 'abgeschlossen') {
-        html += '<div style="margin-top:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:4px">Interne Notiz</div>';
-        html += '<textarea id="terminNotiz" rows="2" placeholder="Notiz hinzufuegen..." style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif;resize:none;box-sizing:border-box">' + esc(t.Notiz || '') + '</textarea></div>';
+        html += '<div style="margin-top:12px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:4px;display:flex;justify-content:space-between;align-items:center">';
+        html += '<span>Interne Notiz</span>';
+        html += '<button type="button" onclick="terminNotizSpeichern()" style="padding:3px 10px;border:1px solid var(--gold);border-radius:10px;background:var(--gold-glow);color:var(--gold);font-size:9px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:0.3px">Speichern</button>';
+        html += '</div>';
+        html += '<textarea id="terminNotiz" rows="2" placeholder="Notiz hinzufuegen..." '
+             + 'data-termin-id="' + esc(t.id || '') + '" '
+             + 'data-start-iso="' + esc(t.Start_ISO || '') + '" '
+             + 'data-kundenname="' + esc(t.Kundenname || '') + '" '
+             + 'onblur="terminNotizSpeichern(true)" '
+             + 'style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif;resize:none;box-sizing:border-box">' + esc(t.Notiz || '') + '</textarea></div>';
       }
 
       // Ueberlappungs-Vorschlaege
@@ -8410,11 +8455,17 @@
       }, { passive: true });
     })();
 
-    // Close sheets on backdrop click
+    // Close sheets on backdrop click + Escape-Key
     document.querySelectorAll('.sheet-overlay').forEach(function(overlay) {
       overlay.addEventListener('click', function(e) {
         if (e.target === overlay) closeSheet(overlay.id);
       });
+    });
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' || e.keyCode === 27) {
+        var open = document.querySelector('.sheet-overlay.show');
+        if (open) closeSheet(open.id);
+      }
     });
 
     // FB-40: Auto-X-Button oben rechts in JEDEM Sheet (wenn noch keiner da).
