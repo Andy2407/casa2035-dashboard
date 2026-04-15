@@ -2476,8 +2476,87 @@
 
     // === Navigation ===
     var currentPage = 'dashboard';
+
+    // === Kontext-Hints pro Seite (FB-48) ===
+    // Kurze, konkrete Tipps - rotieren pro Aufruf, dismissbar, persistent pro Tab
+    var PAGE_HINTS = {
+      dashboard: [
+        '<b>Cockpit:</b> Widgets per Drag sortieren, &times; blendet aus.',
+        '<b>Tipp:</b> Long-Press auf das + unten oeffnet die KI-Befehle.',
+        '<b>Pull-to-refresh:</b> Nach unten ziehen laedt frische Daten.',
+        '<b>Kacheln tippen:</b> Springt direkt zum passenden Bereich.',
+        '<b>KI-Hinweise:</b> Reagieren auf echten Salon-Zustand - nicht generisch.'
+      ],
+      termine: [
+        '<b>Links-/Rechts-Swipe</b> wechselt den Tag.',
+        '<b>Lang-Druck</b> auf Termin oeffnet Schnellaktionen.',
+        '<b>Tippe auf die Kalenderwoche</b> unten, um zu "Heute" zu springen.',
+        '<b>Filter nach Stylistin:</b> Oben rechts, zeigt nur dessen Termine.',
+        '<b>Leerer Slot antippen:</b> Neuen Termin direkt anlegen.'
+      ],
+      beratung: [
+        '<b>Kanal-Filter:</b> WhatsApp, Instagram, Mail getrennt anzeigbar.',
+        '<b>Sprachnotiz:</b> Mikro im Reply-Feld nimmt Antwort auf.',
+        '<b>Anfrage antippen</b> zeigt die komplette Konversation.',
+        '<b>Karriere-Anfragen</b> landen hier mit Tag "Bewerbung".',
+        '<b>Antwortvorschlaege:</b> KI schlaegt passende Texte vor.'
+      ],
+      kunden: [
+        '<b>Suche:</b> Name, Telefon oder Mail - sofortige Treffer.',
+        '<b>Kunde antippen</b> zeigt Historie, Fotos und Vorlieben.',
+        '<b>Filter "Follow-Up":</b> Zeigt Kunden, die Kontakt brauchen.',
+        '<b>VIP-Tag</b> kennzeichnet Stammkundinnen.',
+        '<b>Langer Druck</b> auf Kunde oeffnet Schnellaktionen (Anruf, WhatsApp).'
+      ],
+      lager: [
+        '<b>Rote Karten</b> = unter Mindestbestand. Sofort nachbestellen.',
+        '<b>"Nachbestellen"-Filter</b> oben zeigt nur kritische Produkte.',
+        '<b>Nachbestell-Button</b> legt Bestellung direkt an.',
+        '<b>Sammelbestellung:</b> Freitags pruefen, Montags bestellen.',
+        '<b>LA Biosthetique:</b> Lieferzeit 3-5 Werktage einplanen.'
+      ],
+      kasse: [
+        '<b>Rechnung erstellen:</b> + unten oder FAB am Startschirm.',
+        '<b>Tagesabschluss</b> unten - fuer End-of-Day und Kassensturz.',
+        '<b>DATEV-Export:</b> Ganz unten, CSV fuer Steuerberater.',
+        '<b>Zahlart:</b> Bar / Karte / Online getrennt gebucht.',
+        '<b>GoBD-konform:</b> Rechnungen koennen nicht geaendert werden.'
+      ],
+      einstellungen: [
+        '<b>Salon-Regeln:</b> KI beachtet diese bei Terminvorschlaegen.',
+        '<b>Profil anpassen:</b> Kuerzel und Farbe fuer Termin-Chips.',
+        '<b>Personal &amp; Rechte:</b> Nur Chefin - Rollen setzen (CHF/FRM/STY/AZU).',
+        '<b>Backend-Verbindung:</b> Status des Casa-Servers pruefen.',
+        '<b>Karriere:</b> Offene Stellen pflegen - auf Salon-Homepage sichtbar.'
+      ]
+    };
+    function pageHintKey(page) { return 'casa_hint_' + page + '_idx'; }
+    function pageHintDismissKey() { return 'casa_hint_dismissed_session'; }
+    function renderPageHint(page) {
+      try {
+        var bar = document.getElementById('pageHintBar');
+        var txt = document.getElementById('pageHintText');
+        if (!bar || !txt) return;
+        if (sessionStorage.getItem(pageHintDismissKey()) === '1') { bar.style.display = 'none'; return; }
+        var pool = PAGE_HINTS[page];
+        if (!pool || !pool.length) { bar.style.display = 'none'; return; }
+        var idxRaw = parseInt(localStorage.getItem(pageHintKey(page)) || '0', 10);
+        if (isNaN(idxRaw) || idxRaw < 0) idxRaw = 0;
+        var idx = idxRaw % pool.length;
+        txt.innerHTML = pool[idx];
+        bar.style.display = 'flex';
+        localStorage.setItem(pageHintKey(page), String((idx + 1) % pool.length));
+      } catch (e) { /* silent */ }
+    }
+    function dismissPageHint() {
+      var bar = document.getElementById('pageHintBar');
+      if (bar) bar.style.display = 'none';
+      try { sessionStorage.setItem(pageHintDismissKey(), '1'); } catch (e) {}
+    }
+
     function showPage(page) {
       currentPage = page;
+      renderPageHint(page);
       var activePage = document.querySelector('.page.active');
       var pageId = 'page' + page.charAt(0).toUpperCase() + page.slice(1);
       var el = document.getElementById(pageId);
@@ -7978,6 +8057,7 @@
     function initApp() {
       updateThemeIcon();
       updateFabForPage('dashboard');
+      renderPageHint('dashboard');
       renderSalonRegeln();
       renderRegelVorschlaege();
       // FB-41: Mitarbeiter aus Supabase laden (blockiert NICHT, Fallback USERS bleibt aktiv)
