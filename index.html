@@ -1071,6 +1071,23 @@
       }
     }
 
+    /* FB-30: KI-Assist-Panel auf schmalen Viewports nicht mit FAB/Feedback-FAB kollidieren lassen */
+    @media (max-width: 480px) {
+      .ki-assist-panel {
+        left: 12px !important;
+        right: 12px !important;
+        width: auto !important;
+        max-width: none !important;
+        bottom: calc(var(--nav-height) + var(--safe-bottom) + 88px) !important;
+        max-height: min(400px, calc(100vh - var(--nav-height) - var(--safe-bottom) - var(--safe-top) - 140px)) !important;
+      }
+    }
+    /* FB-45: Landscape-Zoom-Schutz — Cockpit-Widgets horizontal scrollbar statt overlap, wenn zu eng */
+    @media (max-height: 500px) and (orientation: landscape) and (max-width: 900px) {
+      .ki-assist-panel { max-height: calc(100vh - 80px) !important; }
+      .cockpit-grid { grid-auto-rows: minmax(80px, auto); }
+    }
+
     /* === iPhone Landscape: Kompakt-Modus === */
     @media (max-height: 500px) and (orientation: landscape) {
       :root { --nav-height: 36px; --safe-top: env(safe-area-inset-top, 0px); }
@@ -2129,6 +2146,99 @@
       return r.json();
     }
 
+    // === FB-41: Mitarbeiter aus Supabase laden (statt hardcoded USERS) ===
+    // Liefert die echten DB-Mitarbeiter fuer den Salon (RLS-geschuetzt).
+    // Fallback auf USERS (Login-Map) falls DB-Load scheitert.
+    var mitarbeiterCache = [];
+    var mitarbeiterLoading = false;
+    var RENA_SALON_ID = '26230de8-a46e-4610-937c-c302547b5a73';
+    function currentSalonId() {
+      try {
+        var metaStr = sessionStorage.getItem('casa_meta');
+        if (metaStr) {
+          var meta = JSON.parse(metaStr);
+          if (meta && meta.salon_id) return meta.salon_id;
+        }
+        var tok = sessionStorage.getItem('casa_token');
+        if (tok) {
+          var payload = JSON.parse(atob(tok.split('.')[1] || ''));
+          if (payload && payload.app_metadata && payload.app_metadata.salon_id) return payload.app_metadata.salon_id;
+          if (payload && payload.user_metadata && payload.user_metadata.salon_id) return payload.user_metadata.salon_id;
+        }
+      } catch (_) {}
+      return RENA_SALON_ID;
+    }
+    async function loadMitarbeiterFromDB() {
+      if (!isBackendMode()) { mitarbeiterCache = []; return []; }
+      mitarbeiterLoading = true;
+      try {
+        var sid = currentSalonId();
+        var rows = await apiGet('mitarbeiter', 'salon_id=eq.' + encodeURIComponent(sid) + '&aktiv=eq.true&select=*&order=vorname.asc');
+        mitarbeiterCache = Array.isArray(rows) ? rows : [];
+      } catch (e) {
+        console.warn('[FB-41] loadMitarbeiterFromDB Fallback auf USERS:', e && e.message);
+        mitarbeiterCache = [];
+      }
+      mitarbeiterLoading = false;
+      return mitarbeiterCache;
+    }
+    // Liefert eine einheitliche Stylist-Liste im Dashboard-Format
+    // { name, nachname, rolle, titel, kuerzel, farbe, isAdmin }.
+    // Quelle: DB (mitarbeiterCache) ODER Fallback USERS.
+    // rolleFilter: Array von Rollen (z.B. ['FRM','STY','CHF']) oder null fuer alle ausser admin.
+    function getStylistList(rolleFilter) {
+      var out = [];
+      var seen = {};
+      function addFromDB(m) {
+        var r = (m.rolle || 'STY').toUpperCase();
+        if (rolleFilter && rolleFilter.indexOf(r) === -1) return;
+        var first = m.vorname || m.name || '';
+        var last = m.nachname || '';
+        if (!first) return;
+        var key = first.toLowerCase();
+        if (seen[key]) return; seen[key] = true;
+        var kz = ((first.charAt(0) || '') + (last.charAt(0) || '')).toUpperCase();
+        if (!kz) kz = first.substring(0,2).toUpperCase();
+        // Versuche Farbe/Kuerzel aus USERS uebernehmen (Display-Konsistenz)
+        var matchUser = null;
+        Object.keys(USERS).forEach(function(k) {
+          if (USERS[k].name && USERS[k].name.toLowerCase() === first.toLowerCase()) matchUser = USERS[k];
+        });
+        out.push({
+          id: m.id || null,
+          name: first,
+          nachname: last,
+          rolle: r,
+          titel: m.titel || (matchUser && matchUser.titel) || '',
+          kuerzel: (matchUser && matchUser.kuerzel) || kz,
+          farbe: (matchUser && matchUser.farbe) || '#8899aa',
+          isAdmin: !!(matchUser && matchUser.isAdmin)
+        });
+      }
+      function addFromUSERS(key) {
+        if (key === 'admin') return;
+        var u = USERS[key];
+        if (!u) return;
+        var r = (u.rolle || 'STY').toUpperCase();
+        if (rolleFilter && rolleFilter.indexOf(r) === -1) return;
+        var k = (u.name || '').toLowerCase();
+        if (seen[k]) return; seen[k] = true;
+        out.push({
+          id: null,
+          name: u.name, nachname: u.nachname || '',
+          rolle: r, titel: u.titel || '',
+          kuerzel: u.kuerzel, farbe: u.farbe,
+          isAdmin: !!u.isAdmin
+        });
+      }
+      if (mitarbeiterCache && mitarbeiterCache.length) {
+        mitarbeiterCache.forEach(addFromDB);
+      } else {
+        Object.keys(USERS).forEach(addFromUSERS);
+      }
+      return out;
+    }
+
     // === Helpers ===
     function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
     function fmtEur(n) { return (parseFloat(n) || 0).toFixed(2).replace('.', ','); }
@@ -2880,11 +2990,10 @@
       });
 
       var stylistOptions = '';
-      Object.keys(USERS).forEach(function(key) {
-        if (key === 'admin') return;
-        var u = USERS[key];
+      getStylistList(['CHF','FRM','STY']).forEach(function(u) {
         stylistOptions += '<option value="' + esc(u.name) + '">' + esc(u.name) + ' (' + esc(ROLLEN_LABEL[u.rolle] || u.rolle) + ')</option>';
       });
+      if (!stylistOptions) stylistOptions = '<option value="">Lade...</option>';
 
       // Try to guess service from message
       var msg = (b.Nachricht || '').toLowerCase();
@@ -2985,12 +3094,12 @@
         serviceOptions += '<option value="' + esc(s.Service) + '" data-dauer="' + s.Dauer_Min + '" data-preis="' + s.Preis + '">' + esc(s.Service) + ' (' + s.Dauer_Min + ' Min, ' + s.Preis + ' &euro;)</option>';
       });
       var stylistOptions = '';
-      Object.keys(USERS).forEach(function(key) {
-        if (key === 'admin') return;
-        var u = USERS[key];
-        var sel = (currentUser && USERS[currentUser] && USERS[currentUser].name === u.name) ? ' selected' : '';
+      var meName = (currentUser && USERS[currentUser]) ? USERS[currentUser].name : '';
+      getStylistList(['CHF','FRM','STY']).forEach(function(u) {
+        var sel = (meName && meName === u.name) ? ' selected' : '';
         stylistOptions += '<option value="' + esc(u.name) + '"' + sel + '>' + esc(u.name) + '</option>';
       });
+      if (!stylistOptions) stylistOptions = '<option value="">Lade...</option>';
 
       inner.innerHTML = '<div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:12px">Neuer Termin</div>'
         + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Kundenname</label>'
@@ -4546,10 +4655,8 @@
       // FRM/CHF: Stylist-Zuweisung
       if ((currentRolle === 'FRM' || currentRolle === 'CHF') && t.id) {
         var stylistNames = [];
-        Object.values(USERS).forEach(function(uu) {
-          if (uu.rolle === 'CHF' || uu.rolle === 'FRM' || uu.rolle === 'STY') {
-            if (stylistNames.indexOf(uu.name) === -1) stylistNames.push(uu.name);
-          }
+        getStylistList(['CHF','FRM','STY']).forEach(function(uu) {
+          if (stylistNames.indexOf(uu.name) === -1) stylistNames.push(uu.name);
         });
         (termineCache || []).forEach(function(tx) {
           if (tx.Stylist && stylistNames.indexOf(tx.Stylist) === -1) stylistNames.push(tx.Stylist);
@@ -4670,7 +4777,7 @@
         if (isOverlapping) {
           html += '<div style="margin-top:12px;padding:10px;background:var(--warning-bg);border:1px solid rgba(196,138,26,0.3);border-radius:var(--radius-sm)">';
           html += '<div style="font-size:11px;font-weight:700;color:var(--warning);margin-bottom:6px">&#9888; Terminueberschneidung erkannt</div>';
-          var allStylists = Object.values(USERS).filter(function(u) { return u.rolle === 'FRM' || u.rolle === 'STY' || u.rolle === 'CHF'; });
+          var allStylists = getStylistList(['FRM','STY','CHF']);
           var suggestions = [];
           allStylists.forEach(function(alt) {
             if (alt.name === t.Stylist) return;
@@ -4833,11 +4940,10 @@
       var curTime = fmtTime(found.Start_ISO);
 
       var stylistOptions = '';
-      Object.values(USERS).forEach(function(u) {
-        if (u.rolle === 'FRM' || u.rolle === 'STY' || u.rolle === 'CHF') {
-          stylistOptions += '<option value="' + esc(u.name) + '"' + (u.name === found.Stylist ? ' selected' : '') + '>' + esc(u.name) + ' (' + esc(u.titel || '') + ')</option>';
-        }
+      getStylistList(['FRM','STY','CHF']).forEach(function(u) {
+        stylistOptions += '<option value="' + esc(u.name) + '"' + (u.name === found.Stylist ? ' selected' : '') + '>' + esc(u.name) + ' (' + esc(u.titel || '') + ')</option>';
       });
+      if (!stylistOptions) stylistOptions = '<option value="">Lade...</option>';
 
       var slotOptions = '';
       for (var h = 8; h <= 19; h++) {
@@ -6351,9 +6457,9 @@
       var container = document.getElementById('personalPerms');
       if (!container || !perms.personalTab) return;
       container.textContent = '';
-      Object.keys(USERS).forEach(function(uname) {
-        if (uname === 'admin') return;
-        var u = USERS[uname];
+      var team = getStylistList(null);
+      team.forEach(function(u) {
+        if (u.isAdmin) return;
         var card = document.createElement('div');
         card.className = 'settings-item';
         card.innerHTML = '<div class="left"><div class="avatar" style="width:32px;height:32px;background:' + u.farbe + ';font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border-radius:50%">' + u.kuerzel + '</div>'
@@ -7838,6 +7944,10 @@
       updateFabForPage('dashboard');
       renderSalonRegeln();
       renderRegelVorschlaege();
+      // FB-41: Mitarbeiter aus Supabase laden (blockiert NICHT, Fallback USERS bleibt aktiv)
+      loadMitarbeiterFromDB().then(function() {
+        if (perms.personalTab) renderPersonalPerms();
+      });
       if (perms.personalTab) renderPersonalPerms();
       loadCockpitLayout();
       fetchAll();
@@ -7884,9 +7994,19 @@
         initApp();
       }
 
-      // Service Worker
+      // FB-42: Service Worker mit Auto-Update + Page-Reload bei Update
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(function() {});
+        var swReloadDone = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function() {
+          if (swReloadDone) return;
+          swReloadDone = true;
+          location.reload();
+        });
+        navigator.serviceWorker.register('sw.js').then(function(reg) {
+          // Alle 60s auf SW-Update pruefen (fuer lang-offene PWA-Tabs)
+          setInterval(function() { try { reg.update(); } catch(e) {} }, 60000);
+          reg.update().catch(function() {});
+        }).catch(function() {});
       }
     });
 
