@@ -2209,7 +2209,9 @@
       mitarbeiterLoading = true;
       try {
         var sid = currentSalonId();
-        var rows = await apiGet('mitarbeiter', 'salon_id=eq.' + encodeURIComponent(sid) + '&aktiv=eq.true&select=*&order=vorname.asc');
+        // FB-41/VETO: SELECT-Whitelist — NIEMALS select=* (exponiert auth_token_hash etc.)
+        var SELECT_WHITELIST = 'id,vorname,nachname,name,rolle,titel,geschlecht,kann_damen,kann_herren,aktiv,salon_id,kuerzel,farbe';
+        var rows = await apiGet('mitarbeiter', 'salon_id=eq.' + encodeURIComponent(sid) + '&aktiv=eq.true&select=' + SELECT_WHITELIST + '&order=vorname.asc');
         mitarbeiterCache = Array.isArray(rows) ? rows : [];
       } catch (e) {
         console.warn('[FB-41] loadMitarbeiterFromDB Fallback auf USERS:', e && e.message);
@@ -2223,13 +2225,16 @@
     // Quelle: DB (mitarbeiterCache) ODER Fallback USERS.
     // rolleFilter: Array von Rollen (z.B. ['FRM','STY','CHF']) oder null fuer alle ausser admin.
     function getStylistList(rolleFilter) {
+      // FB-41/VETO: Type-Guard — verhindere Crash bei String/Object statt Array
+      if (rolleFilter != null && !Array.isArray(rolleFilter)) rolleFilter = null;
       var out = [];
       var seen = {};
       function addFromDB(m) {
         var r = (m.rolle || 'STY').toUpperCase();
         if (rolleFilter && rolleFilter.indexOf(r) === -1) return;
-        var first = m.vorname || m.name || '';
-        var last = m.nachname || '';
+        // FB-41/VETO: XSS-esc fuer alle aus DB stammenden Strings, die in HTML/<option> landen koennen
+        var first = esc(m.vorname || m.name || '');
+        var last = esc(m.nachname || '');
         if (!first) return;
         var key = first.toLowerCase();
         if (seen[key]) return; seen[key] = true;
@@ -2245,8 +2250,8 @@
           name: first,
           nachname: last,
           rolle: r,
-          titel: m.titel || (matchUser && matchUser.titel) || '',
-          kuerzel: (matchUser && matchUser.kuerzel) || kz,
+          titel: esc(m.titel || (matchUser && matchUser.titel) || ''),
+          kuerzel: esc((matchUser && matchUser.kuerzel) || kz),
           farbe: (matchUser && matchUser.farbe) || '#8899aa',
           isAdmin: !!(matchUser && matchUser.isAdmin)
         });
@@ -2419,6 +2424,9 @@
       sessionStorage.removeItem('casa_refresh');
       sessionStorage.removeItem('casa_meta');
       sessionStorage.removeItem('casa_user_id');
+      // FB-41/VETO: Cache-Reset beim Logout — verhindert Mitarbeiterdaten-Leak ueber Session-Grenzen
+      mitarbeiterCache = [];
+      mitarbeiterLoading = false;
       currentUser = null;
       currentRolle = null;
       location.reload();
