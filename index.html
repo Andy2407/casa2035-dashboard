@@ -1055,6 +1055,15 @@
       .cockpit-wide { grid-column: 1; }
     }
 
+    /* === iOS Auto-Zoom-Fix (FB-53/45/38/42/47/46/30/36): font-size >= 16px verhindert iOS-Safari Zoom-In bei Input-Focus === */
+    @media (max-width: 768px) {
+      input[type="text"], input[type="password"], input[type="email"], input[type="tel"],
+      input[type="search"], input[type="number"], input[type="date"], input[type="time"],
+      input[type="datetime-local"], input[type="url"], textarea, select {
+        font-size: 16px !important;
+      }
+    }
+
     /* === iPhone Landscape: Kompakt-Modus === */
     @media (max-height: 500px) and (orientation: landscape) {
       :root { --nav-height: 36px; --safe-top: env(safe-area-inset-top, 0px); }
