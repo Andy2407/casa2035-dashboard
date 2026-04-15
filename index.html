@@ -1785,23 +1785,26 @@
         <div class="lager-stat-box"><div class="value" style="color:var(--success)" id="lagerOk">0</div><div class="label">OK</div></div>
         <div class="lager-stat-box"><div class="value" style="color:var(--warning)" id="lagerLow">0</div><div class="label">Niedrig</div></div>
       </div>
-      <div class="search-wrap">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input class="search-input" id="lagerSearch" placeholder="Produkt suchen..." oninput="filterLager()">
-      </div>
-      <div class="filter-bar" id="lagerFilterBar">
-        <button class="filter-btn active" onclick="setLagerFilter('alle')">Alle</button>
-        <button class="filter-btn" onclick="setLagerFilter('low')">Nachbestellen</button>
-        <button class="filter-btn" onclick="setLagerFilter('ok')">OK</button>
-      </div>
-      <div class="filter-bar" id="lagerKatFilter">
-        <button class="filter-btn active" onclick="setLagerKategorie('alle')">Alle</button>
-        <button class="filter-btn" onclick="setLagerKategorie('Shampoo')">Shampoo</button>
-        <button class="filter-btn" onclick="setLagerKategorie('Pflege')">Pflege</button>
-        <button class="filter-btn" onclick="setLagerKategorie('Farbe')">Farbe</button>
-        <button class="filter-btn" onclick="setLagerKategorie('Styling')">Styling</button>
-        <button class="filter-btn" onclick="setLagerKategorie('Treatment')">Treatment</button>
-        <button class="filter-btn" onclick="setLagerKategorie('Zubehoer')">Zubehoer</button>
+      <!-- F4 15.04.2026: Sticky Lager-Toolbar -->
+      <div class="lager-toolbar">
+        <div class="search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" id="lagerSearch" placeholder="Produkt suchen..." oninput="filterLager()">
+        </div>
+        <div class="filter-bar" id="lagerFilterBar">
+          <button class="filter-btn active" onclick="setLagerFilter('alle')">Alle</button>
+          <button class="filter-btn" onclick="setLagerFilter('low')">Nachbestellen</button>
+          <button class="filter-btn" onclick="setLagerFilter('ok')">OK</button>
+        </div>
+        <div class="filter-bar" id="lagerKatFilter">
+          <button class="filter-btn active" onclick="setLagerKategorie('alle')">Alle</button>
+          <button class="filter-btn" onclick="setLagerKategorie('Shampoo')">Shampoo</button>
+          <button class="filter-btn" onclick="setLagerKategorie('Pflege')">Pflege</button>
+          <button class="filter-btn" onclick="setLagerKategorie('Farbe')">Farbe</button>
+          <button class="filter-btn" onclick="setLagerKategorie('Styling')">Styling</button>
+          <button class="filter-btn" onclick="setLagerKategorie('Treatment')">Treatment</button>
+          <button class="filter-btn" onclick="setLagerKategorie('Zubehoer')">Zubehoer</button>
+        </div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
         <span style="font-size:12px;color:var(--text-dim)" id="lagerCount">0 Produkte</span>
@@ -1961,6 +1964,14 @@
         <!-- System-Log -->
         <div class="section-title" style="margin-top:16px">System-Protokoll</div>
         <div id="adminLog"></div>
+      </div>
+      <!-- Logout (immer sichtbar) -->
+      <div class="settings-section" id="logoutSection" style="margin-top:24px">
+        <button class="btn" onclick="doLogout()" style="width:100%;padding:14px;background:linear-gradient(135deg,#5a1a1a,#7a2222);color:#fff;border:1px solid #8a3030;border-radius:var(--radius);font-weight:700;font-size:14px;letter-spacing:0.3px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Abmelden
+        </button>
+        <div style="text-align:center;font-size:10px;color:var(--text-micro);margin-top:6px" id="logoutUserHint"></div>
       </div>
       <div style="text-align:center;margin-top:20px;font-size:10px;color:var(--text-micro)">
         Casa 2035 &middot; Vision 2035 Dashboard &middot; v9.0<br>
@@ -2649,13 +2660,16 @@
       ]
     };
     function pageHintKey(page) { return 'casa_hint_' + page + '_idx'; }
-    function pageHintDismissKey() { return 'casa_hint_dismissed_session'; }
+    function pageHintDismissKey(page) { return 'casa_hint_dismissed_' + (page || 'global'); }
+    var currentPageHintPage = null;
     function renderPageHint(page) {
       try {
         var bar = document.getElementById('pageHintBar');
         var txt = document.getElementById('pageHintText');
         if (!bar || !txt) return;
-        if (sessionStorage.getItem(pageHintDismissKey()) === '1') { bar.style.display = 'none'; return; }
+        currentPageHintPage = page;
+        // F4 15.04.2026: Dismiss nur pro Seite (nicht global). Bei Page-Switch erneut anzeigen.
+        if (sessionStorage.getItem(pageHintDismissKey(page)) === '1') { bar.style.display = 'none'; return; }
         var pool = PAGE_HINTS[page];
         if (!pool || !pool.length) { bar.style.display = 'none'; return; }
         var idxRaw = parseInt(localStorage.getItem(pageHintKey(page)) || '0', 10);
@@ -2669,7 +2683,8 @@
     function dismissPageHint() {
       var bar = document.getElementById('pageHintBar');
       if (bar) bar.style.display = 'none';
-      try { sessionStorage.setItem(pageHintDismissKey(), '1'); } catch (e) {}
+      // F4 15.04.2026: Dismiss nur pro aktueller Seite (nicht global). Andere Seiten zeigen Hints weiter.
+      try { sessionStorage.setItem(pageHintDismissKey(currentPageHintPage), '1'); } catch (e) {}
     }
 
     function showPage(page) {
