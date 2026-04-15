@@ -372,13 +372,15 @@
     .termin-status::before {
       content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor;
     }
+    /* BUG-FIX 15.04.2026: Ueberlappung uebermalte Stylist-Farbe + sah aus wie Storno.
+       Jetzt: Stylist-Farbe bleibt links, oben feiner amber Warn-Streifen, dezenter Hintergrund. */
     .termin-overlap-warn {
-      border-left: 3px solid var(--danger) !important;
-      background: var(--danger-bg) !important;
+      box-shadow: inset 0 2px 0 0 #d4a24c !important;
+      background: linear-gradient(180deg, rgba(212,162,76,0.10) 0%, transparent 40%) !important;
     }
     .termin-overlap-badge {
       display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 700;
-      color: var(--danger); margin-left: 6px;
+      color: #d4a24c; margin-left: 6px;
     }
     .termin-time-block {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -717,6 +719,24 @@
     @media (max-height: 500px) and (orientation: landscape) {
       .termine-toolbar { top: calc(env(safe-area-inset-top, 0px) + 36px); }
     }
+    /* BUG-FIX 15.04.2026: sticky Toolbar — Titel + Liste/Tag/Woche + Datum in einer Zeile */
+    .termine-toolbar-row {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 2px 0;
+    }
+    .termine-date-inline {
+      display: flex; align-items: center; gap: 4px; margin-left: auto; flex: 0 0 auto;
+    }
+    .termine-date-inline > button {
+      background: var(--surface); border: 1px solid var(--border); color: var(--text);
+      width: 28px; height: 28px; border-radius: var(--radius-sm);
+      display: inline-flex; align-items: center; justify-content: center; cursor: pointer;
+      padding: 0;
+    }
+    .termine-date-inline > button:hover { background: var(--bg-warm); }
+    .termine-date-inline .heute-btn {
+      width: auto; padding: 0 10px; font-size: 11px; font-weight: 600; color: var(--gold);
+    }
+    .termine-date-inline .heute-btn.hidden { display: none; }
     /* === Termin Day/Week Views === */
     .termin-view-toggle { display: flex; gap: 0; margin-bottom: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
     .termin-view-btn {
@@ -1608,20 +1628,19 @@
     <!-- PAGE: Termine -->
     <div class="page" id="pageTermine">
       <div class="termine-toolbar" id="termineToolbar">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div class="section-title" style="margin:0;font-size:13px">TERMINE <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></div>
-          <div class="termin-view-toggle" style="margin:0;border:none">
+        <!-- BUG-FIX 15.04.2026: Header + View-Toggle + Datum-Navigation in EINER sticky Zeile -->
+        <div class="termine-toolbar-row">
+          <div class="section-title" style="margin:0;font-size:13px;flex:0 0 auto">TERMINE <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></div>
+          <div class="termin-view-toggle" style="margin:0;border:none;flex:0 0 auto">
             <button class="termin-view-btn active" onclick="setTerminView('list')" id="tvList">Liste</button>
             <button class="termin-view-btn" onclick="setTerminView('day')" id="tvDay">Tag</button>
             <button class="termin-view-btn" onclick="setTerminView('week')" id="tvWeek">Woche</button>
           </div>
-        </div>
-        <div class="date-nav" style="margin-bottom:0;padding:4px 0">
-          <button onclick="changeTerminDate(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer;font-size:13px" title="Zurueck zu Heute">Heute</div>
-          <div class="date-nav-right">
+          <div class="termine-date-inline">
+            <button onclick="changeTerminDate(-1)" aria-label="Vorheriger Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer;font-size:12px;white-space:nowrap" title="Zurueck zu Heute">Heute</div>
+            <button onclick="changeTerminDate(1)" aria-label="Naechster Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg></button>
             <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()">Heute</button>
-            <button onclick="changeTerminDate(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><polyline points="9 18 15 12 9 6"/></svg></button>
           </div>
         </div>
         <div class="staff-filter" id="terminStaffFilter" style="margin-bottom:0"></div>
@@ -3320,14 +3339,12 @@
       var dateStr = terminViewDate.toISOString().split('T')[0];
       document.getElementById('terminDateLabel').textContent = fmtDate(dateStr);
 
+      // BUG-FIX 15.04.2026: Liste konsistent mit Tag/Woche — kein impliziter Stylist-Filter
+      // (frueher: !perms.alleTermine + currentUser versteckte Termine anderer Stylisten in Liste,
+      //  waehrend Tag/Woche alle zeigten. Staff-Filter-Chips uebernehmen diese Funktion explizit.)
       var filtered = termine.filter(function(t) {
         var match = (t.Start_ISO || '').indexOf(dateStr) === 0;
-        if (terminStaffFilter !== 'alle') {
-          match = match && t.Stylist === terminStaffFilter;
-        } else if (!perms.alleTermine && currentUser) {
-          var uName = USERS[currentUser] ? USERS[currentUser].name : '';
-          if (uName) match = match && t.Stylist === uName;
-        }
+        if (terminStaffFilter !== 'alle') match = match && t.Stylist === terminStaffFilter;
         return match;
       }).sort(function(a, b) { return (a.Start_ISO || '').localeCompare(b.Start_ISO || ''); });
 
