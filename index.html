@@ -2761,11 +2761,18 @@
     // Kurze, konkrete Tipps - rotieren pro Aufruf, dismissbar, persistent pro Tab
     var PAGE_HINTS = {
       dashboard: [
-        '<b>Cockpit:</b> Widgets per Drag sortieren, &times; blendet aus.',
-        '<b>Tipp:</b> Long-Press auf das + unten oeffnet die KI-Befehle.',
-        '<b>Pull-to-refresh:</b> Nach unten ziehen laedt frische Daten.',
-        '<b>Kacheln tippen:</b> Springt direkt zum passenden Bereich.',
-        '<b>KI-Hinweise:</b> Reagieren auf echten Salon-Zustand - nicht generisch.'
+        '<b>Widgets sortieren:</b> &#9776;-Griff greifen, Kachel per Drag neu anordnen &mdash; Reihenfolge wird gespeichert.',
+        '<b>Long-Press auf das +</b> unten rechts startet Jarvis (KI-Sprachbefehle: "Termin fuer morgen 10 Uhr", "Tagesabschluss").',
+        '<b>Pull-to-refresh:</b> Cockpit von oben nach unten ziehen &rarr; Live-Daten frisch aus Datenbank laden.',
+        '<b>Anpassen-Modus:</b> &#9881; oben rechts &rarr; Widgets ein-/ausblenden, &times; blendet einzelne Kacheln aus.',
+        '<b>Live-Daten:</b> Kacheln aktualisieren sich automatisch &mdash; Termine, Umsatz, Lagerwarnungen in Echtzeit.'
+      ],
+      home: [
+        '<b>Widgets sortieren:</b> &#9776;-Griff greifen, Kachel per Drag neu anordnen &mdash; Reihenfolge wird gespeichert.',
+        '<b>Long-Press auf das +</b> unten rechts startet Jarvis (KI-Sprachbefehle: "Termin fuer morgen 10 Uhr", "Tagesabschluss").',
+        '<b>Pull-to-refresh:</b> Cockpit von oben nach unten ziehen &rarr; Live-Daten frisch aus Datenbank laden.',
+        '<b>Anpassen-Modus:</b> &#9881; oben rechts &rarr; Widgets ein-/ausblenden, &times; blendet einzelne Kacheln aus.',
+        '<b>Live-Daten:</b> Kacheln aktualisieren sich automatisch &mdash; Termine, Umsatz, Lagerwarnungen in Echtzeit.'
       ],
       termine: [
         '<b>Links-/Rechts-Swipe</b> wechselt den Tag.',
@@ -2818,6 +2825,9 @@
         var bar = document.getElementById('pageHintBar');
         var txt = document.getElementById('pageHintText');
         if (!bar || !txt) return;
+        // Sprint-4b: Page-Alias-Map (home->dashboard etc.) fuer Robustheit
+        var pageAlias = { 'home': 'dashboard', '': 'dashboard', 'cockpit': 'dashboard' };
+        if (pageAlias[page]) page = pageAlias[page];
         currentPageHintPage = page;
         // F4 15.04.2026: Dismiss nur pro Seite (nicht global). Bei Page-Switch erneut anzeigen.
         if (sessionStorage.getItem(pageHintDismissKey(page)) === '1') { bar.style.display = 'none'; return; }
@@ -3716,7 +3726,20 @@
       var grid = document.createElement('div');
       grid.className = 'day-view-grid';
 
-      for (var h = 8; h <= 20; h++) {
+      // Sprint-4b: Dynamische Stundenrange — alle Termine sichtbar (kein Drift mehr).
+      // Default 7-22, erweitert auf min(termin)/max(termin+dauer) wenn ausserhalb.
+      var minH = 7, maxH = 22;
+      filtered.forEach(function(t) {
+        var sd = new Date(t.Start_ISO);
+        var sH = sd.getHours();
+        var dur = parseInt(t.Dauer_Min) || 30;
+        var endH = Math.ceil((sd.getHours() * 60 + sd.getMinutes() + dur) / 60);
+        if (sH < minH) minH = sH;
+        if (endH > maxH) maxH = endH;
+      });
+      if (minH > maxH) { minH = 8; maxH = 20; }
+
+      for (var h = minH; h <= maxH; h++) {
         var row = document.createElement('div');
         row.className = 'day-hour-row';
         row.innerHTML = '<div class="day-hour-label">' + String(h).padStart(2,'0') + ':00</div><div class="day-hour-slots" id="daySlot' + h + '"></div>';
@@ -3771,10 +3794,28 @@
       var wrapper = document.createElement('div');
       wrapper.className = 'week-view-wrapper';
 
+      // Sprint-4b: Dynamische Wochen-Stundenrange ueber alle Termine der Woche.
+      var weekMinH = 7, weekMaxH = 22;
+      var weekStartStr = start.toISOString().split('T')[0];
+      var weekEnd = new Date(start); weekEnd.setDate(weekEnd.getDate() + 6);
+      var weekEndStr = weekEnd.toISOString().split('T')[0];
+      termine.forEach(function(t) {
+        var ds = (t.Start_ISO || '').split('T')[0];
+        if (ds < weekStartStr || ds > weekEndStr) return;
+        if (terminStaffFilter !== 'alle' && t.Stylist !== terminStaffFilter) return;
+        var sd = new Date(t.Start_ISO);
+        var sH = sd.getHours();
+        var dur = parseInt(t.Dauer_Min) || 30;
+        var endH = Math.ceil((sd.getHours() * 60 + sd.getMinutes() + dur) / 60);
+        if (sH < weekMinH) weekMinH = sH;
+        if (endH > weekMaxH) weekMaxH = endH;
+      });
+      if (weekMinH > weekMaxH) { weekMinH = 8; weekMaxH = 20; }
+
       // Time axis
       var timeAxis = document.createElement('div');
       timeAxis.className = 'week-time-axis';
-      for (var h = 8; h <= 20; h++) {
+      for (var h = weekMinH; h <= weekMaxH; h++) {
         var lbl = document.createElement('div');
         lbl.className = 'week-time-label';
         lbl.textContent = String(h).padStart(2, '0') + ':00';
@@ -3797,9 +3838,9 @@
         header.textContent = days[i] + ' ' + d.getDate();
         col.appendChild(header);
 
-        // Hour cells
+        // Hour cells - Sprint-4b: dynamische Range
         var cells = {};
-        for (var hh = 8; hh <= 20; hh++) {
+        for (var hh = weekMinH; hh <= weekMaxH; hh++) {
           var cell = document.createElement('div');
           cell.className = 'week-hour-cell';
           col.appendChild(cell);
