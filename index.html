@@ -3298,16 +3298,26 @@
         var alleKasseEntries = (rechnungen || []).concat(ausgaben || []);
         if (alleKasseEntries.length > 0) {
           renderKasseEntries(alleKasseEntries);
-          // Finanzen aus Rechnungen + Ausgaben berechnen
+          // Finanzen aus Rechnungen + Ausgaben berechnen — NUR HEUTE (Sprint-4a Bug 1)
+          var heuteStr = localDateStr(new Date());
+          function istHeute(r) {
+            var d = r.erstellt_am || r.datum || '';
+            return (d || '').substring(0,10) === heuteStr;
+          }
           var barTotal = 0, karteTotal = 0, ausgabenTotal = 0;
           rechnungen.forEach(function(r) {
+            if (!istHeute(r)) return;
+            if (r.status === 'storniert') return;
             var betrag = parseFloat(r.Betrag || r.brutto || 0);
             if ((r.Zahlart || r.zahlungsart || '') === 'bar') barTotal += betrag;
             else karteTotal += betrag;
           });
-          ausgaben.forEach(function(a) { ausgabenTotal += parseFloat(a.Betrag || a.brutto || 0); });
+          ausgaben.forEach(function(a) {
+            if (!istHeute(a)) return;
+            ausgabenTotal += parseFloat(a.Betrag || a.brutto || 0);
+          });
           // F6 Bug 4 (Tagesumsatz): Tagesumsatz = BRUTTO Einnahmen (Bar + Karte). Ausgaben separat (kasseAusgaben).
-          // Vorher wurde brutto - ausgaben angezeigt — das ist Netto-Gewinn, nicht Tagesumsatz.
+          // Sprint-4a Bug 1: nur heutige Belege summieren (Storno raus).
           var bruttoUmsatz = barTotal + karteTotal;
           var nettoErgebnis = bruttoUmsatz - ausgabenTotal;
           renderFinanzen({ tagesUmsatz: bruttoUmsatz, realUmsatz: nettoErgebnis, barEinnahmen: barTotal, karteEinnahmen: karteTotal, ausgabenGesamt: ausgabenTotal });
@@ -4403,19 +4413,31 @@
     function setKundenFilter(filter) {
       currentKundenFilter = filter;
       document.querySelectorAll('#kundenFilter .filter-btn').forEach(function(b) { b.classList.remove('active'); });
-      var labels = { alle: 'Alle', vip: 'VIP', followup: 'Follow-Up', neu: 'Neue' };
+      // F6 Bug 12: erweiterte Filter-Labels (Neu/Stamm/VIP/Inaktiv + bestehende)
+      var labels = { alle: 'Alle', neu: 'Neu', stamm: 'Stamm', vip: 'VIP', inaktiv: 'Inaktiv', followup: 'Follow-Up' };
       document.querySelectorAll('#kundenFilter .filter-btn').forEach(function(b) { if (b.textContent === labels[filter]) b.classList.add('active'); });
       filterKunden();
     }
     function filterKunden() {
       var q = (document.getElementById('kundenSearch').value || '').toLowerCase();
+      var nowMs = Date.now();
+      var INAKTIV_DAYS = 90;
       var filtered = kundenCache.filter(function(k) {
         var matchText = !q || ((k.Name || k.name || '') + ' ' + (k.Email || k.email || '') + ' ' + (k.Telefon || k.telefon || '')).toLowerCase().indexOf(q) !== -1;
         var besuche = parseInt(k.Besuche || k.besuche || 0);
         var isVip = k.VIP || k.vip || besuche >= 10;
         var hasFollowUp = k.Follow_Up || k.follow_up;
         var isNeu = besuche <= 1;
-        var matchFilter = currentKundenFilter === 'alle' || (currentKundenFilter === 'vip' && isVip) || (currentKundenFilter === 'followup' && hasFollowUp) || (currentKundenFilter === 'neu' && isNeu);
+        var isStamm = besuche >= 3 && besuche < 10;
+        var lastVisit = k.Letzter_Besuch || k.letzter_besuch || '';
+        var lastVisitMs = lastVisit ? new Date(lastVisit).getTime() : 0;
+        var isInaktiv = !lastVisit || (lastVisitMs && (nowMs - lastVisitMs) > INAKTIV_DAYS * 86400000);
+        var matchFilter = currentKundenFilter === 'alle'
+          || (currentKundenFilter === 'vip' && isVip)
+          || (currentKundenFilter === 'stamm' && isStamm)
+          || (currentKundenFilter === 'followup' && hasFollowUp)
+          || (currentKundenFilter === 'neu' && isNeu)
+          || (currentKundenFilter === 'inaktiv' && isInaktiv);
         return matchText && matchFilter;
       });
       renderKundenList(filtered);
@@ -4429,21 +4451,109 @@
         var name = k.Name || k.name || 'Unbekannt';
         var besuche = parseInt(k.Besuche || k.besuche || 0);
         var isVip = k.VIP || k.vip || besuche >= 10;
+        var isStamm = besuche >= 3 && besuche < 10;
         var hasFollowUp = k.Follow_Up || k.follow_up;
         var lastVisit = k.Letzter_Besuch || k.letzter_besuch || '';
+        var telefon = k.Telefon || k.telefon || '';
         var card = document.createElement('div');
         card.className = 'kunde-card touch-scale';
+        // F6 Bug 11: Telefon sichtbar in Card. F6 Bug 13: explizites onclick auf openKundeDetail.
         card.innerHTML = '<div class="kunde-avatar" style="background:' + colors[idx % colors.length] + '">' + esc(name.substring(0, 2).toUpperCase()) + '</div>'
           + '<div class="kunde-info"><div class="kunde-name">' + esc(name) + demoDot() + '</div>'
-          + '<div class="kunde-detail">' + (k.Email || k.email || '') + (besuche ? ' — ' + besuche + ' Besuche' : '') + (lastVisit ? ' — Letzter: ' + fmtDate(lastVisit) : '') + '</div>'
+          + '<div class="kunde-detail">' + (k.Email || k.email || '') + (besuche ? ' &middot; ' + besuche + ' Besuche' : '') + (lastVisit ? ' &middot; Letzter: ' + fmtDate(lastVisit) : '') + '</div>'
+          + (telefon ? '<div class="kunde-detail" style="color:var(--gold);font-weight:600;margin-top:2px">&#128222; <a href="tel:' + esc(telefon) + '" onclick="event.stopPropagation()" style="color:var(--gold);text-decoration:none">' + esc(telefon) + '</a></div>' : '')
           + '<div class="kunde-tags">'
           + (isVip ? '<span class="kunde-tag" style="background:var(--gold-glow);color:var(--gold)">VIP</span>' : '')
+          + (isStamm ? '<span class="kunde-tag" style="background:rgba(45,138,78,0.1);color:var(--success)">Stamm</span>' : '')
           + (hasFollowUp ? '<span class="kunde-tag" style="background:var(--warning-bg);color:var(--warning)">Follow-Up</span>' : '')
           + (besuche <= 1 ? '<span class="kunde-tag" style="background:var(--info-bg);color:var(--info)">Neu</span>' : '')
           + '</div></div>';
+        card.style.cursor = 'pointer';
         card.onclick = function() { openKundeDetail(k); };
         list.appendChild(card);
       });
+    }
+
+    // F6 Bug 10: Neuer-Kunde Sheet
+    function openNeuerKundeSheet() {
+      var inner = document.getElementById('detailInner');
+      inner.innerHTML = '<div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:12px">Neuer Kunde</div>'
+        + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:4px">Name *</label>'
+        + '<input type="text" id="nkName" placeholder="Vor- und Nachname" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:8px;font-family:Inter,sans-serif">'
+        + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:4px">Telefon</label>'
+        + '<input type="tel" id="nkTelefon" placeholder="0176-..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:8px;font-family:Inter,sans-serif">'
+        + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:4px">E-Mail</label>'
+        + '<input type="email" id="nkEmail" placeholder="kunde@email.de" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:8px;font-family:Inter,sans-serif">'
+        + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:4px">Notiz</label>'
+        + '<textarea id="nkNotiz" rows="2" placeholder="Vorlieben, Allergien, etc." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none"></textarea>'
+        + '<div style="display:flex;gap:8px;margin-top:14px">'
+        + '<button class="btn btn-primary" style="flex:1" onclick="submitNeuerKunde()">Kunde anlegen</button>'
+        + '<button class="btn btn-secondary" onclick="closeSheet(\'detailSheet\')">Abbrechen</button></div>';
+      openSheet('detailSheet');
+    }
+    async function submitNeuerKunde() {
+      var name = (document.getElementById('nkName').value || '').trim();
+      if (!name) { showToast('Name ist Pflicht', 'warning'); return; }
+      var telefon = (document.getElementById('nkTelefon').value || '').trim();
+      var email = (document.getElementById('nkEmail').value || '').trim();
+      var notiz = (document.getElementById('nkNotiz').value || '').trim();
+      var newKunde = { Name: name, name: name, Telefon: telefon, telefon: telefon, Email: email, email: email, Notiz: notiz, notiz: notiz, Besuche: 0, besuche: 0, Umsatz: 0 };
+      if (isBackendMode()) {
+        try {
+          var res = await apiPost('kunden', { name: name, telefon: telefon, email: email, notiz: notiz, anzahl_besuche: 0, salon_id: currentSalonId() });
+          if (Array.isArray(res) && res[0] && res[0].id) newKunde.id = res[0].id;
+          showToast('Kunde "' + name + '" angelegt', 'success');
+        } catch(e) { showToast('Fehler: ' + e.message, 'error'); return; }
+      } else {
+        showToast('Kunde "' + name + '" angelegt (Demo)', 'success');
+      }
+      kundenCache.push(newKunde);
+      renderKunden(kundenCache);
+      closeSheet('detailSheet');
+    }
+
+    // F6 Bug 9: Anruf-Dokumentation (Festnetz / manuelle Anrufe)
+    function openAnrufDokuSheet() {
+      var inner = document.getElementById('detailInner');
+      var kundenOptions = (kundenCache || []).map(function(k) { return '<option value="' + esc(k.Name || k.name || '') + '">' + esc(k.Name || k.name || '') + (k.Telefon || k.telefon ? ' (' + esc(k.Telefon || k.telefon) + ')' : '') + '</option>'; }).join('');
+      inner.innerHTML = '<div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:12px">&#128222; Anruf dokumentieren</div>'
+        + '<div style="font-size:11px;color:var(--text-dim);margin-bottom:10px">Festnetz / manuelle Anrufe — landet im Kundenverlauf.</div>'
+        + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:4px">Kunde *</label>'
+        + '<input list="anrufKundenList" id="adKunde" placeholder="Name eingeben oder auswaehlen" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:8px;font-family:Inter,sans-serif">'
+        + '<datalist id="anrufKundenList">' + kundenOptions + '</datalist>'
+        + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:4px">Anruf-Typ</label>'
+        + '<select id="adTyp" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:8px;font-family:Inter,sans-serif">'
+        + '<option value="eingehend">Eingehend</option><option value="ausgehend">Ausgehend</option><option value="verpasst">Verpasst</option></select>'
+        + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:4px">Inhalt / Notiz *</label>'
+        + '<textarea id="adNotiz" rows="4" placeholder="Worum ging es? Welche Aktion?" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none"></textarea>'
+        + '<div style="display:flex;gap:8px;margin-top:14px">'
+        + '<button class="btn btn-primary" style="flex:1" onclick="submitAnrufDoku()">Anruf speichern</button>'
+        + '<button class="btn btn-secondary" onclick="closeSheet(\'detailSheet\')">Abbrechen</button></div>';
+      openSheet('detailSheet');
+    }
+    async function submitAnrufDoku() {
+      var kundeName = (document.getElementById('adKunde').value || '').trim();
+      var typ = document.getElementById('adTyp').value;
+      var notiz = (document.getElementById('adNotiz').value || '').trim();
+      if (!kundeName || !notiz) { showToast('Kunde und Notiz sind Pflicht', 'warning'); return; }
+      if (isBackendMode()) {
+        try {
+          var k = (kundenCache || []).find(function(x) { return (x.Name || x.name || '').toLowerCase() === kundeName.toLowerCase(); });
+          await apiPost('anfragen_log', {
+            salon_id: currentSalonId(),
+            kanal: 'telefon',
+            typ: 'anruf',
+            betreff: 'Anruf ' + typ + ' \u2014 ' + kundeName,
+            nachricht: notiz,
+            kunden_id: k && k.id ? k.id : null,
+            status: 'gelesen'
+          });
+          showToast('Anruf dokumentiert', 'success');
+        } catch(e) { showToast('Fehler: ' + e.message, 'error'); return; }
+      } else {
+        showToast('Anruf dokumentiert (Demo)', 'success');
+      }
+      closeSheet('detailSheet');
     }
     function openKundeDetail(k) {
       var inner = document.getElementById('detailInner');
