@@ -2209,9 +2209,10 @@
       mitarbeiterLoading = true;
       try {
         var sid = currentSalonId();
-        // FB-41/VETO: SELECT-Whitelist — NIEMALS select=* (exponiert auth_token_hash etc.)
-        var SELECT_WHITELIST = 'id,vorname,nachname,name,rolle,titel,geschlecht,kann_damen,kann_herren,aktiv,salon_id,kuerzel,farbe';
-        var rows = await apiGet('mitarbeiter', 'salon_id=eq.' + encodeURIComponent(sid) + '&aktiv=eq.true&select=' + SELECT_WHITELIST + '&order=vorname.asc');
+        // FB-41/VETO: SELECT-Whitelist — NIEMALS select=* (exponiert auth_token_hash, email, telefon)
+        // Reales Schema: id,name,rolle,status,spezialisierung,salon_id,geschlecht,kann_damen,kann_herren
+        var SELECT_WHITELIST = 'id,name,rolle,status,spezialisierung,salon_id,geschlecht,kann_damen,kann_herren';
+        var rows = await apiGet('mitarbeiter', 'salon_id=eq.' + encodeURIComponent(sid) + '&status=eq.aktiv&select=' + SELECT_WHITELIST + '&order=name.asc');
         mitarbeiterCache = Array.isArray(rows) ? rows : [];
       } catch (e) {
         console.warn('[FB-41] loadMitarbeiterFromDB Fallback auf USERS:', e && e.message);
