@@ -2558,11 +2558,14 @@
         Object.keys(USERS).forEach(addFromUSERS);
       }
       // SPRINT5 (16.04.2026): Rena (Chefin/Inhaberin) IMMER als erste Position, Rest alphabetisch
+      // Match auch wenn u.name "Rena Rados" (voll) — nicht nur "Rena" alleine
       out.sort(function(a, b) {
         var an = (a.name || '').toLowerCase();
         var bn = (b.name || '').toLowerCase();
-        if (an === 'rena') return -1;
-        if (bn === 'rena') return 1;
+        var aIsRena = an.indexOf('rena') === 0;
+        var bIsRena = bn.indexOf('rena') === 0;
+        if (aIsRena && !bIsRena) return -1;
+        if (bIsRena && !aIsRena) return 1;
         return an.localeCompare(bn, 'de');
       });
       return out;
