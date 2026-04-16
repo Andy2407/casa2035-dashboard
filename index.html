@@ -3494,7 +3494,7 @@
 
       var stylistOptions = '';
       getStylistList(['CHF','FRM','STY']).forEach(function(u) {
-        stylistOptions += '<option value="' + esc(u.name) + '">' + esc(u.name) + ' (' + esc(ROLLEN_LABEL[u.rolle] || u.rolle) + ')</option>';
+        stylistOptions += '<option value="' + esc(u.name) + '">' + esc((u.name || '').split(' ')[0]) + ' (' + esc(ROLLEN_LABEL[u.rolle] || u.rolle) + ')</option>';
       });
       if (!stylistOptions) stylistOptions = '<option value="">Lade...</option>';
 
@@ -3600,7 +3600,7 @@
       var meName = (currentUser && USERS[currentUser]) ? USERS[currentUser].name : '';
       getStylistList(['CHF','FRM','STY']).forEach(function(u) {
         var sel = (meName && meName === u.name) ? ' selected' : '';
-        stylistOptions += '<option value="' + esc(u.name) + '"' + sel + '>' + esc(u.name) + '</option>';
+        stylistOptions += '<option value="' + esc(u.name) + '"' + sel + '>' + esc((u.name || '').split(' ')[0]) + '</option>';
       });
       if (!stylistOptions) stylistOptions = '<option value="">Lade...</option>';
 
@@ -3686,7 +3686,7 @@
             chip.style.borderColor = u.farbe || '#8899aa';
             chip.style.background = (u.farbe || '#8899aa') + '22';
           }
-          chip.innerHTML = '<span class="dot" style="background:' + (u.farbe || '#8899aa') + '"></span>' + esc(u.name);
+          chip.innerHTML = '<span class="dot" style="background:' + (u.farbe || '#8899aa') + '"></span>' + esc((u.name || '').split(' ')[0]);
           (function(nm){ chip.onclick = function() { terminStaffFilter = nm; renderTermine(termineCache); }; })(u.name);
           staffFilter.appendChild(chip);
         });
@@ -4159,7 +4159,7 @@
           sel.textContent = '';
           stylists.forEach(function(u) {
             var o = document.createElement('option');
-            o.value = u.name; o.textContent = u.name + (u.titel ? ' (' + u.titel + ')' : '');
+            o.value = u.name; o.textContent = (u.name || '').split(' ')[0] + (u.titel ? ' (' + u.titel + ')' : '');
             sel.appendChild(o);
           });
           // Vorauswahl: aktueller User, sonst vorherige Auswahl
@@ -5706,7 +5706,7 @@
 
       var stylistOptions = '';
       getStylistList(['FRM','STY','CHF']).forEach(function(u) {
-        stylistOptions += '<option value="' + esc(u.name) + '"' + (u.name === found.Stylist ? ' selected' : '') + '>' + esc(u.name) + ' (' + esc(u.titel || '') + ')</option>';
+        stylistOptions += '<option value="' + esc(u.name) + '"' + (u.name === found.Stylist ? ' selected' : '') + '>' + esc((u.name || '').split(' ')[0]) + ' (' + esc(u.titel || '') + ')</option>';
       });
       if (!stylistOptions) stylistOptions = '<option value="">Lade...</option>';
 
