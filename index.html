@@ -792,7 +792,7 @@
     .week-view-wrapper { display: flex; overflow-x: auto; }
     .week-time-axis { width: 40px; flex-shrink: 0; padding-top: 30px; position: sticky; left: 0; z-index: 3; background: var(--surface); }
     .week-time-label { height: 48px; font-size: 10px; color: var(--text-dim); text-align: right; padding-right: 6px; font-variant-numeric: tabular-nums; line-height: 48px; }
-    .week-view-grid { flex: 1; display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; min-width: 480px; }
+    .week-view-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; min-width: 560px; }
     .week-day-col { min-width: 0; border-left: 1px solid var(--border); }
     .week-day-header { font-size: 11px; font-weight: 700; text-align: center; padding: 6px; color: var(--text-dim); border-bottom: 1px solid var(--border); height: 30px; }
     .week-day-header.today { color: var(--gold); }
@@ -1249,7 +1249,7 @@
       .day-hour-label { font-size: 9px; min-width: 28px; padding: 2px 3px; }
       .day-termin-block { font-size: 9px; padding: 2px 4px; }
       /* Wochenansicht: Scrollbar im Wrapper, Achse bleibt sticky + kompaktere Hoehen */
-      .week-view-grid { min-width: 360px; }
+      .week-view-grid { min-width: 420px; }
       .week-hour-cell { height: 36px; }
       .week-time-label { height: 36px; line-height: 36px; }
       .week-time-axis { padding-top: 22px; }
@@ -1304,6 +1304,33 @@
       .fab { width: 32px; height: 32px; }
       .fab svg { width: 14px; height: 14px; }
       #dashFeedbackFab { left: max(20px, calc(env(safe-area-inset-left, 0px) + 8px)) !important; }
+    }
+
+    /* SPRINT5-FIX (16.04.2026): PWA Standalone + Landscape — ueberschreibt display-mode:standalone Defaults
+       (1416-1421 setzen padding-top:calc(12px+safe-top)!important + padding-bottom:calc(8px+safe-bottom)!important,
+        was in Landscape den Header und die Bottom-Nav zerreisst, weil Safe-Area-Inset landschaft nur seitlich relevant ist). */
+    @media (display-mode: standalone) and (max-height: 500px) and (orientation: landscape),
+           (display-mode: fullscreen) and (max-height: 500px) and (orientation: landscape) {
+      body { padding-top: 0 !important; padding-bottom: 0 !important; }
+      .header, #appHeader {
+        padding-top: max(2px, env(safe-area-inset-top, 0px)) !important;
+        padding-bottom: 2px !important;
+        padding-left: max(12px, env(safe-area-inset-left, 12px)) !important;
+        padding-right: max(12px, env(safe-area-inset-right, 12px)) !important;
+      }
+      .bottom-nav, .tab-bar, nav.bottomnav {
+        padding-bottom: max(0px, env(safe-area-inset-bottom, 0px)) !important;
+        height: calc(var(--nav-height, 36px) + env(safe-area-inset-bottom, 0px)) !important;
+      }
+      /* FAB und Feedback-Button ueber Bottom-Nav + Safe-Area */
+      .fab-wrap { bottom: calc(var(--nav-height, 36px) + env(safe-area-inset-bottom, 0px) + 4px) !important; }
+      #dashFeedbackFab { bottom: calc(var(--nav-height, 36px) + env(safe-area-inset-bottom, 0px) + 4px) !important; }
+      /* Content-Hoehe korrekt berechnen (keine doppelte Safe-Top-Addition) */
+      main { min-height: calc(100vh - var(--nav-height, 36px) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important; }
+      /* Detail-Sheet darf nicht ueber Bottom-Nav laufen */
+      #detailSheet .sheet-content, .sheet .sheet-content {
+        max-height: calc(100vh - var(--nav-height, 36px) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 20px) !important;
+      }
     }
 
     /* === KI-Vorschlaege === */
@@ -3994,10 +4021,11 @@
 
       var grid = document.createElement('div');
       grid.className = 'week-view-grid';
-      var days = ['Mo','Di','Mi','Do','Fr','Sa'];
+      // SPRINT5-FIX (16.04.2026): Woche = Mo-So (7 Tage, nicht 6). Vorher fehlte Sonntag.
+      var days = ['Mo','Di','Mi','Do','Fr','Sa','So'];
       var today = new Date().toISOString().split('T')[0];
 
-      for (var i = 0; i < 6; i++) {
+      for (var i = 0; i < 7; i++) {
         var d = new Date(start); d.setDate(d.getDate() + i);
         var dStr = d.toISOString().split('T')[0];
         var col = document.createElement('div');
