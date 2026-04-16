@@ -2482,6 +2482,14 @@
         var SELECT_WHITELIST = 'id,name,rolle,status,spezialisierung,salon_id,geschlecht,kann_damen,kann_herren,ist_friseur';
         var rows = await apiGet('mitarbeiter', 'salon_id=eq.' + encodeURIComponent(sid) + '&status=eq.aktiv&ist_friseur=eq.true&select=' + SELECT_WHITELIST + '&order=name.asc');
         mitarbeiterCache = Array.isArray(rows) ? rows : [];
+        // SPRINT5 (16.04.2026): Rena (Chefin) IMMER vorn, gilt auch fuer Filter-Chips die direkt aus Cache rendern
+        mitarbeiterCache.sort(function(a, b) {
+          var an = (a.name || '').toLowerCase();
+          var bn = (b.name || '').toLowerCase();
+          if (an.indexOf('rena') === 0) return -1;
+          if (bn.indexOf('rena') === 0) return 1;
+          return an.localeCompare(bn, 'de');
+        });
       } catch (e) {
         console.warn('[FB-41] loadMitarbeiterFromDB Fallback auf USERS:', e && e.message);
         mitarbeiterCache = [];
