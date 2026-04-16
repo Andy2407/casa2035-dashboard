@@ -1767,7 +1767,9 @@
       </div>
       <div id="terminContent"></div>
       <div class="section-title" style="margin-top:16px">KI-Hinweise</div>
-      <div id="kiTermineHints" class="ki-suggestions stagger"></div>
+      <!-- BUG3-FIX 16.04.2026: padding-bottom verhindert Abschneiden durch Bottom-Nav in Safari PWA.
+           calc: nav(64px) + safe-area-bottom (34px iPhone) + 24px Luft = ~122px. -->
+      <div id="kiTermineHints" class="ki-suggestions stagger" style="padding-bottom:calc(env(safe-area-inset-bottom,0px) + 24px)"></div>
     </div>
 
     <!-- PAGE: Kasse -->
@@ -3887,13 +3889,16 @@
         getStylistList(['CHF','FRM','STY']).forEach(function(u) {
           var chip = document.createElement('div');
           var isActive = terminStaffFilter === u.name;
+          var farbe = u.farbe || '#8899aa';
           chip.className = 'staff-chip' + (isActive ? ' active' : '');
-          // SPRINT5 (16.04.2026): Active-State in Stylist-Farbe statt Gold-Default
+          // BUG2-FIX 16.04.2026: border-left IMMER in Stylist-Farbe (active + inactive).
+          // Active: volle border + bg-tint. Inactive: nur left-border als Identitaets-Akzent.
+          chip.style.borderLeftColor = farbe;
           if (isActive) {
-            chip.style.borderColor = u.farbe || '#8899aa';
-            chip.style.background = (u.farbe || '#8899aa') + '22';
+            chip.style.borderColor = farbe;
+            chip.style.background = farbe + '22';
           }
-          chip.innerHTML = '<span class="dot" style="background:' + (u.farbe || '#8899aa') + '"></span>' + esc((u.name || '').split(' ')[0]);
+          chip.innerHTML = '<span class="dot" style="background:' + farbe + '"></span>' + esc((u.name || '').split(' ')[0]);
           (function(nm){ chip.onclick = function() { terminStaffFilter = nm; renderTermine(termineCache); }; })(u.name);
           staffFilter.appendChild(chip);
         });
