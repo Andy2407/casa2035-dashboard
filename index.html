@@ -729,12 +729,15 @@
       position: sticky; top: calc(var(--safe-top, 0px) + 52px); z-index: 50;
       background: var(--bg);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      padding: 8px 0 6px;
+      padding: 8px 16px 8px;
       border-bottom: 1px solid var(--border);
-      margin: 0 -16px; padding-left: 16px; padding-right: 16px;
+      margin: 0 -16px 10px;
+      display: flex; flex-direction: column; gap: 6px;
     }
+    /* SPRINT5 (16.04.2026): Zeile 2 (staff-filter) IMMER sticky innerhalb der Toolbar */
+    .termine-toolbar .staff-filter { margin-bottom: 0; padding-bottom: 2px; }
     @media (max-height: 500px) and (orientation: landscape) {
-      .termine-toolbar { top: calc(env(safe-area-inset-top, 0px) + 36px); }
+      .termine-toolbar { top: calc(env(safe-area-inset-top, 0px) + 36px); padding: 4px 12px; gap: 3px; }
     }
     /* BUG-FIX 15.04.2026: sticky Toolbar — Titel + Liste/Tag/Woche + Datum in einer Zeile */
     .termine-toolbar-row {
@@ -2474,9 +2477,10 @@
       try {
         var sid = currentSalonId();
         // FB-41/VETO: SELECT-Whitelist — NIEMALS select=* (exponiert auth_token_hash, email, telefon)
-        // Reales Schema: id,name,rolle,status,spezialisierung,salon_id,geschlecht,kann_damen,kann_herren
-        var SELECT_WHITELIST = 'id,name,rolle,status,spezialisierung,salon_id,geschlecht,kann_damen,kann_herren';
-        var rows = await apiGet('mitarbeiter', 'salon_id=eq.' + encodeURIComponent(sid) + '&status=eq.aktiv&select=' + SELECT_WHITELIST + '&order=name.asc');
+        // Reales Schema: id,name,rolle,status,spezialisierung,salon_id,geschlecht,kann_damen,kann_herren,ist_friseur
+        // SPRINT5 (16.04.2026): ist_friseur=eq.true — Andreas (CHF, Admin) wird als Stylist ausgeblendet
+        var SELECT_WHITELIST = 'id,name,rolle,status,spezialisierung,salon_id,geschlecht,kann_damen,kann_herren,ist_friseur';
+        var rows = await apiGet('mitarbeiter', 'salon_id=eq.' + encodeURIComponent(sid) + '&status=eq.aktiv&ist_friseur=eq.true&select=' + SELECT_WHITELIST + '&order=name.asc');
         mitarbeiterCache = Array.isArray(rows) ? rows : [];
       } catch (e) {
         console.warn('[FB-41] loadMitarbeiterFromDB Fallback auf USERS:', e && e.message);
@@ -2525,6 +2529,9 @@
         if (key === 'admin') return;
         var u = USERS[key];
         if (!u) return;
+        // SPRINT5 (16.04.2026): Andreas Schengel ist KEIN Friseur (Gruender/Capo)
+        if (u.isAdmin === true) return;
+        if ((u.name || '').toLowerCase() === 'andreas') return;
         var r = (u.rolle || 'STY').toUpperCase();
         if (rolleFilter && rolleFilter.indexOf(r) === -1) return;
         var k = (u.name || '').toLowerCase();
@@ -2542,7 +2549,32 @@
       } else {
         Object.keys(USERS).forEach(addFromUSERS);
       }
+      // SPRINT5 (16.04.2026): Rena (Chefin/Inhaberin) IMMER als erste Position, Rest alphabetisch
+      out.sort(function(a, b) {
+        var an = (a.name || '').toLowerCase();
+        var bn = (b.name || '').toLowerCase();
+        if (an === 'rena') return -1;
+        if (bn === 'rena') return 1;
+        return an.localeCompare(bn, 'de');
+      });
       return out;
+    }
+
+    // SPRINT5 (16.04.2026): Einheitlicher Color-Lookup fuer Stylist anhand Name
+    // Sucht zuerst in getStylistList (DB+USERS konsolidiert, bereits ist_friseur-gefiltert),
+    // matcht case-insensitive auf Vorname ODER volles "Vorname Nachname".
+    function getStylistColor(name) {
+      if (!name) return 'var(--text-dim)';
+      var n = String(name).trim().toLowerCase();
+      var list = getStylistList(null);
+      for (var i = 0; i < list.length; i++) {
+        var u = list[i];
+        var full = ((u.name || '') + ' ' + (u.nachname || '')).trim().toLowerCase();
+        if ((u.name || '').toLowerCase() === n) return u.farbe;
+        if (full === n) return u.farbe;
+        if (n.indexOf((u.name || '').toLowerCase()) === 0) return u.farbe;
+      }
+      return 'var(--text-dim)';
     }
 
     // === Helpers ===
@@ -3639,9 +3671,15 @@
         staffFilter.appendChild(allChip);
         getStylistList(['CHF','FRM','STY']).forEach(function(u) {
           var chip = document.createElement('div');
-          chip.className = 'staff-chip' + (terminStaffFilter === u.name ? ' active' : '');
+          var isActive = terminStaffFilter === u.name;
+          chip.className = 'staff-chip' + (isActive ? ' active' : '');
+          // SPRINT5 (16.04.2026): Active-State in Stylist-Farbe statt Gold-Default
+          if (isActive) {
+            chip.style.borderColor = u.farbe || '#8899aa';
+            chip.style.background = (u.farbe || '#8899aa') + '22';
+          }
           chip.innerHTML = '<span class="dot" style="background:' + (u.farbe || '#8899aa') + '"></span>' + esc(u.name);
-          chip.onclick = function() { terminStaffFilter = u.name; renderTermine(termineCache); };
+          (function(nm){ chip.onclick = function() { terminStaffFilter = nm; renderTermine(termineCache); }; })(u.name);
           staffFilter.appendChild(chip);
         });
       }
@@ -3680,7 +3718,9 @@
         card.className = 'termin-card touch-scale';
         if (overlaps[idx]) card.classList.add('termin-overlap-warn');
         card.onclick = function() { openTerminDetail(t); };
-        var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
+        // SPRINT5 (16.04.2026): Konsistente Stylist-Farbe via getStylistColor (DB+USERS konsolidiert)
+        var stylistColor = getStylistColor(t.Stylist);
+        card.style.borderLeft = '3px solid ' + stylistColor;
         var statusLabel = t.Status || 'bestaetigt';
         var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt'));
         var hasRecipe = !!findRecipe(t.Service);
@@ -3690,7 +3730,7 @@
           + (overlaps[idx] ? '<span class="termin-overlap-badge">&#9888; Ueberlappung</span>' : '') + '</div>'
           + '<div class="termin-kunde">' + esc(t.Kundenname || t.Kunde || '') + '</div>'
           + '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">'
-          + '<div class="termin-stylist"><span class="dot" style="background:' + (u ? u.farbe : 'var(--text-dim)') + '"></span>' + esc(t.Stylist || '') + '</div>'
+          + '<div class="termin-stylist"><span class="dot" style="background:' + stylistColor + '"></span>' + esc(t.Stylist || '') + '</div>'
           + '<span class="termin-status ' + statusClass + '">' + esc(statusLabel) + '</span></div></div>'
           + '<div class="termin-preis">' + fmtEur(t.Preis) + ' &euro;' + demoDot() + '</div>';
         container.appendChild(card);
@@ -3761,7 +3801,8 @@
         var heightPx = Math.max((dur / 60) * 60, 20);
         var slot = document.getElementById('daySlot' + startH);
         if (!slot) return;
-        var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
+        // SPRINT5 (16.04.2026): getStylistColor (DB+USERS konsolidiert)
+        var dayColor = getStylistColor(t.Stylist);
         var colIdx = staffKeys.indexOf(t.Stylist || 'Unbekannt');
         var block = document.createElement('div');
         block.className = 'day-termin-block';
@@ -3771,7 +3812,8 @@
         block.style.left = (colIdx * colWidth) + '%';
         block.style.width = colWidth + '%';
         block.style.right = 'auto';
-        block.style.borderLeftColor = u ? u.farbe : 'var(--gold)';
+        block.style.borderLeftColor = dayColor;
+        block.style.background = (dayColor && dayColor.indexOf('#') === 0) ? dayColor + '14' : 'var(--surface)';
         var statusDot = t.Status === 'bestaetigt' ? '#2d8a4e' : (t.Status === 'offen' ? '#c48a1a' : '#686058');
         var dayRecipe = findRecipe(t.Service);
         block.innerHTML = '<div style="font-weight:600;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
@@ -3866,8 +3908,10 @@
           var heightPx = Math.max((dur / 60) * 48, 16);
           chip.style.top = topPx + 'px';
           chip.style.height = heightPx + 'px';
-          var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
-          chip.style.borderLeftColor = u ? u.farbe : 'var(--gold)';
+          // SPRINT5 (16.04.2026): getStylistColor konsolidiert
+          var weekColor = getStylistColor(t.Stylist);
+          chip.style.borderLeftColor = weekColor;
+          if (weekColor && weekColor.indexOf('#') === 0) chip.style.background = weekColor + '18';
           var timeStr = fmtTime(t.Start_ISO);
           var svcStr = esc((t.Service || '').substring(0, 10));
           var weekRecipe = findRecipe(t.Service);
@@ -4060,11 +4104,17 @@
       container.textContent = '';
       if (!perms.umsatzSehen || !data) return;
       Object.keys(data).forEach(function(name) {
-        var u = Object.values(USERS).find(function(u) { return u.name === name; });
+        // SPRINT5 (16.04.2026): getStylistColor + Kuerzel aus getStylistList konsolidiert
+        var color = getStylistColor(name);
+        var kz = (function(){
+          var list = getStylistList(null);
+          for (var i=0;i<list.length;i++){ if ((list[i].name||'').toLowerCase() === String(name||'').toLowerCase()) return list[i].kuerzel; }
+          return String(name||'??').substring(0,2).toUpperCase();
+        })();
         var div = document.createElement('div');
         div.className = 'kasse-entry';
         div.innerHTML = '<div class="left"><div style="display:flex;align-items:center;gap:8px">'
-          + '<div style="width:28px;height:28px;border-radius:50%;background:' + (u ? u.farbe : 'var(--text-dim)') + ';display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700">' + (u ? u.kuerzel : '??') + '</div>'
+          + '<div style="width:28px;height:28px;border-radius:50%;background:' + color + ';display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700">' + esc(kz) + '</div>'
           + '<div><div class="name">' + esc(name) + '</div><div class="detail">' + data[name].count + ' Rechnungen</div></div></div></div>'
           + '<div class="amount" style="color:var(--gold)">' + fmtEur(data[name].summe) + ' &euro;</div>';
         container.appendChild(div);
@@ -5325,7 +5375,9 @@
     // === Termin Detail ===
     function openTerminDetail(t) {
       var inner = document.getElementById('detailInner');
-      var u = Object.values(USERS).find(function(u) { return u.name === t.Stylist; });
+      // SPRINT5 (16.04.2026): getStylistColor (DB+USERS konsolidiert)
+      var detailStylistColor = getStylistColor(t.Stylist);
+      var u = { farbe: detailStylistColor };
       var recipe = findRecipe(t.Service);
 
       var statusLabel = t.Status || 'bestaetigt';
