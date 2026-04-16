@@ -1492,7 +1492,7 @@
     </div>
     <div class="jarvis-transcript" id="jarvisTranscript">Ich hoere zu...</div>
     <div class="jarvis-response" id="jarvisResponse"></div>
-    <div class="jarvis-hint">Sage z.B. &laquo;Zeig Termine&raquo; &middot; &laquo;Wieviel Umsatz&raquo; &middot; &laquo;Neuer Termin&raquo;</div>
+    <div class="jarvis-hint">Sage &laquo;Was steht an?&raquo; &middot; &laquo;Ja, bereite vor&raquo; &middot; &laquo;Ignorieren&raquo; &middot; &laquo;Zeig Termine&raquo;</div>
   </div>
 
   <!-- Go-Live Checklist Overlay -->
@@ -7902,10 +7902,184 @@
 
     // === JARVIS KI-Kontext ===
     var jarvisContext = { lastAction: null, pendingConfirm: null, conversationHistory: [], isSpeaking: false };
+    var jarvisIgnored = {}; // Session-Ignore-Liste: id → true (nicht nochmal ansprechen)
+    var jarvisLastScanItems = []; // Priority-Queue aus letztem jarvisProactiveScan
     var JARVIS_GREETINGS = [
       'Selbstverstaendlich.', 'Sofort.', 'Alles klar.', 'Wird erledigt.', 'Bin dran.', 'Kein Problem.'
     ];
     function jarvisGreet() { return JARVIS_GREETINGS[Math.floor(Math.random() * JARVIS_GREETINGS.length)]; }
+
+    // =============================================================
+    // JARVIS PROAKTIVER SCAN (Feature A)
+    // Wird automatisch bei openJarvis() aufgerufen.
+    // Prueft alle Caches auf actionable Items, baut Priority-Queue,
+    // begruesst Nutzer mit personalisierter Zusammenfassung.
+    // =============================================================
+    function jarvisProactiveScan() {
+      var items = [];
+      var now = new Date();
+      var todayStr = now.toISOString().split('T')[0];
+      var tomorrowStr = new Date(now.getTime() + 86400000).toISOString().split('T')[0];
+
+      // Check 1: Termin-Ueberlappungen (gleicher Stylist, heute+morgen)
+      var termine = termineCache || [];
+      var terminNearby = termine.filter(function(t) {
+        return (t.Start_ISO||'').indexOf(todayStr)===0 || (t.Start_ISO||'').indexOf(tomorrowStr)===0;
+      });
+      var firstOverlap = null;
+      scanOuter: for (var si = 0; si < terminNearby.length; si++) {
+        for (var sj = si+1; sj < terminNearby.length; sj++) {
+          var ta = terminNearby[si], tb = terminNearby[sj];
+          if (!ta.Start_ISO || !tb.Start_ISO) continue;
+          if (!(ta.Stylist||'').trim() || (ta.Stylist||'') !== (tb.Stylist||'')) continue;
+          if ((ta.Status||'')==='storniert' || (tb.Status||'')==='storniert') continue;
+          var taS = new Date(ta.Start_ISO), taE = new Date(taS.getTime()+((parseInt(ta.Dauer_Min)||45)*60000));
+          var tbS = new Date(tb.Start_ISO), tbE = new Date(tbS.getTime()+((parseInt(tb.Dauer_Min)||45)*60000));
+          if (taS < tbE && tbS < taE) { firstOverlap = {a:ta,b:tb}; break scanOuter; }
+        }
+      }
+      if (firstOverlap && !jarvisIgnored['overlap']) {
+        var ov = firstOverlap;
+        var oTag = (ov.a.Start_ISO||'').indexOf(todayStr)===0 ? 'heute' : 'morgen';
+        var oZeit = new Date(ov.a.Start_ISO).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
+        items.push({
+          id:'overlap', prio:1,
+          msg:'Terminueberlappung '+oTag+' um '+oZeit+' bei '+(ov.a.Stylist||'unbekannt')+'. '+(ov.a.Kundenname||ov.a.Kunde||'?')+' und '+(ov.b.Kundenname||ov.b.Kunde||'?')+' ueberschneiden sich.',
+          action:(function(o){return function(){showPage('termine');setTimeout(function(){openTerminDetail(o.a);},400);};})(ov)
+        });
+      }
+
+      // Check 2: Lager kritisch (Bestand <= 20% von Mindestbestand)
+      var lager = lagerCache || [];
+      var kritischProd = null;
+      for (var li=0; li<lager.length && !kritischProd; li++) {
+        var lp = lager[li];
+        var lpid = lp.Produkt||lp.Name||lp.produktname||'';
+        if (jarvisIgnored['lager_'+lpid]) continue;
+        var lpB = parseInt(lp.Bestand||lp.bestand||0);
+        var lpMin = parseInt(lp.Min_Bestand||lp.min_bestand||3);
+        if (lpB <= Math.max(1, Math.floor(lpMin*0.2))) kritischProd = lp;
+      }
+      if (kritischProd && !jarvisIgnored['lager_kritisch']) {
+        var kpName = kritischProd.Produkt||kritischProd.Name||kritischProd.produktname||'Produkt';
+        var kpBestand = parseInt(kritischProd.Bestand||kritischProd.bestand||0);
+        var kpMenge = Math.max(5, (parseInt(kritischProd.Min_Bestand||kritischProd.min_bestand||3))*3);
+        items.push({
+          id:'lager_kritisch', prio:2,
+          msg:kpName+' kritisch: nur noch '+kpBestand+' auf Lager. Empfehlung: '+kpMenge+' Stueck bestellen.',
+          action:(function(kp,km){return function(){
+            showPage('lager');
+            setTimeout(function(){
+              openNachbestellungSheet();
+              setTimeout(function(){
+                var nbP=document.getElementById('nbProdukt');
+                if(nbP){var tgt=(kp.Produkt||kp.Name||kp.produktname||'').toLowerCase();for(var xi=0;xi<nbP.options.length;xi++){if(nbP.options[xi].text.toLowerCase().indexOf(tgt)!==-1){nbP.selectedIndex=xi;break;}}}
+                var nbM=document.getElementById('nbMenge');if(nbM)nbM.value=km;
+              },350);
+            },300);
+          };})(kritischProd,kpMenge)
+        });
+      }
+
+      // Check 3: Offene Anfragen > 24h
+      var beratungen = beratungenCache || [];
+      var altOffen = beratungen.filter(function(b){
+        if (b.Status!=='offen') return false;
+        return (now - new Date(b.erstellt_am||b.Datum||b.datum||0)) > 86400000;
+      });
+      if (altOffen.length > 0 && !jarvisIgnored['anfragen_alt']) {
+        items.push({
+          id:'anfragen_alt', prio:3,
+          msg:altOffen.length+' Anfrage'+(altOffen.length>1?'n':'')+' seit ueber 24 Stunden unbeantwortet.',
+          action:function(){showPage('beratung');setTimeout(function(){setBeratungFilter('offen');},300);}
+        });
+      }
+
+      // Check 4: Tagesumsatz unter Schnitt nach 14 Uhr
+      if (now.getHours() >= 14 && !jarvisIgnored['umsatz_niedrig']) {
+        var sEl = document.getElementById('statUmsatz');
+        if (sEl) {
+          var uheu = parseFloat((sEl.textContent||'0').replace(',','.').replace(/[^0-9.]/g,''))||0;
+          if (uheu < 320) {
+            items.push({
+              id:'umsatz_niedrig', prio:4,
+              msg:'Nach 14 Uhr, Tagesumsatz bei '+uheu.toFixed(0)+' Euro, unter dem Tagesdurchschnitt.',
+              action:function(){showPage('kasse');}
+            });
+          }
+        }
+      }
+
+      // Check 5: Termine ohne Stylist heute
+      var ohneS = termine.filter(function(t){
+        return (t.Start_ISO||'').indexOf(todayStr)===0 && !(t.Stylist||'').trim() && (t.Status||'')!=='storniert';
+      });
+      if (ohneS.length > 0 && !jarvisIgnored['kein_stylist']) {
+        items.push({
+          id:'kein_stylist', prio:5,
+          msg:ohneS.length+' Termin'+(ohneS.length>1?' haben':' hat')+' heute keinen Stylist zugewiesen.',
+          action:(function(t0){return function(){showPage('termine');setTimeout(function(){openTerminDetail(t0);},400);};})(ohneS[0])
+        });
+      }
+
+      // Check 6: Kunden-Geburtstag heute/morgen
+      var kunden = kundenCache || [];
+      var bdList = [];
+      kunden.forEach(function(k){
+        var geb=k.Geburtstag||k.geburtstag||''; if(!geb) return;
+        var d=new Date(geb);
+        var tom=new Date(now.getTime()+86400000);
+        var isT=d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
+        var isTom=d.getMonth()===tom.getMonth()&&d.getDate()===tom.getDate();
+        if(isT||isTom) bdList.push({k:k,wann:isT?'heute':'morgen'});
+      });
+      if (bdList.length > 0 && !jarvisIgnored['geburtstag']) {
+        var bdNames = bdList.slice(0,2).map(function(x){return x.k.Name||x.k.name||'';}).filter(Boolean).join(' und ');
+        items.push({
+          id:'geburtstag', prio:6,
+          msg:bdNames+' hat '+bdList[0].wann+' Geburtstag. Gute Gelegenheit fuer eine persoenliche Geste.',
+          action:function(){showPage('kunden');}
+        });
+      }
+
+      // Ignorierte entfernen + nach Prio sortieren
+      items = items.filter(function(it){return !jarvisIgnored[it.id];});
+      items.sort(function(a,b){return a.prio-b.prio;});
+      jarvisLastScanItems = items;
+
+      // Begruessung zusammenbauen
+      var uN = (currentUser && USERS[currentUser]) ? USERS[currentUser].name : 'Chef';
+      var hh = now.getHours();
+      var grussStr = hh<11?'Guten Morgen':hh<14?'Mahlzeit':hh<18?'Servus':'Noch da';
+
+      if (items.length === 0) {
+        var naechster = null;
+        termine.forEach(function(t){var s=new Date(t.Start_ISO||'');if(s>now&&(!naechster||s<new Date(naechster.Start_ISO)))naechster=t;});
+        var okMsg = grussStr+', '+uN+'. Alles im gruenen Bereich.';
+        if (naechster) okMsg += ' Naechster Termin: '+(naechster.Kundenname||naechster.Kunde||'')+' um '+new Date(naechster.Start_ISO).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+'.';
+        jarvisRespond(okMsg, null, true);
+        return;
+      }
+
+      var topItems = items.slice(0, Math.min(2, items.length));
+      var scanMsg = grussStr+', '+uN+'. '+items.length+' Punkt'+(items.length>1?'e benoetigen':' benoetigt')+' deine Aufmerksamkeit. ';
+      scanMsg += topItems.map(function(it,idx){return (idx+1)+': '+it.msg;}).join(' ');
+      scanMsg += ' Soll ich den ersten Punkt fuer dich vorbereiten?';
+      jarvisRespond(scanMsg, null, true);
+    }
+
+    // =============================================================
+    // JARVIS EXECUTE TOP ACTION (Feature B)
+    // Oeffnet das passende Dialog/Sheet mit Pre-Fill.
+    // User muss nur noch bestaetigen — keine Auto-Ausfuehrung.
+    // =============================================================
+    function jarvisExecuteTopAction() {
+      var items = jarvisLastScanItems.filter(function(it){return !jarvisIgnored[it.id];});
+      if (!items.length) { jarvisRespond('Keine offenen Punkte mehr. Alles erledigt.', null, true); return; }
+      var top = items[0];
+      jarvisIgnored[top.id] = true; // nach Vorbereiten als erledigt markieren
+      jarvisRespond(jarvisGreet()+' Ich bereite alles vor. Du musst nur noch bestaetigen.', top.action, false);
+    }
 
     // Kunden-Suche per Name (Fuzzy)
     function jarvisFindKunde(text) {
@@ -7979,6 +8153,63 @@
       else if (jarvisContext.pendingConfirm && /^(nein|stop|abbruch|cancel|nicht|falsch)/.test(text)) {
         response = 'Alles klar, abgebrochen.';
         jarvisContext.pendingConfirm = null;
+      }
+
+      // === PROAKTIVE BEFEHLE (Feature C) ===
+
+      // "Was steht an?" / "Was empfiehlst du?" → Scan erneut anzeigen
+      else if (/was.*an|was.*offen|was.*heute|was.*empfiehlst|empfehlung|uebersicht.*probleme|probleme.*uebers/.test(text)) {
+        jarvisProactiveScan();
+        return; // jarvisProactiveScan ruft jarvisRespond selbst auf
+      }
+
+      // "Ja, mach das" / "Ja, bereite vor" / "Los" → Top-Action ausfuehren (nach Scan)
+      else if (/^(ja|ok|los|mach|bereite|vorbereiten|schieb|bestell|beantworte|oeffne)/.test(text) && jarvisLastScanItems.filter(function(it){return !jarvisIgnored[it.id];}).length > 0 && !jarvisContext.pendingConfirm) {
+        jarvisExecuteTopAction();
+        return;
+      }
+
+      // "Ignorieren" / "Ueberspringen" / "Naechster" → aktuellen Top-Item ignorieren, naechstes anzeigen
+      else if (/ignorier|uebersprin|nicht wichtig|naechste|skip|vergiss das/.test(text)) {
+        var aktItems = jarvisLastScanItems.filter(function(it){return !jarvisIgnored[it.id];});
+        if (aktItems.length > 0) {
+          jarvisIgnored[aktItems[0].id] = true;
+          var verbleibend = jarvisLastScanItems.filter(function(it){return !jarvisIgnored[it.id];});
+          if (verbleibend.length > 0) {
+            response = 'Alles klar, ignoriert. Naechster Punkt: ' + verbleibend[0].msg + ' Vorbereiten?';
+          } else {
+            response = 'Erledigt. Keine weiteren Punkte.';
+          }
+        } else {
+          response = 'Nichts mehr zu ignorieren. Alles ist schon abgehakt.';
+        }
+      }
+
+      // "Schieb den Termin" → Termin-Overlap Action direkt ausfuehren
+      else if (/schieb.*termin|termin.*schieb|verschieb.*termin/.test(text)) {
+        var ovItem = jarvisLastScanItems.find(function(it){return it.id==='overlap'&&!jarvisIgnored[it.id];});
+        if (ovItem) {
+          jarvisIgnored['overlap'] = true;
+          jarvisRespond(jarvisGreet()+' Oeffne den Termin zum Verschieben. Du entscheidest.', ovItem.action, false);
+          return;
+        } else {
+          response = 'Keine Terminueberlappung gefunden.';
+        }
+      }
+
+      // "Bestell nach" → Lager-Kritisch Action direkt ausfuehren
+      else if (/bestell.*nach|nachbestell|produkt.*bestell/.test(text)) {
+        var lagItem = jarvisLastScanItems.find(function(it){return it.id==='lager_kritisch'&&!jarvisIgnored[it.id];});
+        if (lagItem) {
+          jarvisIgnored['lager_kritisch'] = true;
+          jarvisRespond(jarvisGreet()+' Oeffne das Bestellformular mit vorausgefuellten Daten.', lagItem.action, false);
+          return;
+        } else {
+          showPage('lager');
+          setTimeout(function(){openNachbestellungSheet();},300);
+          response = jarvisGreet()+' Oeffne Bestellformular.';
+          keepListening = false;
+        }
       }
 
       // === RECHNUNG erstellen (Smart: Kunde + Service + Zahlart aus Sprache) ===
@@ -8325,13 +8556,17 @@
       document.getElementById('jarvisResponse').textContent = response;
       jarvisContext.conversationHistory.push({ role: 'jarvis', text: response });
 
-      // Text-to-Speech (FB-49: Sprech-Guard gegen Intent-Mehrfachausloesung)
+      // Text-to-Speech mit natuerlichen Pausen an Satzgrenzen (Feature D)
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
-        var utter = new SpeechSynthesisUtterance(response);
+        // Satzteile an Punkten und Nummern aufteilen fuer natuerliche Pausen
+        var sprechText = response
+          .replace(/(\d+:)/g, function(m){ return m + ' '; }) // "1: " → Pause nach Nummerierung
+          .replace(/\.\s+/g, '. \u200B'); // Null-Breitenzeichen als Pause-Marker
+        var utter = new SpeechSynthesisUtterance(sprechText);
         utter.lang = 'de-DE';
-        utter.rate = 1.0;
-        utter.pitch = 0.95;
+        utter.rate = 0.95; // leicht langsamer = natuerlicher
+        utter.pitch = 0.92;
         jarvisContext.isSpeaking = true;
         utter.onend = function() { jarvisContext.isSpeaking = false; };
         utter.onerror = function() { jarvisContext.isSpeaking = false; };
@@ -8339,10 +8574,16 @@
       }
 
       if (action) {
-        setTimeout(function() {
-          closeJarvis();
-          action();
-        }, 1500);
+        // Warte bis Sprache beendet ist, dann Dialog oeffnen
+        var waitForSpeech = function() {
+          if (!jarvisContext.isSpeaking) {
+            closeJarvis();
+            action();
+          } else {
+            setTimeout(waitForSpeech, 200);
+          }
+        };
+        setTimeout(waitForSpeech, 1200);
       } else if (keepListening) {
         setTimeout(function() {
           if (jarvisActive) {
