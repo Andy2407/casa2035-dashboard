@@ -739,7 +739,9 @@
       margin: 0 -16px 10px; padding-left: 16px; padding-right: 16px;
     }
     .termine-toolbar {
-      position: sticky; top: calc(var(--safe-top, 0px) + 52px); z-index: 50;
+      /* BUG1-FIX 16.04.2026: top=68px (gemessene Header-Hoehe bei safe-top=0) + safe-top fuer Notch.
+         Vorher: calc(safe-top+52px) war 16px zu wenig → Toolbar 16px unter Header versteckt */
+      position: sticky; top: calc(env(safe-area-inset-top, 0px) + 68px); z-index: 50;
       background: var(--bg);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       padding: 8px 16px 8px;
@@ -750,6 +752,7 @@
     /* SPRINT5 (16.04.2026): Zeile 2 (staff-filter) IMMER sticky innerhalb der Toolbar */
     .termine-toolbar .staff-filter { margin-bottom: 0; padding-bottom: 2px; }
     @media (max-height: 500px) and (orientation: landscape) {
+      /* Landscape: Header kompakter (~36px ohne safe-top) */
       .termine-toolbar { top: calc(env(safe-area-inset-top, 0px) + 36px); padding: 4px 12px; gap: 3px; }
     }
     /* BUG-FIX 15.04.2026: sticky Toolbar — Titel + Liste/Tag/Woche + Datum in einer Zeile */
@@ -854,12 +857,15 @@
     .staff-filter { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; }
     .staff-filter::-webkit-scrollbar { display: none; }
     .staff-chip {
-      display: flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: var(--radius-full);
-      font-size: 11px; font-weight: 600; border: 1px solid var(--border); background: var(--surface);
-      cursor: pointer; white-space: nowrap; transition: all 200ms;
+      display: flex; align-items: center; gap: 4px; padding: 4px 10px 4px 8px; border-radius: var(--radius-full);
+      font-size: 11px; font-weight: 600; border: 1px solid var(--border);
+      /* BUG2-FIX 16.04.2026: border-left Akzent in Stylist-Farbe, immer sichtbar (active+inactive).
+         border-left-color wird per JS gesetzt. border-left-width 3px zeigt Identitaet. */
+      border-left-width: 3px;
+      background: var(--surface); cursor: pointer; white-space: nowrap; transition: all 200ms;
     }
-    .staff-chip.active { border-color: var(--gold); background: var(--gold-glow); }
-    .staff-chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .staff-chip.active { background: var(--gold-glow); }
+    .staff-chip .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
     /* === Admin-Zentrale === */
     .admin-health {
@@ -3358,16 +3364,35 @@
         return s; // unbekannt (z.B. "Julia Fischer"): Original beibehalten, chip-Filter zeigt ihn via "Alle"
       }
       return rows.map(function(r) {
+        // termine-Tabelle: mitarbeiter ist ein Objekt {name, ...} durch PostgREST-Embed
+        // terminvorschlaege-Tabelle: mitarbeiter ist ein Text-String (Legacy-Fallback)
+        var stylistRaw = (r.mitarbeiter && typeof r.mitarbeiter === 'object')
+          ? (r.mitarbeiter.name || '')
+          : (r.mitarbeiter || r.Stylist || '');
+        // Kundenname: termine hat kunden-Objekt via FK-Join; terminvorschlaege hat kundenname direkt
+        var kundenObj = r.kunden || null;
+        var kundennameResolved = kundenObj
+          ? ((kundenObj.vorname || '') + ' ' + (kundenObj.nachname || '')).trim()
+          : (r.kundenname || r.Kundenname || '');
+        // Start/Ende: termine hat datum+start_zeit (date + time), terminvorschlaege hat beginn (timestamptz)
+        var startISO = r.beginn || r.Start_ISO || r.start_iso;
+        if (!startISO && r.datum && r.start_zeit) {
+          startISO = r.datum + 'T' + r.start_zeit;
+        }
+        var endeISO = r.ende || r.Ende_ISO || r.ende_iso;
+        if (!endeISO && r.datum && r.end_zeit) {
+          endeISO = r.datum + 'T' + r.end_zeit;
+        }
         return Object.assign({}, r, {
-          Start_ISO: r.beginn || r.start_iso || r.Start_ISO,
-          Ende_ISO: r.ende || r.ende_iso || r.Ende_ISO,
+          Start_ISO: startISO,
+          Ende_ISO: endeISO,
           Service: r.dienstleistung || r.Service || r.service || '',
-          Kundenname: r.kundenname || r.Kundenname || '',
-          Stylist: normalizeStylist(r.mitarbeiter || r.Stylist),
+          Kundenname: kundennameResolved,
+          Stylist: normalizeStylist(stylistRaw),
           Stylist_Wunsch: r.stylist_wunsch || r.Stylist_Wunsch || '',
           Status: r.status || r.Status || 'bestaetigt',
-          Preis: r.preis || r.gesamtpreis_netto || r.Preis || 0,
-          Dauer_Min: r.dauer_min || r.gesamtdauer_min || r.Dauer_Min || 0,
+          Preis: parseFloat(r.gesamtpreis_netto || r.preis || r.Preis || 0) || 0,
+          Dauer_Min: r.gesamtdauer_min || r.dauer_min || r.Dauer_Min || 0,
           id: r.id
         });
       });
@@ -3449,7 +3474,8 @@
       try {
         var [events, termine, services, lager, kunden, beratungen, rechnungen, ausgaben, rezepturen] = await Promise.all([
           apiGet('anfragen_log', 'order=erstellt_am.desc&limit=50').catch(function() { return []; }),
-          apiGet('terminvorschlaege', 'order=beginn.asc&limit=500').catch(function() { return []; }),
+          // PRIMARY: termine-Tabelle mit mitarbeiter+kunden Embedded-Join via PostgREST
+          apiGet('termine', 'order=datum.asc,start_zeit.asc&limit=500&select=*,mitarbeiter(id,name),kunden(id,vorname,nachname)').catch(function() { return null; }),
           apiGet('services_preisliste', 'order=name.asc').catch(function() { return []; }),
           apiGet('lager', 'order=produktname.asc').catch(function() { return []; }),
           apiGet('kunden', 'order=name.asc').catch(function() { return []; }),
@@ -3458,6 +3484,16 @@
           apiGet('ausgaben', 'order=erstellt_am.desc&limit=50').catch(function() { return []; }),
           apiGet('service_rezepturen', 'order=service_name.asc').catch(function() { return []; })
         ]);
+
+        // FALLBACK: termine-Query null bedeutet RLS-Fehler oder leere DB → terminvorschlaege als Fallback
+        if (termine === null) {
+          console.warn('[fetchAll] termine-Query fehlgeschlagen → Fallback auf terminvorschlaege');
+          try {
+            termine = await apiGet('terminvorschlaege', 'order=beginn.asc&limit=500');
+          } catch(fallbackErr) {
+            termine = [];
+          }
+        }
 
         // Wenn wichtige Tabs (Termine, Kunden) leer → Demo-Modus fuer Vorfuehrung
         var hatTermine = (termine||[]).length > 0;
@@ -4997,7 +5033,20 @@
       if (!terminId || !stylistName) return;
       try {
         if (isBackendMode()) {
-          await apiPatch('terminvorschlaege', 'id=eq.' + encodeURIComponent(terminId), { mitarbeiter: stylistName });
+          // Stylist-ID aus getStylistList() ermitteln fuer termine-FK (mitarbeiter.id)
+          var stylistId = null;
+          try {
+            (getStylistList(null) || []).forEach(function(s) {
+              var fullName = ((s.name || '') + ' ' + (s.nachname || '')).trim();
+              if (fullName === stylistName || s.name === stylistName) stylistId = s.id || null;
+            });
+          } catch(e) {}
+          if (stylistId) {
+            await apiPatch('termine', 'id=eq.' + encodeURIComponent(terminId), { stylist_id: stylistId });
+          } else {
+            // Fallback: terminvorschlaege (Legacy) oder termine ohne stylist_id
+            await apiPatch('terminvorschlaege', 'id=eq.' + encodeURIComponent(terminId), { mitarbeiter: stylistName }).catch(function(){});
+          }
         }
         var found = termineCache.find(function(t) { return t.id === terminId; });
         if (found) { found.Stylist = stylistName; found.mitarbeiter = stylistName; }
@@ -7793,6 +7842,8 @@
       document.getElementById('jarvisTranscript').textContent = 'Ich hoere zu...';
       document.getElementById('jarvisResponse').textContent = '';
       startJarvisListening();
+      // Proaktiver Scan bei jedem Oeffnen (A)
+      setTimeout(function() { jarvisProactiveScan(); }, 400);
     }
 
     function closeJarvis() {
