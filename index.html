@@ -3332,13 +3332,38 @@
       });
     }
     function mapTermine(rows) {
+      // SPRINT5-FIX (16.04.2026): Stylist-Namen auf volle Form normalisieren, damit
+      // Filter-Chips (voller Name aus mitarbeiter-DB) mit Legacy-Termine-Daten
+      // (kurze Vornamen aus terminvorschlaege) zuverlaessig matchen.
+      var stylistFullMap = (function() {
+        var m = {};
+        try {
+          (typeof getStylistList === 'function' ? getStylistList() : []).forEach(function(s) {
+            var full = (s.name || '').trim();
+            if (!full) return;
+            var first = full.split(' ')[0].toLowerCase();
+            m[first] = full;
+            m[full.toLowerCase()] = full;
+          });
+        } catch(e) {}
+        return m;
+      })();
+      function normalizeStylist(raw) {
+        if (!raw) return 'Rena Rados';
+        var s = String(raw).trim();
+        var key = s.toLowerCase();
+        if (stylistFullMap[key]) return stylistFullMap[key];
+        var firstKey = key.split(' ')[0];
+        if (stylistFullMap[firstKey]) return stylistFullMap[firstKey];
+        return s; // unbekannt (z.B. "Julia Fischer"): Original beibehalten, chip-Filter zeigt ihn via "Alle"
+      }
       return rows.map(function(r) {
         return Object.assign({}, r, {
           Start_ISO: r.beginn || r.start_iso || r.Start_ISO,
           Ende_ISO: r.ende || r.ende_iso || r.Ende_ISO,
           Service: r.dienstleistung || r.Service || r.service || '',
           Kundenname: r.kundenname || r.Kundenname || '',
-          Stylist: r.mitarbeiter || r.Stylist || 'Rena',
+          Stylist: normalizeStylist(r.mitarbeiter || r.Stylist),
           Stylist_Wunsch: r.stylist_wunsch || r.Stylist_Wunsch || '',
           Status: r.status || r.Status || 'bestaetigt',
           Preis: r.preis || r.gesamtpreis_netto || r.Preis || 0,
