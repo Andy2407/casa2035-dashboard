@@ -3127,55 +3127,59 @@
 
     // === Kontext-Hints pro Seite (FB-48) ===
     // Kurze, konkrete Tipps - rotieren pro Aufruf, dismissbar, persistent pro Tab
+    // FB 17.04.2026 Ticket cb7071d0: Kontext-Hinweise tiefer, konkret, mit echten Aktionen.
+    // Statt generischer Tipps: „Was hilft mir JETZT auf dieser Seite" — Workday-/Linear-inspiriert.
     var PAGE_HINTS = {
       dashboard: [
-        '<b>Widgets sortieren:</b> &#9776;-Griff greifen, Kachel per Drag neu anordnen &mdash; Reihenfolge wird gespeichert.',
-        '<b>Jarvis KI-Assistent:</b> Mikrofon-Symbol oben rechts &rarr; Frag Jarvis direkt: &ldquo;Was steht heute an?&rdquo; oder &ldquo;Zeig Umsatz&rdquo;.',
-        '<b>Pull-to-refresh:</b> Cockpit von oben nach unten ziehen &rarr; Live-Daten frisch aus Datenbank laden.',
-        '<b>Anpassen-Modus:</b> &#9881; oben rechts &rarr; Widgets ein-/ausblenden, &times; blendet einzelne Kacheln aus.',
-        '<b>Live-Daten:</b> Kacheln aktualisieren sich automatisch &mdash; Termine, Umsatz, Lagerwarnungen in Echtzeit.'
+        '<b>Cmd/Ctrl + K</b> oeffnet die globale Suche &mdash; findet Kunde, Termin, Produkt sofort.',
+        '<b>Jarvis:</b> Mikro oben rechts oder tippen &rarr; &ldquo;Wie viele Termine heute?&rdquo; &middot; &ldquo;Umsatz diese Woche?&rdquo;',
+        '<b>Kachel per Drag verschieben:</b> &#9881; oben rechts aktiviert den Anpassen-Modus, dann &#9776;-Griff ziehen.',
+        '<b>Live-Werte:</b> Alle Zahlen kommen direkt aus der Datenbank &mdash; keine Schaetzungen, keine Verzoegerung.',
+        '<b>Pull-to-refresh:</b> Seite kurz nach unten ziehen laedt alles neu (auch auf iPad).'
       ],
       home: [
-        '<b>Widgets sortieren:</b> &#9776;-Griff greifen, Kachel per Drag neu anordnen &mdash; Reihenfolge wird gespeichert.',
-        '<b>Jarvis KI-Assistent:</b> Mikrofon-Symbol oben rechts &rarr; Frag Jarvis direkt: &ldquo;Was steht heute an?&rdquo; oder &ldquo;Zeig Umsatz&rdquo;.',
-        '<b>Pull-to-refresh:</b> Cockpit von oben nach unten ziehen &rarr; Live-Daten frisch aus Datenbank laden.',
-        '<b>Anpassen-Modus:</b> &#9881; oben rechts &rarr; Widgets ein-/ausblenden, &times; blendet einzelne Kacheln aus.',
-        '<b>Live-Daten:</b> Kacheln aktualisieren sich automatisch &mdash; Termine, Umsatz, Lagerwarnungen in Echtzeit.'
+        '<b>Cmd/Ctrl + K</b> oeffnet die globale Suche &mdash; findet Kunde, Termin, Produkt sofort.',
+        '<b>Begruessung</b> zeigt deine wichtigsten Zahlen fuer heute &mdash; Termine, Anfragen, Lager-Alarm in einem Satz.',
+        '<b>Tipp vom Tag:</b> Wenn etwas rot ist (z.B. Lager-Alarm), ein Tipp auf die Kachel bringt dich direkt hin.',
+        '<b>Jarvis:</b> Nach dem Login einmal probieren &mdash; je mehr du fragst, desto besser passt er sich an deinen Salon an.'
       ],
       termine: [
-        '<b>Links-/Rechts-Swipe</b> wechselt den Tag.',
-        '<b>Lang-Druck</b> auf Termin oeffnet Schnellaktionen.',
-        '<b>Tippe auf die Kalenderwoche</b> unten, um zu "Heute" zu springen.',
-        '<b>Filter nach Stylistin:</b> Oben rechts, zeigt nur dessen Termine.',
-        '<b>Leerer Slot antippen:</b> Neuen Termin direkt anlegen.'
+        '<b>Heute-Knopf</b> oben springt auf den aktuellen Tag. Datumsfeld akzeptiert Direkt-Eingabe.',
+        '<b>Hochformat = 5 Tage</b>, <b>Querformat = 7 Tage</b> &mdash; das Handy drehen reicht.',
+        '<b>Farben der Mitarbeiterinnen</b> bleiben ueberall gleich. Rena = Gold, Sarah = Rose, Julia = Blau, Lena = Violett.',
+        '<b>Rote Linie</b> im Kalender = gerade jetzt. Laeuft automatisch mit.',
+        '<b>Tipp auf Termin</b> oeffnet Details &mdash; Bestaetigen, Verschieben, Stornieren direkt auf der Karte.',
+        '<b>Kundenwunsch &#11088;</b> markiert, wenn Kundin eine bestimmte Stylistin wollte &mdash; nicht uebersehen.'
       ],
       beratung: [
-        '<b>Kanal-Filter:</b> WhatsApp, Instagram, Mail getrennt anzeigbar.',
-        '<b>Sprachnotiz:</b> Mikro im Reply-Feld nimmt Antwort auf.',
-        '<b>Anfrage antippen</b> zeigt die komplette Konversation.',
-        '<b>Karriere-Anfragen</b> landen hier mit Tag "Bewerbung".',
-        '<b>Antwortvorschlaege:</b> KI schlaegt passende Texte vor.'
+        '<b>Wunschfrisur:</b> 1 Foto aktuell + 1 Foto Wunsch &rarr; KI zeigt, wie es aussehen koennte.',
+        '<b>Farbcode:</b> Foto + Ist-Stufe + Ziel-Stufe &rarr; du bekommst Mischformel, Einwirkzeit, Vorher/Nachher-Bild.',
+        '<b>Haaranalyse Profi:</b> 3 Fotos (vorne, seitlich, Ansatz) &rarr; 3-Stufen-Prognose mit Produkt-Tipps aus deinem Lager.',
+        '<b>Schnellcheck:</b> Im Sessel in 10 Sekunden, reicht fuer 80 % der Beratungen.',
+        '<b>Kundin sehen, was die KI sieht:</b> Vor-/Nachher-Bild zusammen mit ihr anschauen &mdash; Verkaufs-Booster.',
+        '<b>Hinweis an Kundin:</b> KI-Analyse ist ein Vorschlag &mdash; deine Erfahrung entscheidet am Ende.'
       ],
       kunden: [
-        '<b>Suche:</b> Name, Telefon oder Mail - sofortige Treffer.',
-        '<b>Kunde antippen</b> zeigt Historie, Fotos und Vorlieben.',
-        '<b>Filter "Follow-Up":</b> Zeigt Kunden, die Kontakt brauchen.',
-        '<b>VIP-Tag</b> kennzeichnet Stammkundinnen.',
-        '<b>Langer Druck</b> auf Kunde oeffnet Schnellaktionen (Anruf, WhatsApp).'
+        '<b>Suche:</b> Name, Telefon oder Mail &mdash; drei Buchstaben reichen.',
+        '<b>Filter VIP</b> zeigt deine Stammkundinnen (&gt; 10 Besuche). Lade sie zur Weihnachtsaktion ein.',
+        '<b>Filter Inaktiv</b> zeigt Kundinnen, die seit 3+ Monaten nicht mehr da waren &mdash; gezieltes Re-Engagement.',
+        '<b>Kunde &rarr; Stamm &rarr; Haaranalyse:</b> Zeigt ihre komplette Haar-Geschichte auf einen Blick.',
+        '<b>Anruf dokumentieren:</b> Telefon-Knopf auf der Karte speichert Gespraech + setzt Follow-Up automatisch.'
       ],
       lager: [
-        '<b>Rote Karten</b> = unter Mindestbestand. Sofort nachbestellen.',
-        '<b>"Nachbestellen"-Filter</b> oben zeigt nur kritische Produkte.',
-        '<b>Nachbestell-Button</b> legt Bestellung direkt an.',
-        '<b>Sammelbestellung:</b> Freitags prüfen, Montags bestellen.',
-        '<b>LA Biosthetique:</b> Lieferzeit 3-5 Werktage einplanen.'
+        '<b>Rote Karte</b> = unter Mindestbestand, sofort nachbestellen.',
+        '<b>Bestand direkt aendern:</b> Einfach auf die Stueck-Zahl tippen &rarr; neuer Wert &rarr; fertig (17.04. neu).',
+        '<b>Reichweite in Tagen</b> unten rechts zeigt, wie lang der Bestand noch reicht.',
+        '<b>Sammelbestellung Freitag</b> &rarr; Lieferung Montag &mdash; spart Versandkosten bei La Biosthetique.',
+        '<b>Filter "Nachbestellen"</b> zeigt nur die Produkte, die du jetzt bestellen musst.'
       ],
       kasse: [
-        '<b>Rechnung erstellen:</b> + unten oder FAB am Startschirm.',
-        '<b>Tagesabschluss</b> unten - für End-of-Day und Kassensturz.',
-        '<b>DATEV-Export:</b> Ganz unten, CSV für Steuerberater.',
-        '<b>Zahlart:</b> Bar / Karte / Online getrennt gebucht.',
-        '<b>GoBD-konform:</b> Rechnungen können nicht geaendert werden.'
+        '<b>+ FAB</b> unten rechts erstellt blitzschnell eine Rechnung &mdash; Services sind vorbefuellt.',
+        '<b>MwSt 19 %</b> wird automatisch gerechnet. Du gibst netto ein oder brutto, Casa macht den Rest.',
+        '<b>Tagesabschluss</b> unten: prueft Bar + Karte + Gutschein, erzeugt GoBD-konforme PDF.',
+        '<b>Filter Datum + Stylistin + Zahlart</b> kombinierbar &mdash; fuer Provisions-Abrechnung ein Gold wert.',
+        '<b>Ausgabe erfassen:</b> Rechts oben &rarr; Kategorie + Netto + MwSt &rarr; direkt in der Buchhaltung.',
+        '<b>DATEV-Export:</b> kommt Q3 2026 &mdash; bis dahin CSV-Download fuer deinen Steuerberater.'
       ],
       einstellungen: [
         '<b>Salon-Regeln:</b> KI beachtet diese bei Terminvorschlaegen.',
