@@ -4907,7 +4907,7 @@
 
         card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">'
           + '<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:6px;background:' + katColor + '20;color:' + katColor + '">' + esc(p.Kategorie || 'Sonstiges') + '</span>'
-          + '<span style="font-size:11px;font-weight:700;color:' + barColor + '">' + bestand + ' Stk.</span></div>'
+          + '<span class="lager-bestand-edit" data-id="' + esc(p.id || '') + '" data-prod="' + esc(p.Produkt || p.Name || '') + '" data-current="' + bestand + '" style="font-size:11px;font-weight:700;color:' + barColor + ';cursor:pointer;padding:1px 6px;border-radius:4px;border:1px dashed ' + barColor + '33" title="Klick: Bestand direkt aendern">' + bestand + ' Stk.</span></div>'
           + '<div class="produkt-name">' + esc(p.Produkt || p.Name || '') + demoDot() + '</div>'
           + '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(p.Marke || '') + (p.VK_Preis ? ' — ' + fmtEur(p.VK_Preis) + ' EUR' : '') + '</div>'
           + '<div style="margin-top:7px;height:5px;background:var(--bg-warm);border-radius:3px;overflow:hidden;position:relative">'
@@ -4935,6 +4935,43 @@
         }
         (function(produkt) { card.onclick = function() { openProduktDetail(produkt); }; })(p);
         list.appendChild(card);
+      });
+      // Inline-Edit Bestand (Capo-Ticket "Lager voll mit Fehlern" 17.04.2026)
+      // Workday-/Linear-Vorbild: Klick auf Bestand = direkt editierbar, kein Modal
+      list.querySelectorAll('.lager-bestand-edit').forEach(function(el) {
+        el.addEventListener('click', function(ev) {
+          ev.stopPropagation();
+          var id = el.getAttribute('data-id');
+          var prod = el.getAttribute('data-prod');
+          var current = parseInt(el.getAttribute('data-current')) || 0;
+          var neu = prompt('Neuer Bestand fuer "' + prod + '":', current);
+          if (neu === null) return;
+          neu = parseInt(neu);
+          if (isNaN(neu) || neu < 0) { showToast('Ungueltiger Wert', 'error'); return; }
+          if (!id) { showToast('Produkt nicht in DB — Demo-Modus', 'warning'); return; }
+          // Supabase PATCH
+          var cfg = JSON.parse(localStorage.getItem('casa2035_config') || '{}');
+          var baseUrl = cfg.baseUrl || 'https://api.casa2035.de';
+          var userJwt = sessionStorage.getItem('casa_token') || '';
+          fetch(baseUrl + '/rest/v1/lager?id=eq.' + id, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': (typeof API_DEFAULTS !== 'undefined' ? API_DEFAULTS.anonKey : ''),
+              'Authorization': 'Bearer ' + userJwt,
+              'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({ bestand: neu })
+          }).then(function(r) {
+            if (r.ok) {
+              showToast('Bestand aktualisiert: ' + neu, 'success');
+              // Cache aktualisieren
+              var p = (lagerCache||[]).find(function(x){ return x.id===id; });
+              if (p) p.Bestand = neu;
+              renderLagerTab(lagerCache);
+            } else showToast('Update fehlgeschlagen (' + r.status + ')', 'error');
+          }).catch(function() { showToast('Netzwerkfehler', 'error'); });
+        });
       });
     }
 
