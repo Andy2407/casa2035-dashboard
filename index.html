@@ -736,9 +736,27 @@
     /* === Responsive === */
     /* FB-47: Landscape-iPhone (844x390 etc.) nutzt volle Breite, NICHT Desktop-Zentrierung.
        Desktop-Zentrierung (max-width:600px) nur wenn KEIN Landscape-Phone (d.h. height > 500px oder orientation portrait). */
-    @media (min-width: 768px) and (min-height: 501px), (min-width: 768px) and (orientation: portrait) {
+    @media (min-width: 768px) and (max-width: 1199px) and (min-height: 501px), (min-width: 768px) and (max-width: 1199px) and (orientation: portrait) {
+      /* Tablet / iPad: 600px zentriert */
       main { max-width: 600px; margin: 0 auto; }
       .bottom-nav { max-width: 600px; left: 50%; transform: translateX(-50%); border-radius: var(--radius) var(--radius) 0 0; }
+    }
+    /* DESKTOP / iMac / Laptop (>=1200px): breites Layout, mehr Spalten, nutzt den Bildschirm aus */
+    @media (min-width: 1200px) {
+      main { max-width: 1200px; margin: 0 auto; padding: 20px 24px 120px; }
+      .bottom-nav { max-width: 720px; left: 50%; transform: translateX(-50%); border-radius: var(--radius) var(--radius) 0 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.2); }
+      .header { padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+      .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+      .kasse-summary { grid-template-columns: repeat(4, 1fr); }
+      /* Termine-Toolbar zentrieren */
+      .termine-toolbar, .lager-toolbar, .kasse-toolbar { margin-left: -24px; margin-right: -24px; padding-left: 24px; padding-right: 24px; }
+      /* Fullscreen-Modal etwas luftiger */
+      .modal-content { max-width: 640px; }
+    }
+    /* ULTRAWIDE / grosse iMac (>=1600px): zweispaltige Seiten-Aufteilung moeglich */
+    @media (min-width: 1600px) {
+      main { max-width: 1400px; }
+      .stats-grid { grid-template-columns: repeat(4, 1fr); }
     }
     @media (max-width: 360px) {
       .stats-grid { grid-template-columns: 1fr; }
