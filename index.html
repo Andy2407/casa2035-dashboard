@@ -650,6 +650,34 @@
     .lager-stat-box .value { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; }
     .lager-stat-box .label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; margin-top: 2px; }
 
+    /* FB-73: Lager-Grid responsive — 2 iPhone / 3 iPad / 4 Desktop */
+    .lager-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    @media (min-width: 600px) {
+      .lager-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .lager-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .lager-kachel {
+      min-height: 0;
+      box-sizing: border-box;
+    }
+    .lager-kachel .produkt-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+      max-height: 2.6em;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
     /* === Filter Bars === */
     .filter-bar { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .filter-bar::-webkit-scrollbar { display: none; }
@@ -1350,8 +1378,13 @@
     .ki-suggestion-card:hover { border-color: var(--border-accent); box-shadow: var(--shadow-soft); }
     .ki-suggestion-card .ki-icon {
       width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center;
-      justify-content: center; font-size: 16px; background: var(--gold-glow); flex-shrink: 0;
+      justify-content: center; background: var(--gold-glow); flex-shrink: 0;
+      color: var(--gold);
     }
+    .ki-suggestion-card .ki-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+    .ki-suggestion-card[data-prio="danger"] .ki-icon { background: var(--danger-bg); color: var(--danger); }
+    .ki-suggestion-card[data-prio="warning"] .ki-icon { background: var(--warning-bg); color: var(--warning); }
+    .ki-suggestion-card[data-prio="success"] .ki-icon { background: var(--success-bg); color: var(--success); }
     .ki-suggestion-card .ki-body { flex: 1; min-width: 0; }
     .ki-suggestion-card .ki-title { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
     .ki-suggestion-card .ki-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.4; }
@@ -1915,7 +1948,7 @@
       </div>
       <div class="section-title">KI-Hinweise</div>
       <div id="kiLagerHints" class="ki-suggestions stagger"></div>
-      <div class="event-list" id="lagerList"></div>
+      <div class="lager-grid" id="lagerList"></div>
       <!-- Bestellungen Section (merged from old separate page) -->
       <div class="section-title" id="bestellungenTitle" style="display:none">BESTELLUNGEN</div>
       <div id="bestellungenList" style="display:none"></div>
@@ -4031,7 +4064,18 @@
           + '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">'
           + '<div class="termin-stylist"><span class="dot" style="background:' + stylistColor + '"></span>' + esc(t.Stylist || '') + '</div>'
           + '<span class="termin-status ' + statusClass + '">' + esc(statusLabel) + '</span></div></div>'
-          + '<div class="termin-preis">' + fmtEur(t.Preis) + ' &euro;' + demoDot() + '</div>';
+          + '<div style="position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
+          + '<div class="termin-preis">' + fmtEur(t.Preis) + ' &euro;' + demoDot() + '</div>'
+          + (function(){
+              // FB-78: Stylist-Schnell-Dropdown in Kachel
+              if (currentRolle !== 'FRM' && currentRolle !== 'CHF') return '';
+              var opts = '';
+              var sNames = [];
+              getStylistList(['CHF','FRM','STY']).forEach(function(uu) { if (sNames.indexOf(uu.name)===-1) sNames.push(uu.name); });
+              sNames.forEach(function(n) { opts += '<option value="' + esc(n) + '"' + (n === t.Stylist ? ' selected' : '') + '>' + esc(n) + '</option>'; });
+              return '<select onclick="event.stopPropagation()" onchange="(function(sel,tid,startIso){terminZuweisen(tid,sel.value);var foundT=(termineCache||[]).find(function(x){return x.id===tid&&x.Start_ISO===startIso;});if(foundT)foundT.Stylist=sel.value;})(this,'' + esc(t.id||'') + '','' + esc(t.Start_ISO||'') + '')" style="font-size:10px;padding:2px 4px;border:1px solid var(--border-accent);border-radius:6px;background:var(--surface);color:var(--text);max-width:90px;cursor:pointer">' + opts + '</select>';
+            })()
+          + '</div>';
         container.appendChild(card);
       });
     }
@@ -4719,23 +4763,22 @@
         var reichweiteTage = bestand > 0 ? Math.round((bestand / verbrauchProWoche) * 7) : 0;
 
         var card = document.createElement('div');
-        card.style.cssText = 'background:var(--surface);border:1px solid ' + (isCritical ? 'var(--danger)' : isLow ? 'rgba(196,138,26,0.4)' : 'var(--border)') + ';border-radius:var(--radius);padding:14px;cursor:pointer;transition:all .2s var(--ease)';
+        card.className = 'lager-kachel';
+        card.style.cssText = 'background:var(--surface);border:1px solid ' + (isCritical ? 'var(--danger)' : isLow ? 'rgba(196,138,26,0.4)' : 'var(--border)') + ';border-radius:var(--radius);padding:10px;cursor:pointer;transition:all .2s var(--ease)';
         if (isCritical) card.style.borderLeft = '3px solid var(--danger)';
         else if (isLow) card.style.borderLeft = '3px solid var(--warning)';
 
-        card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
-          + '<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 8px;border-radius:6px;background:' + katColor + '20;color:' + katColor + '">' + esc(p.Kategorie || 'Sonstiges') + '</span>'
-          + '<span style="font-size:12px;font-weight:700;color:' + barColor + '">' + bestand + ' Stk.</span></div>'
-          + '<div style="font-size:14px;font-weight:600;color:var(--text);line-height:1.3">' + esc(p.Produkt || p.Name || '') + demoDot() + '</div>'
-          + '<div style="font-size:11px;color:var(--text-dim);margin-top:2px">' + esc(p.Marke || '') + (p.VK_Preis ? ' — ' + fmtEur(p.VK_Preis) + ' EUR' : '') + '</div>'
-          + '<div style="margin-top:8px;height:6px;background:var(--bg-warm);border-radius:3px;overflow:hidden;position:relative">'
+        card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">'
+          + '<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:6px;background:' + katColor + '20;color:' + katColor + '">' + esc(p.Kategorie || 'Sonstiges') + '</span>'
+          + '<span style="font-size:11px;font-weight:700;color:' + barColor + '">' + bestand + ' Stk.</span></div>'
+          + '<div class="produkt-name">' + esc(p.Produkt || p.Name || '') + demoDot() + '</div>'
+          + '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(p.Marke || '') + (p.VK_Preis ? ' — ' + fmtEur(p.VK_Preis) + ' EUR' : '') + '</div>'
+          + '<div style="margin-top:7px;height:5px;background:var(--bg-warm);border-radius:3px;overflow:hidden;position:relative">'
           + '<div style="height:100%;border-radius:3px;transition:width .5s ease;width:' + pct + '%;background:' + barColor + '"></div>'
           + '<div style="position:absolute;top:0;bottom:0;width:1px;background:var(--text-dim);opacity:0.4;left:' + Math.round((min / maxDisplay) * 100) + '%"></div></div>'
           + '<div style="font-size:9px;color:var(--text-micro);margin-top:2px;display:flex;justify-content:space-between">'
-          + '<span>Min: ' + min + '</span><span style="font-weight:600;color:' + barColor + '">' + (isCritical ? 'KRITISCH' : isLow ? 'Nachbestellen' : 'OK') + '</span></div>'
-          + '<div style="font-size:10px;color:var(--text-dim);margin-top:4px;display:flex;justify-content:space-between">'
-          + '<span>~' + verbrauchProWoche + '/Woche</span>'
-          + '<span style="font-weight:600;color:' + (reichweiteTage <= 7 ? 'var(--danger)' : reichweiteTage <= 14 ? 'var(--warning)' : 'var(--text-dim)') + '">' + (reichweiteTage > 0 ? 'Reicht noch ' + reichweiteTage + ' Tage' : 'Leer!') + '</span></div>';
+          + '<span>Min: ' + min + '</span><span style="font-weight:600;color:' + barColor + '">' + (isCritical ? 'KRITISCH' : isLow ? 'Bestellen' : 'OK') + '</span></div>'
+          + '<div style="font-size:9px;color:var(--text-dim);margin-top:3px;text-align:right;font-weight:600;color:' + (reichweiteTage <= 7 ? 'var(--danger)' : reichweiteTage <= 14 ? 'var(--warning)' : 'var(--text-dim)') + '">' + (reichweiteTage > 0 ? reichweiteTage + 'd' : 'Leer!') + '</div>';
 
         if (perms.lagerBestellen) {
           var btn = document.createElement('button');
@@ -5998,6 +6041,17 @@
         }
       }
 
+      // FB-77: Termindauer manuell anpassen
+      if (statusLabel !== 'storniert' && statusLabel !== 'abgeschlossen') {
+        html += '<div style="margin-top:12px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm)">';
+        html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:6px">Dauer anpassen</div>';
+        html += '<div style="display:flex;gap:8px;align-items:center">';
+        html += '<input type="number" id="terminDauerInput" min="5" max="480" step="5" value="' + (t.Dauer_Min || 30) + '" data-termin-id="' + esc(t.id || '') + '" data-start-iso="' + esc(t.Start_ISO || '') + '" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:14px;font-weight:600;font-family:Inter,sans-serif;text-align:center">';
+        html += '<span style="font-size:12px;color:var(--text-secondary);white-space:nowrap">Minuten</span>';
+        html += '<button class="btn btn-secondary btn-sm" onclick="terminDauerSpeichern()" style="white-space:nowrap">Speichern</button>';
+        html += '</div></div>';
+      }
+
       // Action Buttons
       html += '<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">';
       if (statusLabel === 'offen') {
@@ -6068,6 +6122,26 @@
       area.addEventListener('keydown', function(ev) {
         if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); try { input.click(); } catch(e) {} }
       });
+    }
+
+    // FB-77: Termindauer manuell speichern
+    async function terminDauerSpeichern() {
+      var inp = document.getElementById('terminDauerInput');
+      if (!inp) return;
+      var neueDauer = parseInt(inp.value) || 0;
+      if (neueDauer < 5 || neueDauer > 480) { showToast('Bitte eine Dauer zwischen 5 und 480 Minuten eingeben', 'warning'); return; }
+      var terminId = inp.getAttribute('data-termin-id');
+      var startISO = inp.getAttribute('data-start-iso');
+      var found = termineCache.find(function(t) { return (terminId && t.id === terminId) || t.Start_ISO === startISO; });
+      if (!found) { showToast('Termin nicht gefunden', 'warning'); return; }
+      found.Dauer_Min = neueDauer;
+      if (isBackendMode() && terminId) {
+        try {
+          await apiPatch('termine', 'id=eq.' + encodeURIComponent(terminId), { dauer_min: neueDauer });
+        } catch(e) { /* Demo-Modus: kein Server-Update */ }
+      }
+      renderTermine(termineCache);
+      showToast('Dauer gespeichert: ' + neueDauer + ' Minuten', 'success');
     }
 
     function terminBestaetigen(startISO, kundenname) {
@@ -8349,11 +8423,25 @@
 
     // Local fallback when backend unreachable
     function jarvisLocalFallback(text) {
+      // FB-75: Intent-Erkennung fuer Aufgaben-Ausfuehrung (MVP Offline-Fallback)
       var t = text.toLowerCase();
+      // Nachbestellung
+      if (/nachbestell|nachorder|produkt.*bestell|bestell.*produkt/i.test(t)) {
+        return { text: 'Ich oeffne die Nachbestellung fuer dich.', actions: [{ type: 'execute', fn: 'nachbestellung_anlegen', label: 'Nachbestellung oeffnen', payload: {} }] };
+      }
+      // Rechnung erstellen
+      if (/rechnung.*erstell|erstell.*rechnung|rechnung.*schreib|schreib.*rechnung/i.test(t)) {
+        return { text: 'Ich oeffne die Rechnungsmaske.', actions: [{ type: 'execute', fn: 'rechnung_erstellen', label: 'Rechnung oeffnen', payload: {} }] };
+      }
+      // Tagesabschluss
+      if (/tagesabschluss|tages.abschluss|abschluss.*heute|kasse.*abschluss/i.test(t)) {
+        return { text: 'Ich oeffne den Tagesabschluss.', actions: [{ type: 'execute', fn: 'tagesabschluss', label: 'Tagesabschluss oeffnen', payload: {} }] };
+      }
+      // Navigation
       if (/termin/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Termine direkt.', actions: [{ type: 'goto_page', label: 'Termine', payload: { page: 'termine' } }] }; }
       if (/kasse|umsatz/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Kasse direkt.', actions: [{ type: 'goto_page', label: 'Kasse', payload: { page: 'kasse' } }] }; }
       if (/lager/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Lager direkt.', actions: [{ type: 'goto_page', label: 'Lager', payload: { page: 'lager' } }] }; }
-      return { text: 'Keine Verbindung zum KI-Backend. Bitte Internetverbindung pruefen.', actions: [] };
+      return { text: 'Keine Verbindung. Bitte Internetverbindung pruefen.', actions: [] };
     }
 
     function jarvisRenderMessage(text, actions, rolle) {
@@ -8419,20 +8507,84 @@
           showPage('kasse');
           setTimeout(function() { if (typeof openTagesabschluss === 'function') openTagesabschluss(); }, 300);
           break;
+        case 'execute':
+          // FB-75: Aufgaben direkt ausfuehren
+          jarvisDoExecute(action);
+          return; // eigene Toast/Message in jarvisDoExecute
         default:
           break;
       }
       jarvisRenderMessage('Erledigt.', [], 'assistant');
     }
 
+    // FB-75: Aufgaben-Ausfuehrung (MVP: 3 Intents)
+    function jarvisDoExecute(action) {
+      var p = action.payload || {};
+      switch (action.fn) {
+        case 'verschiebe_termin':
+          if (p.termin_id && p.neues_datum) {
+            var found = (termineCache || []).find(function(t) { return t.id === p.termin_id || (t.Kundenname && t.Kundenname === p.kunde); });
+            if (found && p.neues_datum) {
+              found.Start_ISO = p.neues_datum;
+              renderTermine(termineCache);
+              jarvisRenderMessage('Termin von ' + (p.kunde || found.Kundenname || 'Kunde') + ' wurde verschoben.', [], 'assistant');
+              jarvisSpeak('Termin wurde verschoben.');
+            } else {
+              jarvisRenderMessage('Termin nicht gefunden. Bitte Terminseite pruefen.', [{ type: 'goto_page', label: 'Termine', payload: { page: 'termine' } }], 'assistant');
+            }
+          }
+          break;
+        case 'nachbestellung_anlegen':
+          closeJarvis();
+          showPage('lager');
+          setTimeout(function() {
+            if (typeof openNachbestellungSheet === 'function') openNachbestellungSheet();
+          }, 300);
+          jarvisRenderMessage('Nachbestellung wird geoeffnet.', [], 'assistant');
+          jarvisSpeak('Nachbestellung wird geoeffnet.');
+          break;
+        case 'rechnung_erstellen':
+          closeJarvis();
+          showPage('kasse');
+          setTimeout(function() {
+            if (typeof openRechnungSheet === 'function') openRechnungSheet();
+          }, 300);
+          jarvisRenderMessage('Rechnung wird geoeffnet.', [], 'assistant');
+          jarvisSpeak('Rechnung wird geoeffnet.');
+          break;
+        case 'tagesabschluss':
+          closeJarvis();
+          showPage('kasse');
+          setTimeout(function() {
+            if (typeof openTagesabschluss === 'function') openTagesabschluss();
+          }, 300);
+          jarvisRenderMessage('Tagesabschluss wird geoeffnet.', [], 'assistant');
+          jarvisSpeak('Tagesabschluss wird geoeffnet.');
+          break;
+        default:
+          jarvisRenderMessage('Diese Aufgabe kann ich noch nicht direkt ausfuehren.', [], 'assistant');
+      }
+    }
+
     function jarvisSpeak(text) {
+      // FB-76: Sanftere deutsche Stimme (Anna/Helena/Google Deutsch bevorzugt)
       if (!('speechSynthesis' in window) || !text) return;
       window.speechSynthesis.cancel();
       var utter = new SpeechSynthesisUtterance(text);
       utter.lang = 'de-DE';
       utter.rate = 0.95;
-      utter.pitch = 0.92;
-      window.speechSynthesis.speak(utter);
+      utter.pitch = 1.05;
+      function doSpeak() {
+        var voices = window.speechSynthesis.getVoices();
+        var preferred = voices.find(function(v) { return v.lang.startsWith('de') && /anna|helena|google/i.test(v.name); })
+          || voices.find(function(v) { return v.lang.startsWith('de') && /markus|thomas|yannick/i.test(v.name); })
+          || voices.find(function(v) { return v.lang.startsWith('de'); });
+        if (preferred) utter.voice = preferred;
+        window.speechSynthesis.speak(utter);
+      }
+      // Voices laden ggf. asynchron (Safari/iOS)
+      if (window.speechSynthesis.getVoices().length) { doSpeak(); }
+      else { window.speechSynthesis.onvoiceschanged = function() { doSpeak(); window.speechSynthesis.onvoiceschanged = null; }; }
     }
 
     // Keyboard: J to toggle Jarvis
