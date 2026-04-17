@@ -4073,7 +4073,9 @@
               var sNames = [];
               getStylistList(['CHF','FRM','STY']).forEach(function(uu) { if (sNames.indexOf(uu.name)===-1) sNames.push(uu.name); });
               sNames.forEach(function(n) { opts += '<option value="' + esc(n) + '"' + (n === t.Stylist ? ' selected' : '') + '>' + esc(n) + '</option>'; });
-              return '<select onclick="event.stopPropagation()" onchange="(function(sel,tid,startIso){terminZuweisen(tid,sel.value);var foundT=(termineCache||[]).find(function(x){return x.id===tid&&x.Start_ISO===startIso;});if(foundT)foundT.Stylist=sel.value;})(this,'' + esc(t.id||'') + '','' + esc(t.Start_ISO||'') + '')" style="font-size:10px;padding:2px 4px;border:1px solid var(--border-accent);border-radius:6px;background:var(--surface);color:var(--text);max-width:90px;cursor:pointer">' + opts + '</select>';
+              var escapedId = esc(t.id||'').replace(/'/g, "\\'");
+              var escapedIso = esc(t.Start_ISO||'').replace(/'/g, "\\'");
+              return '<select onclick="event.stopPropagation()" onchange="(function(sel,tid,startIso){terminZuweisen(tid,sel.value);var foundT=(termineCache||[]).find(function(x){return x.id===tid&&x.Start_ISO===startIso;});if(foundT)foundT.Stylist=sel.value;})(this,\'' + escapedId + '\',\'' + escapedIso + '\')" style="font-size:10px;padding:2px 4px;border:1px solid var(--border-accent);border-radius:6px;background:var(--surface);color:var(--text);max-width:90px;cursor:pointer">' + opts + '</select>';
             })()
           + '</div>';
         container.appendChild(card);
@@ -5190,7 +5192,7 @@
       var titel = { wunschfrisur: 'Wunschlook analysiert', haaranalyse: 'Haaranalyse durchgefuehrt', farbcode: 'Farbcode berechnet' }[typ] || typ;
       var beschreibung = (inputDaten && inputDaten.notiz) || (inputDaten && inputDaten.haartyp) || '';
       var eintrag = {
-        salon_id: '26230de8-a46e-4610-937c-c302547b5a73',
+        salon_id: currentSalonId(),
         typ: typ, titel: titel, beschreibung: beschreibung,
         input_daten: inputDaten || {}, output_daten: outputDaten || {},
         bilder_urls: [], erstellt_am: new Date().toISOString()
@@ -6595,7 +6597,7 @@
       var payload = {
         typ: 'farbcode',
         kanal: 'dashboard',
-        salon_id: '26230de8-a46e-4610-937c-c302547b5a73',
+        salon_id: currentSalonId(),
         ist_stufe: selectedIstFarbe.stufe,
         ist_name: selectedIstFarbe.name,
         ziel_stufe: selectedZielFarbe.stufe,
@@ -7074,7 +7076,7 @@
       var payload = {
         typ: 'haaranalyse_profi',
         kanal: 'dashboard',
-        salon_id: '26230de8-a46e-4610-937c-c302547b5a73',
+        salon_id: currentSalonId(),
         name: kundeName,
         email: kundeEmail,
         fotos: haaranalysePhotos.slice(0, 5),
@@ -7451,7 +7453,7 @@
       var payload = {
         typ: 'wunschfrisur',
         kanal: 'dashboard',
-        salon_id: '26230de8-a46e-4610-937c-c302547b5a73',
+        salon_id: currentSalonId(),
         name: wfName,
         haartyp: wfHaartyp,
         notiz: wfNotiz,
