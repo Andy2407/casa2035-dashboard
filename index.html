@@ -2197,6 +2197,9 @@
         </div>
       </div>
 
+      <!-- Jarvis-Briefing: Der Ironman-Moment, Jarvis spricht zuerst (18.04.2026) -->
+      <div id="jarvisBriefing" style="display:none;margin-bottom:16px"></div>
+
       <!-- KI-Vorschlaege Kachel -->
       <div class="section-title">KI-Vorschlaege</div>
       <div class="ki-suggestions stagger" id="kiSuggestions"></div>
@@ -11052,6 +11055,117 @@
     // FB 17.04. Ticket 4db3e7c0: Feedback-Widget soll nicht jedes Mal nach Mic-Erlaubnis fragen -> localStorage
     var fbMicGranted = localStorage.getItem('casa_mic_granted') === '1';
     // Voice Interpunktions-Heuristik (FB-14/29): "punkt"/"komma"/"fragezeichen" -> Zeichen
+    // === JARVIS-BRIEFING: Jarvis weiß vor dem Chef was ansteht (18.04. Capo-Wunsch) ===
+    function renderJarvisBriefing() {
+      var panel = document.getElementById('jarvisBriefing');
+      if (!panel) return;
+      var rolle = (sessionStorage.getItem('casa_rolle') || '').toUpperCase();
+      var userKey = sessionStorage.getItem('casa_user') || '';
+      var vorname = (window.USERS && USERS[userKey] && USERS[userKey].name) || 'Chef';
+      var nowD = new Date(), h = nowD.getHours();
+      var todayStr = nowD.toISOString().split('T')[0];
+      var findings = [];
+
+      // Alle Muster abklopfen — je wichtiger zuerst
+      try {
+        // 1. Unbestaetigte Termine heute
+        var unconfirmed = (window.termineCache || []).filter(function(t){
+          return (t.Start_ISO||'').indexOf(todayStr)===0 && (t.Status==='vorgeschlagen' || t.Status==='offen');
+        });
+        if (unconfirmed.length >= 3) {
+          findings.push({ prio: 1, icon: '⚡', title: unconfirmed.length + ' Termine heute noch unbestätigt',
+            text: 'Ich schlage vor: schick mit einem Klick allen eine Bestätigungs-Mail raus.',
+            action: { label: 'Jetzt bestätigen', fn: function(){ showPage('termine'); } } });
+        }
+        // 2. Stammkunden zu lange weg
+        var heute = new Date(todayStr);
+        var inaktiv = (window.kundenCache || []).filter(function(k){
+          var lb = k.letzter_besuch || k.Letzter_Besuch;
+          if (!lb) return false;
+          var days = (heute - new Date(lb)) / 86400000;
+          return days > 60 && (k.anzahl_besuche||k.Anzahl_Besuche||0) >= 3;
+        });
+        if (inaktiv.length >= 3) {
+          findings.push({ prio: 2, icon: '🔔', title: inaktiv.length + ' Stammkundinnen sind länger als 60 Tage weg',
+            text: 'Ich habe die Liste sortiert nach Umsatz-Potenzial. Soll ich Einladungs-Entwürfe vorbereiten?',
+            action: { label: 'Liste ansehen', fn: function(){ showPage('kunden'); } } });
+        }
+        // 3. Lager-Alarm priorisiert nach Verbrauch
+        var kritisch = (window.lagerCache||[]).filter(function(p){
+          return (parseInt(p.Bestand)||0) <= Math.floor((parseInt(p.Min_Bestand)||3)/2);
+        });
+        if (kritisch.length) {
+          findings.push({ prio: 3, icon: '📦', title: kritisch.length + ' Produkt' + (kritisch.length>1?'e':'') + ' KRITISCH im Lager',
+            text: 'Bei ' + esc(kritisch[0].Produkt||kritisch[0].Name||'') + ' reicht der Bestand keine Woche mehr.',
+            action: { label: 'Jetzt bestellen', fn: function(){ showPage('lager'); } } });
+        }
+        // 4. Umsatz Trend gegen Vorwoche
+        if (typeof rechnungenCache !== 'undefined' && Array.isArray(rechnungenCache)) {
+          var d = new Date(todayStr); d.setDate(d.getDate() - 7);
+          var lastWeekStr = d.toISOString().substring(0,10);
+          var heuteU = rechnungenCache.filter(function(r){ return (r.erstellt_am||r.created_at||'').indexOf(todayStr)===0; }).reduce(function(s,r){ return s + (parseFloat(r.brutto||0)||0); }, 0);
+          var letzteWocheU = rechnungenCache.filter(function(r){ return (r.erstellt_am||r.created_at||'').indexOf(lastWeekStr)===0; }).reduce(function(s,r){ return s + (parseFloat(r.brutto||0)||0); }, 0);
+          if (letzteWocheU > 0 && heuteU < letzteWocheU * 0.7) {
+            findings.push({ prio: 4, icon: '📉', title: 'Heute läuft langsamer als vor 7 Tagen',
+              text: 'Letzte Woche gleiche Uhrzeit warst du bei ' + letzteWocheU.toFixed(0) + ' €. Willst du eine Last-Minute-Aktion raushauen?',
+              action: { label: 'Aktion starten', fn: function(){ showPage('beratung'); } } });
+          } else if (letzteWocheU > 0 && heuteU > letzteWocheU * 1.3) {
+            findings.push({ prio: 4, icon: '🔥', title: 'Heute +' + Math.round((heuteU/letzteWocheU-1)*100) + '% gegenüber Vorwoche!',
+              text: 'Der Tag läuft. Das hier nochmal mit Instagram teilen? Ich hab einen Posting-Vorschlag.',
+              action: { label: 'Vorschlag zeigen', fn: function(){ showPage('beratung'); } } });
+          }
+        }
+        // 5. Kein Team-Mitglied morgen im Plan
+        var morgenStr = new Date(Date.now()+86400000).toISOString().substring(0,10);
+        var morgenTermine = (window.termineCache||[]).filter(function(t){ return (t.Start_ISO||'').indexOf(morgenStr)===0; });
+        if (morgenTermine.length === 0 && h >= 16) {
+          findings.push({ prio: 5, icon: '🗓️', title: 'Morgen noch kein Termin eingetragen',
+            text: 'Nutze die freie Zeit für Lager-Check, Instagram oder ein Team-Treffen.',
+            action: { label: 'Woche planen', fn: function(){ showPage('termine'); } } });
+        }
+      } catch(e) { /* silent */ }
+
+      if (!findings.length) { panel.style.display = 'none'; return; }
+      findings.sort(function(a,b){ return a.prio - b.prio; });
+      findings = findings.slice(0, 3);
+
+      var greeting = h < 6 ? 'Noch früh, Chef' : (h < 11 ? 'Guten Morgen, ' + vorname : (h < 14 ? 'Zur Mittagszeit, ' + vorname : (h < 18 ? 'Nachmittag, ' + vorname : 'Feierabend-Nähe, ' + vorname)));
+      var html = '<div style="background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#0a0a0a 100%);border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:18px 20px;color:#e8e4de;position:relative;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(201,168,76,0.2)">'
+        + '<div style="position:absolute;top:0;right:0;width:160px;height:160px;background:radial-gradient(circle,rgba(201,168,76,0.25) 0%,transparent 70%);filter:blur(40px);pointer-events:none"></div>'
+        + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;position:relative;z-index:1">'
+        + '<div style="width:32px;height:32px;border-radius:50%;background:radial-gradient(circle,#E0C870 0%,#C9A84C 50%,#8a7230 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(201,168,76,0.5);animation:jarvisPulse 3s ease-in-out infinite">'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.5" style="width:16px;height:16px"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>'
+        + '</div>'
+        + '<div><div style="font-size:10px;font-weight:800;color:#E0C870;letter-spacing:2px;text-transform:uppercase">Jarvis</div>'
+        + '<div style="font-family:\'Playfair Display\',serif;font-size:17px;font-weight:600;color:#f0ebdf">' + esc(greeting) + '. Hier ist, was mir aufgefallen ist:</div></div></div>'
+        + '<div style="position:relative;z-index:1">';
+      findings.forEach(function(f, i){
+        html += '<div data-jfind="' + i + '" style="padding:10px 12px;margin-bottom:' + (i === findings.length-1 ? '0' : '8px') + ';background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.15);border-left:3px solid #C9A84C;border-radius:8px;cursor:pointer;transition:all 200ms;display:flex;align-items:center;gap:12px">'
+          + '<span style="font-size:20px">' + f.icon + '</span>'
+          + '<div style="flex:1"><div style="font-size:13px;font-weight:600;color:#f0ebdf;margin-bottom:2px">' + esc(f.title) + '</div>'
+          + '<div style="font-size:11px;color:#a09a8d;line-height:1.4">' + esc(f.text) + '</div></div>'
+          + '<span style="font-size:10px;font-weight:700;color:#E0C870;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap">' + esc(f.action.label) + ' →</span>'
+          + '</div>';
+      });
+      html += '</div></div>';
+      panel.innerHTML = html;
+      panel.style.display = 'block';
+      panel.querySelectorAll('[data-jfind]').forEach(function(el, idx){
+        el.addEventListener('click', function(){ if (findings[idx] && findings[idx].action.fn) findings[idx].action.fn(); });
+        el.addEventListener('mouseenter', function(){ el.style.background = 'rgba(201,168,76,0.08)'; el.style.transform = 'translateX(4px)'; });
+        el.addEventListener('mouseleave', function(){ el.style.background = 'rgba(255,255,255,0.03)'; el.style.transform = 'translateX(0)'; });
+      });
+    }
+    // CSS-Animation einmalig injizieren
+    (function(){
+      var st = document.createElement('style');
+      st.textContent = '@keyframes jarvisPulse { 0%,100% { transform: scale(1); box-shadow: 0 0 20px rgba(201,168,76,0.5); } 50% { transform: scale(1.08); box-shadow: 0 0 32px rgba(201,168,76,0.75); } }';
+      document.head.appendChild(st);
+    })();
+    // Auto-Render
+    setTimeout(renderJarvisBriefing, 2500);
+    setInterval(renderJarvisBriefing, 90000);
+
     // === Sparkline-Renderer (18.04. Capo: Grafiken in Stat-Cards) ===
     function renderSparkline(statCardId, values) {
       var card = document.getElementById(statCardId);
