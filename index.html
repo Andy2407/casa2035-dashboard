@@ -546,31 +546,31 @@
     .fab-menu-item:hover { background: var(--surface-hover); }
     .fab-menu-item .fm-icon { font-size: 16px; }
 
-    /* === KI Assist Panel === */
-    .ki-assist-panel {
-      display: none; position: fixed; bottom: calc(var(--nav-height) + var(--safe-bottom) + 76px);
-      right: 16px; width: min(360px, calc(100vw - 32px)); max-height: 400px;
-      background: var(--card-solid); border: 1px solid var(--border-accent);
-      border-radius: var(--radius-lg); box-shadow: var(--shadow-medium);
-      overflow: hidden; z-index: 160; animation: scaleIn 250ms var(--ease);
+    /* === Jarvis Chat Bubbles === */
+    .jarvis-msg { display: flex; margin-bottom: 10px; }
+    .jarvis-msg.user { justify-content: flex-end; }
+    .jarvis-msg.assistant { justify-content: flex-start; }
+    .jarvis-bubble {
+      max-width: 82%; padding: 10px 14px; font-size: 13px; line-height: 1.45; word-break: break-word;
     }
-    .ki-assist-panel.show { display: flex; flex-direction: column; }
-    .ki-header {
-      padding: 14px 16px; background: var(--gold-gradient); color: #fff;
-      display: flex; justify-content: space-between; align-items: center;
+    .jarvis-msg.user .jarvis-bubble {
+      background: var(--gold-glow); border: 1px solid var(--gold); border-radius: 12px 12px 2px 12px; color: var(--text);
     }
-    .ki-header h4 { font-size: 14px; font-weight: 700; margin: 0; }
-    .ki-body { padding: 14px 16px; overflow-y: auto; flex: 1; }
-    .ki-input-row { display: flex; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--border); }
-    .ki-input {
-      flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-full);
-      background: var(--surface); color: var(--text); font-size: 12px; font-family: 'Inter', sans-serif; outline: none;
+    .jarvis-msg.assistant .jarvis-bubble {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px 12px 12px 2px; color: var(--text);
     }
-    .ki-input:focus { border-color: var(--gold); }
-    .ki-send {
-      width: 32px; height: 32px; border-radius: 50%; background: var(--gold-gradient);
-      border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    .jarvis-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; padding: 0 0 4px 0; justify-content: flex-start; }
+    .jarvis-actions button {
+      padding: 7px 14px; background: var(--gold-gradient); color: #fff; border: none;
+      border-radius: var(--radius-full); font-size: 12px; font-weight: 600; cursor: pointer;
+      font-family: 'Inter', sans-serif; transition: opacity 150ms;
     }
+    .jarvis-actions button:hover { opacity: 0.85; }
+    .jarvis-loading { display: flex; gap: 4px; align-items: center; padding: 8px 0; }
+    .jarvis-loading span { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); opacity: 0.5; animation: jarvisLoadDot 1.2s infinite; }
+    .jarvis-loading span:nth-child(2) { animation-delay: 0.2s; }
+    .jarvis-loading span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes jarvisLoadDot { 0%,80%,100% { transform: scale(0.7); opacity: 0.4; } 40% { transform: scale(1.1); opacity: 1; } }
 
     /* === Login Overlay === */
     .login-overlay {
@@ -720,7 +720,7 @@
 
     /* === Print === */
     @media print {
-      .header, .bottom-nav, .fab-wrap, #dashFeedbackFab, #dashFeedbackPanel, .ki-assist-panel { display: none !important; }
+      .header, .bottom-nav, .fab-wrap, #dashFeedbackFab, #dashFeedbackPanel { display: none !important; }
       body { padding: 0; background: #fff; color: #000; }
       .page { display: none !important; }
       .page.active { display: block !important; }
@@ -1149,28 +1149,16 @@
     input[type="text"], input[type="password"], input[type="email"], input[type="tel"],
     input[type="search"], input[type="number"], input[type="date"], input[type="time"],
     input[type="datetime-local"], input[type="url"], textarea, select,
-    .search-input, .ki-input, .sheet input, .sheet textarea, .sheet select,
-    #kundenSearch, #lagerSearch, #beratungSearch, #regelText, #kiAssistInput,
+    .search-input, .sheet input, .sheet textarea, .sheet select,
+    #kundenSearch, #lagerSearch, #beratungSearch, #regelText, #jarvisInput,
     #terminDateInput, #terminTimeInput, #terminKundeInput, #nbMenge,
     #neuerKundeName, #neuerKundeEmail, #neuerKundeTelefon,
     #verschiebenDatum, #kiHintChatInput {
       font-size: 16px !important;
     }
 
-    /* FB-30: KI-Assist-Panel auf schmalen Viewports nicht mit FAB/Feedback-FAB kollidieren lassen */
-    @media (max-width: 480px) {
-      .ki-assist-panel {
-        left: 12px !important;
-        right: 12px !important;
-        width: auto !important;
-        max-width: none !important;
-        bottom: calc(var(--nav-height) + var(--safe-bottom) + 88px) !important;
-        max-height: min(400px, calc(100vh - var(--nav-height) - var(--safe-bottom) - var(--safe-top) - 140px)) !important;
-      }
-    }
     /* FB-45: Landscape-Zoom-Schutz — Cockpit-Widgets horizontal scrollbar statt overlap, wenn zu eng */
     @media (max-height: 500px) and (orientation: landscape) and (max-width: 900px) {
-      .ki-assist-panel { max-height: calc(100vh - 80px) !important; }
       .cockpit-grid { grid-auto-rows: minmax(80px, auto); }
     }
 
@@ -1484,15 +1472,38 @@
   <!-- Toast Container -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Jarvis Voice Overlay -->
+  <!-- Jarvis Conversational Overlay -->
   <div class="jarvis-overlay" id="jarvisOverlay">
-    <button class="jarvis-close" onclick="closeJarvis()">&times;</button>
-    <div class="jarvis-ring">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    <button class="jarvis-close" onclick="closeJarvis()" aria-label="Jarvis schliessen">&times;</button>
+    <div style="display:flex;flex-direction:column;width:min(480px,calc(100vw - 24px));max-height:calc(100vh - 120px)">
+      <!-- Header -->
+      <div style="display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid rgba(201,168,76,0.15);flex-shrink:0">
+        <div class="jarvis-ring" style="width:40px;height:40px;flex-shrink:0">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:20px;height:20px"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:0.5px">Jarvis</div>
+          <div style="font-size:11px;color:var(--gold);font-weight:500" id="jarvisStatusLine">Bereit</div>
+        </div>
+        <button id="jarvisMicToggle" onclick="toggleJarvisMic()" title="Mikrofon" style="margin-left:auto;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(201,168,76,0.4);background:transparent;color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 200ms">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+        </button>
+      </div>
+      <!-- Transcript / Chat area -->
+      <div id="jarvisTranscript" style="flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:4px;min-height:100px;max-height:60vh">
+        <!-- messages inserted here -->
+      </div>
+      <!-- Input row -->
+      <div style="display:flex;gap:8px;padding:12px 16px;border-top:1px solid rgba(201,168,76,0.12);flex-shrink:0">
+        <input id="jarvisInput" type="text" placeholder="Schreib oder sprich..." autocomplete="off"
+          style="flex:1;padding:10px 14px;border:1px solid rgba(201,168,76,0.25);border-radius:var(--radius-full);background:rgba(255,255,255,0.06);color:#fff;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color 200ms"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();jarvisSubmitInput();}"
+          onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(201,168,76,0.25)'">
+        <button onclick="jarvisSubmitInput()" style="width:40px;height:40px;border-radius:50%;background:var(--gold-gradient);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0" title="Senden">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
     </div>
-    <div class="jarvis-transcript" id="jarvisTranscript">Ich hoere zu...</div>
-    <div class="jarvis-response" id="jarvisResponse"></div>
-    <div class="jarvis-hint">Sage &laquo;Was steht an?&raquo; &middot; &laquo;Ja, bereite vor&raquo; &middot; &laquo;Ignorieren&raquo; &middot; &laquo;Zeig Termine&raquo;</div>
   </div>
 
   <!-- Go-Live Checklist Overlay -->
@@ -2122,22 +2133,7 @@
     </button>
   </div>
 
-  <!-- KI Assist Panel -->
-  <div class="ki-assist-panel" id="kiAssistPanel" role="dialog" aria-label="KI-Assistent">
-    <div class="ki-header">
-      <h4>KI-Assistent</h4>
-      <button style="background:rgba(255,255,255,0.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px" onclick="toggleKiAssist()">&times;</button>
-    </div>
-    <div class="ki-body" id="kiAssistBody">
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:10px">Frag mich etwas ueber deinen Salon...</div>
-      <div id="kiAssistChat"></div>
-    </div>
-    <div class="ki-input-row">
-      <button class="voice-btn" id="kiVoiceBtn" onclick="toggleVoiceInput('kiAssistInput','kiVoiceBtn')" title="Sprachnachricht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
-      <input class="ki-input" id="kiAssistInput" placeholder="Frage eingeben oder sprechen..." onkeydown="if(event.key==='Enter')sendKiQuestion()">
-      <button class="ki-send" onclick="sendKiQuestion()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
-    </div>
-  </div>
+  <!-- KI Assist Panel: removed (Capo 16.04.2026 — Jarvis als einziger KI-Kanal) -->
 
   <!-- Bottom Sheets -->
   <div class="sheet-overlay" id="rechnungSheet">
@@ -2953,14 +2949,14 @@
     var PAGE_HINTS = {
       dashboard: [
         '<b>Widgets sortieren:</b> &#9776;-Griff greifen, Kachel per Drag neu anordnen &mdash; Reihenfolge wird gespeichert.',
-        '<b>Long-Press auf das +</b> unten rechts startet Jarvis (KI-Sprachbefehle: "Termin fuer morgen 10 Uhr", "Tagesabschluss").',
+        '<b>Jarvis KI-Assistent:</b> Mikrofon-Symbol oben rechts &rarr; Frag Jarvis direkt: &ldquo;Was steht heute an?&rdquo; oder &ldquo;Zeig Umsatz&rdquo;.',
         '<b>Pull-to-refresh:</b> Cockpit von oben nach unten ziehen &rarr; Live-Daten frisch aus Datenbank laden.',
         '<b>Anpassen-Modus:</b> &#9881; oben rechts &rarr; Widgets ein-/ausblenden, &times; blendet einzelne Kacheln aus.',
         '<b>Live-Daten:</b> Kacheln aktualisieren sich automatisch &mdash; Termine, Umsatz, Lagerwarnungen in Echtzeit.'
       ],
       home: [
         '<b>Widgets sortieren:</b> &#9776;-Griff greifen, Kachel per Drag neu anordnen &mdash; Reihenfolge wird gespeichert.',
-        '<b>Long-Press auf das +</b> unten rechts startet Jarvis (KI-Sprachbefehle: "Termin fuer morgen 10 Uhr", "Tagesabschluss").',
+        '<b>Jarvis KI-Assistent:</b> Mikrofon-Symbol oben rechts &rarr; Frag Jarvis direkt: &ldquo;Was steht heute an?&rdquo; oder &ldquo;Zeig Umsatz&rdquo;.',
         '<b>Pull-to-refresh:</b> Cockpit von oben nach unten ziehen &rarr; Live-Daten frisch aus Datenbank laden.',
         '<b>Anpassen-Modus:</b> &#9881; oben rechts &rarr; Widgets ein-/ausblenden, &times; blendet einzelne Kacheln aus.',
         '<b>Live-Daten:</b> Kacheln aktualisieren sich automatisch &mdash; Termine, Umsatz, Lagerwarnungen in Echtzeit.'
@@ -3181,43 +3177,36 @@
       var items = [];
       if (page === 'dashboard') {
         items = [
-          { icon: '&#9998;', label: 'Neue Rechnung', action: 'openRechnungSheet()' },
-          { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
+          { icon: '&#9998;', label: 'Neue Rechnung', action: 'openRechnungSheet()' }
         ];
       } else if (page === 'termine') {
         items = [
-          { icon: '&#128197;', label: 'Neuer Termin', action: 'openNeuerTermin()' },
-          { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
+          { icon: '&#128197;', label: 'Neuer Termin', action: 'openNeuerTermin()' }
         ];
       } else if (page === 'kasse') {
         items = [
           { icon: '&#9998;', label: 'Neue Rechnung', action: 'openRechnungSheet()' },
           { icon: '&#128181;', label: 'Ausgabe buchen', action: 'openAusgabeSheet()' },
           { icon: '&#128202;', label: 'Tagesabschluss', action: 'openTagesabschluss()' },
-          { icon: '&#128230;', label: 'DATEV-Export', action: 'openDatevExport()' },
-          { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
+          { icon: '&#128230;', label: 'DATEV-Export', action: 'openDatevExport()' }
         ];
       } else if (page === 'kunden') {
         items = [
-          { icon: '&#128100;', label: 'Kunde anlegen', action: 'openNeuerKunde()' },
-          { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
+          { icon: '&#128100;', label: 'Kunde anlegen', action: 'openNeuerKunde()' }
         ];
       } else if (page === 'lager') {
         items = [
-          { icon: '&#128230;', label: 'Nachbestellen', action: 'openNachbestellungSheet()' },
-          { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
+          { icon: '&#128230;', label: 'Nachbestellen', action: 'openNachbestellungSheet()' }
         ];
       } else if (page === 'beratung') {
         items = [
           { icon: '&#127912;', label: 'Farbcode-Tool', action: 'showKiTool("farbcode")' },
           { icon: '&#128269;', label: 'Haaranalyse', action: 'showKiTool("haaranalyse")' },
-          { icon: '&#10024;', label: 'Wunschlook', action: 'showKiTool("wunschfrisur")' },
-          { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
+          { icon: '&#10024;', label: 'Wunschlook', action: 'showKiTool("wunschfrisur")' }
         ];
       } else if (page === 'einstellungen') {
         items = [
-          { icon: '&#128279;', label: 'Verbindung einrichten', action: 'openConfigSheet()' },
-          { icon: '&#128172;', label: 'KI-Assistent', action: 'toggleKiAssist()' }
+          { icon: '&#128279;', label: 'Verbindung einrichten', action: 'openConfigSheet()' }
         ];
       }
       items.forEach(function(it) {
@@ -3229,29 +3218,7 @@
       });
     }
 
-    // === KI Assist ===
-    var kiAssistOpen = false;
-    function toggleKiAssist() {
-      kiAssistOpen = !kiAssistOpen;
-      document.getElementById('kiAssistPanel').classList.toggle('show', kiAssistOpen);
-    }
-    function sendKiQuestion() {
-      var input = document.getElementById('kiAssistInput');
-      var q = input.value.trim();
-      if (!q) return;
-      input.value = '';
-      var chat = document.getElementById('kiAssistChat');
-      var userMsg = document.createElement('div');
-      userMsg.style.cssText = 'text-align:right;margin-bottom:8px';
-      userMsg.innerHTML = '<span style="display:inline-block;padding:8px 12px;background:var(--gold);color:#fff;border-radius:var(--radius-sm) var(--radius-sm) 0 var(--radius-sm);font-size:12px;max-width:80%">' + esc(q) + '</span>';
-      chat.appendChild(userMsg);
-      var answer = getKiDemoResponse(currentPage, q);
-      var botMsg = document.createElement('div');
-      botMsg.style.cssText = 'margin-bottom:8px';
-      botMsg.innerHTML = '<span style="display:inline-block;padding:8px 12px;background:var(--surface-hover);color:var(--text);border-radius:var(--radius-sm) var(--radius-sm) var(--radius-sm) 0;font-size:12px;max-width:80%;line-height:1.4">' + esc(answer) + '</span>';
-      chat.appendChild(botMsg);
-      chat.scrollTop = chat.scrollHeight;
-    }
+    // === KI Assist: removed (Capo 16.04.2026) — Jarvis ist der einzige KI-Kanal ===
 
     // === Config Sheet ===
     // anonKey = oeffentlicher Supabase Anon-Key (RLS-geschuetzt, darf im Frontend liegen)
@@ -5734,7 +5701,7 @@
         html += '<div id="' + detailId + '" style="display:none;padding:6px 10px 10px 36px;border-top:1px solid var(--border);font-size:11px;line-height:1.5">';
         html += '<div style="color:var(--text-secondary);margin-bottom:8px">' + h.desc + '</div>';
         if (h.detail) html += '<div style="color:var(--text);margin-bottom:8px;font-size:10px;background:var(--bg-warm);padding:6px 8px;border-radius:6px">' + h.detail + '</div>';
-        html += '<button onclick="event.stopPropagation();toggleKiAssist();setTimeout(function(){var inp=document.getElementById(\'kiInput\');if(inp){inp.value=\'' + esc(h.title).replace(/'/g, "\\'") + ' — was genau empfiehlst du fuer ' + esc(t.Kundenname || '').replace(/'/g, "\\'") + '?\';inp.focus();}},300)" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--gold);border-radius:16px;background:var(--gold-glow);color:var(--gold);font-size:10px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif"><span style="font-size:12px">&#129302;</span> KI fragen</button>';
+        html += '<button onclick="event.stopPropagation();toggleJarvis();setTimeout(function(){var inp=document.getElementById(\'jarvisInput\');if(inp){inp.value=\'' + esc(h.title).replace(/'/g, "\\'") + ' — was genau empfiehlst du fuer ' + esc(t.Kundenname || '').replace(/'/g, "\\'") + '?\';inp.focus();}},300)" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--gold);border-radius:16px;background:var(--gold-glow);color:var(--gold);font-size:10px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif"><span style="font-size:12px">&#129302;</span> Jarvis fragen</button>';
         html += '</div></div>';
       });
       html += '</div>';
@@ -7827,778 +7794,300 @@
       showToast('Sprechen Sie jetzt...', 'info');
     }
 
-    // === JARVIS Voice Command System ===
+    // =============================================================
+    // JARVIS CONVERSATIONAL SYSTEM (Capo 16.04.2026)
+    // Multi-Turn, Backend-connected, Dashboard-State-aware
+    // =============================================================
     var jarvisRecognition = null;
     var jarvisActive = false;
+    var jarvisMicActive = false;
+    var jarvisSpeechTimeout = null;
+
+    // Session-State (resets on logout)
+    var jarvisSession = {
+      id: null,
+      history: [],
+      context: { aktueller_tab: 'home', kunde_context_id: null }
+    };
+
+    function jarvisResetSession() {
+      jarvisSession = { id: null, history: [], context: { aktueller_tab: 'home', kunde_context_id: null } };
+    }
 
     function toggleJarvis() {
       if (jarvisActive) { closeJarvis(); return; }
-      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        showToast('Spracherkennung wird von diesem Browser nicht unterstuetzt.', 'warning');
-        return;
-      }
       openJarvis();
     }
 
     function openJarvis() {
+      if (!jarvisSession.id) jarvisSession.id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : ('jrv-' + Date.now());
+      jarvisSession.context.aktueller_tab = currentPage || 'home';
       jarvisActive = true;
       document.getElementById('jarvisBtn').classList.add('listening');
       document.getElementById('jarvisOverlay').classList.add('active');
-      document.getElementById('jarvisTranscript').textContent = 'Ich hoere zu...';
-      document.getElementById('jarvisResponse').textContent = '';
-      startJarvisListening();
-      // Proaktiver Scan bei jedem Oeffnen (A)
-      setTimeout(function() { jarvisProactiveScan(); }, 400);
+      // Focus input
+      var inp = document.getElementById('jarvisInput');
+      if (inp) setTimeout(function() { inp.focus(); }, 200);
+      // If first open this session — show greeting in transcript
+      var transcript = document.getElementById('jarvisTranscript');
+      if (transcript && transcript.children.length === 0) {
+        var uName = (currentUser && USERS && USERS[currentUser]) ? USERS[currentUser].name : 'Chef';
+        var h = new Date().getHours();
+        var gruss = h < 12 ? 'Guten Morgen' : h < 17 ? 'Guten Tag' : 'Guten Abend';
+        jarvisRenderMessage(gruss + ', ' + uName + '. Wie kann ich helfen?', [], 'assistant');
+      }
     }
 
     function closeJarvis() {
       jarvisActive = false;
       document.getElementById('jarvisBtn').classList.remove('listening');
       document.getElementById('jarvisOverlay').classList.remove('active');
-      if (jarvisRecognition) { jarvisRecognition.abort(); jarvisRecognition = null; }
+      stopJarvisMic();
     }
 
-    function startJarvisListening() {
+    // === Mic toggle (separate from overlay open/close) ===
+    function toggleJarvisMic() {
+      if (jarvisMicActive) {
+        stopJarvisMic();
+      } else {
+        startJarvisMic();
+      }
+    }
+
+    function startJarvisMic() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        showToast('Spracherkennung wird von diesem Browser nicht unterstuetzt.', 'warning');
+        return;
+      }
       if (jarvisRecognition) { jarvisRecognition.abort(); jarvisRecognition = null; }
       var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
       var rec = new SR();
       rec.lang = 'de-DE';
-      rec.continuous = false;
+      rec.continuous = true;
       rec.interimResults = true;
-      rec.maxAlternatives = 3;
+      rec.maxAlternatives = 1;
       jarvisRecognition = rec;
+      jarvisMicActive = true;
+      var micBtn = document.getElementById('jarvisMicToggle');
+      if (micBtn) { micBtn.style.background = 'rgba(196,64,64,0.15)'; micBtn.style.borderColor = 'var(--danger)'; micBtn.style.color = 'var(--danger)'; }
+      document.getElementById('jarvisStatusLine').textContent = 'Zuhoeren...';
 
+      var lastFinal = '';
       rec.onresult = function(e) {
-        var transcript = '';
+        var interimTxt = '';
+        var finalTxt = '';
         for (var i = e.resultIndex; i < e.results.length; i++) {
-          transcript += e.results[i][0].transcript;
+          if (e.results[i].isFinal) { finalTxt += e.results[i][0].transcript; }
+          else { interimTxt += e.results[i][0].transcript; }
         }
-        document.getElementById('jarvisTranscript').textContent = transcript || 'Ich hoere zu...';
-        if (e.results[e.results.length - 1].isFinal) {
-          processJarvisCommand(transcript.trim().toLowerCase());
+        var inp = document.getElementById('jarvisInput');
+        if (inp) inp.value = (lastFinal + finalTxt + interimTxt).trim();
+        if (finalTxt) {
+          lastFinal += finalTxt;
+          // Auto-send after 1.5s pause
+          clearTimeout(jarvisSpeechTimeout);
+          jarvisSpeechTimeout = setTimeout(function() {
+            var inp2 = document.getElementById('jarvisInput');
+            if (inp2 && inp2.value.trim()) { jarvisSubmitInput(); lastFinal = ''; }
+          }, 1500);
         }
       };
-
-      rec.onend = function() {
-        if (jarvisActive && !jarvisRecognition) return;
-        if (jarvisActive) {
-          setTimeout(function() {
-            if (jarvisActive) startJarvisListening();
-          }, 300);
-        }
-      };
-
       rec.onerror = function(e) {
-        if (e.error === 'not-allowed') {
-          showToast('Mikrofon-Zugriff verweigert.', 'warning');
-          closeJarvis();
-        } else if (e.error === 'no-speech') {
-          document.getElementById('jarvisTranscript').textContent = 'Ich hoere zu...';
-        }
+        if (e.error === 'not-allowed') { showToast('Mikrofon-Zugriff verweigert.', 'warning'); stopJarvisMic(); }
+        else if (e.error === 'no-speech') { document.getElementById('jarvisStatusLine').textContent = 'Zuhoeren...'; }
       };
-
+      rec.onend = function() { if (jarvisMicActive) rec.start(); };
       rec.start();
     }
 
-    // === JARVIS KI-Kontext ===
-    var jarvisContext = { lastAction: null, pendingConfirm: null, conversationHistory: [], isSpeaking: false };
-    var jarvisIgnored = {}; // Session-Ignore-Liste: id → true (nicht nochmal ansprechen)
-    var jarvisLastScanItems = []; // Priority-Queue aus letztem jarvisProactiveScan
-    var JARVIS_GREETINGS = [
-      'Selbstverstaendlich.', 'Sofort.', 'Alles klar.', 'Wird erledigt.', 'Bin dran.', 'Kein Problem.'
-    ];
-    function jarvisGreet() { return JARVIS_GREETINGS[Math.floor(Math.random() * JARVIS_GREETINGS.length)]; }
-
-    // =============================================================
-    // JARVIS PROAKTIVER SCAN (Feature A)
-    // Wird automatisch bei openJarvis() aufgerufen.
-    // Prueft alle Caches auf actionable Items, baut Priority-Queue,
-    // begruesst Nutzer mit personalisierter Zusammenfassung.
-    // =============================================================
-    function jarvisProactiveScan() {
-      var items = [];
-      var now = new Date();
-      var todayStr = now.toISOString().split('T')[0];
-      var tomorrowStr = new Date(now.getTime() + 86400000).toISOString().split('T')[0];
-
-      // Check 1: Termin-Ueberlappungen (gleicher Stylist, heute+morgen)
-      var termine = termineCache || [];
-      var terminNearby = termine.filter(function(t) {
-        return (t.Start_ISO||'').indexOf(todayStr)===0 || (t.Start_ISO||'').indexOf(tomorrowStr)===0;
-      });
-      var firstOverlap = null;
-      scanOuter: for (var si = 0; si < terminNearby.length; si++) {
-        for (var sj = si+1; sj < terminNearby.length; sj++) {
-          var ta = terminNearby[si], tb = terminNearby[sj];
-          if (!ta.Start_ISO || !tb.Start_ISO) continue;
-          if (!(ta.Stylist||'').trim() || (ta.Stylist||'') !== (tb.Stylist||'')) continue;
-          if ((ta.Status||'')==='storniert' || (tb.Status||'')==='storniert') continue;
-          var taS = new Date(ta.Start_ISO), taE = new Date(taS.getTime()+((parseInt(ta.Dauer_Min)||45)*60000));
-          var tbS = new Date(tb.Start_ISO), tbE = new Date(tbS.getTime()+((parseInt(tb.Dauer_Min)||45)*60000));
-          if (taS < tbE && tbS < taE) { firstOverlap = {a:ta,b:tb}; break scanOuter; }
-        }
-      }
-      if (firstOverlap && !jarvisIgnored['overlap']) {
-        var ov = firstOverlap;
-        var oTag = (ov.a.Start_ISO||'').indexOf(todayStr)===0 ? 'heute' : 'morgen';
-        var oZeit = new Date(ov.a.Start_ISO).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'});
-        items.push({
-          id:'overlap', prio:1,
-          msg:'Terminueberlappung '+oTag+' um '+oZeit+' bei '+(ov.a.Stylist||'unbekannt')+'. '+(ov.a.Kundenname||ov.a.Kunde||'?')+' und '+(ov.b.Kundenname||ov.b.Kunde||'?')+' ueberschneiden sich.',
-          action:(function(o){return function(){showPage('termine');setTimeout(function(){openTerminDetail(o.a);},400);};})(ov)
-        });
-      }
-
-      // Check 2: Lager kritisch (Bestand <= 20% von Mindestbestand)
-      var lager = lagerCache || [];
-      var kritischProd = null;
-      for (var li=0; li<lager.length && !kritischProd; li++) {
-        var lp = lager[li];
-        var lpid = lp.Produkt||lp.Name||lp.produktname||'';
-        if (jarvisIgnored['lager_'+lpid]) continue;
-        var lpB = parseInt(lp.Bestand||lp.bestand||0);
-        var lpMin = parseInt(lp.Min_Bestand||lp.min_bestand||3);
-        if (lpB <= Math.max(1, Math.floor(lpMin*0.2))) kritischProd = lp;
-      }
-      if (kritischProd && !jarvisIgnored['lager_kritisch']) {
-        var kpName = kritischProd.Produkt||kritischProd.Name||kritischProd.produktname||'Produkt';
-        var kpBestand = parseInt(kritischProd.Bestand||kritischProd.bestand||0);
-        var kpMenge = Math.max(5, (parseInt(kritischProd.Min_Bestand||kritischProd.min_bestand||3))*3);
-        items.push({
-          id:'lager_kritisch', prio:2,
-          msg:kpName+' kritisch: nur noch '+kpBestand+' auf Lager. Empfehlung: '+kpMenge+' Stueck bestellen.',
-          action:(function(kp,km){return function(){
-            showPage('lager');
-            setTimeout(function(){
-              openNachbestellungSheet();
-              setTimeout(function(){
-                var nbP=document.getElementById('nbProdukt');
-                if(nbP){var tgt=(kp.Produkt||kp.Name||kp.produktname||'').toLowerCase();for(var xi=0;xi<nbP.options.length;xi++){if(nbP.options[xi].text.toLowerCase().indexOf(tgt)!==-1){nbP.selectedIndex=xi;break;}}}
-                var nbM=document.getElementById('nbMenge');if(nbM)nbM.value=km;
-              },350);
-            },300);
-          };})(kritischProd,kpMenge)
-        });
-      }
-
-      // Check 3: Offene Anfragen > 24h
-      var beratungen = beratungenCache || [];
-      var altOffen = beratungen.filter(function(b){
-        if (b.Status!=='offen') return false;
-        return (now - new Date(b.erstellt_am||b.Datum||b.datum||0)) > 86400000;
-      });
-      if (altOffen.length > 0 && !jarvisIgnored['anfragen_alt']) {
-        items.push({
-          id:'anfragen_alt', prio:3,
-          msg:altOffen.length+' Anfrage'+(altOffen.length>1?'n':'')+' seit ueber 24 Stunden unbeantwortet.',
-          action:function(){showPage('beratung');setTimeout(function(){setBeratungFilter('offen');},300);}
-        });
-      }
-
-      // Check 4: Tagesumsatz unter Schnitt nach 14 Uhr
-      if (now.getHours() >= 14 && !jarvisIgnored['umsatz_niedrig']) {
-        var sEl = document.getElementById('statUmsatz');
-        if (sEl) {
-          var uheu = parseFloat((sEl.textContent||'0').replace(',','.').replace(/[^0-9.]/g,''))||0;
-          if (uheu < 320) {
-            items.push({
-              id:'umsatz_niedrig', prio:4,
-              msg:'Nach 14 Uhr, Tagesumsatz bei '+uheu.toFixed(0)+' Euro, unter dem Tagesdurchschnitt.',
-              action:function(){showPage('kasse');}
-            });
-          }
-        }
-      }
-
-      // Check 5: Termine ohne Stylist heute
-      var ohneS = termine.filter(function(t){
-        return (t.Start_ISO||'').indexOf(todayStr)===0 && !(t.Stylist||'').trim() && (t.Status||'')!=='storniert';
-      });
-      if (ohneS.length > 0 && !jarvisIgnored['kein_stylist']) {
-        items.push({
-          id:'kein_stylist', prio:5,
-          msg:ohneS.length+' Termin'+(ohneS.length>1?' haben':' hat')+' heute keinen Stylist zugewiesen.',
-          action:(function(t0){return function(){showPage('termine');setTimeout(function(){openTerminDetail(t0);},400);};})(ohneS[0])
-        });
-      }
-
-      // Check 6: Kunden-Geburtstag heute/morgen
-      var kunden = kundenCache || [];
-      var bdList = [];
-      kunden.forEach(function(k){
-        var geb=k.Geburtstag||k.geburtstag||''; if(!geb) return;
-        var d=new Date(geb);
-        var tom=new Date(now.getTime()+86400000);
-        var isT=d.getMonth()===now.getMonth()&&d.getDate()===now.getDate();
-        var isTom=d.getMonth()===tom.getMonth()&&d.getDate()===tom.getDate();
-        if(isT||isTom) bdList.push({k:k,wann:isT?'heute':'morgen'});
-      });
-      if (bdList.length > 0 && !jarvisIgnored['geburtstag']) {
-        var bdNames = bdList.slice(0,2).map(function(x){return x.k.Name||x.k.name||'';}).filter(Boolean).join(' und ');
-        items.push({
-          id:'geburtstag', prio:6,
-          msg:bdNames+' hat '+bdList[0].wann+' Geburtstag. Gute Gelegenheit fuer eine persoenliche Geste.',
-          action:function(){showPage('kunden');}
-        });
-      }
-
-      // Ignorierte entfernen + nach Prio sortieren
-      items = items.filter(function(it){return !jarvisIgnored[it.id];});
-      items.sort(function(a,b){return a.prio-b.prio;});
-      jarvisLastScanItems = items;
-
-      // Begruessung zusammenbauen
-      var uN = (currentUser && USERS[currentUser]) ? USERS[currentUser].name : 'Chef';
-      var hh = now.getHours();
-      var grussStr = hh<11?'Guten Morgen':hh<14?'Mahlzeit':hh<18?'Servus':'Noch da';
-
-      if (items.length === 0) {
-        var naechster = null;
-        termine.forEach(function(t){var s=new Date(t.Start_ISO||'');if(s>now&&(!naechster||s<new Date(naechster.Start_ISO)))naechster=t;});
-        var okMsg = grussStr+', '+uN+'. Alles im gruenen Bereich.';
-        if (naechster) okMsg += ' Naechster Termin: '+(naechster.Kundenname||naechster.Kunde||'')+' um '+new Date(naechster.Start_ISO).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+'.';
-        jarvisRespond(okMsg, null, true);
-        return;
-      }
-
-      var topItems = items.slice(0, Math.min(2, items.length));
-      var scanMsg = grussStr+', '+uN+'. '+items.length+' Punkt'+(items.length>1?'e benoetigen':' benoetigt')+' deine Aufmerksamkeit. ';
-      scanMsg += topItems.map(function(it,idx){return (idx+1)+': '+it.msg;}).join(' ');
-      scanMsg += ' Soll ich den ersten Punkt fuer dich vorbereiten?';
-      jarvisRespond(scanMsg, null, true);
+    function stopJarvisMic() {
+      jarvisMicActive = false;
+      clearTimeout(jarvisSpeechTimeout);
+      if (jarvisRecognition) { jarvisRecognition.abort(); jarvisRecognition = null; }
+      var micBtn = document.getElementById('jarvisMicToggle');
+      if (micBtn) { micBtn.style.background = 'transparent'; micBtn.style.borderColor = 'rgba(201,168,76,0.4)'; micBtn.style.color = 'var(--gold)'; }
+      var sl = document.getElementById('jarvisStatusLine');
+      if (sl) sl.textContent = 'Bereit';
     }
 
-    // =============================================================
-    // JARVIS EXECUTE TOP ACTION (Feature B)
-    // Oeffnet das passende Dialog/Sheet mit Pre-Fill.
-    // User muss nur noch bestaetigen — keine Auto-Ausfuehrung.
-    // =============================================================
-    function jarvisExecuteTopAction() {
-      var items = jarvisLastScanItems.filter(function(it){return !jarvisIgnored[it.id];});
-      if (!items.length) { jarvisRespond('Keine offenen Punkte mehr. Alles erledigt.', null, true); return; }
-      var top = items[0];
-      jarvisIgnored[top.id] = true; // nach Vorbereiten als erledigt markieren
-      jarvisRespond(jarvisGreet()+' Ich bereite alles vor. Du musst nur noch bestaetigen.', top.action, false);
+    // === Send a message ===
+    function jarvisSubmitInput() {
+      var inp = document.getElementById('jarvisInput');
+      if (!inp) return;
+      var text = inp.value.trim();
+      if (!text) return;
+      inp.value = '';
+      jarvisSendMessage(text);
     }
 
-    // Kunden-Suche per Name (Fuzzy)
-    function jarvisFindKunde(text) {
-      if (!kundenCache || !kundenCache.length) return null;
-      var words = text.toLowerCase().split(/\s+/);
-      var best = null; var bestScore = 0;
-      kundenCache.forEach(function(k) {
-        var name = (k.Name || k.name || '').toLowerCase();
-        var score = 0;
-        words.forEach(function(w) { if (w.length > 2 && name.indexOf(w) !== -1) score += w.length; });
-        if (score > bestScore) { bestScore = score; best = k; }
-      });
-      return bestScore >= 3 ? best : null;
-    }
+    function jarvisSendMessage(userText) {
+      // Show user bubble
+      jarvisRenderMessage(userText, [], 'user');
+      // Push to history
+      jarvisSession.history.push({ rolle: 'user', nachricht: userText, ts: Date.now() });
 
-    // Service-Erkennung aus Text
-    function jarvisFindService(text) {
-      var t = text.toLowerCase();
-      var svcList = (typeof services !== 'undefined' && services.length) ? services : [
-        {Service:'Damenhaarschnitt',Preis:55},{Service:'Herrenhaarschnitt',Preis:35},{Service:'Herrenschnitt + Bartpflege',Preis:45},
-        {Service:'Balayage',Preis:120},{Service:'Farbbehandlung Komplett',Preis:85},{Service:'Haarverlaengerung (Beratung)',Preis:0},
-        {Service:'Haarpflege-Treatment',Preis:35},{Service:'Kopfmassage',Preis:20},{Service:'Waschen, Schneiden, Foehnen',Preis:65},
-        {Service:'Brautfrisur',Preis:95},{Service:'Styling / Foehnen',Preis:25}
-      ];
-      var found = [];
-      svcList.forEach(function(s) {
-        var sn = (s.Service || s.name || '').toLowerCase();
-        // Exakter oder Teil-Match
-        if (t.indexOf(sn) !== -1) { found.push(s); return; }
-        // Keyword-Matching
-        if (/damen.*schnitt|damenhaar/.test(t) && /damen/.test(sn)) found.push(s);
-        else if (/herren.*schnitt|herrenhaar/.test(t) && /herren/.test(sn) && !/bart/.test(sn)) found.push(s);
-        else if (/bart/.test(t) && /bart/.test(sn)) found.push(s);
-        else if (/balayage|bala/.test(t) && /balayage/.test(sn)) found.push(s);
-        else if (/farb|faerb|colora/.test(t) && /farb/.test(sn)) found.push(s);
-        else if (/waschen.*schneiden|schneiden.*foehnen/.test(t) && /waschen/.test(sn)) found.push(s);
-        else if (/braut|hochzeit/.test(t) && /braut/.test(sn)) found.push(s);
-        else if (/styling|foehnen/.test(t) && /styling/.test(sn)) found.push(s);
-        else if (/pflege|treatment|kur/.test(t) && /pflege/.test(sn)) found.push(s);
-        else if (/massage|kopf/.test(t) && /massage/.test(sn)) found.push(s);
-      });
-      // Deduplizieren
-      var unique = []; var seen = {};
-      found.forEach(function(f) { var k = f.Service || f.name; if (!seen[k]) { seen[k] = true; unique.push(f); }});
-      return unique;
-    }
+      // Dashboard state snapshot
+      var dashState = {
+        termine_heute: (function() { var el = document.getElementById('statTermine'); return el ? parseInt(el.textContent) || 0 : 0; })(),
+        lager_alarm: document.querySelectorAll('.lager-card.alarm').length,
+        offene_anfragen: (function() { var el = document.getElementById('statBeratung'); return el ? parseInt(el.textContent) || 0 : 0; })(),
+        tages_umsatz: finanzenCache ? (finanzenCache.tagesUmsatz || 0) : 0,
+        aktueller_tab: currentPage || 'home'
+      };
 
-    // Zahlart erkennen
-    function jarvisFindZahlart(text) {
-      if (/bar\b|cash/.test(text)) return 'bar';
-      if (/karte|ec|kredit|card/.test(text)) return 'karte';
-      if (/ueberweis|transfer/.test(text)) return 'ueberweisung';
-      return null;
-    }
+      // Loading indicator
+      var loadId = 'jload' + Date.now();
+      var chat = document.getElementById('jarvisTranscript');
+      var loadEl = document.createElement('div');
+      loadEl.id = loadId;
+      loadEl.className = 'jarvis-msg assistant';
+      loadEl.innerHTML = '<div class="jarvis-bubble"><div class="jarvis-loading"><span></span><span></span><span></span></div></div>';
+      chat.appendChild(loadEl);
+      chat.scrollTop = chat.scrollHeight;
 
-    function processJarvisCommand(text) {
-      // FB-49: Guard - ignore commands while Jarvis is speaking
-      if (jarvisContext.isSpeaking) return;
-      var response = '';
-      var action = null;
-      var keepListening = true;
-      jarvisContext.conversationHistory.push({ role: 'user', text: text });
+      // Set status
+      var sl = document.getElementById('jarvisStatusLine');
+      if (sl) sl.textContent = 'Denkt nach...';
 
-      // === Bestaetigung auf vorherige Aktion ===
-      if (jarvisContext.pendingConfirm && /^(ja|passt|genau|machen|ok|bestaetig|korrekt|stimmt|richtig|jawohl)/.test(text)) {
-        response = jarvisGreet() + ' ' + jarvisContext.pendingConfirm.confirmMsg;
-        action = jarvisContext.pendingConfirm.action;
-        jarvisContext.pendingConfirm = null;
-        keepListening = false;
-      }
-      else if (jarvisContext.pendingConfirm && /^(nein|stop|abbruch|cancel|nicht|falsch)/.test(text)) {
-        response = 'Alles klar, abgebrochen.';
-        jarvisContext.pendingConfirm = null;
-      }
-
-      // === PROAKTIVE BEFEHLE (Feature C) ===
-
-      // "Was steht an?" / "Was empfiehlst du?" → Scan erneut anzeigen
-      else if (/was.*an|was.*offen|was.*heute|was.*empfiehlst|empfehlung|uebersicht.*probleme|probleme.*uebers/.test(text)) {
-        jarvisProactiveScan();
-        return; // jarvisProactiveScan ruft jarvisRespond selbst auf
-      }
-
-      // "Ja, mach das" / "Ja, bereite vor" / "Los" → Top-Action ausfuehren (nach Scan)
-      else if (/^(ja|ok|los|mach|bereite|vorbereiten|schieb|bestell|beantworte|oeffne)/.test(text) && jarvisLastScanItems.filter(function(it){return !jarvisIgnored[it.id];}).length > 0 && !jarvisContext.pendingConfirm) {
-        jarvisExecuteTopAction();
-        return;
-      }
-
-      // "Ignorieren" / "Ueberspringen" / "Naechster" → aktuellen Top-Item ignorieren, naechstes anzeigen
-      else if (/ignorier|uebersprin|nicht wichtig|naechste|skip|vergiss das/.test(text)) {
-        var aktItems = jarvisLastScanItems.filter(function(it){return !jarvisIgnored[it.id];});
-        if (aktItems.length > 0) {
-          jarvisIgnored[aktItems[0].id] = true;
-          var verbleibend = jarvisLastScanItems.filter(function(it){return !jarvisIgnored[it.id];});
-          if (verbleibend.length > 0) {
-            response = 'Alles klar, ignoriert. Naechster Punkt: ' + verbleibend[0].msg + ' Vorbereiten?';
-          } else {
-            response = 'Erledigt. Keine weiteren Punkte.';
-          }
-        } else {
-          response = 'Nichts mehr zu ignorieren. Alles ist schon abgehakt.';
-        }
-      }
-
-      // "Schieb den Termin" → Termin-Overlap Action direkt ausfuehren
-      else if (/schieb.*termin|termin.*schieb|verschieb.*termin/.test(text)) {
-        var ovItem = jarvisLastScanItems.find(function(it){return it.id==='overlap'&&!jarvisIgnored[it.id];});
-        if (ovItem) {
-          jarvisIgnored['overlap'] = true;
-          jarvisRespond(jarvisGreet()+' Oeffne den Termin zum Verschieben. Du entscheidest.', ovItem.action, false);
-          return;
-        } else {
-          response = 'Keine Terminueberlappung gefunden.';
-        }
-      }
-
-      // "Bestell nach" → Lager-Kritisch Action direkt ausfuehren
-      else if (/bestell.*nach|nachbestell|produkt.*bestell/.test(text)) {
-        var lagItem = jarvisLastScanItems.find(function(it){return it.id==='lager_kritisch'&&!jarvisIgnored[it.id];});
-        if (lagItem) {
-          jarvisIgnored['lager_kritisch'] = true;
-          jarvisRespond(jarvisGreet()+' Oeffne das Bestellformular mit vorausgefuellten Daten.', lagItem.action, false);
-          return;
-        } else {
-          showPage('lager');
-          setTimeout(function(){openNachbestellungSheet();},300);
-          response = jarvisGreet()+' Oeffne Bestellformular.';
-          keepListening = false;
-        }
-      }
-
-      // === RECHNUNG erstellen (Smart: Kunde + Service + Zahlart aus Sprache) ===
-      else if (/rechnung|abrechnung|kassier|bezahl|abkassier/.test(text)) {
-        var kunde = jarvisFindKunde(text);
-        var svcs = jarvisFindService(text);
-        var zahlart = jarvisFindZahlart(text);
-        if (kunde && svcs.length > 0) {
-          var svcNames = svcs.map(function(s) { return s.Service || s.name; }).join(', ');
-          var total = 0; svcs.forEach(function(s) { total += parseFloat(s.Preis || s.preis || 0); });
-          var brutto = Math.round(total * 1.19 * 100) / 100;
-          response = jarvisGreet() + ' Rechnung fuer ' + (kunde.Name || kunde.name) + ': ' + svcNames + '. Brutto ' + brutto.toFixed(2).replace('.', ',') + ' Euro' + (zahlart ? ', ' + zahlart : '') + '. Soll ich buchen?';
-          jarvisContext.pendingConfirm = {
-            confirmMsg: 'Rechnung wird erstellt.',
-            action: function() {
-              showPage('kasse');
-              setTimeout(function() {
-                if (typeof openRechnungSheet === 'function') openRechnungSheet();
-                // Pre-fill Rechnung
-                setTimeout(function() {
-                  var kundeInput = document.getElementById('kasseKunde');
-                  if (kundeInput) kundeInput.value = kunde.Name || kunde.name;
-                  var svcSel = document.getElementById('kasseService');
-                  if (svcSel && svcs[0]) {
-                    for (var i = 0; i < svcSel.options.length; i++) {
-                      if (svcSel.options[i].value === (svcs[0].Service || svcs[0].name)) { svcSel.selectedIndex = i; break; }
-                    }
-                  }
-                  if (zahlart) {
-                    var zahlSel = document.getElementById('kasseZahlart');
-                    if (zahlSel) zahlSel.value = zahlart;
-                  }
-                  if (typeof updateKassePreview === 'function') updateKassePreview();
-                }, 300);
-              }, 300);
-            }
-          };
-        } else if (svcs.length > 0 && !kunde) {
-          response = 'Service erkannt: ' + svcs.map(function(s){return s.Service||s.name}).join(', ') + '. Fuer welchen Kunden?';
-        } else {
-          response = jarvisGreet() + ' Oeffne die Kasse fuer eine neue Rechnung.';
-          action = function() { showPage('kasse'); setTimeout(function() { if (typeof openRechnungSheet === 'function') openRechnungSheet(); }, 300); };
-          keepListening = false;
-        }
-      }
-
-      // === TERMIN erstellen ===
-      else if (/neu.*termin|termin.*anlegen|termin.*erstell|termin.*buchen|termin.*machen/.test(text)) {
-        var tKunde = jarvisFindKunde(text);
-        var tSvcs = jarvisFindService(text);
-        var tKName = tKunde ? (tKunde.Name || tKunde.name) : null;
-        if (tKName && tSvcs.length > 0) {
-          response = jarvisGreet() + ' Termin fuer ' + tKName + ': ' + tSvcs.map(function(s){return s.Service||s.name}).join(', ') + '. Oeffne Terminbuchung.';
-        } else if (tKName) {
-          response = jarvisGreet() + ' Oeffne Terminbuchung fuer ' + tKName + '.';
-        } else {
-          response = jarvisGreet() + ' Oeffne Terminbuchung.';
-        }
-        action = function() {
-          showPage('termine');
-          setTimeout(function() {
-            if (typeof openNeuerTermin === 'function') openNeuerTermin();
-            setTimeout(function() {
-              if (tKName) {
-                var kInp = document.getElementById('terminKundeInput');
-                if (kInp) kInp.value = tKName;
-              }
-              if (tSvcs && tSvcs.length > 0) {
-                var svcSel = document.getElementById('terminSvcSelect');
-                if (svcSel) {
-                  var target = tSvcs[0].Service || tSvcs[0].name;
-                  for (var i = 0; i < svcSel.options.length; i++) {
-                    if (svcSel.options[i].value === target) { svcSel.selectedIndex = i; break; }
-                  }
-                }
-              }
-            }, 350);
-          }, 300);
-        };
-        keepListening = false;
-      }
-
-      // === TERMIN STORNIEREN (EU AI Act: Mensch entscheidet - nur Dialog oeffnen) ===
-      else if (/storni|absag|termin.*abbrech|termin.*cancel/.test(text)) {
-        var stKunde = jarvisFindKunde(text);
-        if (stKunde) {
-          var stName = stKunde.Name || stKunde.name;
-          var stJetzt = new Date();
-          var stTermin = null;
-          (termineCache || []).forEach(function(t) {
-            var name = (t.Kundenname || t.Kunde || t.kunde || '').toLowerCase();
-            var start = new Date(t.Start_ISO || '');
-            if (name.indexOf(stName.toLowerCase()) !== -1
-                && start >= stJetzt
-                && (t.Status || 'bestaetigt') !== 'storniert'
-                && (!stTermin || start < new Date(stTermin.Start_ISO))) {
-              stTermin = t;
-            }
-          });
-          if (stTermin) {
-            var stZeit = new Date(stTermin.Start_ISO).toLocaleString('de-DE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-            response = 'Termin gefunden: ' + stName + ' am ' + stZeit + '. Oeffne Detail zur Bestaetigung.';
-            action = function() { showPage('termine'); setTimeout(function() { if (typeof openTerminDetail === 'function') openTerminDetail(stTermin); }, 400); };
-            keepListening = false;
-          } else {
-            response = 'Keinen offenen Termin fuer ' + stName + ' gefunden.';
-          }
-        } else {
-          response = 'Fuer welchen Kunden soll der Termin storniert werden?';
-        }
-      }
-
-      // === TERMINE HEUTE (FB-49: explizit setzen + sprechen) ===
-      else if (/termin.*heute|heute.*termin/.test(text)) {
-        var hDate = new Date();
-        var hStr = hDate.toISOString().split('T')[0];
-        var hCount = (termineCache || []).filter(function(t) { return (t.Start_ISO || '').indexOf(hStr) === 0; }).length;
-        response = 'Zeige Termine am heutigen Tag. ' + hCount + ' Termine heute.';
-        action = function() {
-          if (typeof terminViewDate !== 'undefined') { terminViewDate = hDate; }
-          showPage('termine');
-          setTimeout(function() { if (typeof renderTermine === 'function') renderTermine(termineCache); if (typeof jarvisScrollToFirstTermin === 'function') jarvisScrollToFirstTermin(); }, 350);
-        };
-        keepListening = false;
-      }
-
-      // === TERMINE MORGEN / UEBERMORGEN ===
-      else if (/termin.*ueber.?morgen|ueber.?morgen.*termin/.test(text)) {
-        var uDate = new Date(); uDate.setDate(uDate.getDate() + 2);
-        var uStr = uDate.toISOString().split('T')[0];
-        var uCount = (termineCache || []).filter(function(t) { return (t.Start_ISO || '').indexOf(uStr) === 0; }).length;
-        response = uCount + ' Termine uebermorgen. Oeffne Uebersicht.';
-        action = function() {
-          if (typeof terminViewDate !== 'undefined') { terminViewDate = uDate; }
-          showPage('termine');
-          setTimeout(function() { if (typeof renderTermine === 'function') renderTermine(termineCache); jarvisScrollToFirstTermin(); }, 350);
-        };
-        keepListening = false;
-      }
-      else if (/termin.*morgen|morgen.*termin/.test(text)) {
-        var mDate = new Date(); mDate.setDate(mDate.getDate() + 1);
-        var mStr = mDate.toISOString().split('T')[0];
-        var mCount = (termineCache || []).filter(function(t) { return (t.Start_ISO || '').indexOf(mStr) === 0; }).length;
-        response = mCount + ' Termine morgen. Oeffne Uebersicht.';
-        action = function() {
-          if (typeof terminViewDate !== 'undefined') { terminViewDate = mDate; }
-          showPage('termine');
-          setTimeout(function() { if (typeof renderTermine === 'function') renderTermine(termineCache); jarvisScrollToFirstTermin(); }, 350);
-        };
-        keepListening = false;
-      }
-
-      // === UMSATZ Woche / Monat ===
-      else if (/umsatz.*woche|woche.*umsatz|wochenumsatz/.test(text)) {
-        var wStart = new Date(); wStart.setDate(wStart.getDate() - ((wStart.getDay() + 6) % 7)); wStart.setHours(0,0,0,0);
-        var wSumme = 0;
-        (typeof rechnungenCache !== 'undefined' && rechnungenCache ? rechnungenCache : []).forEach(function(r) {
-          var d = new Date(r.Datum || r.datum || r.Start_ISO || 0);
-          if (d >= wStart) wSumme += parseFloat(r.Betrag || r.betrag || r.Brutto || 0);
-        });
-        response = 'Wochenumsatz: ' + wSumme.toFixed(2).replace('.', ',') + ' Euro.';
-      }
-      else if (/umsatz.*monat|monat.*umsatz|monatsumsatz/.test(text)) {
-        var moStart = new Date(); moStart.setDate(1); moStart.setHours(0,0,0,0);
-        var moSumme = 0;
-        (typeof rechnungenCache !== 'undefined' && rechnungenCache ? rechnungenCache : []).forEach(function(r) {
-          var d = new Date(r.Datum || r.datum || r.Start_ISO || 0);
-          if (d >= moStart) moSumme += parseFloat(r.Betrag || r.betrag || r.Brutto || 0);
-        });
-        response = 'Monatsumsatz: ' + moSumme.toFixed(2).replace('.', ',') + ' Euro.';
-      }
-
-      // === OFFENE ANFRAGEN (Filter direkt) ===
-      else if (/offene.*anfrage|offen.*beratung|anfragen.*offen/.test(text)) {
-        var offenCount = (beratungenCache || []).filter(function(b) { return b.Status === 'offen'; }).length;
-        response = offenCount + ' offene Anfragen. Filter wird gesetzt.';
-        action = function() {
-          showPage('beratung');
-          setTimeout(function() { if (typeof setBeratungFilter === 'function') setBeratungFilter('offen'); }, 300);
-        };
-        keepListening = false;
-      }
-
-      // === LAGER-ALARM (Filter auf unter Mindestbestand) ===
-      else if (/lager.?alarm|alarm.*lager|nachbestell|unter.*mindestbestand|niedrig.*bestand/.test(text)) {
-        var lowCount = (lagerCache || []).filter(function(p) { return (parseInt(p.Bestand) || 0) <= (parseInt(p.Min_Bestand) || 3); }).length;
-        response = lowCount + ' Produkte unter Mindestbestand. Filter wird gesetzt.';
-        action = function() {
-          showPage('lager');
-          setTimeout(function() { if (typeof setLagerFilter === 'function') setLagerFilter('low'); }, 300);
-        };
-        keepListening = false;
-      }
-
-      // === TAGESABSCHLUSS ===
-      else if (/tagesabschluss|tag.*abschlies|feierabend|laden.*zu|schluss.*machen/.test(text)) {
-        var u3 = document.getElementById('statUmsatz') ? document.getElementById('statUmsatz').textContent : '0';
-        response = 'Tagesumsatz ' + u3 + ' Euro. Oeffne den Tagesabschluss zur Pruefung.';
-        action = function() { showPage('kasse'); setTimeout(function() { if (typeof openTagesabschluss === 'function') openTagesabschluss(); }, 300); };
-        keepListening = false;
-      }
-
-      // === DATEV Export ===
-      else if (/datev|steuerberater|export|steuer/.test(text)) {
-        response = jarvisGreet() + ' Oeffne den DATEV-Export fuer deinen Steuerberater.';
-        action = function() { showPage('kasse'); setTimeout(function() { if (typeof openDatevExport === 'function') openDatevExport(); }, 300); };
-        keepListening = false;
-      }
-
-      // === Navigation ===
-      else if (/termin|kalender|buchung/.test(text)) {
-        var todayStr = new Date().toISOString().split('T')[0];
-        var count = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(todayStr) === 0; }).length;
-        response = count + ' Termine heute. Oeffne die Uebersicht.';
-        action = function() { showPage('termine'); };
-        keepListening = false;
-      }
-      else if (/kasse|umsatz|geld|einnahm/.test(text)) {
-        var umsatz = document.getElementById('statUmsatz') ? document.getElementById('statUmsatz').textContent : '0';
-        response = 'Tagesumsatz: ' + umsatz + ' Euro. Oeffne die Kasse.';
-        action = function() { showPage('kasse'); };
-        keepListening = false;
-      }
-      else if (/kunde|kunden|crm|kundschaft/.test(text)) {
-        // Suche spezifischen Kunden
-        var suchKunde = jarvisFindKunde(text);
-        if (suchKunde && !/wie ?viel|anzahl|gesamt/.test(text)) {
-          var kName = suchKunde.Name || suchKunde.name;
-          var kBesuche = parseInt(suchKunde.Besuche || suchKunde.besuche || 0);
-          response = kName + ': ' + kBesuche + ' Besuche, Umsatz ' + fmtEur(suchKunde.Umsatz || suchKunde.umsatz || 0) + ' Euro. Oeffne das Profil.';
-          action = function() { showPage('kunden'); setTimeout(function() { openKundeDetail(suchKunde); }, 500); };
-        } else {
-          var anz = kundenCache ? kundenCache.length : 0;
-          response = anz + ' Kunden in der Datenbank.';
-          action = function() { showPage('kunden'); };
-        }
-        keepListening = false;
-      }
-      else if (/lager|produkt|bestand|vorrat|nachbestell/.test(text)) {
-        var lowStock = lagerCache.filter(function(p) { return (parseInt(p.Bestand) || 0) <= (parseInt(p.Min_Bestand) || 3); });
-        response = lowStock.length > 0 ? 'Achtung: ' + lowStock.length + ' Produkte unter Mindestbestand! Oeffne Lager.' : 'Lager ist gut bestuckt. Alles im gruenen Bereich.';
-        action = function() { showPage('lager'); };
-        keepListening = false;
-      }
-      else if (/beratung|anfrage|haaranalyse|wunsch|farbcode/.test(text)) {
-        var openAnf = beratungenCache.filter(function(b) { return b.Status === 'offen'; });
-        response = openAnf.length > 0 ? openAnf.length + ' offene Anfragen. Oeffne Beratung.' : 'Keine offenen Anfragen. Oeffne Beratung.';
-        action = function() { showPage('beratung'); };
-        keepListening = false;
-      }
-      else if (/einstell|config|verbind|backend/.test(text)) {
-        response = 'Oeffne Einstellungen.';
-        action = function() { showPage('einstellungen'); };
-        keepListening = false;
-      }
-      else if (/start|home|dashboard|cockpit|uebersicht|zurueck/.test(text)) {
-        response = 'Zurueck zur Uebersicht.';
-        action = function() { showPage('dashboard'); };
-        keepListening = false;
-      }
-
-      // === Daten-Abfragen ===
-      else if (/wie ?viel.*umsatz|umsatz.*heute|was.*umsatz|was.*verdient/.test(text)) {
-        var u2 = document.getElementById('statUmsatz') ? document.getElementById('statUmsatz').textContent : '0';
-        response = 'Heutiger Tagesumsatz: ' + u2 + ' Euro.';
-      }
-      else if (/wie ?viel.*termin|termin.*heute|was.*termin|was.*ansteht/.test(text)) {
-        var td = new Date().toISOString().split('T')[0];
-        var tc = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(td) === 0; }).length;
-        var naechster = null;
-        var jetzt = new Date();
-        termineCache.forEach(function(t) {
-          var start = new Date(t.Start_ISO || '');
-          if (start > jetzt && (!naechster || start < new Date(naechster.Start_ISO))) naechster = t;
-        });
-        response = tc + ' Termine heute.';
-        if (naechster) response += ' Naechster: ' + (naechster.Kunde || naechster.kunde || 'Unbekannt') + ' um ' + new Date(naechster.Start_ISO).toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'}) + '.';
-      }
-      else if (/naechster.*termin|wer.*kommt.*als.*naechst|wer.*dran/.test(text)) {
-        var jetzt2 = new Date();
-        var next = null;
-        termineCache.forEach(function(t) {
-          var start = new Date(t.Start_ISO || '');
-          if (start > jetzt2 && (!next || start < new Date(next.Start_ISO))) next = t;
-        });
-        if (next) {
-          response = 'Naechster Termin: ' + (next.Kunde || next.kunde || 'Unbekannt') + ', ' + (next.Service || next.service || '') + ' um ' + new Date(next.Start_ISO).toLocaleTimeString('de-DE', {hour:'2-digit',minute:'2-digit'}) + '.';
-        } else {
-          response = 'Keine weiteren Termine heute.';
-        }
-      }
-
-      // === Hilfe ===
-      else if (/hilfe|help|was.*kannst|befehle|commands/.test(text)) {
-        response = 'Ich kann: Termine heute, morgen oder uebermorgen zeigen, Termine anlegen oder stornieren, Umsatz heute Woche Monat abfragen, Rechnungen erstellen, offene Anfragen und Lager-Alarm filtern, Tagesabschluss und DATEV-Export oeffnen.';
-      }
-
-      // === Gruss ===
-      else if (/hallo|hi |hey|guten|morgen|moin|servus/.test(text)) {
-        var h = new Date().getHours();
-        var gruss = h < 12 ? 'Guten Morgen' : h < 17 ? 'Guten Tag' : 'Guten Abend';
-        var uName = currentUser || 'Chef';
-        response = gruss + ', ' + uName + '. Was kann ich fuer dich tun?';
-      }
-
-      // === WF-05 KI-Assistent Fallback (Mistral via n8n) ===
-      else if (text.length > 5) {
-        // Versuche LLM-Antwort via WF-05
-        response = 'Moment, ich denke nach...';
-        document.getElementById('jarvisResponse').textContent = response;
-        jarvisCallLLM(text);
-        return; // async, kein weiterer Code hier
-      }
-
-      // === Fallback (FB-49 Spec) ===
-      else {
-        response = 'Das habe ich nicht verstanden. Sag Hilfe fuer Befehle.';
-      }
-
-      jarvisRespond(response, action, keepListening);
-    }
-
-    // LLM-Fallback via WF-05
-    function jarvisCallLLM(text) {
-      var url = (typeof backendUrl !== 'undefined' && backendUrl) ? backendUrl + 'wf05-ki-assistent' : null;
-      if (!url) {
-        jarvisRespond('LLM-Verbindung nicht verfuegbar. Versuche konkrete Befehle wie "Zeig Termine" oder "Rechnung erstellen".', null, true);
-        return;
-      }
+      // POST to WF-JARVIS-CHAT
+      var url = 'https://niniho13.app.n8n.cloud/webhook/jarvis-chat';
+      var token = (typeof sessionStorage !== 'undefined' && sessionStorage.getItem('casa_token')) || '';
       fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'CASA_Auth': '4800df27365d67597b68e663342921' },
-        body: JSON.stringify({ frage: text, kontext: { seite: currentPage, user: currentUser, salon_id: salonId || '' } })
-      }).then(function(r) { return r.json(); }).then(function(data) {
-        var antwort = data.antwort || data.response || data.text || 'Ich konnte keine Antwort generieren.';
-        jarvisRespond(antwort, null, true);
-      }).catch(function() {
-        jarvisRespond('Ich kann gerade nicht auf die KI zugreifen. Probiere es mit einem direkten Befehl.', null, true);
+        headers: { 'Content-Type': 'application/json', 'CASA_Auth': token },
+        body: JSON.stringify({
+          user_id: currentUser || '',
+          salon_id: (typeof currentSalonId === 'function') ? currentSalonId() : (salonId || ''),
+          session_id: jarvisSession.id,
+          message: userText,
+          history: jarvisSession.history.slice(-10),
+          dashboard_state: dashState,
+          kunde_context_id: jarvisSession.context.kunde_context_id || null
+        })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var el = document.getElementById(loadId);
+        if (el) el.remove();
+        if (sl) sl.textContent = 'Bereit';
+        if (data && data.success !== false) {
+          var resp = data.response || data;
+          var text2 = resp.text || resp.antwort || resp.message || (typeof resp === 'string' ? resp : 'Hier bin ich.');
+          var actions = resp.actions || [];
+          jarvisRenderMessage(text2, actions, 'assistant');
+          jarvisSession.history.push({ rolle: 'assistant', nachricht: text2, ts: Date.now(), actions: actions });
+          jarvisSpeak(text2);
+        } else {
+          jarvisRenderMessage('Entschuldige, das ist gerade nicht verfuegbar. Probiere es gleich nochmal.', [], 'assistant');
+        }
+      })
+      .catch(function() {
+        var el = document.getElementById(loadId);
+        if (el) el.remove();
+        if (sl) sl.textContent = 'Bereit';
+        // Offline fallback: try local processing
+        var localResp = jarvisLocalFallback(userText);
+        jarvisRenderMessage(localResp.text, localResp.actions || [], 'assistant');
+        jarvisSession.history.push({ rolle: 'assistant', nachricht: localResp.text, ts: Date.now() });
+        if (localResp.text) jarvisSpeak(localResp.text);
       });
     }
 
-    // Zentrale Antwort-Funktion
-    function jarvisRespond(response, action, keepListening) {
-      document.getElementById('jarvisResponse').textContent = response;
-      jarvisContext.conversationHistory.push({ role: 'jarvis', text: response });
-
-      // Text-to-Speech mit natuerlichen Pausen an Satzgrenzen (Feature D)
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        // Satzteile an Punkten und Nummern aufteilen fuer natuerliche Pausen
-        var sprechText = response
-          .replace(/(\d+:)/g, function(m){ return m + ' '; }) // "1: " → Pause nach Nummerierung
-          .replace(/\.\s+/g, '. \u200B'); // Null-Breitenzeichen als Pause-Marker
-        var utter = new SpeechSynthesisUtterance(sprechText);
-        utter.lang = 'de-DE';
-        utter.rate = 0.95; // leicht langsamer = natuerlicher
-        utter.pitch = 0.92;
-        jarvisContext.isSpeaking = true;
-        utter.onend = function() { jarvisContext.isSpeaking = false; };
-        utter.onerror = function() { jarvisContext.isSpeaking = false; };
-        window.speechSynthesis.speak(utter);
-      }
-
-      if (action) {
-        // Warte bis Sprache beendet ist, dann Dialog oeffnen
-        var waitForSpeech = function() {
-          if (!jarvisContext.isSpeaking) {
-            closeJarvis();
-            action();
-          } else {
-            setTimeout(waitForSpeech, 200);
-          }
-        };
-        setTimeout(waitForSpeech, 1200);
-      } else if (keepListening) {
-        setTimeout(function() {
-          if (jarvisActive) {
-            document.getElementById('jarvisTranscript').textContent = 'Ich hoere zu...';
-          }
-        }, 2500);
-      }
+    // Local fallback when backend unreachable
+    function jarvisLocalFallback(text) {
+      var t = text.toLowerCase();
+      if (/termin/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Termine direkt.', actions: [{ type: 'goto_page', label: 'Termine', payload: { page: 'termine' } }] }; }
+      if (/kasse|umsatz/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Kasse direkt.', actions: [{ type: 'goto_page', label: 'Kasse', payload: { page: 'kasse' } }] }; }
+      if (/lager/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Lager direkt.', actions: [{ type: 'goto_page', label: 'Lager', payload: { page: 'lager' } }] }; }
+      return { text: 'Keine Verbindung zum KI-Backend. Bitte Internetverbindung pruefen.', actions: [] };
     }
 
-    // Keyboard shortcut: press J to toggle Jarvis
+    function jarvisRenderMessage(text, actions, rolle) {
+      var chat = document.getElementById('jarvisTranscript');
+      if (!chat) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'jarvis-msg ' + (rolle || 'assistant');
+      var bubble = document.createElement('div');
+      bubble.className = 'jarvis-bubble';
+      bubble.textContent = text;
+      wrap.appendChild(bubble);
+      // Action buttons under assistant bubble
+      if (actions && actions.length && rolle !== 'user') {
+        var bar = document.createElement('div');
+        bar.className = 'jarvis-actions';
+        // Wrap bar inside a container aligned left
+        var barWrap = document.createElement('div');
+        barWrap.className = 'jarvis-msg assistant';
+        barWrap.style.marginTop = '0';
+        barWrap.appendChild(bar);
+        actions.forEach(function(a) {
+          var btn = document.createElement('button');
+          btn.textContent = a.label;
+          btn.onclick = function() { jarvisExecuteAction(a); };
+          bar.appendChild(btn);
+        });
+        chat.appendChild(wrap);
+        chat.appendChild(barWrap);
+        chat.scrollTop = chat.scrollHeight;
+        return;
+      }
+      chat.appendChild(wrap);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function jarvisExecuteAction(action) {
+      switch (action.type) {
+        case 'open_sheet':
+          if (action.payload && action.payload.sheet_id) { /* future */ }
+          break;
+        case 'goto_page':
+          if (action.payload && action.payload.page) { closeJarvis(); showPage(action.payload.page); }
+          break;
+        case 'open_termin':
+          closeJarvis();
+          showPage('termine');
+          if (action.payload && action.payload.termin_id && typeof openTerminDetail === 'function') {
+            setTimeout(function() { var t = (termineCache || []).find(function(x) { return x.id === action.payload.termin_id; }); if (t) openTerminDetail(t); }, 400);
+          }
+          break;
+        case 'open_rechnung':
+          closeJarvis();
+          showPage('kasse');
+          setTimeout(function() { if (typeof openRechnungSheet === 'function') openRechnungSheet(); }, 300);
+          break;
+        case 'open_nachbestellung':
+          closeJarvis();
+          showPage('lager');
+          setTimeout(function() { if (typeof openNachbestellungSheet === 'function') openNachbestellungSheet(); }, 300);
+          break;
+        case 'open_tagesabschluss':
+          closeJarvis();
+          showPage('kasse');
+          setTimeout(function() { if (typeof openTagesabschluss === 'function') openTagesabschluss(); }, 300);
+          break;
+        default:
+          break;
+      }
+      jarvisRenderMessage('Erledigt.', [], 'assistant');
+    }
+
+    function jarvisSpeak(text) {
+      if (!('speechSynthesis' in window) || !text) return;
+      window.speechSynthesis.cancel();
+      var utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'de-DE';
+      utter.rate = 0.95;
+      utter.pitch = 0.92;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // Keyboard: J to toggle Jarvis
     document.addEventListener('keydown', function(e) {
       if (e.key === 'j' && !e.ctrlKey && !e.metaKey && !e.altKey && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
         e.preventDefault();
         toggleJarvis();
       }
+      if (e.key === 'Escape' && jarvisActive) { closeJarvis(); }
     });
 
     // === WIDGET-PERSONALISIERUNG (Cockpit) ===
@@ -9830,16 +9319,6 @@
       if (fabOpen && !e.target.closest('.fab-wrap')) closeFab();
     });
 
-    // FAB long press for KI-Assistent
-    var fabLongTimer = null;
-    var fabBtnEl = document.getElementById('fabBtn');
-    if (fabBtnEl) {
-      fabBtnEl.addEventListener('touchstart', function(e) {
-        fabLongTimer = setTimeout(function() { toggleKiAssist(); e.preventDefault(); }, 500);
-      });
-      fabBtnEl.addEventListener('touchend', function() { clearTimeout(fabLongTimer); });
-      fabBtnEl.addEventListener('touchmove', function() { clearTimeout(fabLongTimer); });
-    }
   </script>
 
   <!-- PWA Install Banner -->
