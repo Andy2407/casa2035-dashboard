@@ -10945,7 +10945,8 @@
         + '<div style="margin-bottom:12px"><div style="color:var(--text-dim);text-transform:uppercase;font-size:10px;font-weight:700;letter-spacing:0.8px;margin-bottom:6px">Suche & Navigation</div>'
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Globale Suche</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Cmd/Ctrl + K</kbd></div>'
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Tastaturkuerzel-Hilfe</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">?</kbd></div>'
-        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Schliessen / Abbrechen</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Esc</kbd></div></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Schliessen / Abbrechen</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Esc</kbd></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Home / Termine / Beratung / Kunden / Lager / Kasse / Admin</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Alt + 1…7</kbd></div></div>'
         + '<div style="margin-bottom:12px"><div style="color:var(--text-dim);text-transform:uppercase;font-size:10px;font-weight:700;letter-spacing:0.8px;margin-bottom:6px">In der Suche</div>'
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Hoch / Runter</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">&uarr; &darr;</kbd></div>'
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Oeffnen</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">&crarr;</kbd></div></div>'
@@ -11181,11 +11182,18 @@
       });
       overlay.addEventListener('click', function(e){ if (e.target === overlay) closeSearch(); });
 
-      // Shortcut Cmd/Ctrl + K
+      // Shortcut Cmd/Ctrl + K + Alt+1..7 fuer Tab-Wechsel
       document.addEventListener('keydown', function(e){
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
           e.preventDefault();
           openSearch();
+          return;
+        }
+        // Alt + 1..7: schneller Tab-Wechsel (Workday/Linear-Shortcut)
+        if (e.altKey && !e.shiftKey && !e.metaKey && !e.ctrlKey && e.key >= '1' && e.key <= '7') {
+          var tabs = ['dashboard','termine','beratung','kunden','lager','kasse','einstellungen'];
+          var idx = parseInt(e.key) - 1;
+          if (tabs[idx]) { e.preventDefault(); try { showPage(tabs[idx]); } catch(er) {} }
         }
       });
       // Focus-Trap: Tab + Shift+Tab bleiben im Modal
