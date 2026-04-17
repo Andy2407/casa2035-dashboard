@@ -229,16 +229,20 @@
       position: sticky; top: 0; z-index: 100;
       /* FB 17.04. Ticket 351f8adc: iPhone-Status-Leiste (Uhrzeit/WLAN/Batterie) ueberlappt Header -> Mindest-Pad-Top 44px */
       padding: max(calc(env(safe-area-inset-top, 0px) + 14px), var(--min-header-pad, 44px)) max(20px, env(safe-area-inset-right, 20px)) 12px max(20px, env(safe-area-inset-left, 20px));
-      background: rgba(250,248,246,0.92);
-      backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+      /* FB 17.04. Ticket 57047aa8: Designer-Balken-Redesign. Premium-Look, iCal-+Workday-inspiriert, nicht kopiert. */
+      background: rgba(250,248,246,0.94);
+      backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
       border-bottom: 1px solid var(--border);
+      box-shadow: 0 1px 0 rgba(201,168,76,0.12), 0 2px 20px rgba(0,0,0,0.04);
     }
-    [data-theme="dark"] .header { background: rgba(10,10,10,0.92); }
-    .header-top { display: flex; justify-content: space-between; align-items: center; }
-    .header-left { display: flex; flex-direction: column; gap: 0; }
-    .header-greeting { font-size: 10px; font-weight: 600; color: var(--text-dim); letter-spacing: 1.2px; text-transform: uppercase; }
-    .header-salon { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin-top: 2px; }
-    .header-salon em { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; color: var(--gold); }
+    [data-theme="dark"] .header { background: rgba(10,10,10,0.92); box-shadow: 0 1px 0 rgba(201,168,76,0.25), 0 2px 20px rgba(0,0,0,0.4); }
+    /* Feine Gold-Linie direkt unter dem Header — wie ein Premium-Accent */
+    .header::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent 0%, var(--gold) 35%, var(--gold) 65%, transparent 100%); opacity: 0.5; pointer-events: none; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .header-left { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+    .header-greeting { font-size: 9px; font-weight: 700; color: var(--gold); letter-spacing: 1.6px; text-transform: uppercase; opacity: 0.8; }
+    .header-salon { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .header-salon em { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 600; color: var(--gold); margin-left: 2px; }
     .header-right { display: flex; align-items: center; gap: 10px; }
     .live-dot {
       display: inline-flex; align-items: center; gap: 5px;
@@ -840,31 +844,60 @@
       border: none; transition: all 200ms;
     }
     .termin-view-btn.active { background: var(--gold); color: #fff; }
-    .day-view-grid { position: relative; min-height: 600px; }
-    .day-hour-row { display: flex; align-items: flex-start; min-height: 60px; border-bottom: 1px solid var(--border); }
-    .day-hour-label { width: 45px; font-size: 11px; color: var(--text-dim); padding-top: 2px; flex-shrink: 0; font-variant-numeric: tabular-nums; }
-    .day-hour-slots { flex: 1; position: relative; min-height: 60px; }
+    /* === Apple-iCal-Look (17.04.2026, Capo-Ticket 45b8a93a) === */
+    .day-view-grid { position: relative; min-height: 600px; background: var(--surface); border-radius: var(--radius-sm); overflow: hidden; }
+    .day-hour-row { display: flex; align-items: stretch; min-height: 52px; border-bottom: 1px solid rgba(0,0,0,0.06); }
+    .day-hour-row:nth-child(odd) { background: rgba(255,255,255,0.02); }
+    .day-hour-label { width: 52px; font-size: 10px; color: var(--text-dim); padding: 4px 8px 0 0; flex-shrink: 0; font-variant-numeric: tabular-nums; text-align: right; letter-spacing: 0.3px; text-transform: uppercase; font-weight: 600; }
+    .day-hour-slots { flex: 1; position: relative; min-height: 52px; border-left: 1px solid rgba(0,0,0,0.06); }
     .day-termin-block {
-      position: absolute; left: 4px; right: 4px;
-      background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold);
-      border-radius: var(--radius-sm); padding: 4px 8px; font-size: 11px; overflow: hidden;
-      cursor: pointer; transition: all 200ms var(--ease); z-index: 1;
+      position: absolute; left: 6px; right: 6px;
+      background: linear-gradient(135deg, rgba(201,168,76,0.18), rgba(201,168,76,0.08));
+      border: 1px solid rgba(201,168,76,0.35);
+      border-left: 3px solid var(--gold);
+      border-radius: 8px; padding: 6px 10px; font-size: 11px; overflow: hidden;
+      cursor: pointer; transition: transform 150ms var(--ease), box-shadow 150ms; z-index: 1;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     }
-    .day-termin-block:hover { box-shadow: var(--shadow-soft); z-index: 2; }
-    .week-view-wrapper { display: flex; overflow-x: auto; }
-    .week-time-axis { width: 40px; flex-shrink: 0; padding-top: 30px; position: sticky; left: 0; z-index: 3; background: var(--surface); }
-    .week-time-label { height: 48px; font-size: 10px; color: var(--text-dim); text-align: right; padding-right: 6px; font-variant-numeric: tabular-nums; line-height: 48px; }
+    .day-termin-block:hover { transform: translateX(2px); box-shadow: 0 4px 16px rgba(201,168,76,0.25); z-index: 2; }
+    .day-termin-block .dtb-time { font-size: 10px; font-weight: 700; color: var(--gold-dark, var(--gold)); letter-spacing: 0.3px; }
+    .day-termin-block .dtb-name { font-size: 12px; font-weight: 600; color: var(--text); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .day-termin-block .dtb-svc { font-size: 10px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    /* Now-Line (wie Apple iCal rote Linie) */
+    .now-line { position: absolute; left: 0; right: 0; height: 2px; background: #E74C3C; z-index: 5; pointer-events: none; }
+    .now-line::before { content: ''; position: absolute; left: -6px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: #E74C3C; box-shadow: 0 0 0 3px rgba(231,76,60,0.2); }
+
+    .week-view-wrapper { display: flex; overflow-x: auto; background: var(--surface); border-radius: var(--radius); padding: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .week-time-axis { width: 48px; flex-shrink: 0; padding-top: 36px; position: sticky; left: 0; z-index: 3; background: var(--surface); border-right: 1px solid rgba(0,0,0,0.06); }
+    .week-time-label { height: 48px; font-size: 9px; color: var(--text-dim); text-align: right; padding: 0 8px 0 4px; font-variant-numeric: tabular-nums; line-height: 16px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; }
     .week-view-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; min-width: 560px; }
-    .week-day-col { min-width: 0; border-left: 1px solid var(--border); }
-    .week-day-header { font-size: 11px; font-weight: 700; text-align: center; padding: 6px; color: var(--text-dim); border-bottom: 1px solid var(--border); height: 30px; }
-    .week-day-header.today { color: var(--gold); }
-    .week-hour-cell { height: 48px; border-bottom: 1px solid var(--border); position: relative; }
-    .week-termin-chip {
-      font-size: 9px; padding: 2px 4px; margin: 1px 2px;
-      background: var(--surface); border: 1px solid var(--border); border-left: 2px solid var(--gold);
-      border-radius: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      cursor: pointer; position: absolute; left: 1px; right: 1px; z-index: 1;
+    .week-day-col { min-width: 0; border-left: 1px solid rgba(0,0,0,0.06); position: relative; }
+    .week-day-col:first-child { border-left: none; }
+    .week-day-header {
+      font-size: 10px; font-weight: 700; text-align: center; padding: 8px 4px 6px;
+      color: var(--text-dim); border-bottom: 1px solid rgba(0,0,0,0.08);
+      height: 36px; letter-spacing: 0.5px; text-transform: uppercase;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      background: linear-gradient(180deg, var(--surface) 0%, var(--surface-hover) 100%);
     }
+    .week-day-header .dow-name { font-size: 9px; color: var(--text-dim); letter-spacing: 0.8px; }
+    .week-day-header .dow-date { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: 0; text-transform: none; line-height: 1; font-variant-numeric: tabular-nums; }
+    .week-day-header.today { background: linear-gradient(180deg, rgba(201,168,76,0.12), rgba(201,168,76,0.03)); color: var(--gold); }
+    .week-day-header.today .dow-date { color: var(--gold); background: var(--gold); color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; }
+    .week-hour-cell { height: 48px; border-bottom: 1px solid rgba(0,0,0,0.04); position: relative; }
+    .week-hour-cell:nth-child(odd) { background: rgba(0,0,0,0.015); }
+    .week-termin-chip {
+      font-size: 10px; padding: 3px 6px; margin: 0;
+      background: linear-gradient(135deg, rgba(201,168,76,0.22), rgba(201,168,76,0.10));
+      border: 1px solid rgba(201,168,76,0.4);
+      border-left: 3px solid var(--gold);
+      border-radius: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      cursor: pointer; position: absolute; left: 2px; right: 2px; z-index: 1;
+      font-weight: 600; color: var(--text);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      transition: transform 120ms ease, box-shadow 120ms;
+    }
+    .week-termin-chip:hover { transform: scale(1.03); z-index: 3; box-shadow: 0 4px 12px rgba(201,168,76,0.3); }
 
     /* === Profil Dropdown === */
     .profile-dropdown {
@@ -3751,8 +3784,14 @@
       var badge = document.getElementById('unreadBadge');
       if (unread.length > 0) { badge.style.display = ''; badge.textContent = unread.length; }
       else { badge.style.display = 'none'; }
-      document.getElementById('statBeratung').textContent = unread.length;
-      document.getElementById('statBeratungSub').textContent = 'offene Anfragen';
+      // FB 17.04. Ticket 4996fad1: Home-Tab soll auch offene Beratungen (Wunschfrisur/Farbcode/Haaranalyse) zaehlen.
+      var offeneBeratungen = (typeof beratungenCache !== 'undefined' && beratungenCache)
+        ? beratungenCache.filter(function(b){ return b.Status==='offen' || b.Status==='neu'; }).length : 0;
+      var total = unread.length + offeneBeratungen;
+      document.getElementById('statBeratung').textContent = total;
+      document.getElementById('statBeratungSub').textContent = offeneBeratungen > 0
+        ? (unread.length + ' Anfragen · ' + offeneBeratungen + ' Beratungen')
+        : 'offene Anfragen';
 
       events.slice(0, 8).forEach(function(ev, idx) {
         var card = document.createElement('div');
@@ -4189,6 +4228,18 @@
         row.innerHTML = '<div class="day-hour-label">' + String(h).padStart(2,'0') + ':00</div><div class="day-hour-slots" id="daySlot' + h + '"></div>';
         grid.appendChild(row);
       }
+      // Apple-iCal-Now-Line (rote Linie auf heutiger Ansicht)
+      var nowD = new Date();
+      var isDayToday = localDateStr(nowD) === selectedDate;
+      if (isDayToday && nowD.getHours() >= minH && nowD.getHours() <= maxH) {
+        var currentSlot = document.getElementById('daySlot' + nowD.getHours());
+        if (currentSlot) {
+          var nL = document.createElement('div');
+          nL.className = 'now-line';
+          nL.style.top = (nowD.getMinutes() / 60 * 52) + 'px';
+          currentSlot.appendChild(nL);
+        }
+      }
       container.appendChild(grid);
       var colCount = Math.max(staffKeys.length, 1);
       var colWidth = 100 / colCount;
@@ -4217,13 +4268,17 @@
         block.style.width = colWidth + '%';
         block.style.right = 'auto';
         block.style.borderLeftColor = dayColor;
-        block.style.background = (dayColor && dayColor.indexOf('#') === 0) ? dayColor + '14' : 'var(--surface)';
+        if (dayColor && dayColor.indexOf('#') === 0) {
+          block.style.background = 'linear-gradient(135deg,' + dayColor + '2E,' + dayColor + '10)';
+          block.style.borderColor = dayColor + '55';
+        }
         var statusDot = t.Status === 'bestätigt' ? '#2d8a4e' : (t.Status === 'offen' ? '#c48a1a' : '#686058');
         var dayRecipe = findRecipe(t.Service);
-        block.innerHTML = '<div style="font-weight:600;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
-          + '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + statusDot + ';margin-right:3px;vertical-align:middle"></span>'
-          + fmtTime(t.Start_ISO) + ' ' + esc(t.Service || '') + (dayRecipe ? ' &#128203;' : '') + '</div>'
-          + '<div style="font-size:9px;color:var(--text-dim)">' + esc(t.Stylist || '') + ' — ' + esc(t.Kundenname || '') + demoDot() + '</div>';
+        // Apple-iCal-Style 3-Zeiler: Time + Kunde + Service
+        block.innerHTML = '<div class="dtb-time"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + statusDot + ';margin-right:4px;vertical-align:middle"></span>'
+          + fmtTime(t.Start_ISO) + ' · ' + (t.Dauer_Min || '?') + ' Min</div>'
+          + '<div class="dtb-name">' + esc(t.Kundenname || t.Kunde || '—') + '</div>'
+          + '<div class="dtb-svc">' + esc(t.Service || '') + (dayRecipe ? ' &#128203;' : '') + ' · ' + esc(t.Stylist || '') + demoDot() + '</div>';
         block.onclick = function() { openTerminDetail(t); };
         slot.appendChild(block);
       });
@@ -4278,6 +4333,8 @@
       grid.style.gridTemplateColumns = 'repeat(' + weekDaysCount + ', 1fr)';
       var today = new Date().toISOString().split('T')[0];
 
+      var nowDate = new Date();
+      var nowHourPx = (nowDate.getHours() - weekMinH) * 48 + (nowDate.getMinutes() / 60) * 48;
       for (var i = 0; i < weekDaysCount; i++) {
         var d = new Date(start); d.setDate(d.getDate() + i);
         var dStr = d.toISOString().split('T')[0];
@@ -4285,8 +4342,16 @@
         col.className = 'week-day-col';
         var header = document.createElement('div');
         header.className = 'week-day-header' + (dStr === today ? ' today' : '');
-        header.textContent = days[i] + ' ' + d.getDate();
+        // iCal-Style: DOW-Name klein oben + große Tagesnummer unten (heute rund gold)
+        header.innerHTML = '<div class="dow-name">' + days[i] + '</div><div class="dow-date">' + d.getDate() + '</div>';
         col.appendChild(header);
+        // Now-Line nur in heutiger Spalte (Apple-iCal-Rot)
+        if (dStr === today && nowDate.getHours() >= weekMinH && nowDate.getHours() <= weekMaxH) {
+          var nowL = document.createElement('div');
+          nowL.className = 'now-line';
+          nowL.style.top = (36 + nowHourPx) + 'px';
+          col.appendChild(nowL);
+        }
 
         // Hour cells - Sprint-4b: dynamische Range
         var cells = {};
@@ -4313,17 +4378,25 @@
           var chip = document.createElement('div');
           chip.className = 'week-termin-chip';
           var topPx = (startM / 60) * 48;
-          var heightPx = Math.max((dur / 60) * 48, 16);
+          var heightPx = Math.max((dur / 60) * 48, 18);
           chip.style.top = topPx + 'px';
           chip.style.height = heightPx + 'px';
-          // SPRINT5 (16.04.2026): getStylistColor konsolidiert
+          // Apple-iCal-Style: Farbe mitarbeiter + tiefer Gradient
           var weekColor = getStylistColor(t.Stylist);
           chip.style.borderLeftColor = weekColor;
-          if (weekColor && weekColor.indexOf('#') === 0) chip.style.background = weekColor + '18';
+          if (weekColor && weekColor.indexOf('#') === 0) {
+            chip.style.background = 'linear-gradient(135deg,' + weekColor + '2E,' + weekColor + '12)';
+            chip.style.borderColor = weekColor + '55';
+          }
           var timeStr = fmtTime(t.Start_ISO);
-          var svcStr = esc((t.Service || '').substring(0, 10));
+          var svcStr = esc((t.Service || '').substring(0, 12));
           var weekRecipe = findRecipe(t.Service);
-          chip.innerHTML = timeStr + ' ' + svcStr + (weekRecipe ? ' &#128203;' : '');
+          // Zwei-Zeiler wenn genug Hoehe
+          if (heightPx >= 30) {
+            chip.innerHTML = '<div style="font-size:9px;font-weight:700;opacity:0.85">' + timeStr + '</div><div style="font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + svcStr + (weekRecipe ? ' &#128203;' : '') + '</div>';
+          } else {
+            chip.innerHTML = timeStr + ' ' + svcStr + (weekRecipe ? ' &#128203;' : '');
+          }
           chip.title = timeStr + ' ' + esc(t.Service || '') + ' — ' + esc(t.Kundenname || '');
           chip.onclick = function() { openTerminDetail(t); };
           cells[startH].appendChild(chip);
