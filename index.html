@@ -788,7 +788,8 @@
        Ohne diese Top-Angabe verschwindet die KW-Anzeige hinter dem Header beim Scrollen. */
     /* F4 15.04.2026: Sticky Toolbars auch in Lager + Kasse (Suche + Filter + Aktionen bleiben beim Scrollen sichtbar) */
     .lager-toolbar, .kasse-toolbar {
-      position: sticky; top: calc(var(--safe-top, 0px) + 52px); z-index: 50;
+      /* FB 17.04.: gleiche Formel wie termine-toolbar, matched die neue Header-Hoehe */
+      position: sticky; top: calc(max(env(safe-area-inset-top, 0px) + 14px, 44px) + 38px); z-index: 50;
       background: var(--bg);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       padding: 8px 0 6px;
@@ -796,10 +797,10 @@
       margin: 0 -16px 10px; padding-left: 16px; padding-right: 16px;
     }
     .termine-toolbar {
-      /* BUG1-FIX 16.04.2026: top=68px (gemessene Header-Hoehe bei safe-top=0) + safe-top für Notch.
-         FB-50 17.04.2026: KW-Anzeige im Hochformat verschwindet weil top-Wert zu gross war wenn
-         safe-area-inset-top=0 (normales iPhone ohne Notch). Fallback 0px sichert Sichtbarkeit. */
-      position: sticky; top: calc(env(safe-area-inset-top, 0px) + 62px); z-index: 50;
+      /* FB 17.04.2026 Tickets 5e8ba232 + fb39109d: KW-Anzeige verschwindet im Hochformat.
+         Ursache: sticky-top war 62px, Header aber ~74px (44px Safe-Area-Fallback + 30px Content) -> Toolbar wurde verdeckt.
+         Fix: top matcht exakt die neue Header-Hoehe (max der beiden Werte). */
+      position: sticky; top: calc(max(env(safe-area-inset-top, 0px) + 14px, 44px) + 38px); z-index: 50;
       background: var(--bg);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       padding: 8px 16px 8px;
@@ -10537,7 +10538,8 @@
     }
 
     // Persistenter Mic-Permission Cache (FB-19): nach erstem Grant nicht mehr neu fragen
-    var fbMicGranted = false;
+    // FB 17.04. Ticket 4db3e7c0: Feedback-Widget soll nicht jedes Mal nach Mic-Erlaubnis fragen -> localStorage
+    var fbMicGranted = localStorage.getItem('casa_mic_granted') === '1';
     // Voice Interpunktions-Heuristik (FB-14/29): "punkt"/"komma"/"fragezeichen" -> Zeichen
     function applyVoicePunctuation(text) {
       if (!text) return text;
@@ -10599,6 +10601,7 @@
       navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
         stream.getTracks().forEach(function(t) { t.stop(); });
         fbMicGranted = true;
+        try { localStorage.setItem('casa_mic_granted', '1'); } catch(e) {}
         startRec();
       }).catch(function() { showToast('Mikrofon-Zugriff verweigert', 'error'); });
     }
