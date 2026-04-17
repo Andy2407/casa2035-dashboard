@@ -3,7 +3,7 @@
 <head>
     <link rel="stylesheet" href="https://api.casa2035.de/fonts/fonts.css">
   <meta charset="UTF-8">
-  <!-- Capo 16.04.2026: Zoom komplett sperren in App-Ansicht. Schriftgroesse ueber Settings (Accessibility-Ersatz). -->
+  <!-- Capo 16.04.2026: Zoom komplett sperren in App-Ansicht. Schriftgroesse über Settings (Accessibility-Ersatz). -->
   <!-- FB-49/52/74 17.04.2026: initial-scale=1 (ohne .0) verhindert Querformat-Reset-Zoom auf Safari. shrink-to-fit=no blockiert alten iOS-Safari Shrink. -->
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -163,12 +163,12 @@
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
       overscroll-behavior: none;
-      /* Capo 16.04.2026: kein Pinch-Zoom, kein Doppel-Tap-Zoom. Schriftgroesse ueber Settings. */
+      /* Capo 16.04.2026: kein Pinch-Zoom, kein Doppel-Tap-Zoom. Schriftgroesse über Settings. */
       touch-action: manipulation;
       -webkit-touch-callout: none;
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
-      /* A11y-Ersatz fuer gesperrten Zoom: benutzerwaehlbare Schriftgroesse-Basis via CSS-Var */
+      /* A11y-Ersatz für gesperrten Zoom: benutzerwaehlbare Schriftgroesse-Basis via CSS-Var */
       font-size: var(--user-font-size, 14px);
     }
     /* A11y Schriftgroesse: 3 Stufen (klein/normal/gross/xl) via data-font-size am body */
@@ -386,7 +386,7 @@
       display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700;
       padding: 2px 8px; border-radius: var(--radius-full); text-transform: uppercase; letter-spacing: 0.3px;
     }
-    .termin-status.bestaetigt { background: var(--success-bg); color: var(--success); }
+    .termin-status.bestätigt { background: var(--success-bg); color: var(--success); }
     .termin-status.offen { background: var(--warning-bg); color: var(--warning); }
     .termin-status.abgeschlossen { background: var(--bg-warm); color: var(--text-dim); }
     .termin-status.storniert { background: var(--danger-bg); color: var(--danger); text-decoration: line-through; }
@@ -773,7 +773,7 @@
       margin: 0 -16px 10px; padding-left: 16px; padding-right: 16px;
     }
     .termine-toolbar {
-      /* BUG1-FIX 16.04.2026: top=68px (gemessene Header-Hoehe bei safe-top=0) + safe-top fuer Notch.
+      /* BUG1-FIX 16.04.2026: top=68px (gemessene Header-Hoehe bei safe-top=0) + safe-top für Notch.
          FB-50 17.04.2026: KW-Anzeige im Hochformat verschwindet weil top-Wert zu gross war wenn
          safe-area-inset-top=0 (normales iPhone ohne Notch). Fallback 0px sichert Sichtbarkeit. */
       position: sticky; top: calc(env(safe-area-inset-top, 0px) + 62px); z-index: 50;
@@ -1205,7 +1205,7 @@
       html, body { width: 100vw; height: 100vh; overflow: hidden; }
       :root { --nav-height: 36px; --safe-top: env(safe-area-inset-top, 0px); }
       body { padding-top: 0; overflow-y: auto; }
-      /* Header versteckt sich beim Scrollen — Safe-Area fuer Notch/Dynamic Island */
+      /* Header versteckt sich beim Scrollen — Safe-Area für Notch/Dynamic Island */
       .header {
         padding: calc(env(safe-area-inset-top, 0px) + 2px) max(12px, env(safe-area-inset-right, 12px)) 2px max(12px, env(safe-area-inset-left, 12px));
         position: sticky; top: 0;
@@ -1357,12 +1357,12 @@
         padding-bottom: max(0px, env(safe-area-inset-bottom, 0px)) !important;
         height: calc(var(--nav-height, 36px) + env(safe-area-inset-bottom, 0px)) !important;
       }
-      /* FAB und Feedback-Button ueber Bottom-Nav + Safe-Area */
+      /* FAB und Feedback-Button über Bottom-Nav + Safe-Area */
       .fab-wrap { bottom: calc(var(--nav-height, 36px) + env(safe-area-inset-bottom, 0px) + 4px) !important; }
       #dashFeedbackFab { bottom: calc(var(--nav-height, 36px) + env(safe-area-inset-bottom, 0px) + 4px) !important; }
       /* Content-Hoehe korrekt berechnen (keine doppelte Safe-Top-Addition) */
       main { min-height: calc(100vh - var(--nav-height, 36px) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px)) !important; }
-      /* Detail-Sheet darf nicht ueber Bottom-Nav laufen */
+      /* Detail-Sheet darf nicht über Bottom-Nav laufen */
       #detailSheet .sheet-content, .sheet .sheet-content {
         max-height: calc(100vh - var(--nav-height, 36px) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 20px) !important;
       }
@@ -1520,7 +1520,7 @@
 
   <!-- Jarvis Conversational Overlay -->
   <div class="jarvis-overlay" id="jarvisOverlay">
-    <button class="jarvis-close" onclick="closeJarvis()" aria-label="Jarvis schliessen">&times;</button>
+    <button class="jarvis-close" onclick="closeJarvis()" aria-label="Jarvis schließen">&times;</button>
     <div style="display:flex;flex-direction:column;width:min(480px,calc(100vw - 24px));max-height:calc(100vh - 120px)">
       <!-- Header -->
       <div style="display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid rgba(201,168,76,0.15);flex-shrink:0">
@@ -1560,7 +1560,7 @@
         <button class="golive-close" onclick="closeGoLive()">&times;</button>
       </div>
       <div class="golive-body">
-        <p>Diese Daten sind <strong>Demo-Daten</strong> fuer die Vorfuehrung. Fuer den Echtbetrieb muessen folgende Punkte erledigt werden:</p>
+        <p>Diese Daten sind <strong>Demo-Daten</strong> für die Vorfuehrung. Für den Echtbetrieb muessen folgende Punkte erledigt werden:</p>
         <div class="golive-section">
           <h4>Infrastruktur</h4>
           <div class="golive-item"><span class="check done">&#10003;</span>Datenbank auf eigenem Server</div>
@@ -1574,7 +1574,7 @@
           <div class="golive-item"><span class="check done">&#10003;</span>11 Automatisierungs-Workflows erstellt</div>
           <div class="golive-item"><span class="check open">&#9679;</span>Workflows importieren + testen</div>
           <div class="golive-item"><span class="check open">&#9679;</span>Zugangsdaten einrichten</div>
-          <div class="golive-item"><span class="check open">&#9679;</span>E2E-Verbundtest durchfuehren</div>
+          <div class="golive-item"><span class="check open">&#9679;</span>E2E-Verbundtest durchführen</div>
         </div>
         <div class="golive-section">
           <h4>Daten</h4>
@@ -1665,13 +1665,13 @@
     <div id="pageHintBar" class="page-hint-bar" style="display:none" role="note" aria-live="polite">
       <span class="page-hint-icon">&#128161;</span>
       <span class="page-hint-text" id="pageHintText"></span>
-      <button type="button" class="page-hint-close" onclick="dismissPageHint()" aria-label="Tipp schliessen">&times;</button>
+      <button type="button" class="page-hint-close" onclick="dismissPageHint()" aria-label="Tipp schließen">&times;</button>
     </div>
 
     <!-- PAGE: Mein Salon (Home) -->
     <div class="page active" id="pageDashboard">
       <div class="hero-card" onclick="showPage('termine')">
-        <h3 class="serif" id="heroTitle">Willkommen zurueck</h3>
+        <h3 class="serif" id="heroTitle">Willkommen zurück</h3>
         <p id="heroSubtitle">Dein Salon auf einen Blick</p>
         <div class="hero-time" id="heroTime"></div>
         <div class="demo-banner" id="demoBanner" onclick="event.stopPropagation();openGoLive()" style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:var(--radius-full);background:linear-gradient(135deg,rgba(196,138,26,0.15),rgba(224,168,46,0.1));border:1px solid rgba(196,138,26,0.25);cursor:pointer;font-size:11px;font-weight:600;color:var(--warning);transition:all 200ms">
@@ -1791,7 +1791,7 @@
       <div class="section-title">KI-Vorschlaege</div>
       <div class="ki-suggestions stagger" id="kiSuggestions"></div>
 
-      <div class="section-title">Aktuelle Ereignisse <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten — Klicken fuer Go-Live Status">D</span></div>
+      <div class="section-title">Aktuelle Ereignisse <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten — Klicken für Go-Live Status">D</span></div>
       <div class="event-list stagger" id="eventList"></div>
     </div>
 
@@ -1811,7 +1811,7 @@
           <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten" style="flex:0 0 auto;margin-left:4px">D</span>
           <div class="termine-date-inline">
             <button onclick="changeTerminDate(-1)" aria-label="Vorheriger Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="15 18 9 12 15 6"/></svg></button>
-            <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer;font-size:12px;white-space:nowrap" title="Zurueck zu Heute">Heute</div>
+            <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer;font-size:12px;white-space:nowrap" title="Zurück zu Heute">Heute</div>
             <button onclick="changeTerminDate(1)" aria-label="Naechster Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg></button>
           </div>
         </div>
@@ -1845,13 +1845,13 @@
           <div class="action-card" onclick="openRechnungSheet()"><div class="icon">&#9998;</div><div class="title">Rechnung</div><div class="desc">Neue Rechnung erstellen</div></div>
           <div class="action-card" onclick="openAusgabeSheet()"><div class="icon">&#128181;</div><div class="title">Ausgabe</div><div class="desc">Betriebsausgabe buchen</div></div>
           <div class="action-card" onclick="openTagesabschluss()" id="tagesabschlussCard"><div class="icon">&#128202;</div><div class="title">Tagesabschluss</div><div class="desc">GoBD-konform abschliessen</div></div>
-          <div class="action-card" onclick="openDatevExport()"><div class="icon">&#128230;</div><div class="title">DATEV-Export</div><div class="desc">CSV + XML fuer Steuerberater</div></div>
+          <div class="action-card" onclick="openDatevExport()"><div class="icon">&#128230;</div><div class="title">DATEV-Export</div><div class="desc">CSV + XML für Steuerberater</div></div>
         </div>
       </div>
       <div class="section-title">KI-Hinweise</div>
       <div id="kiKasseHints" class="ki-suggestions stagger"></div>
       <div class="section-title">Heutige Buchungen</div>
-      <!-- F6 Bug 7: Filter-UI fuer Rechnungs-Liste (Datum, Stylist, Zahlart) -->
+      <!-- F6 Bug 7: Filter-UI für Rechnungs-Liste (Datum, Stylist, Zahlart) -->
       <div id="kasseFilterBar" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
         <input type="date" id="kasseFilterDatum" onchange="filterKasseEntries()" style="flex:1;min-width:120px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif" title="Datum-Filter">
         <select id="kasseFilterStylist" onchange="filterKasseEntries()" style="flex:1;min-width:120px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">
@@ -1966,7 +1966,7 @@
       <div class="ki-tool-panel" id="kiToolPanel">
         <h3 id="kiToolTitle"></h3>
         <div id="kiToolContent"></div>
-        <button class="btn btn-secondary btn-block" style="margin-top:12px" onclick="document.getElementById('kiToolPanel').style.display='none'">Schliessen</button>
+        <button class="btn btn-secondary btn-block" style="margin-top:12px" onclick="document.getElementById('kiToolPanel').style.display='none'">Schließen</button>
       </div>
       <div class="section-title">Offene Anfragen</div>
       <div class="filter-bar" id="beratungFilter">
@@ -1990,7 +1990,7 @@
         <select id="beratungRoutedFilter" onchange="filterBeratungen()" style="flex:1;min-width:120px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">
           <option value="">Alle Routings</option>
           <option value="wf-02a">WF-02a Termin</option>
-          <option value="wf-02b">WF-02b Bestaetigung</option>
+          <option value="wf-02b">WF-02b Bestätigung</option>
           <option value="wf-03a">WF-03a Wunschfrisur</option>
           <option value="wf-03b">WF-03b Haaranalyse</option>
           <option value="wf-03c">WF-03c Schnell-Check</option>
@@ -2112,7 +2112,7 @@
         <!-- Quick Actions -->
         <div class="section-title" style="margin-top:16px">Schnellzugriff</div>
         <div class="admin-quick-actions">
-          <button class="admin-qbtn" onclick="runSystemCheck()">&#128270; System pruefen</button>
+          <button class="admin-qbtn" onclick="runSystemCheck()">&#128270; System prüfen</button>
           <button class="admin-qbtn" onclick="openConfigSheet()">&#128279; Verbindung</button>
           <button class="admin-qbtn" onclick="event.stopPropagation();openGoLive()">&#128640; Go-Live Status</button>
           <button class="admin-qbtn" onclick="exportSystemReport()">&#128196; Report exportieren</button>
@@ -2198,7 +2198,7 @@
         </div>
       </div>
       <label style="margin-top:8px">Dienstleistung *</label>
-      <select id="reService" onchange="updateRePreview()"><option value="">Bitte waehlen...</option></select>
+      <select id="reService" onchange="updateRePreview()"><option value="">Bitte wählen...</option></select>
       <label style="margin-top:8px">Zusatzleistung (optional)</label>
       <select id="reZusatz" onchange="updateRePreview()">
         <option value="">Keine</option>
@@ -2289,7 +2289,7 @@
     <div class="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-title">DATEV-Export</div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Exportiere Buchungsdaten fuer deinen Steuerberater. DATEV-kompatibles Format (CSV + XML).</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">Exportiere Buchungsdaten für deinen Steuerberater. DATEV-kompatibles Format (CSV + XML).</div>
       <label>Zeitraum</label>
       <div class="sheet-row">
         <div><label>Von</label><input type="date" id="datevVon"></div>
@@ -2319,7 +2319,7 @@
       <div class="sheet-handle"></div>
       <div id="kiHintInner"></div>
       <div class="sheet-actions" style="margin-top:12px">
-        <button class="btn btn-secondary" onclick="closeSheet('kiHintSheet')">Schliessen</button>
+        <button class="btn btn-secondary" onclick="closeSheet('kiHintSheet')">Schließen</button>
       </div>
     </div>
   </div>
@@ -2474,7 +2474,7 @@
       <label style="margin-top:8px"><input type="checkbox" id="svcAktiv" checked> Aktiv (buchbar)</label>
       <div class="sheet-actions">
         <button class="btn btn-secondary" onclick="closeSheet('serviceSheet')">Abbrechen</button>
-        <button class="btn" id="svcDeleteBtn" onclick="deleteService()" style="display:none;background:#5a1a1a;color:#fff;border:1px solid #8a3030;border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer">Loeschen</button>
+        <button class="btn" id="svcDeleteBtn" onclick="deleteService()" style="display:none;background:#5a1a1a;color:#fff;border:1px solid #8a3030;border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer">Löschen</button>
         <button class="btn btn-primary" onclick="submitService()">Speichern</button>
       </div>
     </div>
@@ -2507,7 +2507,7 @@
       <label style="margin-top:8px"><input type="checkbox" id="karAktiv" checked> Aktiv (auf Webseite sichtbar)</label>
       <div class="sheet-actions">
         <button class="btn btn-secondary" onclick="closeSheet('karriereSheet')">Abbrechen</button>
-        <button class="btn" id="karDeleteBtn" onclick="deleteKarriere()" style="display:none;background:#5a1a1a;color:#fff;border:1px solid #8a3030;border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer">Loeschen</button>
+        <button class="btn" id="karDeleteBtn" onclick="deleteKarriere()" style="display:none;background:#5a1a1a;color:#fff;border:1px solid #8a3030;border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer">Löschen</button>
         <button class="btn btn-primary" onclick="submitKarriere()">Speichern</button>
       </div>
     </div>
@@ -2596,7 +2596,7 @@
     }
 
     // === FB-41: Mitarbeiter aus Supabase laden (statt hardcoded USERS) ===
-    // Liefert die echten DB-Mitarbeiter fuer den Salon (RLS-geschuetzt).
+    // Liefert die echten DB-Mitarbeiter für den Salon (RLS-geschuetzt).
     // Fallback auf USERS (Login-Map) falls DB-Load scheitert.
     var mitarbeiterCache = [];
     var mitarbeiterLoading = false;
@@ -2616,11 +2616,11 @@
           if (payload && payload.user_metadata && payload.user_metadata.salon_id) return payload.user_metadata.salon_id;
         }
       } catch (_) {}
-      // Nur im Demo-Modus (ohne eingeloggten Nutzer) auf Rena-Fallback zurueckfallen.
+      // Nur im Demo-Modus (ohne eingeloggten Nutzer) auf Rena-Fallback zurückfallen.
       // Multi-Tenant-Sicherheit: im Backend-Modus niemals, sonst Cross-Tenant-Leck.
       try {
         if (typeof isBackendMode === 'function' && isBackendMode()) {
-          console.error('[Security] currentSalonId(): Kein salon_id im Token. Kein Fallback moeglich.');
+          console.error('[Security] currentSalonId(): Kein salon_id im Token. Kein Fallback möglich.');
           return null;
         }
       } catch (_) {}
@@ -2637,7 +2637,7 @@
         var SELECT_WHITELIST = 'id,name,rolle,status,spezialisierung,salon_id,geschlecht,kann_damen,kann_herren,ist_friseur';
         var rows = await apiGet('mitarbeiter', 'salon_id=eq.' + encodeURIComponent(sid) + '&status=eq.aktiv&ist_friseur=eq.true&select=' + SELECT_WHITELIST + '&order=name.asc');
         mitarbeiterCache = Array.isArray(rows) ? rows : [];
-        // SPRINT5 (16.04.2026): Rena (Chefin) IMMER vorn, gilt auch fuer Filter-Chips die direkt aus Cache rendern
+        // SPRINT5 (16.04.2026): Rena (Chefin) IMMER vorn, gilt auch für Filter-Chips die direkt aus Cache rendern
         mitarbeiterCache.sort(function(a, b) {
           var an = (a.name || '').toLowerCase();
           var bn = (b.name || '').toLowerCase();
@@ -2655,7 +2655,7 @@
     // Liefert eine einheitliche Stylist-Liste im Dashboard-Format
     // { name, nachname, rolle, titel, kuerzel, farbe, isAdmin }.
     // Quelle: DB (mitarbeiterCache) ODER Fallback USERS.
-    // rolleFilter: Array von Rollen (z.B. ['FRM','STY','CHF']) oder null fuer alle ausser admin.
+    // rolleFilter: Array von Rollen (z.B. ['FRM','STY','CHF']) oder null für alle ausser admin.
     function getStylistList(rolleFilter) {
       // FB-41/VETO: Type-Guard — verhindere Crash bei String/Object statt Array
       if (rolleFilter != null && !Array.isArray(rolleFilter)) rolleFilter = null;
@@ -2664,7 +2664,7 @@
       function addFromDB(m) {
         var r = (m.rolle || 'STY').toUpperCase();
         if (rolleFilter && rolleFilter.indexOf(r) === -1) return;
-        // FB-41/VETO: XSS-esc fuer alle aus DB stammenden Strings, die in HTML/<option> landen koennen
+        // FB-41/VETO: XSS-esc für alle aus DB stammenden Strings, die in HTML/<option> landen können
         var first = esc(m.vorname || m.name || '');
         var last = esc(m.nachname || '');
         if (!first) return;
@@ -2726,7 +2726,7 @@
       return out;
     }
 
-    // SPRINT5 (16.04.2026): Einheitlicher Color-Lookup fuer Stylist anhand Name
+    // SPRINT5 (16.04.2026): Einheitlicher Color-Lookup für Stylist anhand Name
     // Sucht zuerst in getStylistList (DB+USERS konsolidiert, bereits ist_friseur-gefiltert),
     // matcht case-insensitive auf Vorname ODER volles "Vorname Nachname".
     function getStylistColor(name) {
@@ -2847,7 +2847,7 @@
       } else {
         emailForAuth = uname + '@renarados.casa2035.de';
       }
-      // currentUser fuer UI: bei E-Mail den lokalen Teil pruefen, ob USERS-Eintrag passt
+      // currentUser für UI: bei E-Mail den lokalen Teil prüfen, ob USERS-Eintrag passt
       var unameForUI = uname;
       if (uname.indexOf('@') !== -1) {
         var localPart = uname.split('@')[0];
@@ -2904,14 +2904,14 @@
       sessionStorage.removeItem('casa_refresh');
       sessionStorage.removeItem('casa_meta');
       sessionStorage.removeItem('casa_user_id');
-      // FB-41/VETO: Cache-Reset beim Logout — verhindert Mitarbeiterdaten-Leak ueber Session-Grenzen
+      // FB-41/VETO: Cache-Reset beim Logout — verhindert Mitarbeiterdaten-Leak über Session-Grenzen
       mitarbeiterCache = [];
       mitarbeiterLoading = false;
       currentUser = null;
       currentRolle = null;
       location.reload();
     }
-    // Session-Restore beim Seitenaufruf (wenn gueltiger Token in sessionStorage)
+    // Session-Restore beim Seitenaufruf (wenn gültiger Token in sessionStorage)
     function tryRestoreSession() {
       var tok = sessionStorage.getItem('casa_token');
       var user = sessionStorage.getItem('casa_user');
@@ -3087,21 +3087,21 @@
         '<b>Rote Karten</b> = unter Mindestbestand. Sofort nachbestellen.',
         '<b>"Nachbestellen"-Filter</b> oben zeigt nur kritische Produkte.',
         '<b>Nachbestell-Button</b> legt Bestellung direkt an.',
-        '<b>Sammelbestellung:</b> Freitags pruefen, Montags bestellen.',
+        '<b>Sammelbestellung:</b> Freitags prüfen, Montags bestellen.',
         '<b>LA Biosthetique:</b> Lieferzeit 3-5 Werktage einplanen.'
       ],
       kasse: [
         '<b>Rechnung erstellen:</b> + unten oder FAB am Startschirm.',
-        '<b>Tagesabschluss</b> unten - fuer End-of-Day und Kassensturz.',
-        '<b>DATEV-Export:</b> Ganz unten, CSV fuer Steuerberater.',
+        '<b>Tagesabschluss</b> unten - für End-of-Day und Kassensturz.',
+        '<b>DATEV-Export:</b> Ganz unten, CSV für Steuerberater.',
         '<b>Zahlart:</b> Bar / Karte / Online getrennt gebucht.',
-        '<b>GoBD-konform:</b> Rechnungen koennen nicht geaendert werden.'
+        '<b>GoBD-konform:</b> Rechnungen können nicht geaendert werden.'
       ],
       einstellungen: [
         '<b>Salon-Regeln:</b> KI beachtet diese bei Terminvorschlaegen.',
-        '<b>Profil anpassen:</b> Kuerzel und Farbe fuer Termin-Chips.',
+        '<b>Profil anpassen:</b> Kuerzel und Farbe für Termin-Chips.',
         '<b>Personal &amp; Rechte:</b> Nur Chefin - Rollen setzen (CHF/FRM/STY/AZU).',
-        '<b>Backend-Verbindung:</b> Status des Casa-Servers pruefen.',
+        '<b>Backend-Verbindung:</b> Status des Casa-Servers prüfen.',
         '<b>Karriere:</b> Offene Stellen pflegen - auf Salon-Homepage sichtbar.'
       ]
     };
@@ -3113,7 +3113,7 @@
         var bar = document.getElementById('pageHintBar');
         var txt = document.getElementById('pageHintText');
         if (!bar || !txt) return;
-        // Sprint-4b: Page-Alias-Map (home->dashboard etc.) fuer Robustheit
+        // Sprint-4b: Page-Alias-Map (home->dashboard etc.) für Robustheit
         var pageAlias = { 'home': 'dashboard', '': 'dashboard', 'cockpit': 'dashboard' };
         if (pageAlias[page]) page = pageAlias[page];
         currentPageHintPage = page;
@@ -3137,7 +3137,7 @@
     }
 
     function showPage(page) {
-      // Race-Fix: offene Sheets vor Page-Wechsel schliessen (persistiert Notiz)
+      // Race-Fix: offene Sheets vor Page-Wechsel schließen (persistiert Notiz)
       try { closeAllSheets(); } catch(e){}
       currentPage = page;
       renderPageHint(page);
@@ -3332,7 +3332,7 @@
       kiBase: 'https://api.casa2035.de/ki'
     };
 
-    // === KI-Bild Direct-Call Helper (umgeht n8n fuer Bildgenerierung) ===
+    // === KI-Bild Direct-Call Helper (umgeht n8n für Bildgenerierung) ===
     function callKiEndpoint(pfad, body) {
       var base = (config && config.kiBase) || API_DEFAULTS.kiBase;
       return fetch(base + pfad, {
@@ -3460,7 +3460,7 @@
           Kundenname: kundennameResolved,
           Stylist: normalizeStylist(stylistRaw),
           Stylist_Wunsch: r.stylist_wunsch || r.Stylist_Wunsch || '',
-          Status: r.status || r.Status || 'bestaetigt',
+          Status: r.status || r.Status || 'bestätigt',
           Preis: parseFloat(r.gesamtpreis_netto || r.preis || r.Preis || 0) || 0,
           Dauer_Min: r.gesamtdauer_min || r.dauer_min || r.Dauer_Min || 0,
           id: r.id
@@ -3565,19 +3565,19 @@
           }
         }
 
-        // Wenn wichtige Tabs (Termine, Kunden) leer → Demo-Modus fuer Vorfuehrung
+        // Wenn wichtige Tabs (Termine, Kunden) leer → Demo-Modus für Vorfuehrung
         var hatTermine = (termine||[]).length > 0;
         var hatKunden = (kunden||[]).length > 0;
         var hatLager = (lager||[]).length > 0;
         if (!hatTermine && !hatKunden && !hatLager) {
           /* Backend connected but core data empty — demo mode */
-          showToast('Verbunden — Demo-Modus fuer Vorfuehrung', 'info');
+          showToast('Verbunden — Demo-Modus für Vorfuehrung', 'info');
           loadDemoData();
           document.getElementById('liveIndicator').textContent = 'DEMO';
           return;
         }
 
-        // Spalten mappen fuer Dashboard-Kompatibilitaet
+        // Spalten mappen für Dashboard-Kompatibilitaet
         termine = mapTermine(termine || []);
         // Rollen-Filter clientseitig (RLS ist aktuell FOR ALL)
         if (currentRolle === 'STY' || currentRolle === 'AZU') {
@@ -3603,7 +3603,7 @@
               if (svcMap[svcName]) {
                 t.Preis = svcMap[svcName];
               } else {
-                // 2. Kombi-Service: "Damenhaarschnitt, Styling / Foehnen"
+                // 2. Kombi-Service: "Damenhaarschnitt, Styling / Föhnen"
                 var parts = (t.Service || '').split(',').map(function(p) { return p.trim(); });
                 var total = 0;
                 parts.forEach(function(p) { if (svcMap[p.toLowerCase()]) total += svcMap[p.toLowerCase()]; });
@@ -3802,7 +3802,7 @@
       else if (msg.indexOf('farb') !== -1) guessedSvc = 'Farbbehandlung Komplett';
 
       inner.innerHTML = '<div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:4px">Termin eintragen</div>'
-        + '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">fuer ' + esc(b.Kundenname || '') + '</div>'
+        + '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">für ' + esc(b.Kundenname || '') + '</div>'
         + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:10px;font-size:11px;color:var(--text-dim);margin-bottom:14px;line-height:1.4"><strong>Anfrage:</strong> ' + esc(b.Nachricht || '') + '</div>'
         + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Service</label>'
         + '<select id="terminSvcSelect" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif">' + serviceOptions + '</select>'
@@ -3858,7 +3858,7 @@
 
       var newTermin = {
         Start_ISO: startISO, Service: svc, Dauer_Min: dauer, Preis: preis,
-        Stylist: stylist, Kundenname: b.Kundenname, Status: 'bestaetigt'
+        Stylist: stylist, Kundenname: b.Kundenname, Status: 'bestätigt'
       };
       termineCache.push(newTermin);
 
@@ -3868,7 +3868,7 @@
       renderTermine(termineCache);
       filterBeratungen();
       closeSheet('detailSheet');
-      showToast('Termin fuer ' + b.Kundenname + ' eingetragen: ' + svc + ' am ' + fmtDate(datum) + ' um ' + zeit, 'success');
+      showToast('Termin für ' + b.Kundenname + ' eingetragen: ' + svc + ' am ' + fmtDate(datum) + ' um ' + zeit, 'success');
     }
 
     function openNeuerTermin() {
@@ -3911,7 +3911,7 @@
         + '<div><label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Uhrzeit</label>'
         + '<input type="time" id="terminTimeInput" value="10:00" onchange="checkOefLive()" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div></div>'
         + '<div id="oefWarnBox" style="display:none;margin-bottom:8px;padding:8px 12px;background:var(--warning-bg);border:1px solid rgba(196,138,26,0.3);border-radius:var(--radius-sm);font-size:11px;color:var(--warning);display:none"></div>'
-        + '<div style="font-size:10px;color:var(--text-dim);margin-bottom:10px">Oeffnungszeiten: Mo–Fr 9–19 Uhr, Sa 9–17 Uhr, So geschlossen</div>'
+        + '<div style="font-size:10px;color:var(--text-dim);margin-bottom:10px">Öffnungszeiten: Mo–Fr 9–19 Uhr, Sa 9–17 Uhr, So geschlossen</div>'
         + '<div style="display:flex;gap:8px;margin-top:8px">'
         + '<button class="btn btn-primary" style="flex:1" onclick="confirmNeuerTermin()">Termin eintragen</button>'
         + '<button class="btn btn-secondary" onclick="closeSheet(\'detailSheet\')">Abbrechen</button></div>';
@@ -3936,19 +3936,19 @@
     }
 
     // FB-63: Öffnungszeiten-Prüfung (Rena Rados: Mo-Fr 9-19h, Sa 9-17h, So geschlossen)
-    // Wird aus oeffnungszeiten-Tabelle befüllt sobald DB live; bis dahin Rena-Demo-Werte
+    // Wird aus öffnungszeiten-Tabelle befüllt sobald DB live; bis dahin Rena-Demo-Werte
     var OEFFNUNGSZEITEN = { 1:[9,19], 2:[9,19], 3:[9,19], 4:[9,19], 5:[9,19], 6:[9,17], 0:null };
     function pruefeOeffnungszeit(datum, zeit, dauerMin) {
       // datum: 'YYYY-MM-DD', zeit: 'HH:MM', dauerMin: number
-      // Gibt null zurueck wenn OK, sonst Warn-String
+      // Gibt null zurück wenn OK, sonst Warn-String
       var d = new Date(datum + 'T' + zeit + ':00');
       var wochentag = d.getDay(); // 0=So
       var oef = OEFFNUNGSZEITEN[wochentag];
       if (!oef) return 'Sonntag: Der Salon ist geschlossen.';
       var startH = d.getHours() + d.getMinutes() / 60;
       var endH = startH + (dauerMin || 0) / 60;
-      if (startH < oef[0]) return 'Vor Oeffnung: Der Salon oeffnet um ' + oef[0] + ':00 Uhr.';
-      if (endH > oef[1]) return 'Nach Schluss: Der Salon schliesst um ' + oef[1] + ':00 Uhr (Termin endet ' + Math.round((endH - oef[1]) * 60) + ' Min nach Schluss).';
+      if (startH < oef[0]) return 'Vor Öffnung: Der Salon oeffnet um ' + oef[0] + ':00 Uhr.';
+      if (endH > oef[1]) return 'Nach Schluss: Der Salon schließt um ' + oef[1] + ':00 Uhr (Termin endet ' + Math.round((endH - oef[1]) * 60) + ' Min nach Schluss).';
       return null;
     }
 
@@ -3968,7 +3968,7 @@
       // FB-63: Öffnungszeiten-Warnung — Abbruch bei geschlossen, Hinweis bei Randzeiten
       var oefWarn = pruefeOeffnungszeit(datum, zeit, dauer);
       if (oefWarn) {
-        showToast('Ausserhalb der Oeffnungszeiten: ' + oefWarn, 'warning');
+        showToast('Ausserhalb der Öffnungszeiten: ' + oefWarn, 'warning');
         return; // Abbruch — Termin wird NICHT eingetragen
       }
 
@@ -3989,11 +3989,11 @@
 
       termineCache.push({
         Start_ISO: startISO, Service: svc, Dauer_Min: dauer, Preis: preis,
-        Stylist: stylist, Kundenname: kunde, Status: 'bestaetigt'
+        Stylist: stylist, Kundenname: kunde, Status: 'bestätigt'
       });
       renderTermine(termineCache);
       closeSheet('detailSheet');
-      showToast('Termin fuer ' + kunde + ' eingetragen: ' + svc + ' am ' + fmtDate(datum) + ' um ' + zeit, 'success');
+      showToast('Termin für ' + kunde + ' eingetragen: ' + svc + ' am ' + fmtDate(datum) + ' um ' + zeit, 'success');
     }
 
     function renderTermine(termine) {
@@ -4070,8 +4070,8 @@
         // SPRINT5 (16.04.2026): Konsistente Stylist-Farbe via getStylistColor (DB+USERS konsolidiert)
         var stylistColor = getStylistColor(t.Stylist);
         card.style.borderLeft = '3px solid ' + stylistColor;
-        var statusLabel = t.Status || 'bestaetigt';
-        var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt'));
+        var statusLabel = t.Status || 'bestätigt';
+        var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestätigt'));
         var hasRecipe = !!findRecipe(t.Service);
         card.innerHTML = '<div class="termin-time-block"><div class="time">' + fmtTime(t.Start_ISO) + '</div><div class="mins">' + (t.Dauer_Min || '?') + ' Min</div></div>'
           + '<div class="termin-body"><div class="termin-service">' + esc(t.Service || 'Termin')
@@ -4176,7 +4176,7 @@
         block.style.right = 'auto';
         block.style.borderLeftColor = dayColor;
         block.style.background = (dayColor && dayColor.indexOf('#') === 0) ? dayColor + '14' : 'var(--surface)';
-        var statusDot = t.Status === 'bestaetigt' ? '#2d8a4e' : (t.Status === 'offen' ? '#c48a1a' : '#686058');
+        var statusDot = t.Status === 'bestätigt' ? '#2d8a4e' : (t.Status === 'offen' ? '#c48a1a' : '#686058');
         var dayRecipe = findRecipe(t.Service);
         block.innerHTML = '<div style="font-weight:600;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'
           + '<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:' + statusDot + ';margin-right:3px;vertical-align:middle"></span>'
@@ -4198,7 +4198,7 @@
       var wrapper = document.createElement('div');
       wrapper.className = 'week-view-wrapper';
 
-      // Sprint-4b: Dynamische Wochen-Stundenrange ueber alle Termine der Woche.
+      // Sprint-4b: Dynamische Wochen-Stundenrange über alle Termine der Woche.
       var weekMinH = 7, weekMaxH = 22;
       var weekStartStr = start.toISOString().split('T')[0];
       var weekEnd = new Date(start); weekEnd.setDate(weekEnd.getDate() + 6);
@@ -4351,7 +4351,7 @@
       if (!gefunden.length) {
         var msg = document.createElement('div');
         msg.style.cssText = 'text-align:center;padding:40px;color:var(--text-dim);font-size:13px';
-        msg.textContent = 'Kein Termin gefunden fuer "' + q + '"';
+        msg.textContent = 'Kein Termin gefunden für "' + q + '"';
         container.appendChild(msg);
         return;
       }
@@ -4362,11 +4362,11 @@
         card.onclick = (function(tt) { return function() { openTerminDetail(tt); }; })(t);
         var stylistColor = getStylistColor(t.Stylist);
         card.style.borderLeft = '3px solid ' + stylistColor;
-        var statusLabel = t.Status || 'bestaetigt';
-        var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt'));
+        var statusLabel = t.Status || 'bestätigt';
+        var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestätigt'));
         var hasRecipe = !!findRecipe(t.Service);
         var dateStr = (t.Start_ISO || '').split('T')[0];
-        // Datum-Block (zeigt Datum bei Suche ueber mehrere Tage)
+        // Datum-Block (zeigt Datum bei Suche über mehrere Tage)
         var timeBlock = document.createElement('div');
         timeBlock.className = 'termin-time-block';
         var dEl = document.createElement('div'); dEl.className = 'time'; dEl.textContent = fmtDate(dateStr);
@@ -4489,7 +4489,7 @@
         amountEl.textContent = (e.typ === 'ausgabe' ? '-' : '+') + fmtEur(e.Betrag || e.betrag) + ' \u20AC';
         div.appendChild(leftEl);
         div.appendChild(amountEl);
-        // F6 Bug 8: Storno-Button fuer Rechnungen (nur einnahme, nicht bereits storniert)
+        // F6 Bug 8: Storno-Button für Rechnungen (nur einnahme, nicht bereits storniert)
         if (e.typ !== 'ausgabe' && e.status !== 'storniert' && e.id) {
           var stornoBtn = document.createElement('button');
           stornoBtn.textContent = 'Storno';
@@ -4551,7 +4551,7 @@
       var sel = document.getElementById('reService');
       sel.textContent = '';
       var opt0 = document.createElement('option');
-      opt0.value = ''; opt0.textContent = 'Bitte waehlen...';
+      opt0.value = ''; opt0.textContent = 'Bitte wählen...';
       sel.appendChild(opt0);
       services.forEach(function(s) {
         var opt = document.createElement('option');
@@ -4620,7 +4620,7 @@
       var stylist = document.getElementById('reStylist').value;
       var svc = document.getElementById('reService');
       var sel = svc.options[svc.selectedIndex];
-      if (!kunde || !sel || !sel.value) { showToast('Bitte Kunde und Service waehlen', 'error'); return; }
+      if (!kunde || !sel || !sel.value) { showToast('Bitte Kunde und Service wählen', 'error'); return; }
       var svcPreis = parseFloat(sel.getAttribute('data-preis')) || 0;
       var zusatz = document.getElementById('reZusatz');
       var zSel = zusatz.options[zusatz.selectedIndex];
@@ -5033,7 +5033,7 @@
       inner.innerHTML = '<div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;margin-bottom:12px">&#128222; Anruf dokumentieren</div>'
         + '<div style="font-size:11px;color:var(--text-dim);margin-bottom:10px">Festnetz / manuelle Anrufe — landet im Kundenverlauf.</div>'
         + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:4px">Kunde *</label>'
-        + '<input list="anrufKundenList" id="adKunde" placeholder="Name eingeben oder auswaehlen" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:8px;font-family:Inter,sans-serif">'
+        + '<input list="anrufKundenList" id="adKunde" placeholder="Name eingeben oder auswählen" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:8px;font-family:Inter,sans-serif">'
         + '<datalist id="anrufKundenList">' + kundenOptions + '</datalist>'
         + '<label style="display:block;font-size:12px;font-weight:600;color:var(--text-dim);margin-bottom:4px">Anruf-Typ</label>'
         + '<select id="adTyp" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:8px;font-family:Inter,sans-serif">'
@@ -5068,19 +5068,19 @@
     }
     // === Kunden-Detail 8-Tab-View (Stand: 17.04.2026) ===
     var _aktuellerKunde = null;
-    var _kundeDetailTab = 'uebersicht';
+    var _kundeDetailTab = 'übersicht';
 
     function openKundeDetail(k) {
       _aktuellerKunde = k;
-      _kundeDetailTab = 'uebersicht';
-      _renderKundeDetailSheet(k, 'uebersicht');
+      _kundeDetailTab = 'übersicht';
+      _renderKundeDetailSheet(k, 'übersicht');
       openSheet('detailSheet');
     }
 
     function _renderKundeDetailSheet(k, activeTab) {
       var inner = document.getElementById('detailInner');
       var tabs = [
-        { id: 'uebersicht', label: '\u00dcbersicht' },
+        { id: 'übersicht', label: '\u00dcbersicht' },
         { id: 'termine',    label: 'Termine' },
         { id: 'rechnungen', label: 'Rechnungen' },
         { id: 'notizen',    label: 'Notizen' },
@@ -5125,7 +5125,7 @@
       var c = document.getElementById('kundeTabContent');
       if (!c) return;
       c.innerHTML = '<div style="color:var(--text-dim);font-size:12px;padding:16px 0">Lade...</div>';
-      if (tabId === 'uebersicht')     { _tabUebersicht(k, c); return; }
+      if (tabId === 'übersicht')     { _tabUebersicht(k, c); return; }
       if (tabId === 'termine')        { _tabTermine(k, c); return; }
       if (tabId === 'rechnungen')     { _tabRechnungen(k, c); return; }
       if (tabId === 'notizen')        { _tabNotizen(k, c); return; }
@@ -5154,8 +5154,8 @@
         + (k.Notiz || k.notiz ? '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:var(--text-secondary);line-height:1.5;margin-bottom:10px"><strong>Notiz:</strong> ' + esc(k.Notiz || k.notiz) + '</div>' : '')
         + (k.Telefon || k.telefon ? '<a href="tel:' + esc(k.Telefon || k.telefon) + '" style="display:block;width:100%;padding:10px;background:transparent;color:var(--gold);border:1px solid var(--gold);border-radius:var(--radius-sm);font-weight:600;font-size:12px;text-align:center;text-decoration:none;margin-bottom:10px">&#128222; Anrufen</a>' : '')
         + '<div style="margin-top:8px;border-top:1px solid var(--border);padding-top:12px">'
-        + '<button onclick="requestKundeLoeschung(\'' + nameSafe + '\')" style="width:100%;padding:10px;background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:var(--radius-sm);font-size:11px;cursor:pointer">Kundendaten loeschen (DSGVO Art. 17)</button>'
-        + '<div style="font-size:9px;color:var(--text-micro);margin-top:4px;text-align:center">Loeschung wird vom Saloninhaber geprueft (10 Tage Aufbewahrung bei offenen Rechnungen)</div>'
+        + '<button onclick="requestKundeLoeschung(\'' + nameSafe + '\')" style="width:100%;padding:10px;background:transparent;border:1px solid var(--danger);color:var(--danger);border-radius:var(--radius-sm);font-size:11px;cursor:pointer">Kundendaten löschen (DSGVO Art. 17)</button>'
+        + '<div style="font-size:9px;color:var(--text-micro);margin-top:4px;text-align:center">Löschung wird vom Saloninhaber geprüft (10 Tage Aufbewahrung bei offenen Rechnungen)</div>'
         + '</div>';
     }
 
@@ -5339,10 +5339,10 @@
       }
     }
 
-    // === DSGVO Art. 17 — Kundendaten-Loeschung (Human-in-the-Loop) ===
+    // === DSGVO Art. 17 — Kundendaten-Löschung (Human-in-the-Loop) ===
     function requestKundeLoeschung(name) {
-      if (!confirm('DSGVO Art. 17: Moechtest du wirklich ALLE Daten von "' + name + '" zur Loeschung vormerken?\n\nDies umfasst: Kontaktdaten, Terminhistorie, Beratungen, Nachrichten.\n\nOffene Rechnungen werden 10 Jahre aufbewahrt (GoBD §147 AO).\n\nDer Saloninhaber muss die Loeschung bestaetigen.')) return;
-      showToast('Loeschanfrage fuer ' + name + ' vorgemerkt. Der Saloninhaber wird benachrichtigt.', 'info', 5000);
+      if (!confirm('DSGVO Art. 17: Moechtest du wirklich ALLE Daten von "' + name + '" zur Löschung vormerken?\n\nDies umfasst: Kontaktdaten, Terminhistorie, Beratungen, Nachrichten.\n\nOffene Rechnungen werden 10 Jahre aufbewahrt (GoBD §147 AO).\n\nDer Saloninhaber muss die Löschung bestätigen.')) return;
+      showToast('Löschanfrage für ' + name + ' vorgemerkt. Der Saloninhaber wird benachrichtigt.', 'info', 5000);
       closeSheet('detailSheet');
     }
 
@@ -5476,7 +5476,7 @@
       if (!terminId || !stylistName) return;
       try {
         if (isBackendMode()) {
-          // Stylist-ID aus getStylistList() ermitteln fuer termine-FK (mitarbeiter.id)
+          // Stylist-ID aus getStylistList() ermitteln für termine-FK (mitarbeiter.id)
           var stylistId = null;
           try {
             (getStylistList(null) || []).forEach(function(s) {
@@ -5641,7 +5641,7 @@
         + '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.5"><span style="font-size:10px;font-weight:700;color:var(--text-dim);display:block;margin-bottom:4px">' + esc(b.Kundenname || '') + ':</span>' + esc(b.Nachricht || '') + '</div>'
         + replySuggHTML
         + '<div style="display:flex;gap:6px;align-items:flex-end;margin-bottom:8px">'
-        + '<textarea id="antwortText" rows="4" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none" placeholder="Antwort eingeben oder KI-Vorschlag waehlen..."></textarea>'
+        + '<textarea id="antwortText" rows="4" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none" placeholder="Antwort eingeben oder KI-Vorschlag wählen..."></textarea>'
         + '<div style="display:flex;flex-direction:column;gap:4px">'
         + '<button class="voice-btn" id="antwortVoiceBtn" onclick="toggleVoiceInput(\'antwortText\',\'antwortVoiceBtn\')" title="Sprachnachricht"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>'
         + '<label class="voice-btn" title="Bild senden" style="cursor:pointer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg><input type="file" accept="image/*" capture="environment" style="display:none" onchange="handleAntwortImage(this)"></label>'
@@ -5719,7 +5719,7 @@
 
       // Guten-Morgen-Tipp
       if (h < 10 && todayTermine.length === 0) {
-        hints.push({ type: 'success', icon: '&#9728;', text: 'Ruhiger Vormittag — perfekt fuer Beratungen oder Lager-Check', action: 'beratung', prio: 10 });
+        hints.push({ type: 'success', icon: '&#9728;', text: 'Ruhiger Vormittag — perfekt für Beratungen oder Lager-Check', action: 'beratung', prio: 10 });
       }
 
       // Samstag = Hochbetrieb
@@ -5763,7 +5763,7 @@
         var d = new Date(now); d.setDate(d.getDate() + mondayOffset + wd);
         weekDays.push(d.toISOString().split('T')[0]);
       }
-      // FB-64 Fix (17.04.2026): gesamtpreis_netto ist fuer viele Termine NULL in der DB.
+      // FB-64 Fix (17.04.2026): gesamtpreis_netto ist für viele Termine NULL in der DB.
       // Fallback: preis_brutto aus services_preisliste per Name-Match, dann EUR 65 Durchschnitt.
       var svcPriceMap = {};
       (servicesCache || []).forEach(function(s) {
@@ -5920,7 +5920,7 @@
     async function exportDatev() {
       var von = document.getElementById('datevVon').value;
       var bis = document.getElementById('datevBis').value;
-      if (!von || !bis) { showToast('Bitte Zeitraum waehlen', 'error'); return; }
+      if (!von || !bis) { showToast('Bitte Zeitraum wählen', 'error'); return; }
 
       var entries = [];
       if (isBackendMode()) {
@@ -5963,7 +5963,7 @@
         var konto = isAusgabe ? '6300' : '4400';
         var gegen = isAusgabe ? '1200' : ((e.Zahlart || e.zahlart) === 'bar' ? '1000' : '1200');
         var shKz = isAusgabe ? 'S' : 'H';
-        // Datum aus DB verwenden (DDMM Format fuer DATEV)
+        // Datum aus DB verwenden (DDMM Format für DATEV)
         var d = new Date(e.erstellt_am || e.datum || new Date());
         var datum = String(d.getDate()).padStart(2, '0') + String(d.getMonth() + 1).padStart(2, '0');
         var beleg = e.rechnungsnummer || e.beleg_nr || (isAusgabe ? 'AU-' : 'RE-') + String(idx + 1).padStart(4, '0');
@@ -5977,7 +5977,7 @@
       // GDPdU-kompatibles XML (§147 AO)
       var xml = '<?xml version="1.0" encoding="UTF-8"?>\n<DataSet xmlns="urn:gdpdu">\n';
       xml += '  <Version>1.0</Version>\n';
-      xml += '  <DataSupplier>\n    <Name>Casa 2035</Name>\n    <Location>Muenchen</Location>\n  </DataSupplier>\n';
+      xml += '  <DataSupplier>\n    <Name>Casa 2035</Name>\n    <Location>München</Location>\n  </DataSupplier>\n';
       xml += '  <Media>\n    <Name>Buchungsdaten</Name>\n';
       xml += '    <Period>\n      <From>' + von + '</From>\n      <To>' + bis + '</To>\n    </Period>\n';
       entries.forEach(function(e, idx) {
@@ -6026,7 +6026,7 @@
 
       // Slots (for termin_vorschlag)
       if (ev.Slots && ev.Slots.length) {
-        html += '<div style="font-size:12px;font-weight:700;margin:12px 0 6px">Verfuegbare Slots:</div>';
+        html += '<div style="font-size:12px;font-weight:700;margin:12px 0 6px">Verfügbare Slots:</div>';
         ev.Slots.forEach(function(s, si) {
           html += '<div style="padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:4px;cursor:pointer;font-size:12px" onclick="showToast(\'Slot ' + esc(s.tag) + ' ' + esc(s.zeit) + ' gewaehlt\',\'success\')">'
             + esc(s.tag) + ' ' + esc(s.zeit) + ' — ' + esc(s.ende) + '</div>';
@@ -6071,8 +6071,8 @@
       var u = { farbe: detailStylistColor };
       var recipe = findRecipe(t.Service);
 
-      var statusLabel = t.Status || 'bestaetigt';
-      var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt'));
+      var statusLabel = t.Status || 'bestätigt';
+      var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestätigt'));
       var html = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">';
       html += '<div><div style="font-family:Playfair Display,serif;font-size:22px;font-weight:700">' + esc(t.Service || 'Termin') + '</div>';
       html += '<div style="font-size:13px;color:var(--text-secondary);margin-top:2px">' + esc(t.Kundenname || t.Kunde || '') + '</div>';
@@ -6172,24 +6172,24 @@
         });
         html += '</div></div>';
       } else {
-        html += '<div style="padding:14px 12px;text-align:center;color:var(--text-dim);font-size:12px">&#128203; Keine Rezeptur fuer diesen Service hinterlegt</div>';
+        html += '<div style="padding:14px 12px;text-align:center;color:var(--text-dim);font-size:12px">&#128203; Keine Rezeptur für diesen Service hinterlegt</div>';
       }
       html += '</div></div>'; // ablaufBody + Wrapper
 
-      // === KI-EMPFEHLUNGEN fuer diesen Termin ===
+      // === KI-EMPFEHLUNGEN für diesen Termin ===
       var kiTerminHints = [];
       // Farbtermin-Hinweis
       if (/farb|balayage|straeh|glossing/i.test(t.Service || '')) {
         kiTerminHints.push({ iconKey: 'droplet', title: 'Olaplex No.1+2 als Strukturschutz empfehlen', desc: '+25 EUR Umsatz pro Behandlung, Haarbruch sichtbar reduziert.', detail: 'Olaplex waehrend der chemischen Behandlung einsetzen — reduziert Haarbruch nachweislich. Direkt ansprechen: "Zum Schutz Ihrer Haarstruktur empfehle ich heute Olaplex dazu." Kunden, die Olaplex erhalten, buchen 30% oefter den naechsten Farbtermin.' });
-        kiTerminHints.push({ iconKey: 'camera', title: 'Vorher-Foto jetzt machen, Nachher-Foto nach Styling', desc: 'Bestes Werbematerial fuer Instagram und Google-Profil.', detail: 'Einwilligung vor dem Start einholen: "Darf ich das Ergebnis fuer unseren Kanal verwenden?" — 80% sagen ja. Gleiche Beleuchtung, gleicher Winkel fuer echten Vergleich. Ein gutes Vorher/Nachher bringt im Schnitt 2-3 Anfragen.' });
+        kiTerminHints.push({ iconKey: 'camera', title: 'Vorher-Foto jetzt machen, Nachher-Foto nach Styling', desc: 'Bestes Werbematerial für Instagram und Google-Profil.', detail: 'Einwilligung vor dem Start einholen: "Darf ich das Ergebnis für unseren Kanal verwenden?" — 80% sagen ja. Gleiche Beleuchtung, gleicher Winkel für echten Vergleich. Ein gutes Vorher/Nachher bringt im Schnitt 2-3 Anfragen.' });
       }
       // Neukunden-Hinweis
       var kundenMatch = kundenCache.find(function(k) { return (k.Name || k.name) === t.Kundenname; });
       if (kundenMatch && (kundenMatch.Besuche || 0) <= 2) {
-        kiTerminHints.push({ iconKey: 'star', title: esc(t.Kundenname) + ' — Besuch Nr. ' + ((kundenMatch.Besuche || 0) + 1), desc: 'Neukunde: besondere Aufmerksamkeit jetzt entscheidet ueber Wiederkommen.', detail: 'Getraenk anbieten, kurzen Rundgang machen, Pflegetipps zum Mitnehmen geben. Am Ende fragen: "Wie haben Sie uns gefunden?" — wichtig fuer Marketing. Visitenkarte + 10%-Gutschein fuer naechsten Besuch mitgeben.' });
+        kiTerminHints.push({ iconKey: 'star', title: esc(t.Kundenname) + ' — Besuch Nr. ' + ((kundenMatch.Besuche || 0) + 1), desc: 'Neukunde: besondere Aufmerksamkeit jetzt entscheidet über Wiederkommen.', detail: 'Getraenk anbieten, kurzen Rundgang machen, Pflegetipps zum Mitnehmen geben. Am Ende fragen: "Wie haben Sie uns gefunden?" — wichtig für Marketing. Visitenkarte + 10%-Gutschein für naechsten Besuch mitgeben.' });
       }
       if (kundenMatch && kundenMatch.VIP) {
-        kiTerminHints.push({ iconKey: 'crown', title: esc(t.Kundenname) + ' — VIP mit ' + (kundenMatch.Besuche || 0) + ' Besuchen', desc: 'Lieblingsprodukte bereitstellen, persoenlich ansprechen.', detail: 'VIPs merken sofort ob man vorbereitet ist. Fragen: "Sind Sie mit Ihrem Pflegeprodukt noch zufrieden?" — oeffnet Nachkauf-Gespraech. Neue Produktneuheit als Probe anbieten (Probiergroesse kostet kaum etwas, wirkt aber sehr wertschatzend).' });
+        kiTerminHints.push({ iconKey: 'crown', title: esc(t.Kundenname) + ' — VIP mit ' + (kundenMatch.Besuche || 0) + ' Besuchen', desc: 'Lieblingsprodukte bereitstellen, persönlich ansprechen.', detail: 'VIPs merken sofort ob man vorbereitet ist. Fragen: "Sind Sie mit Ihrem Pflegeprodukt noch zufrieden?" — oeffnet Nachkauf-Gespraech. Neue Produktneuheit als Probe anbieten (Probiergroesse kostet kaum etwas, wirkt aber sehr wertschatzend).' });
       }
       // Zeitdruck-Hinweis
       if ((parseInt(t.Dauer_Min) || 0) >= 90) {
@@ -6197,11 +6197,11 @@
       }
       // Produktempfehlung
       if (/schnitt|feminin|maskulin|styling/i.test(t.Service || '')) {
-        kiTerminHints.push({ iconKey: 'shoppingBag', title: 'Styling-Produkt beim Foehnen zeigen', desc: 'Kunden kaufen 3x haeufiger was sie in Aktion sehen.', detail: 'Waehrend des Foehnens sagen: "Dieses Produkt benutze ich gerade — damit koennen Sie das Ergebnis zuhause genauso nachstylen." Produkt sichtbar auf dem Tisch lassen, nicht wegpacken. Kurze Demo = bester Verkauf.' });
+        kiTerminHints.push({ iconKey: 'shoppingBag', title: 'Styling-Produkt beim Föhnen zeigen', desc: 'Kunden kaufen 3x haeufiger was sie in Aktion sehen.', detail: 'Waehrend des Föhnens sagen: "Dieses Produkt benutze ich gerade — damit können Sie das Ergebnis zuhause genauso nachstylen." Produkt sichtbar auf dem Tisch lassen, nicht wegpacken. Kurze Demo = bester Verkauf.' });
       }
       // Fallback
       if (kiTerminHints.length < 2) {
-        kiTerminHints.push({ iconKey: 'star', title: 'Google-Bewertung beim Spiegel-Moment anfragen', desc: 'Genau wenn der Kunde zufrieden im Spiegel schaut — bester Moment.', detail: 'Direkt sagen: "Wenn Sie zufrieden sind, wuerden wir uns sehr ueber eine kurze Google-Bewertung freuen — das hilft anderen Kunden uns zu finden." Handy-Link zeigen oder QR-Code bereitstellen.' });
+        kiTerminHints.push({ iconKey: 'star', title: 'Google-Bewertung beim Spiegel-Moment anfragen', desc: 'Genau wenn der Kunde zufrieden im Spiegel schaut — bester Moment.', detail: 'Direkt sagen: "Wenn Sie zufrieden sind, wuerden wir uns sehr über eine kurze Google-Bewertung freuen — das hilft anderen Kunden uns zu finden." Handy-Link zeigen oder QR-Code bereitstellen.' });
       }
       // KI-Empfehlungen rendern — klickbar mit Detail + KI fragen
       html += '<div style="margin-top:12px">';
@@ -6219,7 +6219,7 @@
         html += '<div id="' + detailId + '" style="display:none;padding:6px 10px 10px 36px;border-top:1px solid var(--border);font-size:11px;line-height:1.5">';
         html += '<div style="color:var(--text-secondary);margin-bottom:8px">' + h.desc + '</div>';
         if (h.detail) html += '<div style="color:var(--text);margin-bottom:8px;font-size:10px;background:var(--bg-warm);padding:6px 8px;border-radius:6px">' + h.detail + '</div>';
-        html += '<button onclick="event.stopPropagation();toggleJarvis();setTimeout(function(){var inp=document.getElementById(\'jarvisInput\');if(inp){inp.value=\'' + esc(h.title).replace(/'/g, "\\'") + ' — was genau empfiehlst du fuer ' + esc(t.Kundenname || '').replace(/'/g, "\\'") + '?\';inp.focus();}},300)" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--gold);border-radius:16px;background:var(--gold-glow);color:var(--gold);font-size:10px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif"><span style="font-size:12px">&#129302;</span> Jarvis fragen</button>';
+        html += '<button onclick="event.stopPropagation();toggleJarvis();setTimeout(function(){var inp=document.getElementById(\'jarvisInput\');if(inp){inp.value=\'' + esc(h.title).replace(/'/g, "\\'") + ' — was genau empfiehlst du für ' + esc(t.Kundenname || '').replace(/'/g, "\\'") + '?\';inp.focus();}},300)" style="display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--gold);border-radius:16px;background:var(--gold-glow);color:var(--gold);font-size:10px;font-weight:600;cursor:pointer;font-family:Inter,sans-serif"><span style="font-size:12px">&#129302;</span> Jarvis fragen</button>';
         html += '</div></div>';
       });
       html += '</div>';
@@ -6291,7 +6291,7 @@
               }
             });
           } else {
-            html += '<div style="font-size:11px;color:var(--text-dim)">Keine automatischen Vorschlaege verfuegbar. Bitte manuell verschieben.</div>';
+            html += '<div style="font-size:11px;color:var(--text-dim)">Keine automatischen Vorschlaege verfügbar. Bitte manuell verschieben.</div>';
           }
           html += '</div>';
         }
@@ -6311,9 +6311,9 @@
       // Action Buttons
       html += '<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">';
       if (statusLabel === 'offen') {
-        html += '<button class="btn btn-primary" style="flex:1;min-width:120px" onclick="terminBestaetigen(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\')">&#10003; Bestaetigen</button>';
-      } else if (statusLabel === 'bestaetigt') {
-        html += '<button class="btn btn-primary" style="flex:1;min-width:120px;opacity:0.5" disabled>&#10003; Bestaetigt</button>';
+        html += '<button class="btn btn-primary" style="flex:1;min-width:120px" onclick="terminBestaetigen(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\')">&#10003; Bestätigen</button>';
+      } else if (statusLabel === 'bestätigt') {
+        html += '<button class="btn btn-primary" style="flex:1;min-width:120px;opacity:0.5" disabled>&#10003; Bestätigt</button>';
       } else {
         html += '<button class="btn btn-primary" style="flex:1;min-width:120px;opacity:0.5" disabled>' + esc(statusLabel) + '</button>';
       }
@@ -6349,9 +6349,9 @@
       area.style.overflow = 'hidden';
       area.style.webkitTapHighlightColor = 'transparent';
       area.style.touchAction = 'manipulation';
-      // Input als unsichtbare Overlay-Schicht ueber der gesamten Area, voll anklickbar
+      // Input als unsichtbare Overlay-Schicht über der gesamten Area, voll anklickbar
       input.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:10;font-size:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation';
-      // Sicherstellen, dass der Input wirklich ein Kind der Area ist und ans Ende kommt (z-Index ueber Icons)
+      // Sicherstellen, dass der Input wirklich ein Kind der Area ist und ans Ende kommt (z-Index über Icons)
       area.appendChild(input);
       // Sofortiges visuelles Feedback beim File-Wahl (bevor FileReader laeuft)
       input.addEventListener('change', function() {
@@ -6372,7 +6372,7 @@
           onFiles(ev.dataTransfer.files);
         }
       });
-      // Tastatur-Bedienung (Fallback fuer Screen-Reader / Tab-Navigation)
+      // Tastatur-Bedienung (Fallback für Screen-Reader / Tab-Navigation)
       area.setAttribute('tabindex', '0');
       area.setAttribute('role', 'button');
       area.addEventListener('keydown', function(ev) {
@@ -6403,9 +6403,9 @@
     function terminBestaetigen(startISO, kundenname) {
       var found = termineCache.find(function(t) { return t.Start_ISO === startISO && t.Kundenname === kundenname; });
       if (found) {
-        found.Status = 'bestaetigt';
+        found.Status = 'bestätigt';
         renderTermine(termineCache);
-        showToast('Termin bestaetigt — ' + kundenname, 'success');
+        showToast('Termin bestätigt — ' + kundenname, 'success');
       }
       closeSheet('detailSheet');
     }
@@ -6478,7 +6478,7 @@
         + '<div id="verschiebenSlots" style="margin-top:12px"></div>'
         + '<div style="display:flex;gap:8px;margin-top:16px">'
         + '<button class="btn btn-primary" style="flex:1" onclick="doTerminVerschieben(\'' + esc(startISO) + '\',\'' + esc(kundenname) + '\')">Verschieben</button>'
-        + '<button class="btn btn-secondary" onclick="openTerminDetail(termineCache.find(function(t){return t.Start_ISO===\'' + esc(startISO) + '\'&&t.Kundenname===\'' + esc(kundenname) + '\'}))">Zurueck</button></div>';
+        + '<button class="btn btn-secondary" onclick="openTerminDetail(termineCache.find(function(t){return t.Start_ISO===\'' + esc(startISO) + '\'&&t.Kundenname===\'' + esc(kundenname) + '\'}))">Zurück</button></div>';
       openSheet('detailSheet');
     }
 
@@ -6530,13 +6530,13 @@
       fcKundeRow.style.cssText = 'margin-bottom:12px';
       var fcKundeInput = document.createElement('input');
       fcKundeInput.type = 'text'; fcKundeInput.id = 'fcKundeName';
-      fcKundeInput.placeholder = 'Kundenname (optional, fuer Verlauf)';
+      fcKundeInput.placeholder = 'Kundenname (optional, für Verlauf)';
       fcKundeInput.style.cssText = 'width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg-warm);font-size:12px;color:var(--text);box-sizing:border-box';
       fcKundeRow.appendChild(fcKundeInput);
       wrapper.appendChild(fcKundeRow);
       var intro = document.createElement('div');
       intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
-      intro.textContent = 'Fotografiere Haar oder Bart \u2014 die KI erkennt den aktuellen Farbton. Waehle den Wunschton und erhalte eine realistische Vorher/Nachher-Vorschau.';
+      intro.textContent = 'Fotografiere Haar oder Bart \u2014 die KI erkennt den aktuellen Farbton. Wähle den Wunschton und erhalte eine realistische Vorher/Nachher-Vorschau.';
       wrapper.appendChild(intro);
 
       // Foto-Tipps
@@ -6544,7 +6544,7 @@
       tips.style.cssText = 'margin-bottom:14px;background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius-sm);overflow:hidden';
       var tSum = document.createElement('summary');
       tSum.style.cssText = 'padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--gold)';
-      tSum.textContent = '\u{1F3A8} Foto-Tipps fuer Farbanalyse';
+      tSum.textContent = '\u{1F3A8} Foto-Tipps für Farbanalyse';
       tips.appendChild(tSum);
       var tBody = document.createElement('div');
       tBody.style.cssText = 'padding:8px 14px 12px;font-size:11px;color:var(--text-secondary);line-height:1.8';
@@ -6649,7 +6649,7 @@
 
       var arrow = document.createElement('div');
       arrow.style.cssText = 'text-align:center;margin:2px 0 6px;font-size:12px;color:var(--gold)';
-      arrow.textContent = '↓ Wunschfarbe waehlen ↓';
+      arrow.textContent = '↓ Wunschfarbe wählen ↓';
       wrapper.appendChild(arrow);
 
       var zielDetails = document.createElement('details');
@@ -6732,7 +6732,7 @@
         teaser.style.cssText = 'margin-top:14px;padding:16px;background:linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03));border:2px solid rgba(201,168,76,0.3);border-radius:var(--radius)';
         teaser.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:8px">★ Smart Start: Farbcode-Vorschau</div>'
           + '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5">Sie sehen Farbrichtung + Empfehlung. Mit Salon Pro erhalten Sie: Exakter Farbcode, Mischverhaeltnis, Oxid-Stufe + Einwirkzeit.</div>'
-          + '<button class="btn btn-primary btn-block btn-sm" onclick="showToast(\'Kontaktieren Sie uns fuer ein Upgrade auf Salon Pro\',\'info\',3000)">Upgrade auf Salon Pro →</button>';
+          + '<button class="btn btn-primary btn-block btn-sm" onclick="showToast(\'Kontaktieren Sie uns für ein Upgrade auf Salon Pro\',\'info\',3000)">Upgrade auf Salon Pro →</button>';
         wrapper.appendChild(teaser);
       }
     }
@@ -6781,14 +6781,14 @@
       var reader = new FileReader();
       reader.onload = function(e) {
         if (img) { img.src = e.target.result; img.style.opacity = '1'; }
-        showToast('Foto geladen — bitte Ist-Farbton manuell waehlen oder KI nutzen.', 'success');
+        showToast('Foto geladen — bitte Ist-Farbton manuell wählen oder KI nutzen.', 'success');
       };
       reader.onerror = function() { showToast('Foto konnte nicht geladen werden.', 'error'); };
       reader.readAsDataURL(files[0]);
     }
 
     function generateFarbformel() {
-      if (!selectedIstFarbe || !selectedZielFarbe) { showToast('Bitte Ist- und Ziel-Farbton waehlen', 'error'); return; }
+      if (!selectedIstFarbe || !selectedZielFarbe) { showToast('Bitte Ist- und Ziel-Farbton wählen', 'error'); return; }
       var diff = selectedZielFarbe.stufe - selectedIstFarbe.stufe;
       var result = document.getElementById('farbFormelResult');
       result.style.display = 'block';
@@ -6799,12 +6799,12 @@
         oxidStufe = diff <= 2 ? '6%' : diff <= 4 ? '9%' : '12%';
         mischung = diff <= 3 ? '1:1' : '1:2 (doppelte Menge Oxid)';
         einwirkzeit = diff <= 2 ? '25-30' : diff <= 4 ? '35-40' : '45';
-        hinweis = diff > 3 ? 'ACHTUNG: Starke Aufhellung! Strandtest empfohlen. Olaplex Nr. 1 dringend empfohlen.' : 'Moderate Aufhellung — Olaplex Nr. 1 empfohlen fuer Strukturschutz.';
+        hinweis = diff > 3 ? 'ACHTUNG: Starke Aufhellung! Strandtest empfohlen. Olaplex Nr. 1 dringend empfohlen.' : 'Moderate Aufhellung — Olaplex Nr. 1 empfohlen für Strukturschutz.';
       } else if (diff < 0) {
         oxidStufe = '3% (Tonung)';
         mischung = '1:1';
         einwirkzeit = '20-25';
-        hinweis = 'Tonung/Verdunkelung — schonend fuer das Haar.';
+        hinweis = 'Tonung/Verdunkelung — schonend für das Haar.';
       } else {
         oxidStufe = '3% (Tonung)';
         mischung = '1:1';
@@ -6886,7 +6886,7 @@
         if (kiText) {
           var kiCard = document.createElement('div');
           kiCard.style.cssText = 'margin-top:12px;padding:14px;background:linear-gradient(135deg,rgba(184,150,46,0.06),rgba(184,150,46,0.02));border:1px solid var(--border-accent);border-radius:var(--radius)';
-          // Vorher/Nachher Bild wenn KI-Bild zurueckkommt
+          // Vorher/Nachher Bild wenn KI-Bild zurückkommt
           var ki64 = data.ki_bild_nachher;
           if (ki64) {
             var compareDiv = document.createElement('div');
@@ -6914,12 +6914,12 @@
           result.appendChild(kiCard);
         }
       }).catch(function() {
-        // DEMO-Fallback fuer KI-Empfehlung
+        // DEMO-Fallback für KI-Empfehlung
         var demoText = diff > 0
-          ? 'Bei ' + Math.abs(diff) + ' Stufen Aufhellung empfehle ich eine schrittweise Aufhellung mit Schutzbehandlung (Olaplex/Fibreplex). Vorher Strandtest durchfuehren. Pflege: Feuchtigkeitsmaske 2x/Woche.'
+          ? 'Bei ' + Math.abs(diff) + ' Stufen Aufhellung empfehle ich eine schrittweise Aufhellung mit Schutzbehandlung (Olaplex/Fibreplex). Vorher Strandtest durchführen. Pflege: Feuchtigkeitsmaske 2x/Woche.'
           : diff < 0
-          ? 'Abdunkeln um ' + Math.abs(diff) + ' Stufen ist gut machbar. Semi-permanente Tonung empfohlen fuer natuerliches Ergebnis. Haelt ca. 6-8 Waeschen.'
-          : 'Farbauffrischung auf gleicher Stufe — ideal fuer Glanz und Farbtiefe. Glossing-Treatment empfohlen.';
+          ? 'Abdunkeln um ' + Math.abs(diff) + ' Stufen ist gut machbar. Semi-permanente Tonung empfohlen für natuerliches Ergebnis. Haelt ca. 6-8 Waeschen.'
+          : 'Farbauffrischung auf gleicher Stufe — ideal für Glanz und Farbtiefe. Glossing-Treatment empfohlen.';
         var kiCard = document.createElement('div');
         kiCard.style.cssText = 'margin-top:12px;padding:14px;background:linear-gradient(135deg,rgba(184,150,46,0.06),rgba(184,150,46,0.02));border:1px solid var(--border-accent);border-radius:var(--radius)';
         var demoBadge = document.createElement('div');
@@ -6966,7 +6966,7 @@
       tips.style.cssText = 'margin-bottom:14px;background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius-sm);overflow:hidden';
       var tSum = document.createElement('summary');
       tSum.style.cssText = 'padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--gold)';
-      tSum.textContent = '\u{1F50D} Foto-Tipps fuer Haaranalyse';
+      tSum.textContent = '\u{1F50D} Foto-Tipps für Haaranalyse';
       tips.appendChild(tSum);
       var tBody = document.createElement('div');
       tBody.style.cssText = 'padding:8px 14px 12px;font-size:11px;color:var(--text-secondary);line-height:1.8';
@@ -7066,7 +7066,7 @@
       haNameInput.type = 'text'; haNameInput.id = 'haKundeName'; haNameInput.placeholder = 'Kundenname';
       haNameInput.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;max-width:100%;box-sizing:border-box';
       var haEmailInput = document.createElement('input');
-      haEmailInput.type = 'email'; haEmailInput.id = 'haKundeEmail'; haEmailInput.placeholder = 'E-Mail (fuer PDF)';
+      haEmailInput.type = 'email'; haEmailInput.id = 'haKundeEmail'; haEmailInput.placeholder = 'E-Mail (für PDF)';
       haEmailInput.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;max-width:100%;box-sizing:border-box';
       haFieldsGrid.appendChild(haNameInput); haFieldsGrid.appendChild(haEmailInput);
       wrapper.appendChild(haFieldsGrid);
@@ -7095,7 +7095,7 @@
       progSubtitle.textContent = 'So kann Ihr Haar aussehen, wenn Sie die Pflegehinweise einhalten und empfohlene Produkte verwenden.';
       prognoseSection.appendChild(progSubtitle);
 
-      // Tab-Buttons fuer 3 Stufen
+      // Tab-Buttons für 3 Stufen
       var progTabs = document.createElement('div');
       progTabs.style.cssText = 'display:flex;gap:4px;margin-bottom:14px;background:var(--bg-warm);border-radius:var(--radius-full);padding:3px';
       var stages = [{key:'1w',label:'1 Woche'},{key:'1m',label:'1 Monat'},{key:'3m',label:'3 Monate'}];
@@ -7123,7 +7123,7 @@
         var infoBox = document.createElement('div');
         infoBox.style.cssText = 'flex:1;font-size:12px;line-height:1.6;color:var(--text-secondary)';
         if (s.key === '1w') {
-          infoBox.textContent = 'Erste Verbesserungen sichtbar: Glanz kehrt zurueck, Spitzen wirken gepflegter. Feuchtigkeitsgehalt steigt.';
+          infoBox.textContent = 'Erste Verbesserungen sichtbar: Glanz kehrt zurück, Spitzen wirken gepflegter. Feuchtigkeitsgehalt steigt.';
         } else if (s.key === '1m') {
           infoBox.textContent = 'Deutliche Verbesserung: Haarstruktur erholt sich, Bruch reduziert, natuerlicher Glanz, Spitzen weniger gespalten.';
         } else {
@@ -7160,7 +7160,7 @@
         var teaserBtn = document.createElement('button');
         teaserBtn.className = 'btn btn-primary btn-block btn-sm';
         teaserBtn.textContent = 'Upgrade auf Salon Pro \u2192';
-        teaserBtn.onclick = function() { showToast('Kontaktieren Sie uns fuer ein Upgrade', 'info', 3000); };
+        teaserBtn.onclick = function() { showToast('Kontaktieren Sie uns für ein Upgrade', 'info', 3000); };
         teaser.appendChild(teaserBtn);
         wrapper.appendChild(teaser);
       }
@@ -7221,7 +7221,7 @@
       if (c) c.textContent = haaranalysePhotos.length + ' / 10 Bilder';
     }
 
-    // === DEMO-Daten fuer Haaranalyse (Fallback wenn Webhook nicht erreichbar) ===
+    // === DEMO-Daten für Haaranalyse (Fallback wenn Webhook nicht erreichbar) ===
     var DEMO_HAARANALYSE = {
       params: [
         { name: 'Haartyp', value: 'Wellig (2B)', score: 7 },
@@ -7233,7 +7233,7 @@
         { name: 'Farbhistorie', value: 'Balayage (3 Monate)', score: 6 },
         { name: 'Feuchtigkeitsgehalt', value: 'Leicht reduziert', score: 5 }
       ],
-      empfehlung: 'Feuchtigkeitskur 1x/Woche, Hitzeschutz beim Foehnen. Olaplex Nr. 3 als Home-Treatment. Naechste Balayage-Auffrischung in 4-6 Wochen.'
+      empfehlung: 'Feuchtigkeitskur 1x/Woche, Hitzeschutz beim Föhnen. Olaplex Nr. 3 als Home-Treatment. Naechste Balayage-Auffrischung in 4-6 Wochen.'
     };
 
     function renderHaaranalyseResult(result, data, isDemo) {
@@ -7372,7 +7372,7 @@
       // Intro
       var intro = document.createElement('div');
       intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
-      intro.textContent = 'Laden Sie Fotos des aktuellen Looks und des Wunschlooks getrennt hoch. Die KI kombiniert Ihr Gesicht mit dem gewuenschten Style — Frisur, Bart oder beides — fuer eine realistische Vorschau.';
+      intro.textContent = 'Laden Sie Fotos des aktuellen Looks und des Wunschlooks getrennt hoch. Die KI kombiniert Ihr Gesicht mit dem gewuenschten Style — Frisur, Bart oder beides — für eine realistische Vorschau.';
       wrapper.appendChild(intro);
 
       // Foto-Tipps
@@ -7380,7 +7380,7 @@
       tips.style.cssText = 'margin-bottom:14px;background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius-sm);overflow:hidden';
       var tSum = document.createElement('summary');
       tSum.style.cssText = 'padding:10px 14px;font-size:12px;font-weight:600;cursor:pointer;color:var(--gold)';
-      tSum.textContent = '\u{1F4F8} Foto-Tipps fuer beste Ergebnisse';
+      tSum.textContent = '\u{1F4F8} Foto-Tipps für beste Ergebnisse';
       tips.appendChild(tSum);
       var tBody = document.createElement('div');
       tBody.style.cssText = 'padding:8px 14px 12px;font-size:11px;color:var(--text-secondary);line-height:1.8';
@@ -7477,7 +7477,7 @@
       var camId = type === 'aktuell' ? 'wfAktuellCam' : 'wfWunschCam';
       var fileId = type === 'aktuell' ? 'wfAktuellFile' : 'wfWunschFile';
 
-      // FB-54: EIN Upload-Button mit Popup-Menue "Foto aufnehmen" / "Aus Galerie waehlen"
+      // FB-54: EIN Upload-Button mit Popup-Menue "Foto aufnehmen" / "Aus Galerie wählen"
       var row = document.createElement('div');
       row.style.cssText = 'position:relative;margin-bottom:8px';
 
@@ -7512,7 +7512,7 @@
       var menuFile = document.createElement('button');
       menuFile.type = 'button';
       menuFile.style.cssText = 'width:100%;padding:14px 16px;border:0;border-top:1px solid var(--border);background:transparent;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
-      menuFile.innerHTML = '\u{1F5BC}\uFE0F <span>Aus Galerie waehlen</span>';
+      menuFile.innerHTML = '\u{1F5BC}\uFE0F <span>Aus Galerie wählen</span>';
       menuFile.onmouseenter = function(){ this.style.background='var(--bg-warm)'; };
       menuFile.onmouseleave = function(){ this.style.background='transparent'; };
       menuFile.onclick = function(ev){ ev.stopPropagation(); menu.style.display='none'; fileInput.click(); };
@@ -7522,13 +7522,13 @@
       mainBtn.onclick = function(ev){
         ev.stopPropagation();
         var isOpen = menu.style.display === 'block';
-        // Schliesse alle anderen Menues
+        // Schließe alle anderen Menues
         document.querySelectorAll('[data-wf-upload-menu]').forEach(function(m){ m.style.display='none'; });
         menu.style.display = isOpen ? 'none' : 'block';
       };
       menu.setAttribute('data-wf-upload-menu','1');
 
-      // Klick ausserhalb = schliessen
+      // Klick ausserhalb = schließen
       if (!window.__wfMenuCloser) {
         window.__wfMenuCloser = true;
         document.addEventListener('click', function(){
@@ -7618,7 +7618,7 @@
       reader.readAsDataURL(files[0]);
     }
 
-    // === DEMO-Daten fuer Wunschfrisur-Machbarkeit ===
+    // === DEMO-Daten für Wunschfrisur-Machbarkeit ===
     var DEMO_MACHBARKEIT = {
       score: 87,
       items: [
@@ -7750,7 +7750,7 @@
         vorherImg.src = wfAktuellePhotos[0];
         vorherImg.style.display = 'block';
       }
-      // Nachher-Bild: KI-Ergebnis wenn verfuegbar
+      // Nachher-Bild: KI-Ergebnis wenn verfügbar
       var nachherWrap = document.getElementById('wfKiNachherWrap');
       if (!nachherWrap) return;
       var ki64 = data && data.daten && data.daten.ki_bild_base64;
@@ -7872,8 +7872,8 @@
         { kat: 'produkt', text: 'Nur La Biosthetique Produkte empfehlen' },
         { kat: 'kapazitaet', text: 'Max 3 Termine parallel pro Stylistin' },
         { kat: 'kapazitaet', text: '15 Min Puffer zwischen Farbbehandlungen' },
-        { kat: 'kunde', text: 'VIP-Kunden: Getraenk + persoenliche Begruessung' },
-        { kat: 'kunde', text: 'Neukunden: 10 Min Extra fuer Beratung einplanen' },
+        { kat: 'kunde', text: 'VIP-Kunden: Getraenk + persönliche Begruessung' },
+        { kat: 'kunde', text: 'Neukunden: 10 Min Extra für Beratung einplanen' },
         { kat: 'service', text: 'Keine Dauerwelle unter Stufe 3 Schaedigung' },
         { kat: 'sonstiges', text: 'Allergieabfrage bei JEDER neuen Farbe (Pflicht)' }
       ];
@@ -7933,12 +7933,12 @@
 
       // Verbindungs-Check
       if (!connected) {
-        actions.push({ icon: '&#128279;', title: 'Backend nicht verbunden', desc: 'Das Dashboard laeuft im Demo-Modus. Fuer den Echtbetrieb muss die Backend-Verbindung hergestellt werden.', prio: 'hoch', action: 'openConfigSheet()' });
+        actions.push({ icon: '&#128279;', title: 'Backend nicht verbunden', desc: 'Das Dashboard laeuft im Demo-Modus. Für den Echtbetrieb muss die Backend-Verbindung hergestellt werden.', prio: 'hoch', action: 'openConfigSheet()' });
       }
 
       // Demo-Modus Hinweis
       if (isDemoMode) {
-        actions.push({ icon: '&#128202;', title: 'Demo-Modus aktiv', desc: 'Alle angezeigten Daten sind Beispieldaten fuer die Vorfuehrung. Im Echtbetrieb werden echte Kundendaten angezeigt.', prio: 'mittel' });
+        actions.push({ icon: '&#128202;', title: 'Demo-Modus aktiv', desc: 'Alle angezeigten Daten sind Beispieldaten für die Vorfuehrung. Im Echtbetrieb werden echte Kundendaten angezeigt.', prio: 'mittel' });
       }
 
       // Offene Anfragen
@@ -7956,7 +7956,7 @@
       // Follow-Up Kunden
       var followUps = (kundenCache || []).filter(function(k) { return k.Follow_Up; });
       if (followUps.length > 0) {
-        actions.push({ icon: '&#128100;', title: followUps.length + ' Kunden brauchen Follow-Up', desc: followUps.map(function(k) { return k.Name; }).join(', ') + ' — persoenlicher Kontakt empfohlen.', prio: 'niedrig', action: "showPage('kunden');setKundenFilter('followup')" });
+        actions.push({ icon: '&#128100;', title: followUps.length + ' Kunden brauchen Follow-Up', desc: followUps.map(function(k) { return k.Name; }).join(', ') + ' — persönlicher Kontakt empfohlen.', prio: 'niedrig', action: "showPage('kunden');setKundenFilter('followup')" });
       }
 
       // Tagesabschluss
@@ -7970,7 +7970,7 @@
       }
 
       // Kanäle nicht verbunden
-      actions.push({ icon: '&#128241;', title: 'WhatsApp & Social Media', desc: 'WhatsApp Business, Instagram und Facebook sind noch nicht verbunden. Kunden koennen nur per E-Mail anfragen.', prio: 'niedrig' });
+      actions.push({ icon: '&#128241;', title: 'WhatsApp & Social Media', desc: 'WhatsApp Business, Instagram und Facebook sind noch nicht verbunden. Kunden können nur per E-Mail anfragen.', prio: 'niedrig' });
 
       // Alles gut
       if (actions.length === 0) {
@@ -8020,12 +8020,12 @@
       if (!el) return;
       var items = [
         { icon: '&#128274;', name: 'DSGVO-Status', status: 'ok', detail: 'Konform', desc: '100% EU-Server, keine Daten ausserhalb EU' },
-        { icon: '&#129505;', name: 'KI-Transparenz', status: 'ok', detail: 'EU AI Act konform', desc: 'Kunden werden ueber KI-Nutzung informiert' },
-        { icon: '&#128272;', name: 'Datenverschluesselung', status: 'ok', detail: 'Aktiv', desc: 'SSL/TLS fuer alle Verbindungen' },
+        { icon: '&#129505;', name: 'KI-Transparenz', status: 'ok', detail: 'EU AI Act konform', desc: 'Kunden werden über KI-Nutzung informiert' },
+        { icon: '&#128272;', name: 'Datenverschluesselung', status: 'ok', detail: 'Aktiv', desc: 'SSL/TLS für alle Verbindungen' },
         { icon: '&#128100;', name: 'Zugriffsrechte', status: 'ok', detail: '4 Rollen aktiv', desc: 'Admin, Friseurmeister, Stylist, Azubi' },
         { icon: '&#128466;', name: 'AV-Vertraege', status: 'warn', detail: 'Ausstehend', desc: 'Vertraege mit Dienstleistern muessen noch geschlossen werden' },
         { icon: '&#128197;', name: 'Datenspeicherung', status: 'ok', detail: '10 Jahre', desc: 'Finanzamt-konforme Aufbewahrung (Kassenbuch, Rechnungen)' },
-        { icon: '&#128465;', name: 'Loeschkonzept', status: 'warn', detail: 'In Arbeit', desc: 'Automatische Datenlöschung nach Aufbewahrungsfrist' }
+        { icon: '&#128465;', name: 'Löschkonzept', status: 'warn', detail: 'In Arbeit', desc: 'Automatische Datenlöschung nach Aufbewahrungsfrist' }
       ];
 
       el.innerHTML = items.map(function(s) {
@@ -8052,7 +8052,7 @@
         { time: timeAgo(5), icon: '&#128197;', msg: (termineCache || []).length + ' Termine geladen' },
         { time: timeAgo(5), icon: '&#128100;', msg: (kundenCache || []).length + ' Kunden geladen' },
         { time: timeAgo(5), icon: '&#128230;', msg: (lagerCache || []).length + ' Produkte im Lager' },
-        { time: timeAgo(10), icon: '&#128274;', msg: 'SSL-Zertifikat gueltig' },
+        { time: timeAgo(10), icon: '&#128274;', msg: 'SSL-Zertifikat gültig' },
         { time: timeAgo(15), icon: '&#129505;', msg: 'KI-System bereit' }
       ];
 
@@ -8179,7 +8179,7 @@
 
     // === Service-Preisliste-Verwaltung (CRUD) ===
     var servicesCache = [];
-    // Demo-Services fuer Vorschau wenn kein Backend
+    // Demo-Services für Vorschau wenn kein Backend
     var DEMO_SERVICES = [
       { id: 'd1', name: 'Damenhaarschnitt', preis: 45.00, dauer_min: 60, kategorie: 'schnitt', service_typ: 'damen', aktiv: true },
       { id: 'd2', name: 'Herrenhaarschnitt', preis: 28.00, dauer_min: 30, kategorie: 'schnitt', service_typ: 'herren', aktiv: true },
@@ -8303,14 +8303,14 @@
     async function deleteService() {
       var id = document.getElementById('svcId').value.trim();
       if (!id) return;
-      if (!confirm('Service wirklich loeschen? (Kann Termine mit diesem Service betreffen)')) return;
+      if (!confirm('Service wirklich löschen? (Kann Termine mit diesem Service betreffen)')) return;
       try {
         await apiPatch('services_preisliste', 'id=eq.' + encodeURIComponent(id), { aktiv: false });
         closeSheet('serviceSheet');
         showToast('Service deaktiviert.', 'success');
         loadServicesList();
       } catch (e) {
-        showToast('Fehler beim Loeschen: ' + (e && e.message ? e.message : e), 'error');
+        showToast('Fehler beim Löschen: ' + (e && e.message ? e.message : e), 'error');
       }
     }
 
@@ -8417,7 +8417,7 @@
     async function deleteKarriere() {
       var id = document.getElementById('karId').value.trim();
       if (!id) return;
-      if (!confirm('Stelle wirklich loeschen?')) return;
+      if (!confirm('Stelle wirklich löschen?')) return;
       try {
         await apiPatch('karriere_stellen', 'id=eq.' + encodeURIComponent(id), { aktiv: false });
         closeSheet('karriereSheet');
@@ -8517,8 +8517,8 @@
       if (transcript && transcript.children.length === 0) {
         var uName = (currentUser && USERS && USERS[currentUser]) ? USERS[currentUser].name : 'Chef';
         var h = new Date().getHours();
-        var gruss = h < 12 ? 'Guten Morgen' : h < 17 ? 'Guten Tag' : 'Guten Abend';
-        jarvisRenderMessage(gruss + ', ' + uName + '. Wie kann ich helfen?', [], 'assistant');
+        var gruß = h < 12 ? 'Guten Morgen' : h < 17 ? 'Guten Tag' : 'Guten Abend';
+        jarvisRenderMessage(gruß + ', ' + uName + '. Wie kann ich helfen?', [], 'assistant');
       }
     }
 
@@ -8662,7 +8662,7 @@
           jarvisSession.history.push({ rolle: 'assistant', nachricht: text2, ts: Date.now(), actions: actions });
           jarvisSpeak(text2);
         } else {
-          jarvisRenderMessage('Entschuldige, das ist gerade nicht verfuegbar. Probiere es gleich nochmal.', [], 'assistant');
+          jarvisRenderMessage('Entschuldige, das ist gerade nicht verfügbar. Probiere es gleich nochmal.', [], 'assistant');
         }
       })
       .catch(function() {
@@ -8679,11 +8679,11 @@
 
     // Local fallback when backend unreachable
     function jarvisLocalFallback(text) {
-      // FB-75: Intent-Erkennung fuer Aufgaben-Ausfuehrung (MVP Offline-Fallback)
+      // FB-75: Intent-Erkennung für Aufgaben-Ausführung (MVP Offline-Fallback)
       var t = text.toLowerCase();
       // Nachbestellung
       if (/nachbestell|nachorder|produkt.*bestell|bestell.*produkt/i.test(t)) {
-        return { text: 'Ich oeffne die Nachbestellung fuer dich.', actions: [{ type: 'execute', fn: 'nachbestellung_anlegen', label: 'Nachbestellung oeffnen', payload: {} }] };
+        return { text: 'Ich oeffne die Nachbestellung für dich.', actions: [{ type: 'execute', fn: 'nachbestellung_anlegen', label: 'Nachbestellung oeffnen', payload: {} }] };
       }
       // Rechnung erstellen
       if (/rechnung.*erstell|erstell.*rechnung|rechnung.*schreib|schreib.*rechnung/i.test(t)) {
@@ -8697,7 +8697,7 @@
       if (/termin/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Termine direkt.', actions: [{ type: 'goto_page', label: 'Termine', payload: { page: 'termine' } }] }; }
       if (/kasse|umsatz/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Kasse direkt.', actions: [{ type: 'goto_page', label: 'Kasse', payload: { page: 'kasse' } }] }; }
       if (/lager/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Lager direkt.', actions: [{ type: 'goto_page', label: 'Lager', payload: { page: 'lager' } }] }; }
-      return { text: 'Keine Verbindung. Bitte Internetverbindung pruefen.', actions: [] };
+      return { text: 'Keine Verbindung. Bitte Internetverbindung prüfen.', actions: [] };
     }
 
     function jarvisRenderMessage(text, actions, rolle) {
@@ -8764,7 +8764,7 @@
           setTimeout(function() { if (typeof openTagesabschluss === 'function') openTagesabschluss(); }, 300);
           break;
         case 'execute':
-          // FB-75: Aufgaben direkt ausfuehren
+          // FB-75: Aufgaben direkt ausführen
           jarvisDoExecute(action);
           return; // eigene Toast/Message in jarvisDoExecute
         default:
@@ -8773,7 +8773,7 @@
       jarvisRenderMessage('Erledigt.', [], 'assistant');
     }
 
-    // FB-75: Aufgaben-Ausfuehrung (MVP: 3 Intents)
+    // FB-75: Aufgaben-Ausführung (MVP: 3 Intents)
     function jarvisDoExecute(action) {
       var p = action.payload || {};
       switch (action.fn) {
@@ -8786,7 +8786,7 @@
               jarvisRenderMessage('Termin von ' + (p.kunde || found.Kundenname || 'Kunde') + ' wurde verschoben.', [], 'assistant');
               jarvisSpeak('Termin wurde verschoben.');
             } else {
-              jarvisRenderMessage('Termin nicht gefunden. Bitte Terminseite pruefen.', [{ type: 'goto_page', label: 'Termine', payload: { page: 'termine' } }], 'assistant');
+              jarvisRenderMessage('Termin nicht gefunden. Bitte Terminseite prüfen.', [{ type: 'goto_page', label: 'Termine', payload: { page: 'termine' } }], 'assistant');
             }
           }
           break;
@@ -8818,7 +8818,7 @@
           jarvisSpeak('Tagesabschluss wird geoeffnet.');
           break;
         default:
-          jarvisRenderMessage('Diese Aufgabe kann ich noch nicht direkt ausfuehren.', [], 'assistant');
+          jarvisRenderMessage('Diese Aufgabe kann ich noch nicht direkt ausführen.', [], 'assistant');
       }
     }
 
@@ -8865,7 +8865,7 @@
 
     function toggleCockpitEdit() {
       cockpitEditing = !cockpitEditing;
-      // F6 Bug 3: Body-Class fuer globalen Edit-Mode (Indikator + ggf. Cursor)
+      // F6 Bug 3: Body-Class für globalen Edit-Mode (Indikator + ggf. Cursor)
       document.body.classList.toggle('cockpit-edit-mode', cockpitEditing);
       var grid = document.querySelector('.cockpit-grid');
       var btn = document.getElementById('cockpitEditBtn');
@@ -8944,7 +8944,7 @@
       document.querySelectorAll('.cockpit-card').forEach(function(c) { c.classList.remove('drag-over'); });
     }
 
-    // Touch-Drag fuer iPhone/iPad
+    // Touch-Drag für iPhone/iPad
     var touchDragEl = null;
     var touchClone = null;
     var touchOffsetX = 0, touchOffsetY = 0;
@@ -9097,7 +9097,7 @@
       } catch(e) {}
     }
 
-    // === KI-Vorschlaege fuer Home/Cockpit ===
+    // === KI-Vorschlaege für Home/Cockpit ===
     function renderKiSuggestions() {
       var container = document.getElementById('kiSuggestions');
       if (!container) return;
@@ -9140,7 +9140,7 @@
         suggestions.push({
           iconKey: 'package', title: lowStock.length + ' Produkte unter Mindestbestand',
           desc: 'Jetzt bestellen: ' + names,
-          action: 'Lager pruefen ›', click: function() { showPage('lager'); setLagerFilter('low'); }
+          action: 'Lager prüfen ›', click: function() { showPage('lager'); setLagerFilter('low'); }
         });
       }
 
@@ -9149,7 +9149,7 @@
         var fName = followUps[0].Name || followUps[0].name || '';
         suggestions.push({
           iconKey: 'users', title: followUps.length + ' Kunden mit offenem Follow-Up',
-          desc: fName + (followUps[0].Notiz ? ': ' + esc(followUps[0].Notiz).substring(0, 60) : '') + ' — persoenlicher Kontakt empfohlen',
+          desc: fName + (followUps[0].Notiz ? ': ' + esc(followUps[0].Notiz).substring(0, 60) : '') + ' — persönlicher Kontakt empfohlen',
           action: 'Kunden oeffnen ›', click: function() { showPage('kunden'); setKundenFilter('followup'); }
         });
       }
@@ -9180,8 +9180,8 @@
       if (todayTermine.length < 3 && h < 14) {
         suggestions.push({
           iconKey: 'sun', title: 'Ruhiger Tag — freie Zeit sinnvoll nutzen',
-          desc: 'Nur ' + todayTermine.length + ' Termine heute. Lager pruefen, Follow-Ups anschreiben oder Vorher/Nachher-Fotos aufbereiten.',
-          action: 'Lager pruefen ›', click: function() { showPage('lager'); }
+          desc: 'Nur ' + todayTermine.length + ' Termine heute. Lager prüfen, Follow-Ups anschreiben oder Vorher/Nachher-Fotos aufbereiten.',
+          action: 'Lager prüfen ›', click: function() { showPage('lager'); }
         });
       }
 
@@ -9205,7 +9205,7 @@
       }
     }
 
-    // === KI-Hinweise fuer Termine-Tab ===
+    // === KI-Hinweise für Termine-Tab ===
     function renderKiTermineHints() {
       var c = document.getElementById('kiTermineHints');
       if (!c) return;
@@ -9218,7 +9218,7 @@
       var hasOverlaps = Object.keys(overlaps).length > 0;
 
       if (hasOverlaps) {
-        hints.push({ iconKey: 'warning', title: 'Terminueberschneidung erkannt!', desc: 'Zwei oder mehr Termine ueberlappen sich im Tagesplan — jetzt pruefen und umbuchen, bevor Kunden warten.', prio: 'danger' });
+        hints.push({ iconKey: 'warning', title: 'Terminueberschneidung erkannt!', desc: 'Zwei oder mehr Termine ueberlappen sich im Tagesplan — jetzt prüfen und umbuchen, bevor Kunden warten.', prio: 'danger' });
       }
       var gaps = [];
       var sorted = todayTermine.slice().sort(function(a,b) { return (a.Start_ISO||'').localeCompare(b.Start_ISO||''); });
@@ -9232,13 +9232,13 @@
       }
       if (gaps.length > 0) {
         var g = gaps[0];
-        hints.push({ iconKey: 'clock', title: g.gap + ' Min. freie Zeit bei ' + g.stylist + ' ab ' + g.after, desc: 'Freies Fenster fuer Walk-In oder Kurztermin — jetzt aktiv ansprechen oder Warteliste pruefen.' });
+        hints.push({ iconKey: 'clock', title: g.gap + ' Min. freie Zeit bei ' + g.stylist + ' ab ' + g.after, desc: 'Freies Fenster für Walk-In oder Kurztermin — jetzt aktiv ansprechen oder Warteliste prüfen.' });
       }
       if (todayTermine.length >= 20) {
         hints.push({ iconKey: 'zap', title: 'Voller Tag — ' + todayTermine.length + ' Termine', desc: 'Produktwagen jetzt vorbereiten, Einwirkzeiten straff planen, Getraenke-Station auffuellen.' });
       }
       if (todayTermine.length > 0 && todayTermine.length < 5) {
-        hints.push({ iconKey: 'sun', title: 'Ruhiger Tag — ' + todayTermine.length + ' Termine', desc: 'Ideal fuer Produktpflege, Lager-Check oder Vorher/Nachher-Fotos der letzten Ergebnisse fuer Social Media.' });
+        hints.push({ iconKey: 'sun', title: 'Ruhiger Tag — ' + todayTermine.length + ' Termine', desc: 'Ideal für Produktpflege, Lager-Check oder Vorher/Nachher-Fotos der letzten Ergebnisse für Social Media.' });
       }
       var farbTermine = todayTermine.filter(function(t) { return /farb|balayage|straeh/i.test(t.Service||''); });
       if (farbTermine.length >= 2) {
@@ -9249,14 +9249,14 @@
         { iconKey: 'droplet', title: 'Olaplex zu jedem Farbtermin anbieten', desc: 'Strukturschutz kostet den Kunden ~25 EUR extra und verdoppelt die Zufriedenheit — Haarbruch sichtbar reduziert.' },
         { iconKey: 'calendar', title: 'Naechste Woche schon vorplanen', desc: 'Montag-Check: Welche Produkte werden gebraucht? Welche Kunden haben seit 6 Wochen keinen Termin?' },
         { iconKey: 'star', title: 'Google-Bewertung gezielt anfragen', desc: 'Direkt nach dem Spiegel-Moment fragen: "Wenn Sie zufrieden sind — eine kurze Google-Bewertung hilft uns sehr." 5-Sterne-Reviews bringen neue Laufkundschaft.' },
-        { iconKey: 'camera', title: 'Vorher/Nachher-Foto bei Farbservice', desc: 'Einwilligung einholen, dann beide Fotos machen — bestes Werbematerial fuer Instagram und Google-Profil.' }
+        { iconKey: 'camera', title: 'Vorher/Nachher-Foto bei Farbservice', desc: 'Einwilligung einholen, dann beide Fotos machen — bestes Werbematerial für Instagram und Google-Profil.' }
       ];
       var fi = 0;
       while (hints.length < 3 && fi < fallbacks.length) { hints.push(fallbacks[fi++]); }
       renderKiHintCards(c, hints);
     }
 
-    // === KI-Hinweise fuer Kasse-Tab ===
+    // === KI-Hinweise für Kasse-Tab ===
     function renderKiKasseHints() {
       var c = document.getElementById('kiKasseHints');
       if (!c) return;
@@ -9278,16 +9278,16 @@
         hints.push({ iconKey: 'trending', title: 'Durchschnittlicher Bon: ' + fmtEur(avg) + ' EUR', desc: 'Noch Luft nach oben: Ein LA Biosthetique Pflegeprodukt direkt am Stuhl zeigen bringt durchschnittlich +18 EUR je Kunde.', prio: 'warning' });
       }
       if (avg >= 80) {
-        hints.push({ iconKey: 'star', title: 'Starker Tageswert: ' + fmtEur(avg) + ' EUR Schnitt', desc: 'Hervorragende Leistung beim Produktverkauf — das Muster von heute fuer die naechste Woche festhalten.', prio: 'success' });
+        hints.push({ iconKey: 'star', title: 'Starker Tageswert: ' + fmtEur(avg) + ' EUR Schnitt', desc: 'Hervorragende Leistung beim Produktverkauf — das Muster von heute für die naechste Woche festhalten.', prio: 'success' });
       }
       if (h >= 17 && perms.kasseGesamt) {
         hints.push({ iconKey: 'receipt', title: 'Tagesabschluss noch offen', desc: 'Finanzamt-Pflicht: Kasse jetzt abschliessen, Barentnahmen dokumentieren — Frist laeuft um Mitternacht.', prio: 'warning' });
       }
       if (kasseCache.length === 0 && h > 10) {
-        hints.push({ iconKey: 'clock', title: 'Noch keine Buchungen heute', desc: 'Kasse vorbereitet? Wechselgeld auffuellen, Quittungsrolle pruefen, Terminal eingeschaltet?' });
+        hints.push({ iconKey: 'clock', title: 'Noch keine Buchungen heute', desc: 'Kasse vorbereitet? Wechselgeld auffuellen, Quittungsrolle prüfen, Terminal eingeschaltet?' });
       }
       var kFallbacks = [
-        { iconKey: 'shoppingBag', title: 'Pflegeprodukt direkt am Stuhl empfehlen', desc: 'Beim Foehnen zeigen was genutzt wird — Kunden kaufen 3x haeufiger wenn sie das Produkt in Aktion sehen.' },
+        { iconKey: 'shoppingBag', title: 'Pflegeprodukt direkt am Stuhl empfehlen', desc: 'Beim Föhnen zeigen was genutzt wird — Kunden kaufen 3x haeufiger wenn sie das Produkt in Aktion sehen.' },
         { iconKey: 'barChart', title: 'Tagesumsatz mit Vorwoche vergleichen', desc: 'Gleicher Wochentag, letzter Monat als Referenz — zeigt ob Aktionen wirken oder Schwaechen aufdecken.' },
         { iconKey: 'coin', title: 'Kartenzahlung aktiv foerdern', desc: 'QR-Code-Aufsteller gut platzieren — kuerzere Abrechnung, kein Rueckgeld, weniger Fehler.' },
         { iconKey: 'receipt', title: 'Belege sofort erfassen', desc: 'Kassenbeleg direkt nach jedem Termin buchen — Monatende-Stress vermeiden, Finanzamt-sicher bleiben.' }
@@ -9297,7 +9297,7 @@
       renderKiHintCards(c, hints);
     }
 
-    // === KI-Hinweise fuer Kunden-Tab ===
+    // === KI-Hinweise für Kunden-Tab ===
     function renderKiKundenHints() {
       var c = document.getElementById('kiKundenHints');
       if (!c) return;
@@ -9313,29 +9313,29 @@
 
       if (followUps.length > 0) {
         var fn = followUps[0].Name || followUps[0].name || 'Kunde';
-        hints.push({ iconKey: 'message', title: followUps.length + ' offene Follow-Ups', desc: fn + ' als naechstes kontaktieren — eine persoenliche WhatsApp-Nachricht wirkt dreimal besser als eine Standard-E-Mail.' });
+        hints.push({ iconKey: 'message', title: followUps.length + ' offene Follow-Ups', desc: fn + ' als naechstes kontaktieren — eine persönliche WhatsApp-Nachricht wirkt dreimal besser als eine Standard-E-Mail.' });
       }
       if (noVisit60.length > 0) {
         hints.push({ iconKey: 'heart', title: noVisit60.length + ' Kunden seit 60+ Tagen nicht mehr im Salon', desc: 'Reaktivierung per WhatsApp: "Wir denken an Sie — 10% auf den naechsten Besuch." Guenstigste Form der Neukunden-Werbung.' });
       }
       if (vips.length > 0) {
-        hints.push({ iconKey: 'crown', title: vips.length + ' VIP-Kunden — persoenliche Betreuung', desc: 'Geburtstags-Check jetzt: VIPs erhalten Glueckwunsch + Gutschein vorab — staerkste Bindungsmassnahme im Salon.' });
+        hints.push({ iconKey: 'crown', title: vips.length + ' VIP-Kunden — persönliche Betreuung', desc: 'Geburtstags-Check jetzt: VIPs erhalten Glueckwunsch + Gutschein vorab — staerkste Bindungsmassnahme im Salon.' });
       }
       if (kundenCache.length > 0 && kundenCache.length < 30) {
         hints.push({ iconKey: 'users', title: 'Kundenstamm noch im Aufbau — ' + kundenCache.length + ' Kontakte', desc: 'Jeden Walk-In nach Handynummer fragen. Nur 1 neuer Kontakt pro Tag ergibt 365 Stammkunden im Jahr.' });
       }
       var kuFallbacks = [
-        { iconKey: 'gift', title: 'Geburtstags-Aktion diesen Monat', desc: 'Kunden mit Geburtstag jetzt heraussuchen und persoenliche Nachricht + 10%-Gutschein senden — kostet nichts, wirkt viel.' },
+        { iconKey: 'gift', title: 'Geburtstags-Aktion diesen Monat', desc: 'Kunden mit Geburtstag jetzt heraussuchen und persönliche Nachricht + 10%-Gutschein senden — kostet nichts, wirkt viel.' },
         { iconKey: 'message', title: 'Kurze Pflege-Nachricht senden', desc: '"Wie geht es Ihren Haaren?" per WhatsApp — zeigt echtes Interesse und bringt Folgetermine ohne Rabatt.' },
         { iconKey: 'star', title: 'Stammkunden ab 5. Besuch belohnen', desc: 'Kleines Dankeschoens bei Besuch Nr. 5 merkt sich jeder Kunde — Weiterempfehlungsrate steigt deutlich.' },
-        { iconKey: 'camera', title: 'Kunden um Bewertung bitten', desc: 'Direkt nach dem Spiegel-Moment fragen — Google-Bewertungen sind die wirksamste Werbung fuer neue Laufkundschaft.' }
+        { iconKey: 'camera', title: 'Kunden um Bewertung bitten', desc: 'Direkt nach dem Spiegel-Moment fragen — Google-Bewertungen sind die wirksamste Werbung für neue Laufkundschaft.' }
       ];
       var kufi = 0;
       while (hints.length < 3 && kufi < kuFallbacks.length) { hints.push(kuFallbacks[kufi++]); }
       renderKiHintCards(c, hints);
     }
 
-    // === KI-Hinweise fuer Lager-Tab ===
+    // === KI-Hinweise für Lager-Tab ===
     function renderKiLagerHints() {
       var c = document.getElementById('kiLagerHints');
       if (!c) return;
@@ -9366,7 +9366,7 @@
         }
       }
       var laFallbacks = [
-        { iconKey: 'package', title: 'Freitags bestellen, montags im Regal', desc: 'Wochenend-Uebersicht Freitagmittag machen, Bestellung direkt ausloesen — LA Biosthetique liefert in 3-5 Werktagen.' },
+        { iconKey: 'package', title: 'Freitags bestellen, montags im Regal', desc: 'Wochenend-Übersicht Freitagmittag machen, Bestellung direkt ausloesen — LA Biosthetique liefert in 3-5 Werktagen.' },
         { iconKey: 'shoppingBag', title: 'Sichtbarkeit im Verkaufsregal erhoehen', desc: 'Shampoo + passender Conditioner als Set auf Augenhoehe platzieren — Sets verkaufen sich 40% besser als Einzelstuecke.' },
         { iconKey: 'barChart', title: 'Top-5-Produkte immer doppelt vorhalten', desc: 'Die fuenf meistverkauften Artikel nie unter 5 Stueck fallen lassen — Engpaesse kosten direkt Umsatz.' },
         { iconKey: 'leaf', title: 'Saisonale Empfehlungen jetzt aufstellen', desc: 'Fruehling/Sommer: Sonnenschutz-Spray + Leave-In. Herbst/Winter: intensive Feuchtigkeitskuren an den Spiegel stellen.' }
@@ -9503,45 +9503,45 @@
     function generateKiHintDetail(hint) {
       var t = (hint.title || '').toLowerCase();
       if (t.indexOf('nachbestellen') > -1 || t.indexOf('mindestbestand') > -1 || t.indexOf('ausverkauft') > -1) {
-        return 'Die KI hat Ihren aktuellen Lagerbestand analysiert und festgestellt, dass mehrere Produkte unter den definierten Mindestbestand gefallen sind. Bei den aktuellen Verbrauchsraten besteht das Risiko, dass diese Produkte innerhalb der naechsten 1-2 Wochen komplett aufgebraucht sind. Eine rechtzeitige Nachbestellung verhindert Lieferengpaesse und stellt sicher, dass Sie Ihren Kunden weiterhin alle Services anbieten koennen.';
+        return 'Die KI hat Ihren aktuellen Lagerbestand analysiert und festgestellt, dass mehrere Produkte unter den definierten Mindestbestand gefallen sind. Bei den aktuellen Verbrauchsraten besteht das Risiko, dass diese Produkte innerhalb der naechsten 1-2 Wochen komplett aufgebraucht sind. Eine rechtzeitige Nachbestellung verhindert Lieferengpaesse und stellt sicher, dass Sie Ihren Kunden weiterhin alle Services anbieten können.';
       }
       if (t.indexOf('termin') > -1 || t.indexOf('luecke') > -1 || t.indexOf('ueberschneidung') > -1) {
-        return 'Die KI hat Ihren Terminkalender analysiert und Optimierungspotenzial erkannt. Terminluecken koennen fuer Walk-In-Kunden oder Nachholtermine genutzt werden. Bei Ueberschneidungen empfiehlt sich eine sofortige Umplanung, um Wartezeiten zu vermeiden und die Kundenzufriedenheit zu sichern.';
+        return 'Die KI hat Ihren Terminkalender analysiert und Optimierungspotenzial erkannt. Terminluecken können für Walk-In-Kunden oder Nachholtermine genutzt werden. Bei Ueberschneidungen empfiehlt sich eine sofortige Umplanung, um Wartezeiten zu vermeiden und die Kundenzufriedenheit zu sichern.';
       }
       if (t.indexOf('follow') > -1 || t.indexOf('kontakt') > -1 || t.indexOf('kunde') > -1) {
-        return 'Die KI hat Kunden identifiziert, die fuer eine Kontaktaufnahme faellig sind. Regelmaessige Follow-Ups erhoehen die Kundenbindung nachweislich um bis zu 40%. Eine persoenliche Nachricht per WhatsApp oder ein kurzer Anruf wirkt am staerksten.';
+        return 'Die KI hat Kunden identifiziert, die für eine Kontaktaufnahme faellig sind. Regelmaessige Follow-Ups erhoehen die Kundenbindung nachweislich um bis zu 40%. Eine persönliche Nachricht per WhatsApp oder ein kurzer Anruf wirkt am staerksten.';
       }
       if (t.indexOf('umsatz') > -1 || t.indexOf('bonwert') > -1 || t.indexOf('kasse') > -1 || t.indexOf('tagesabschluss') > -1) {
-        return 'Die KI ueberwacht Ihre Tagesumsaetze und Kassenbewegungen in Echtzeit. Durch gezielte Empfehlungen wie Produktverkauf bei jedem Besuch oder Upselling bei Farbbehandlungen koennen Sie Ihren durchschnittlichen Bonwert deutlich steigern.';
+        return 'Die KI ueberwacht Ihre Tagesumsaetze und Kassenbewegungen in Echtzeit. Durch gezielte Empfehlungen wie Produktverkauf bei jedem Besuch oder Upselling bei Farbbehandlungen können Sie Ihren durchschnittlichen Bonwert deutlich steigern.';
       }
       if (t.indexOf('upsell') > -1 || t.indexOf('olaplex') > -1) {
-        return 'Bei Farbbehandlungen ist Olaplex No.1 als Zusatzschutz besonders empfehlenswert. Kunden schaetzen die professionelle Beratung und sind bereit, fuer den Haarschutz einen Aufpreis zu zahlen. Erfahrungswerte zeigen eine Annahmequote von ca. 60% bei aktiver Empfehlung.';
+        return 'Bei Farbbehandlungen ist Olaplex No.1 als Zusatzschutz besonders empfehlenswert. Kunden schaetzen die professionelle Beratung und sind bereit, für den Haarschutz einen Aufpreis zu zahlen. Erfahrungswerte zeigen eine Annahmequote von ca. 60% bei aktiver Empfehlung.';
       }
       if (t.indexOf('ruhig') > -1 || t.indexOf('weiterbildung') > -1) {
-        return 'Ruhige Tage sind ideal fuer Aufgaben, die im Alltagsstress oft zu kurz kommen: Lager pruefen, Schaufenster umdekorieren, Social-Media-Content erstellen oder Weiterbildung. Nutzen Sie die Zeit produktiv!';
+        return 'Ruhige Tage sind ideal für Aufgaben, die im Alltagsstress oft zu kurz kommen: Lager prüfen, Schaufenster umdekorieren, Social-Media-Content erstellen oder Weiterbildung. Nutzen Sie die Zeit produktiv!';
       }
       if (t.indexOf('antwort') > -1 || t.indexOf('wartet') > -1) {
-        return 'Schnelle Antwortzeiten sind entscheidend fuer die Kundenzufriedenheit. Studien zeigen: Kunden, die innerhalb von 30 Minuten eine Antwort erhalten, buchen 3x haeufiger einen Termin als bei laengerer Wartezeit.';
+        return 'Schnelle Antwortzeiten sind entscheidend für die Kundenzufriedenheit. Studien zeigen: Kunden, die innerhalb von 30 Minuten eine Antwort erhalten, buchen 3x haeufiger einen Termin als bei laengerer Wartezeit.';
       }
       if (t.indexOf('vip') > -1) {
         return 'VIP-Kunden sind das Rueckgrat Ihres Salons. Ein personalisierter Geburtstagsgruss mit kleinem Gutschein staerkt die Bindung enorm. Diese Kunden empfehlen Ihren Salon durchschnittlich 4x haeufiger weiter.';
       }
       if (t.indexOf('farb') > -1) {
-        return 'Mehrere Farbtermine am selben Tag bieten die Chance, Farbe und Entwickler vorab vorzubereiten. Das spart pro Termin ca. 15 Minuten Arbeitszeit und sorgt fuer einen reibungsloseren Ablauf.';
+        return 'Mehrere Farbtermine am selben Tag bieten die Chance, Farbe und Entwickler vorab vorzubereiten. Das spart pro Termin ca. 15 Minuten Arbeitszeit und sorgt für einen reibungsloseren Ablauf.';
       }
       return 'Die KI hat diesen Hinweis basierend auf Ihren aktuellen Salondaten generiert. Durch regelmaessige Analyse von Terminen, Lagerbestaenden, Kundendaten und Umsaetzen erkennt das System Muster und gibt proaktive Empfehlungen.';
     }
 
     function generateKiHintEmpfehlung(hint) {
       var t = (hint.title || '').toLowerCase();
-      if (t.indexOf('nachbestellen') > -1 || t.indexOf('mindestbestand') > -1) return 'Erstellen Sie jetzt eine Sammelbestellung fuer alle kritischen Produkte. LA Biosthetique liefert in 3-5 Werktagen. Tipp: Bestellen Sie 20% ueber Mindestbestand fuer einen Sicherheitspuffer.';
-      if (t.indexOf('ausverkauft') > -1) return 'Sofort nachbestellen! Pruefen Sie, ob ein Alternativprodukt voruebergehend eingesetzt werden kann, bis die Lieferung eintrifft.';
-      if (t.indexOf('ueberschneidung') > -1) return 'Pruefen Sie die betroffenen Termine und verschieben Sie einen davon zu einer freien Kollegin oder auf einen spaeten Slot.';
-      if (t.indexOf('luecke') > -1) return 'Nutzen Sie die Luecke fuer Walk-In-Kunden. Alternativ: Social-Media-Post mit "Spontan-Termin verfuegbar!" veroeffentlichen.';
-      if (t.indexOf('follow') > -1) return 'Senden Sie heute noch eine persoenliche WhatsApp-Nachricht an die ersten 3 Kunden auf der Follow-Up-Liste.';
-      if (t.indexOf('tagesabschluss') > -1) return 'Schliessen Sie die Kasse jetzt ab. GoBD-Pflicht: Tagesabschluss muss taeglich dokumentiert werden.';
-      if (t.indexOf('upsell') > -1 || t.indexOf('olaplex') > -1) return 'Empfehlen Sie bei jedem Farbtermin heute aktiv Olaplex No.1. Bereiten Sie das Produkt vorab vor und erklaeren Sie den Schutzeffekt in einem Satz.';
-      return 'Nehmen Sie sich 5 Minuten Zeit, um diesen Hinweis zu pruefen und die empfohlene Massnahme umzusetzen.';
+      if (t.indexOf('nachbestellen') > -1 || t.indexOf('mindestbestand') > -1) return 'Erstellen Sie jetzt eine Sammelbestellung für alle kritischen Produkte. LA Biosthetique liefert in 3-5 Werktagen. Tipp: Bestellen Sie 20% über Mindestbestand für einen Sicherheitspuffer.';
+      if (t.indexOf('ausverkauft') > -1) return 'Sofort nachbestellen! Prüfen Sie, ob ein Alternativprodukt voruebergehend eingesetzt werden kann, bis die Lieferung eintrifft.';
+      if (t.indexOf('ueberschneidung') > -1) return 'Prüfen Sie die betroffenen Termine und verschieben Sie einen davon zu einer freien Kollegin oder auf einen spaeten Slot.';
+      if (t.indexOf('luecke') > -1) return 'Nutzen Sie die Luecke für Walk-In-Kunden. Alternativ: Social-Media-Post mit "Spontan-Termin verfügbar!" veroeffentlichen.';
+      if (t.indexOf('follow') > -1) return 'Senden Sie heute noch eine persönliche WhatsApp-Nachricht an die ersten 3 Kunden auf der Follow-Up-Liste.';
+      if (t.indexOf('tagesabschluss') > -1) return 'Schließen Sie die Kasse jetzt ab. GoBD-Pflicht: Tagesabschluss muss täglich dokumentiert werden.';
+      if (t.indexOf('upsell') > -1 || t.indexOf('olaplex') > -1) return 'Empfehlen Sie bei jedem Farbtermin heute aktiv Olaplex No.1. Bereiten Sie das Produkt vorab vor und erklären Sie den Schutzeffekt in einem Satz.';
+      return 'Nehmen Sie sich 5 Minuten Zeit, um diesen Hinweis zu prüfen und die empfohlene Massnahme umzusetzen.';
     }
 
     function sendKiHintChat() {
@@ -9567,26 +9567,26 @@
       }, 1200 + Math.random() * 800);
     }
 
-    // === KI Antwort-Generierung fuer Beratung ===
+    // === KI Antwort-Generierung für Beratung ===
     function generateKiReply(b) {
       var name = (b.Kundenname || '').split(' ')[0] || 'Kunde';
       var msg = (b.Nachricht || '').toLowerCase();
       var kanal = b.Kanal || 'email';
 
       if (msg.indexOf('termin') > -1 || msg.indexOf('frei') > -1 || msg.indexOf('buchen') > -1) {
-        return 'Hallo ' + name + '! Vielen Dank fuer Ihre Anfrage. Gerne schaue ich fuer Sie nach freien Terminen. Wann wuerde es Ihnen am besten passen? Wir haben aktuell noch Verfuegbarkeiten diese Woche.';
+        return 'Hallo ' + name + '! Vielen Dank für Ihre Anfrage. Gerne schaue ich für Sie nach freien Terminen. Wann wuerde es Ihnen am besten passen? Wir haben aktuell noch Verfügbarkeiten diese Woche.';
       }
       if (msg.indexOf('storn') > -1 || msg.indexOf('absa') > -1) {
         return 'Hallo ' + name + ', kein Problem — ich storniere Ihren Termin kostenfrei. Moechten Sie gleich einen neuen Termin vereinbaren?';
       }
       if (msg.indexOf('balayage') > -1 || msg.indexOf('farb') > -1 || msg.indexOf('straeh') > -1) {
-        return 'Hallo ' + name + '! Fuer Ihre Farbbehandlung empfehle ich ein Beratungsgespraech im Salon. So koennen wir den idealen Farbton bestimmen. Soll ich einen Termin vorschlagen?';
+        return 'Hallo ' + name + '! Für Ihre Farbbehandlung empfehle ich ein Beratungsgespraech im Salon. So können wir den idealen Farbton bestimmen. Soll ich einen Termin vorschlagen?';
       }
       if (msg.indexOf('olaplex') > -1 || msg.indexOf('treatment') > -1 || msg.indexOf('pflege') > -1) {
-        return 'Hallo ' + name + '! Das Olaplex-Treatment ist eine hervorragende Wahl — es repariert die Haarstruktur von innen. Die Behandlung dauert ca. 60 Minuten. Soll ich einen Termin fuer Sie reservieren?';
+        return 'Hallo ' + name + '! Das Olaplex-Treatment ist eine hervorragende Wahl — es repariert die Haarstruktur von innen. Die Behandlung dauert ca. 60 Minuten. Soll ich einen Termin für Sie reservieren?';
       }
       if (msg.indexOf('preis') > -1 || msg.indexOf('kosten') > -1 || msg.indexOf('was kostet') > -1) {
-        return 'Hallo ' + name + '! Gerne informiere ich Sie ueber unsere Preise. Am besten kommen Sie zu einem kurzen Beratungstermin vorbei — so koennen wir den genauen Aufwand einschaetzen.';
+        return 'Hallo ' + name + '! Gerne informiere ich Sie über unsere Preise. Am besten kommen Sie zu einem kurzen Beratungstermin vorbei — so können wir den genauen Aufwand einschaetzen.';
       }
       if (msg.indexOf('bart') > -1 || msg.indexOf('maskulin') > -1 || msg.indexOf('herren') > -1) {
         return 'Hallo ' + name + '! Unser Herrenschnitt mit Bartpflege ist sehr beliebt. Die Behandlung dauert ca. 45 Minuten. Haben Sie einen Wunschtermin?';
@@ -9594,7 +9594,7 @@
       if (msg.indexOf('danke') > -1 || msg.indexOf('super') > -1 || msg.indexOf('toll') > -1) {
         return 'Vielen Dank, ' + name + '! Das freut uns sehr. Wir freuen uns auf Ihren naechsten Besuch!';
       }
-      return 'Hallo ' + name + '! Vielen Dank fuer Ihre Nachricht. Wie kann ich Ihnen weiterhelfen? Gerne vereinbare ich einen Termin oder berate Sie zu unseren Services.';
+      return 'Hallo ' + name + '! Vielen Dank für Ihre Nachricht. Wie kann ich Ihnen weiterhelfen? Gerne vereinbare ich einen Termin oder berate Sie zu unseren Services.';
     }
 
     function generateKiReplies(b) {
@@ -9625,7 +9625,7 @@
           var wert = lagerCache.reduce(function(sum, p) { return sum + (parseFloat(p.VK_Preis) || 0) * (parseInt(p.Bestand) || 0); }, 0);
           var a = 'Lager: ' + total + ' Produkte, Gesamtwert ' + fmtEur(wert) + ' EUR. ';
           if (low.length > 0) { a += low.length + ' unter Mindestbestand: ' + low.slice(0, 3).map(function(p) { return (p.Produkt || p.Name) + ' (' + (p.Bestand || 0) + ')'; }).join(', '); }
-          else { a += 'Alle ueber Mindestbestand.'; }
+          else { a += 'Alle über Mindestbestand.'; }
           return a;
         }
         return 'Lager-Daten werden geladen.';
@@ -9652,28 +9652,28 @@
       return 'Salon-Assistent bereit. Frag nach: Terminen, Lager, Umsatz, Anfragen, Haaranalyse oder Farbrezepturen.';
     }
 
-    // === Service Produkte (fuer Termin-Detail Rezepte) ===
+    // === Service Produkte (für Termin-Detail Rezepte) ===
     // DB-Cache (wird aus service_rezepturen Tabelle befuellt, hat Prioritaet vor hardcoded JS-Fallback)
     var dbRezeptCache = {};
     var serviceProdukte = {
-      'Damenhaarschnitt + Foehn': {
-        aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Schneiden',dauer_min:25},{schritt:'Foehnen + Styling',dauer_min:15}],
+      'Damenhaarschnitt + Föhn': {
+        aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Schneiden',dauer_min:25},{schritt:'Föhnen + Styling',dauer_min:15}],
         produkte: [{name:'Shampoo Vital',menge:'10 ml'},{name:'Conditioner',menge:'8 ml'},{name:'Hitzeschutz-Spray',menge:'3 Spruehstoesse'}]
       },
       'Haarschnitt Feminin': {
-        aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Schneiden',dauer_min:25},{schritt:'Foehnen',dauer_min:10}],
+        aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Schneiden',dauer_min:25},{schritt:'Föhnen',dauer_min:10}],
         produkte: [{name:'Shampoo Vital',menge:'10 ml'},{name:'Conditioner',menge:'8 ml'}]
       },
       'Balayage + Schnitt': {
-        aufgaben: [{schritt:'Farbanalyse + Beratung',dauer_min:10},{schritt:'Straehnen setzen (Freihand)',dauer_min:45},{schritt:'Einwirkzeit',dauer_min:35,einwirkzeit:true},{schritt:'Auswaschen + Pflege',dauer_min:10},{schritt:'Schneiden',dauer_min:20},{schritt:'Foehnen + Styling',dauer_min:15}],
+        aufgaben: [{schritt:'Farbanalyse + Beratung',dauer_min:10},{schritt:'Straehnen setzen (Freihand)',dauer_min:45},{schritt:'Einwirkzeit',dauer_min:35,einwirkzeit:true},{schritt:'Auswaschen + Pflege',dauer_min:10},{schritt:'Schneiden',dauer_min:20},{schritt:'Föhnen + Styling',dauer_min:15}],
         produkte: [{name:'Blondierpulver',menge:'30 g'},{name:'Oxid 6%',menge:'60 ml',mischung:'1:2 mit Blondierpulver'},{name:'Balayage Folie 30cm',menge:'15-20 Stueck'},{name:'Olaplex No. 1',menge:'3.75 ml',mischung:'In Blondierung einmischen'},{name:'Olaplex No. 2',menge:'15 ml',mischung:'Nach Auswaschen, 10 Min einwirken'},{name:'Shampoo Silber',menge:'15 ml'},{name:'Pflegekur',menge:'20 ml'}]
       },
       'Farbbehandlung Komplett': {
-        aufgaben: [{schritt:'Farbberatung',dauer_min:5},{schritt:'Farbe anmischen',dauer_min:5},{schritt:'Auftragen (Ansatz + Laengen)',dauer_min:20},{schritt:'Einwirkzeit',dauer_min:30,einwirkzeit:true},{schritt:'Auswaschen + Emulgieren',dauer_min:8},{schritt:'Pflege + Foehnen',dauer_min:15}],
+        aufgaben: [{schritt:'Farbberatung',dauer_min:5},{schritt:'Farbe anmischen',dauer_min:5},{schritt:'Auftragen (Ansatz + Laengen)',dauer_min:20},{schritt:'Einwirkzeit',dauer_min:30,einwirkzeit:true},{schritt:'Auswaschen + Emulgieren',dauer_min:8},{schritt:'Pflege + Föhnen',dauer_min:15}],
         produkte: [{name:'Haarfarbe (lt. Farbcode)',menge:'60 ml',mischung:'1:1 mit Oxid'},{name:'Oxid (lt. Stufe)',menge:'60 ml',mischung:'3% Tonung / 6% Aufhellung'},{name:'Handschuhe',menge:'1 Paar'},{name:'Farbschale + Pinsel',menge:'1 Set'},{name:'Pflegekur Color',menge:'20 ml'}]
       },
       'Farbbehandlung': {
-        aufgaben: [{schritt:'Farbberatung',dauer_min:5},{schritt:'Farbe anmischen',dauer_min:5},{schritt:'Auftragen',dauer_min:15},{schritt:'Einwirkzeit',dauer_min:30,einwirkzeit:true},{schritt:'Auswaschen',dauer_min:5},{schritt:'Pflege + Foehnen',dauer_min:15}],
+        aufgaben: [{schritt:'Farbberatung',dauer_min:5},{schritt:'Farbe anmischen',dauer_min:5},{schritt:'Auftragen',dauer_min:15},{schritt:'Einwirkzeit',dauer_min:30,einwirkzeit:true},{schritt:'Auswaschen',dauer_min:5},{schritt:'Pflege + Föhnen',dauer_min:15}],
         produkte: [{name:'Haarfarbe (lt. Farbcode)',menge:'60 ml',mischung:'1:1 mit Oxid'},{name:'Oxid (lt. Stufe)',menge:'60 ml'},{name:'Handschuhe',menge:'1 Paar'},{name:'Pflegekur Color',menge:'15 ml'}]
       },
       'Herrenschnitt': {
@@ -9685,7 +9685,7 @@
         produkte: [{name:'Shampoo Men',menge:'8 ml'},{name:'Bartoel',menge:'3-4 Tropfen'},{name:'Styling Paste',menge:'erbsengrosse Menge'}]
       },
       'Haarpflege + Olaplex': {
-        aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Olaplex No. 1 auftragen',dauer_min:3},{schritt:'Einwirkzeit No. 1',dauer_min:15,einwirkzeit:true},{schritt:'Olaplex No. 2 auftragen',dauer_min:3},{schritt:'Einwirkzeit No. 2',dauer_min:20,einwirkzeit:true},{schritt:'Auswaschen + Pflege',dauer_min:5},{schritt:'Foehnen',dauer_min:10}],
+        aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Olaplex No. 1 auftragen',dauer_min:3},{schritt:'Einwirkzeit No. 1',dauer_min:15,einwirkzeit:true},{schritt:'Olaplex No. 2 auftragen',dauer_min:3},{schritt:'Einwirkzeit No. 2',dauer_min:20,einwirkzeit:true},{schritt:'Auswaschen + Pflege',dauer_min:5},{schritt:'Föhnen',dauer_min:10}],
         produkte: [{name:'Olaplex No. 1',menge:'3.75 ml',mischung:'Pur auftragen'},{name:'Olaplex No. 2',menge:'15 ml',mischung:'Grosszuegig einarbeiten'},{name:'Shampoo Vital',menge:'10 ml'},{name:'Pflegekur',menge:'20 ml'}]
       },
       'Brautstyling Probe': {
@@ -9701,15 +9701,15 @@
         produkte: [{name:'Shampoo Mild',menge:'5 ml'}]
       },
       'Haarschnitt & Styling Damen M': {
-        aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Schneiden',dauer_min:30},{schritt:'Foehnen + Styling',dauer_min:20}],
+        aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Schneiden',dauer_min:30},{schritt:'Föhnen + Styling',dauer_min:20}],
         produkte: [{name:'Shampoo Vital',menge:'10 ml'},{name:'Conditioner',menge:'8 ml'},{name:'Hitzeschutz-Spray',menge:'3 Spruehstoesse'}]
       },
       'Maskulin Schnitt': {
         aufgaben: [{schritt:'Waschen',dauer_min:3},{schritt:'Schneiden',dauer_min:20},{schritt:'Styling',dauer_min:5}],
         produkte: [{name:'Shampoo Men',menge:'8 ml'},{name:'Styling Paste',menge:'erbsengrosse Menge'}]
       },
-      'Foehnfrisur': {
-        aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Foehnen + Stylen',dauer_min:20}],
+      'Föhnfrisur': {
+        aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Föhnen + Stylen',dauer_min:20}],
         produkte: [{name:'Shampoo Vital',menge:'10 ml'},{name:'Hitzeschutz-Spray',menge:'3 Spruehstoesse'},{name:'Volumen-Mousse',menge:'haselnussgrosse Menge'}]
       },
       'Glossing': {
@@ -9717,7 +9717,7 @@
         produkte: [{name:'Glossing-Behandlung',menge:'30 ml'},{name:'Pflegekur',menge:'15 ml'}]
       },
       'Farbbehandlung + Olaplex': {
-        aufgaben: [{schritt:'Farbberatung',dauer_min:5},{schritt:'Farbe anmischen',dauer_min:5},{schritt:'Auftragen (Ansatz + Laengen)',dauer_min:20},{schritt:'Einwirkzeit',dauer_min:30,einwirkzeit:true},{schritt:'Auswaschen + Emulgieren',dauer_min:8},{schritt:'Olaplex No. 1 + No. 2',dauer_min:20,einwirkzeit:true},{schritt:'Pflege + Foehnen',dauer_min:15}],
+        aufgaben: [{schritt:'Farbberatung',dauer_min:5},{schritt:'Farbe anmischen',dauer_min:5},{schritt:'Auftragen (Ansatz + Laengen)',dauer_min:20},{schritt:'Einwirkzeit',dauer_min:30,einwirkzeit:true},{schritt:'Auswaschen + Emulgieren',dauer_min:8},{schritt:'Olaplex No. 1 + No. 2',dauer_min:20,einwirkzeit:true},{schritt:'Pflege + Föhnen',dauer_min:15}],
         produkte: [{name:'Haarfarbe (lt. Farbcode)',menge:'60 ml',mischung:'1:1 mit Oxid'},{name:'Oxid (lt. Stufe)',menge:'60 ml'},{name:'Olaplex No. 1',menge:'3.75 ml',mischung:'In Farbe einmischen'},{name:'Olaplex No. 2',menge:'15 ml',mischung:'Nach Auswaschen, 10 Min einwirken'},{name:'Handschuhe',menge:'1 Paar'},{name:'Pflegekur Color',menge:'20 ml'}]
       }
     };
@@ -9753,23 +9753,23 @@
       var iso = function(h, m) { var d = new Date(now); d.setHours(h, m, 0, 0); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00'; };
       var isoDay = function(dayOffset, h, m) { var d = new Date(now); d.setDate(d.getDate() + dayOffset); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + 'T' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':00'; };
 
-      // Events — 12 Eintraege fuer realistischen Posteingang
+      // Events — 12 Eintraege für realistischen Posteingang
       renderEvents([
         { Timestamp: iso(9, 45), Typ: 'termin_vorschlag', Status: 'ungelesen', Is_Read: 0, Titel: 'Terminvorschlag: Balayage + Schnitt', Nachricht: 'Clara Wolf moechte eine Balayage-Auffrischung + Schnitt (135 Min, 185 EUR). Bevorzugt bei Rena.', Kanal: 'whatsapp', Anfrage_ID: 'EVT-002', Kontakt: '0171-8765432', Kundenname: 'Clara Wolf', Service: 'Balayage + Schnitt', Dauer_Min: 135, Preis: 185,
           Slots: [{ tag: 'Do 10.04.', zeit: '09:00', ende: '11:15' }, { tag: 'Fr 11.04.', zeit: '10:00', ende: '12:15' }, { tag: 'Sa 12.04.', zeit: '09:30', ende: '11:45' }],
-          Antwortvorschlaege: ['Liebe Clara, super! Ich haette am Donnerstag ab 9 Uhr Zeit fuer deine Balayage — 135 Min, 185 EUR. Soll ich reservieren? LG Rena', 'Hi Clara! Freie Plaetze: Do 09:00, Fr 10:00, Sa 09:30. Welcher passt dir am besten? LG Rena', 'Hallo Clara! Ich freue mich auf deine Balayage. Am besten waere Freitag 10:00 — da habe ich extra viel Zeit. Passt dir das? LG Rena'] },
-        { Timestamp: iso(9, 30), Typ: 'termin_vorschlag', Status: 'ungelesen', Is_Read: 0, Titel: 'Terminvorschlag: Haarschnitt & Styling Damen M', Nachricht: 'Maria Testkundin moechte einen Termin fuer Haarschnitt & Styling Damen M (60 Min, 75 EUR)', Kanal: 'email', Anfrage_ID: 'EVT-001', Kontakt: 'maria@test.de', Kundenname: 'Maria Testkundin', Service: 'Haarschnitt & Styling Damen M', Dauer_Min: 60, Preis: 75,
+          Antwortvorschlaege: ['Liebe Clara, super! Ich haette am Donnerstag ab 9 Uhr Zeit für deine Balayage — 135 Min, 185 EUR. Soll ich reservieren? LG Rena', 'Hi Clara! Freie Plaetze: Do 09:00, Fr 10:00, Sa 09:30. Welcher passt dir am besten? LG Rena', 'Hallo Clara! Ich freue mich auf deine Balayage. Am besten waere Freitag 10:00 — da habe ich extra viel Zeit. Passt dir das? LG Rena'] },
+        { Timestamp: iso(9, 30), Typ: 'termin_vorschlag', Status: 'ungelesen', Is_Read: 0, Titel: 'Terminvorschlag: Haarschnitt & Styling Damen M', Nachricht: 'Maria Testkundin moechte einen Termin für Haarschnitt & Styling Damen M (60 Min, 75 EUR)', Kanal: 'email', Anfrage_ID: 'EVT-001', Kontakt: 'maria@test.de', Kundenname: 'Maria Testkundin', Service: 'Haarschnitt & Styling Damen M', Dauer_Min: 60, Preis: 75,
           Slots: [{ tag: 'Mo 07.04.', zeit: '10:00', ende: '11:00' }, { tag: 'Mo 07.04.', zeit: '10:30', ende: '11:30' }, { tag: 'Mo 07.04.', zeit: '11:00', ende: '12:00' }, { tag: 'Di 08.04.', zeit: '09:00', ende: '10:00' }, { tag: 'Di 08.04.', zeit: '14:00', ende: '15:00' }],
-          Antwortvorschlaege: ['Liebe Maria, vielen Dank fuer Ihre Anfrage! Ich habe folgende Termine: Mo 07.04. um 10:00 Uhr — Haarschnitt & Styling (60 Min, 75 EUR). Passt Ihnen? Herzliche Gruesse, Rena Rados', 'Hallo Maria! Schoen, dass Sie sich melden. Ich haette am Montag ab 10 Uhr Zeit — 75 EUR fuer 60 Min. Soll ich reservieren? LG Rena', 'Hi Maria! Freie Plaetze: Mo (10:00, 10:30, 11:00) und Di (09:00, 14:00). Preis: 75 EUR / 60 Min. Welcher passt am besten? LG Rena'] },
-        { Timestamp: iso(9, 20), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Haaranalyse-Anfrage', Nachricht: 'Helena Richter hat 3 Fotos fuer eine Haaranalyse hochgeladen. Haar wirkt trocken und strapaeziert.', Kanal: 'homepage', Anfrage_ID: 'ANF-044' },
-        { Timestamp: iso(9, 15), Typ: 'termin_bestaetigt', Status: 'ungelesen', Is_Read: 0, Titel: 'Termin bestaetigt', Nachricht: 'Maria Mueller — Haarschnitt Feminin, 14:00', Kanal: 'whatsapp', Anfrage_ID: 'ANF-042' },
+          Antwortvorschlaege: ['Liebe Maria, vielen Dank für Ihre Anfrage! Ich habe folgende Termine: Mo 07.04. um 10:00 Uhr — Haarschnitt & Styling (60 Min, 75 EUR). Passt Ihnen? Herzliche Gruesse, Rena Rados', 'Hallo Maria! Schoen, dass Sie sich melden. Ich haette am Montag ab 10 Uhr Zeit — 75 EUR für 60 Min. Soll ich reservieren? LG Rena', 'Hi Maria! Freie Plaetze: Mo (10:00, 10:30, 11:00) und Di (09:00, 14:00). Preis: 75 EUR / 60 Min. Welcher passt am besten? LG Rena'] },
+        { Timestamp: iso(9, 20), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Haaranalyse-Anfrage', Nachricht: 'Helena Richter hat 3 Fotos für eine Haaranalyse hochgeladen. Haar wirkt trocken und strapaeziert.', Kanal: 'homepage', Anfrage_ID: 'ANF-044' },
+        { Timestamp: iso(9, 15), Typ: 'termin_bestaetigt', Status: 'ungelesen', Is_Read: 0, Titel: 'Termin bestätigt', Nachricht: 'Maria Mueller — Haarschnitt Feminin, 14:00', Kanal: 'whatsapp', Anfrage_ID: 'ANF-042' },
         { Timestamp: iso(9, 2), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Neue Anfrage', Nachricht: 'Stefan Braun fragt nach Maskulin Schnitt + Bart', Kanal: 'instagram', Anfrage_ID: 'ANF-043' },
         { Timestamp: iso(8, 50), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Wunschfrisur-Anfrage', Nachricht: 'Mia Lehmann moechte eine Wunschfrisur-Beratung. Hat 2 Referenzbilder mitgeschickt (Bob, schulterlang).', Kanal: 'homepage', Anfrage_ID: 'ANF-045' },
         { Timestamp: iso(8, 45), Typ: 'nachbestellung', Status: 'gelesen', Is_Read: 1, Titel: 'Lagerbestand niedrig', Nachricht: 'Shampoo Vital: nur noch 3 Stueck (Min: 5). Olaplex No. 1: nur noch 2 Stueck (Min: 3).', Kanal: 'system' },
         { Timestamp: iso(8, 30), Typ: 'storno', Status: 'erledigt', Is_Read: 1, Titel: 'Stornierung', Nachricht: 'Lisa Wagner hat Termin am 04.04. storniert (Grund: krank)', Kanal: 'whatsapp', Anfrage_ID: 'ANF-040' },
-        { Timestamp: iso(8, 10), Typ: 'termin_bestaetigt', Status: 'gelesen', Is_Read: 1, Titel: 'Termin bestaetigt', Nachricht: 'Anna Schmidt — Balayage, 10:00', Kanal: 'email', Anfrage_ID: 'ANF-039' },
-        { Timestamp: iso(7, 50), Typ: 'antwort', Status: 'gelesen', Is_Read: 1, Titel: 'Kundenantwort', Nachricht: 'Danke fuer die Info! Komme gerne. Bis Donnerstag!', Kanal: 'facebook', Anfrage_ID: 'ANF-038' },
-        { Timestamp: iso(7, 30), Typ: 'event', Status: 'gelesen', Is_Read: 1, Titel: 'Google-Bewertung', Nachricht: 'Neue 5-Sterne-Bewertung von Laura Braun: "Beste Balayage in Muenchen! Rena ist ein Profi."', Kanal: 'system', Anfrage_ID: 'ANF-037' },
+        { Timestamp: iso(8, 10), Typ: 'termin_bestaetigt', Status: 'gelesen', Is_Read: 1, Titel: 'Termin bestätigt', Nachricht: 'Anna Schmidt — Balayage, 10:00', Kanal: 'email', Anfrage_ID: 'ANF-039' },
+        { Timestamp: iso(7, 50), Typ: 'antwort', Status: 'gelesen', Is_Read: 1, Titel: 'Kundenantwort', Nachricht: 'Danke für die Info! Komme gerne. Bis Donnerstag!', Kanal: 'facebook', Anfrage_ID: 'ANF-038' },
+        { Timestamp: iso(7, 30), Typ: 'event', Status: 'gelesen', Is_Read: 1, Titel: 'Google-Bewertung', Nachricht: 'Neue 5-Sterne-Bewertung von Laura Braun: "Beste Balayage in München! Rena ist ein Profi."', Kanal: 'system', Anfrage_ID: 'ANF-037' },
         { Timestamp: isoDay(-1, 18, 0), Typ: 'antwort', Status: 'erledigt', Is_Read: 1, Titel: 'Produktanfrage', Nachricht: 'Nina Fischer fragt nach Olaplex No. 3 zum Mitnehmen — haben wir das auf Lager?', Kanal: 'whatsapp', Anfrage_ID: 'ANF-036' }
       ]);
 
@@ -9779,7 +9779,7 @@
 
       // Generate 30 days of Termine
       var demoServices = [
-        { Service: 'Damenhaarschnitt + Foehn', Dauer_Min: 45, Preis: 68 },
+        { Service: 'Damenhaarschnitt + Föhn', Dauer_Min: 45, Preis: 68 },
         { Service: 'Haarschnitt Feminin', Dauer_Min: 40, Preis: 55 },
         { Service: 'Balayage + Schnitt', Dauer_Min: 135, Preis: 185 },
         { Service: 'Farbbehandlung Komplett', Dauer_Min: 85, Preis: 120 },
@@ -9789,7 +9789,7 @@
         { Service: 'Haarpflege + Olaplex', Dauer_Min: 60, Preis: 65 },
         { Service: 'Brautstyling Probe', Dauer_Min: 85, Preis: 120 },
         { Service: 'Kinderhaarschnitt', Dauer_Min: 25, Preis: 22 },
-        { Service: 'Foehnfrisur', Dauer_Min: 25, Preis: 30 },
+        { Service: 'Föhnfrisur', Dauer_Min: 25, Preis: 30 },
         { Service: 'Glossing', Dauer_Min: 35, Preis: 40 },
         { Service: 'Haarschnitt & Styling Damen M', Dauer_Min: 60, Preis: 75 }
       ];
@@ -9797,7 +9797,7 @@
       var demoKunden = ['Maria Mueller', 'Anna Schmidt', 'Lisa Wagner', 'Sophie Klein', 'Laura Braun', 'Nina Fischer', 'Lara Weber', 'Julia Hoffmann', 'Sarah Becker', 'Emma Schulz', 'Stefan Braun', 'Thomas Meier', 'Max Fischer', 'Paul Weber', 'Tim Schneider', 'Mia Lehmann', 'Clara Wolf', 'Helena Richter'];
 
       var allTermine = [];
-      // Voller Monat: 14 Tage zurueck + 30 Tage voraus = 44 Tage
+      // Voller Monat: 14 Tage zurück + 30 Tage voraus = 44 Tage
       for (var dayOff = -14; dayOff <= 30; dayOff++) {
         var dayDate = new Date(now); dayDate.setDate(dayDate.getDate() + dayOff);
         var dow = dayDate.getDay();
@@ -9817,9 +9817,9 @@
           else if (dayOff === 0) {
             var termTime = new Date(now); termTime.setHours(startH, startM, 0, 0);
             if (termTime < now) status = 'abgeschlossen';
-            else status = rng() > 0.15 ? 'bestaetigt' : 'offen';
+            else status = rng() > 0.15 ? 'bestätigt' : 'offen';
           } else {
-            status = rng() > 0.25 ? 'bestaetigt' : 'offen';
+            status = rng() > 0.25 ? 'bestätigt' : 'offen';
           }
           // Ende_ISO berechnen
           var endD = new Date(dayDate); endD.setHours(startH, startM + svc.Dauer_Min, 0, 0);
@@ -9892,10 +9892,10 @@
       var kundenData = [
         { Name: 'Maria Mueller', Email: 'maria@test.de', Telefon: '0176-1234567', Besuche: 15, Umsatz: 1250.00, Letzter_Besuch: isoDay(-7, 10, 0), VIP: true, Lieblings_Service: 'Balayage + Schnitt' },
         { Name: 'Anna Schmidt', Email: 'anna.s@mail.de', Telefon: '0172-9876543', Besuche: 22, Umsatz: 1890.00, Letzter_Besuch: isoDay(-3, 14, 0), VIP: true, Lieblings_Service: 'Farbbehandlung Komplett' },
-        { Name: 'Lisa Wagner', Email: 'lisa.w@gmail.com', Telefon: '0151-5555555', Besuche: 8, Umsatz: 580.00, Letzter_Besuch: isoDay(-14, 11, 0), Lieblings_Service: 'Damenhaarschnitt + Foehn' },
+        { Name: 'Lisa Wagner', Email: 'lisa.w@gmail.com', Telefon: '0151-5555555', Besuche: 8, Umsatz: 580.00, Letzter_Besuch: isoDay(-14, 11, 0), Lieblings_Service: 'Damenhaarschnitt + Föhn' },
         { Name: 'Sophie Klein', Email: 'sophie@web.de', Telefon: '0160-1111111', Besuche: 3, Umsatz: 195.00, Letzter_Besuch: isoDay(-21, 9, 0), Follow_Up: true, Notiz: 'Interesse an Olaplex-Treatment gezeigt' },
         { Name: 'Laura Braun', Email: 'laura.b@mail.de', Besuche: 12, Umsatz: 980.00, Letzter_Besuch: isoDay(-5, 16, 0), VIP: true },
-        { Name: 'Nina Fischer', Email: 'nina@test.de', Besuche: 1, Umsatz: 68.00, Letzter_Besuch: isoDay(-2, 10, 0), Notiz: 'Neukundin, kam ueber Instagram' },
+        { Name: 'Nina Fischer', Email: 'nina@test.de', Besuche: 1, Umsatz: 68.00, Letzter_Besuch: isoDay(-2, 10, 0), Notiz: 'Neukundin, kam über Instagram' },
         { Name: 'Stefan Braun', Email: 'stefan.b@mail.de', Besuche: 6, Umsatz: 270.00, Letzter_Besuch: isoDay(-10, 15, 0), Lieblings_Service: 'Herrenschnitt + Bartpflege' },
         { Name: 'Thomas Meier', Email: 'thomas.m@web.de', Besuche: 4, Umsatz: 140.00, Letzter_Besuch: isoDay(-18, 11, 0), Follow_Up: true },
         { Name: 'Mia Lehmann', Email: 'mia.l@gmail.com', Besuche: 0, Umsatz: 0, Notiz: 'Hat Termin angefragt' },
@@ -9903,7 +9903,7 @@
         { Name: 'Helena Richter', Email: 'helena@test.de', Besuche: 7, Umsatz: 490.00, Letzter_Besuch: isoDay(-8, 10, 0) },
         { Name: 'Emma Schulz', Besuche: 2, Umsatz: 150.00, Letzter_Besuch: isoDay(-30, 14, 0), Follow_Up: true },
         { Name: 'Petra Neumann', Email: 'petra.n@web.de', Telefon: '0173-4443322', Besuche: 11, Umsatz: 880.00, Letzter_Besuch: isoDay(-75, 10, 0), Lieblings_Service: 'Farbbehandlung Komplett', Notiz: 'War lange nicht da — Erinnerung senden' },
-        { Name: 'Kathrin Bauer', Email: 'kathrin.b@gmail.com', Besuche: 9, Umsatz: 620.00, Letzter_Besuch: isoDay(-90, 14, 0), Lieblings_Service: 'Damenhaarschnitt + Foehn' },
+        { Name: 'Kathrin Bauer', Email: 'kathrin.b@gmail.com', Besuche: 9, Umsatz: 620.00, Letzter_Besuch: isoDay(-90, 14, 0), Lieblings_Service: 'Damenhaarschnitt + Föhn' },
         { Name: 'Sabine Huber', Telefon: '0176-7778899', Besuche: 5, Umsatz: 340.00, Letzter_Besuch: isoDay(-65, 11, 0), Follow_Up: true, Notiz: 'Wollte Haaranalyse machen' },
         { Name: 'Max Fischer', Email: 'max.f@mail.de', Telefon: '0152-1112233', Besuche: 14, Umsatz: 490.00, Letzter_Besuch: isoDay(-4, 16, 0), Lieblings_Service: 'Herrenschnitt + Bartpflege' },
         { Name: 'Paul Weber', Email: 'paul.w@test.de', Besuche: 3, Umsatz: 105.00, Letzter_Besuch: isoDay(-12, 9, 0), Lieblings_Service: 'Herrenschnitt' },
@@ -9913,14 +9913,14 @@
 
       // Demo Beratungen — 8 Eintraege mit verschiedenen Typen
       renderBeratungen([
-        { Kundenname: 'Helena Richter', Typ: 'haaranalyse', Nachricht: 'Meine Haare sind seit Monaten extrem trocken und brechen ab. Habe 3 Fotos gemacht. Koennen Sie mir sagen, was los ist?', Kanal: 'homepage', Timestamp: iso(9, 20), Status: 'offen' },
+        { Kundenname: 'Helena Richter', Typ: 'haaranalyse', Nachricht: 'Meine Haare sind seit Monaten extrem trocken und brechen ab. Habe 3 Fotos gemacht. Können Sie mir sagen, was los ist?', Kanal: 'homepage', Timestamp: iso(9, 20), Status: 'offen' },
         { Kundenname: 'Mia Lehmann', Typ: 'wunschfrisur', Nachricht: 'Ich haette gerne einen schulterlangen Bob wie auf den Bildern. Ist das mit meinem Haartyp machbar?', Kanal: 'homepage', Timestamp: iso(8, 50), Status: 'offen' },
-        { Kundenname: 'Maria Testkundin', Nachricht: 'Hallo, ich moechte gerne einen Termin fuer Haarschnitt & Styling. Haben Sie naechste Woche noch was frei?', Kanal: 'email', Timestamp: iso(9, 30), Status: 'offen' },
+        { Kundenname: 'Maria Testkundin', Nachricht: 'Hallo, ich moechte gerne einen Termin für Haarschnitt & Styling. Haben Sie naechste Woche noch was frei?', Kanal: 'email', Timestamp: iso(9, 30), Status: 'offen' },
         { Kundenname: 'Stefan Braun', Nachricht: 'Hi, ich braeuchte einen Maskulin Schnitt + Bartpflege. Am liebsten Samstag.', Kanal: 'instagram', Timestamp: iso(9, 2), Status: 'offen' },
         { Kundenname: 'Sophie Klein', Typ: 'farbcode', Nachricht: 'Ich bin aktuell Stufe 5 (Hellbraun) und moechte Stufe 8 (Hellblond). Geht das in einer Sitzung?', Kanal: 'whatsapp', Timestamp: iso(8, 15), Status: 'offen' },
-        { Kundenname: 'Anna Schmidt', Nachricht: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', Kanal: 'whatsapp', Timestamp: isoDay(-1, 16, 30), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', zeit: isoDay(-1, 16, 30) }, { von: 'salon', text: 'Hallo Anna! Klar, ich habe am Donnerstag um 14:00 noch einen Platz frei. Soll ich den fuer dich reservieren? Die Auffrischung dauert ca. 2,5 Stunden.', zeit: isoDay(-1, 17, 15) }] },
+        { Kundenname: 'Anna Schmidt', Nachricht: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', Kanal: 'whatsapp', Timestamp: isoDay(-1, 16, 30), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', zeit: isoDay(-1, 16, 30) }, { von: 'salon', text: 'Hallo Anna! Klar, ich habe am Donnerstag um 14:00 noch einen Platz frei. Soll ich den für dich reservieren? Die Auffrischung dauert ca. 2,5 Stunden.', zeit: isoDay(-1, 17, 15) }] },
         { Kundenname: 'Lisa Wagner', Nachricht: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', Kanal: 'email', Timestamp: isoDay(-2, 11, 0), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', zeit: isoDay(-2, 11, 0) }, { von: 'salon', text: 'Hallo Lisa, kein Problem — Ihr Termin am Freitag ist storniert. Moechten Sie gleich einen neuen Termin vereinbaren?', zeit: isoDay(-2, 11, 45) }] },
-        { Kundenname: 'Sabine Huber', Typ: 'haaranalyse', Nachricht: 'Hatte vor 2 Monaten eine Blondierung und seitdem faellt mir vermehrt Haar aus. Brauche dringend eine Analyse.', Kanal: 'whatsapp', Timestamp: isoDay(-3, 14, 20), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Hatte vor 2 Monaten eine Blondierung und seitdem faellt mir vermehrt Haar aus. Brauche dringend eine Analyse.', zeit: isoDay(-3, 14, 20) }, { von: 'salon', text: 'Hallo Sabine, das klingt nach einer Strukturschaedigung durch die Blondierung. Kommen Sie bitte vorbei fuer eine professionelle Haaranalyse — wir koennen das genau diagnostizieren und einen Pflegeplan erstellen. Ich haette Mittwoch um 11 Uhr Zeit.', zeit: isoDay(-3, 15, 10) }] }
+        { Kundenname: 'Sabine Huber', Typ: 'haaranalyse', Nachricht: 'Hatte vor 2 Monaten eine Blondierung und seitdem faellt mir vermehrt Haar aus. Brauche dringend eine Analyse.', Kanal: 'whatsapp', Timestamp: isoDay(-3, 14, 20), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Hatte vor 2 Monaten eine Blondierung und seitdem faellt mir vermehrt Haar aus. Brauche dringend eine Analyse.', zeit: isoDay(-3, 14, 20) }, { von: 'salon', text: 'Hallo Sabine, das klingt nach einer Strukturschaedigung durch die Blondierung. Kommen Sie bitte vorbei für eine professionelle Haaranalyse — wir können das genau diagnostizieren und einen Pflegeplan erstellen. Ich haette Mittwoch um 11 Uhr Zeit.', zeit: isoDay(-3, 15, 10) }] }
       ]);
 
       // Cockpit NACH allen Caches rendern
@@ -9947,7 +9947,7 @@
 
     // =============================================================
     // FB-19: Globaler Keyboard-Dismiss (iOS/Android)
-    // Touch auf leere Flaeche schliesst aktive Tastatur
+    // Touch auf leere Flaeche schließt aktive Tastatur
     // =============================================================
     (function() {
       function isFormField(el) {
@@ -9996,7 +9996,7 @@
           location.reload();
         });
         navigator.serviceWorker.register('sw.js').then(function(reg) {
-          // Alle 60s auf SW-Update pruefen (fuer lang-offene PWA-Tabs)
+          // Alle 60s auf SW-Update prüfen (für lang-offene PWA-Tabs)
           setInterval(function() { try { reg.update(); } catch(e) {} }, 60000);
           reg.update().catch(function() {});
         }).catch(function() {});
@@ -10042,8 +10042,8 @@
         showChrome();
         scheduleHide();
       }, { passive: true });
-      // Bei Orientierungswechsel zuruecksetzen
-      // FB-49/74 17.04.2026: Nach Drehen setzt iOS Safari manchmal den Zoom zurueck.
+      // Bei Orientierungswechsel zurücksetzen
+      // FB-49/74 17.04.2026: Nach Drehen setzt iOS Safari manchmal den Zoom zurück.
       // Viewport-Meta dynamisch neu schreiben erzwingt scale=1 nach jedem Wechsel.
       window.addEventListener('orientationchange', function() {
         setTimeout(function() {
@@ -10059,7 +10059,7 @@
       });
     })();
 
-    // === Swipe-Navigation fuer Termine (Tag/Liste/Woche) ===
+    // === Swipe-Navigation für Termine (Tag/Liste/Woche) ===
     (function() {
       var startX = 0, startY = 0, swiping = false;
       var terminPage = document.getElementById('pageTermine');
@@ -10097,7 +10097,7 @@
     });
 
     // FB-40: Auto-X-Button oben rechts in JEDEM Sheet (wenn noch keiner da).
-    // Drei Schliess-Wege: X oben rechts (NEU), Handle runter-swipen (bleibt), Klick ausserhalb (bleibt).
+    // Drei Schließ-Wege: X oben rechts (NEU), Handle runter-swipen (bleibt), Klick ausserhalb (bleibt).
     (function() {
       document.querySelectorAll('.sheet-overlay').forEach(function(overlay) {
         var sheet = overlay.querySelector('.sheet');
@@ -10106,7 +10106,7 @@
         if (getComputedStyle(sheet).position === 'static') sheet.style.position = 'relative';
         var btn = document.createElement('button');
         btn.className = 'sheet-x-close';
-        btn.setAttribute('aria-label', 'Schliessen');
+        btn.setAttribute('aria-label', 'Schließen');
         btn.type = 'button';
         btn.textContent = '\u00d7';
         btn.style.cssText = 'position:absolute;top:10px;right:12px;width:32px;height:32px;border-radius:50%;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:20;-webkit-tap-highlight-color:transparent;padding:0';
@@ -10150,7 +10150,7 @@
   </style>
   <div id="pwaInstallBanner"></div>
   <script>
-    // PWA Install-Helfer — erkennt Geraet + Browser, zeigt passende Anleitung
+    // PWA Install-Helfer — erkennt Gerät + Browser, zeigt passende Anleitung
     var deferredInstallPrompt = null;
     window.addEventListener('beforeinstallprompt', function(e) {
       e.preventDefault();
@@ -10619,7 +10619,7 @@
 
   <!-- iOS Add-to-Home-Screen Banner (Capo PWA-Haertung) -->
   <div id="iosA2HBanner" role="dialog" aria-label="App installieren">
-    <button class="a2h-close" onclick="dismissA2H()" aria-label="Schliessen">&times;</button>
+    <button class="a2h-close" onclick="dismissA2H()" aria-label="Schließen">&times;</button>
     <div class="a2h-title">Casa 2035 als App installieren</div>
     <div>Tippe auf das Teilen-Symbol <span style="font-size:16px;">&#x1F5D2;</span> unten in Safari und dann auf <b>&laquo;Zum Home-Bildschirm&raquo;</b>. Die App startet dann ohne Browser-Leiste.</div>
   </div>

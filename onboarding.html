@@ -760,7 +760,7 @@ async function doLogin() {
   }
 }
 
-// Anon-Key fuer Supabase Auth Login
+// Anon-Key für Supabase Auth Login
 // Stand 17.04.2026: Anon-Key aus Konzept Supabase Zugangsdaten
 async function getAnonKey() {
   if (window._anonKey) return window._anonKey;
@@ -910,7 +910,7 @@ function selectService(choice) {
 function goNext() {
   if (!validateStep(currentStep)) return;
   if (currentStep === 5) {
-    // AV + DSGVO Checkboxen pruefen
+    // AV + DSGVO Checkboxen prüfen
     var av = document.getElementById('chk-av');
     var ds = document.getElementById('chk-dsgvo');
     if (!av || !av.checked) { alert('Bitte AV-Vertrag lesen und bestätigen (Pflicht nach DSGVO Art. 28).'); return; }
@@ -1068,7 +1068,7 @@ async function submitWizard() {
       email:          v('s2-chef-email').trim(),
       tmp_password:   v('s2-tmppass'),
     },
-    oeffnungszeiten: hours,
+    öffnungszeiten: hours,
     services_mode:   servicesChoice,
     meta: {
       created_by: ADMIN_EMAIL,
