@@ -3793,6 +3793,9 @@
         document.getElementById('liveIndicator').textContent = 'LIVE';
         // Capo 17.04.: Demo-Badges verschwinden sobald echte DB-Daten kommen (Rena-Live-Ready)
         try { updateDemoBadges(); } catch(e) {}
+        // Capo 18.04.: nach ALLEN Caches Begruessung nochmal rendern (Race-Condition-Fix)
+        try { updateHeroSubtitle(); } catch(e) {}
+        setTimeout(function(){ try { updateHeroSubtitle(); } catch(e) {} }, 600);
       } catch(e) {
         /* fetch error — falling back to demo */
         showToast('Verbindung fehlgeschlagen — Demo-Modus aktiv', 'warning');
@@ -3809,14 +3812,11 @@
       var badge = document.getElementById('unreadBadge');
       if (unread.length > 0) { badge.style.display = ''; badge.textContent = unread.length; }
       else { badge.style.display = 'none'; }
-      // FB 17.04. Ticket 4996fad1: Home-Tab soll auch offene Beratungen (Wunschfrisur/Farbcode/Haaranalyse) zaehlen.
-      var offeneBeratungen = (typeof beratungenCache !== 'undefined' && beratungenCache)
-        ? beratungenCache.filter(function(b){ return b.Status==='offen' || b.Status==='neu'; }).length : 0;
-      var total = unread.length + offeneBeratungen;
-      document.getElementById('statBeratung').textContent = total;
-      document.getElementById('statBeratungSub').textContent = offeneBeratungen > 0
-        ? (unread.length + ' Anfragen · ' + offeneBeratungen + ' Beratungen')
-        : 'offene Anfragen';
+      // FB 18.04.: Home-Kachel + Begruessung nutzen GLEICHE Quelle (unread events), sonst Zahlen-Inkonsistenz
+      document.getElementById('statBeratung').textContent = unread.length;
+      document.getElementById('statBeratungSub').textContent = 'offene Anfragen';
+      // Begruessung sofort nachziehen, damit Zahlen synchron
+      try { if (typeof updateHeroSubtitle === 'function') updateHeroSubtitle(); } catch(e) {}
 
       events.slice(0, 8).forEach(function(ev, idx) {
         var card = document.createElement('div');
