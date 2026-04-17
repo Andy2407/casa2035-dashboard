@@ -1765,20 +1765,27 @@
     <!-- PAGE: Termine -->
     <div class="page" id="pageTermine">
       <div class="termine-toolbar" id="termineToolbar">
-        <!-- BUG-FIX 15.04.2026: Header + View-Toggle + Datum-Navigation in EINER sticky Zeile -->
+        <!-- FB-62 Fix 17.04.2026: Heute-links, Pfeile+Datum rechts, kein TERMINE-Label -->
         <div class="termine-toolbar-row">
-          <div class="section-title" style="margin:0;font-size:13px;flex:0 0 auto">TERMINE <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></div>
+          <!-- Links: Heute-Button + View-Toggle -->
+          <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()" style="display:none;padding:0 12px;height:28px;border:1px solid var(--gold);border-radius:14px;background:var(--gold-glow);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;white-space:nowrap;flex-shrink:0">Heute</button>
           <div class="termin-view-toggle" style="margin:0;border:none;flex:0 0 auto">
             <button class="termin-view-btn active" onclick="setTerminView('list')" id="tvList">Liste</button>
             <button class="termin-view-btn" onclick="setTerminView('day')" id="tvDay">Tag</button>
             <button class="termin-view-btn" onclick="setTerminView('week')" id="tvWeek">Woche</button>
           </div>
+          <!-- Rechts: Demo-Badge + Pfeile + Datum -->
+          <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten" style="flex:0 0 auto;margin-left:4px">D</span>
           <div class="termine-date-inline">
             <button onclick="changeTerminDate(-1)" aria-label="Vorheriger Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="15 18 9 12 15 6"/></svg></button>
             <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer;font-size:12px;white-space:nowrap" title="Zurueck zu Heute">Heute</div>
             <button onclick="changeTerminDate(1)" aria-label="Naechster Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg></button>
-            <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()">Heute</button>
           </div>
+        </div>
+        <!-- FB-61: Termin-Suchleiste mit erhöhtem z-index -->
+        <div class="search-wrap" style="margin:0;position:relative;z-index:51">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" id="terminSearch" placeholder="Termin oder Kundenname suchen..." oninput="filterTermineSuche()" style="margin-bottom:0;font-size:12px;padding:7px 12px 7px 34px">
         </div>
         <div class="staff-filter" id="terminStaffFilter" style="margin-bottom:0"></div>
       </div>
@@ -3848,15 +3855,51 @@
         + '<select id="terminSvcSelect" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif">' + serviceOptions + '</select>'
         + '<label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Stylist</label>'
         + '<select id="terminStySelect" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;margin-bottom:10px;font-family:Inter,sans-serif">' + stylistOptions + '</select>'
-        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px">'
         + '<div><label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Datum</label>'
-        + '<input type="date" id="terminDateInput" value="' + dateVal + '" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div>'
+        + '<input type="date" id="terminDateInput" value="' + dateVal + '" onchange="checkOefLive()" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div>'
         + '<div><label style="font-size:11px;font-weight:600;color:var(--text-dim);display:block;margin-bottom:4px">Uhrzeit</label>'
-        + '<input type="time" id="terminTimeInput" value="10:00" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div></div>'
-        + '<div style="display:flex;gap:8px;margin-top:14px">'
+        + '<input type="time" id="terminTimeInput" value="10:00" onchange="checkOefLive()" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif"></div></div>'
+        + '<div id="oefWarnBox" style="display:none;margin-bottom:8px;padding:8px 12px;background:var(--warning-bg);border:1px solid rgba(196,138,26,0.3);border-radius:var(--radius-sm);font-size:11px;color:var(--warning);display:none"></div>'
+        + '<div style="font-size:10px;color:var(--text-dim);margin-bottom:10px">Oeffnungszeiten: Mo–Fr 9–19 Uhr, Sa 9–17 Uhr, So geschlossen</div>'
+        + '<div style="display:flex;gap:8px;margin-top:8px">'
         + '<button class="btn btn-primary" style="flex:1" onclick="confirmNeuerTermin()">Termin eintragen</button>'
         + '<button class="btn btn-secondary" onclick="closeSheet(\'detailSheet\')">Abbrechen</button></div>';
       openSheet('detailSheet');
+    }
+
+    // FB-63: Live-Warnung im Formular bei Datums-/Zeitwechsel
+    function checkOefLive() {
+      var datum = (document.getElementById('terminDateInput') || {}).value || '';
+      var zeit  = (document.getElementById('terminTimeInput') || {}).value || '';
+      var box   = document.getElementById('oefWarnBox');
+      if (!box || !datum || !zeit) return;
+      var svcSel = document.getElementById('terminSvcSelect');
+      var dauer = svcSel ? (parseInt((svcSel.options[svcSel.selectedIndex] || {}).getAttribute('data-dauer')) || 60) : 60;
+      var warn = pruefeOeffnungszeit(datum, zeit, dauer);
+      if (warn) {
+        box.textContent = '\u26A0\uFE0F ' + warn;
+        box.style.display = 'block';
+      } else {
+        box.style.display = 'none';
+      }
+    }
+
+    // FB-63: Öffnungszeiten-Prüfung (Rena Rados: Mo-Fr 9-19h, Sa 9-17h, So geschlossen)
+    // Wird aus oeffnungszeiten-Tabelle befüllt sobald DB live; bis dahin Rena-Demo-Werte
+    var OEFFNUNGSZEITEN = { 1:[9,19], 2:[9,19], 3:[9,19], 4:[9,19], 5:[9,19], 6:[9,17], 0:null };
+    function pruefeOeffnungszeit(datum, zeit, dauerMin) {
+      // datum: 'YYYY-MM-DD', zeit: 'HH:MM', dauerMin: number
+      // Gibt null zurueck wenn OK, sonst Warn-String
+      var d = new Date(datum + 'T' + zeit + ':00');
+      var wochentag = d.getDay(); // 0=So
+      var oef = OEFFNUNGSZEITEN[wochentag];
+      if (!oef) return 'Sonntag: Der Salon ist geschlossen.';
+      var startH = d.getHours() + d.getMinutes() / 60;
+      var endH = startH + (dauerMin || 0) / 60;
+      if (startH < oef[0]) return 'Vor Oeffnung: Der Salon oeffnet um ' + oef[0] + ':00 Uhr.';
+      if (endH > oef[1]) return 'Nach Schluss: Der Salon schliesst um ' + oef[1] + ':00 Uhr (Termin endet ' + Math.round((endH - oef[1]) * 60) + ' Min nach Schluss).';
+      return null;
     }
 
     function confirmNeuerTermin() {
@@ -3871,6 +3914,14 @@
       var datum = document.getElementById('terminDateInput').value;
       var zeit = document.getElementById('terminTimeInput').value;
       if (!datum || !zeit) { showToast('Bitte Datum und Uhrzeit eingeben', 'warning'); return; }
+
+      // FB-63: Öffnungszeiten-Warnung — Abbruch bei geschlossen, Hinweis bei Randzeiten
+      var oefWarn = pruefeOeffnungszeit(datum, zeit, dauer);
+      if (oefWarn) {
+        showToast('Ausserhalb der Oeffnungszeiten: ' + oefWarn, 'warning');
+        return; // Abbruch — Termin wird NICHT eingetragen
+      }
+
       var startISO = datum + 'T' + zeit + ':00';
 
       // Overlap check
@@ -4206,13 +4257,74 @@
       if (!btn) return;
       var today = new Date(); today.setHours(0,0,0,0);
       var view = new Date(terminViewDate); view.setHours(0,0,0,0);
+      var isHeute;
       if (terminViewMode === 'week') {
         var todayMon = new Date(today); todayMon.setDate(todayMon.getDate() - ((todayMon.getDay() + 6) % 7));
         var viewMon = new Date(view); viewMon.setDate(viewMon.getDate() - ((viewMon.getDay() + 6) % 7));
-        btn.classList.toggle('hidden', todayMon.getTime() === viewMon.getTime());
+        isHeute = todayMon.getTime() === viewMon.getTime();
       } else {
-        btn.classList.toggle('hidden', today.getTime() === view.getTime());
+        isHeute = today.getTime() === view.getTime();
       }
+      // FB-62: Heute-Button als display:none/inline-flex statt CSS-Klasse
+      btn.style.display = isHeute ? 'none' : 'inline-flex';
+    }
+
+    // === FB-61: Termin-Suche ===
+    function filterTermineSuche() {
+      var inp = document.getElementById('terminSearch');
+      var q = inp ? inp.value.trim().toLowerCase() : '';
+      if (!q) {
+        renderTermine(termineCache);
+        return;
+      }
+      var gefunden = termineCache.filter(function(t) {
+        return (t.Service || '').toLowerCase().indexOf(q) > -1
+          || (t.Kundenname || t.Kunde || '').toLowerCase().indexOf(q) > -1
+          || (t.Stylist || '').toLowerCase().indexOf(q) > -1;
+      });
+      var container = document.getElementById('terminContent');
+      if (!container) return;
+      container.textContent = '';
+      if (!gefunden.length) {
+        var msg = document.createElement('div');
+        msg.style.cssText = 'text-align:center;padding:40px;color:var(--text-dim);font-size:13px';
+        msg.textContent = 'Kein Termin gefunden fuer "' + q + '"';
+        container.appendChild(msg);
+        return;
+      }
+      var sorted = gefunden.slice().sort(function(a, b) { return (a.Start_ISO || '').localeCompare(b.Start_ISO || ''); });
+      sorted.forEach(function(t) {
+        var card = document.createElement('div');
+        card.className = 'termin-card touch-scale';
+        card.onclick = (function(tt) { return function() { openTerminDetail(tt); }; })(t);
+        var stylistColor = getStylistColor(t.Stylist);
+        card.style.borderLeft = '3px solid ' + stylistColor;
+        var statusLabel = t.Status || 'bestaetigt';
+        var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestaetigt'));
+        var hasRecipe = !!findRecipe(t.Service);
+        var dateStr = (t.Start_ISO || '').split('T')[0];
+        // Datum-Block (zeigt Datum bei Suche ueber mehrere Tage)
+        var timeBlock = document.createElement('div');
+        timeBlock.className = 'termin-time-block';
+        var dEl = document.createElement('div'); dEl.className = 'time'; dEl.textContent = fmtDate(dateStr);
+        var mEl = document.createElement('div'); mEl.className = 'mins'; mEl.textContent = fmtTime(t.Start_ISO);
+        timeBlock.appendChild(dEl); timeBlock.appendChild(mEl);
+        var body = document.createElement('div');
+        body.className = 'termin-body';
+        var svc = document.createElement('div'); svc.className = 'termin-service'; svc.textContent = t.Service || 'Termin';
+        if (hasRecipe) { var ri = document.createElement('span'); ri.title = 'Rezeptur hinterlegt'; ri.style.cssText = 'font-size:11px;opacity:0.6'; ri.textContent = '\uD83D\uDCCB'; svc.appendChild(ri); }
+        var kd = document.createElement('div'); kd.className = 'termin-kunde'; kd.textContent = t.Kundenname || t.Kunde || '';
+        var row = document.createElement('div'); row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap';
+        var sty = document.createElement('div'); sty.className = 'termin-stylist';
+        var dot = document.createElement('span'); dot.className = 'dot'; dot.style.background = stylistColor;
+        sty.appendChild(dot); sty.appendChild(document.createTextNode(t.Stylist || ''));
+        var stBadge = document.createElement('span'); stBadge.className = 'termin-status ' + statusClass; stBadge.textContent = statusLabel;
+        row.appendChild(sty); row.appendChild(stBadge);
+        body.appendChild(svc); body.appendChild(kd); body.appendChild(row);
+        var preis = document.createElement('div'); preis.className = 'termin-preis'; preis.textContent = fmtEur(t.Preis) + ' \u20AC';
+        card.appendChild(timeBlock); card.appendChild(body); card.appendChild(preis);
+        container.appendChild(card);
+      });
     }
 
     // === Render Kasse / Finanzen ===
@@ -5702,42 +5814,69 @@
         html += '</div>';
       }
 
-      // === REZEPTUR & ABLAUFPLAN ===
+      // === REZEPTUR & ABLAUFPLAN (FB-67/68: aufklappbare Akkordeons) ===
+      var ablaufId = 'ablauf_' + Date.now();
       html += '<div style="margin-top:16px;border:1px solid var(--border-accent);border-left:3px solid var(--gold);border-radius:var(--radius-sm);background:var(--gold-glow);overflow:hidden">';
-      html += '<div style="padding:10px 12px;background:var(--gold-glow);border-bottom:1px solid var(--border-accent);display:flex;align-items:center;gap:6px">';
+      // Akkordeon-Header — immer klickbar
+      html += '<div id="ablaufHeader_' + ablaufId + '" onclick="(function(){var b=document.getElementById(\'ablaufBody_' + ablaufId + '\');var a=document.getElementById(\'ablaufArrow_' + ablaufId + '\');var open=b.style.display!==\'none\';b.style.display=open?\'none\':\'block\';a.style.transform=open?\'rotate(0deg)\':\'rotate(180deg)\';})()" style="padding:10px 12px;display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none">';
       html += '<span style="font-size:14px">&#128203;</span>';
-      html += '<span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gold)">Ablaufplan &amp; Rezeptur</span></div>';
+      html += '<span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--gold);flex:1">Ablaufplan &amp; Rezeptur</span>';
       if (recipe) {
-        // Arbeitsschritte
-        html += '<div style="padding:10px 12px">';
-        html += '<div style="font-size:11px;font-weight:700;margin-bottom:6px;color:var(--text-dim)">ARBEITSSCHRITTE</div>';
+        var stepCount = (recipe.aufgaben || []).length;
+        html += '<span style="font-size:10px;color:var(--text-dim);margin-right:4px">' + stepCount + ' Schritte</span>';
+      }
+      html += '<span id="ablaufArrow_' + ablaufId + '" style="font-size:12px;color:var(--gold);transition:transform 200ms;transform:rotate(180deg)">&#9660;</span>';
+      html += '</div>';
+      // Akkordeon-Body — standardmaessig AUFGEKLAPPT (sichtbar)
+      html += '<div id="ablaufBody_' + ablaufId + '" style="display:block;border-top:1px solid var(--border-accent)">';
+      if (recipe) {
+        // Schritt-Akkordeons
+        html += '<div style="padding:10px 12px 6px">';
+        html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:8px">ARBEITSSCHRITTE</div>';
         var totalMin = 0;
         recipe.aufgaben.forEach(function(a, i) {
           totalMin += a.dauer_min;
-          html += '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">';
-          html += '<span style="display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:var(--gold);color:#fff;font-size:10px;font-weight:700;flex-shrink:0">' + (i + 1) + '</span>';
+          var stepId = 'step_' + ablaufId + '_' + i;
+          // Jeder Schritt ist selbst aufklappbar (Detail-Ebene)
+          html += '<div style="margin-bottom:4px;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--surface)">';
+          html += '<div onclick="(function(){var d=document.getElementById(\'' + stepId + '\');var open=d.style.display!==\'none\';d.style.display=open?\'none\':\'block\';})()" style="display:flex;align-items:center;gap:8px;padding:7px 10px;cursor:pointer">';
+          html += '<span style="display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--gold);color:#fff;font-size:9px;font-weight:700;flex-shrink:0">' + (i + 1) + '</span>';
           html += '<span style="flex:1;font-size:12px;font-weight:500">' + esc(a.schritt) + '</span>';
-          html += '<span style="font-size:11px;font-weight:600;color:var(--text-dim);white-space:nowrap">' + a.dauer_min + ' Min';
+          html += '<span style="font-size:11px;font-weight:600;color:var(--gold);white-space:nowrap">' + a.dauer_min + ' Min';
           if (a.einwirkzeit) html += ' <span style="color:var(--warning)" title="Einwirkzeit">&#9201;</span>';
           html += '</span></div>';
+          // Detail-Zeile (eingeklappt)
+          html += '<div id="' + stepId + '" style="display:none;padding:4px 10px 8px 38px;border-top:1px solid var(--border);font-size:11px;color:var(--text-secondary)">';
+          if (a.hinweis) html += '<div>' + esc(a.hinweis) + '</div>';
+          else html += '<div style="color:var(--text-dim);font-style:italic">Kein zusaetzlicher Hinweis.</div>';
+          html += '</div></div>';
         });
-        html += '<div style="display:flex;justify-content:flex-end;padding:6px 0;font-size:11px;font-weight:700;color:var(--gold)">Gesamt: ' + totalMin + ' Min</div>';
+        html += '<div style="text-align:right;padding:4px 0 8px;font-size:11px;font-weight:700;color:var(--gold)">Gesamt: ' + totalMin + ' Min</div>';
+        html += '</div>';
 
-        // Produkte & Rezeptur
-        html += '<div style="font-size:11px;font-weight:700;margin:10px 0 6px;color:var(--text-dim)">PRODUKTE &amp; REZEPTUR</div>';
-        recipe.produkte.forEach(function(p) {
+        // Produkte & Rezeptur — eigenes Akkordeon
+        var rezId = 'rez_' + ablaufId;
+        html += '<div style="border-top:1px solid var(--border-accent)">';
+        html += '<div id="rezHeader_' + rezId + '" onclick="(function(){var b=document.getElementById(\'rezBody_' + rezId + '\');var a=document.getElementById(\'rezArrow_' + rezId + '\');var open=b.style.display!==\'none\';b.style.display=open?\'none\':\'block\';a.style.transform=open?\'rotate(0deg)\':\'rotate(180deg)\';})()" style="display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;background:var(--bg-warm)">';
+        html += '<span style="font-size:13px">&#128225;</span>';
+        html += '<span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);flex:1">Produkte &amp; Rezeptur</span>';
+        html += '<span style="font-size:10px;color:var(--text-dim);margin-right:4px">' + (recipe.produkte || []).length + ' Produkte</span>';
+        html += '<span id="rezArrow_' + rezId + '" style="font-size:12px;color:var(--text-dim);transition:transform 200ms;transform:rotate(180deg)">&#9660;</span>';
+        html += '</div>';
+        html += '<div id="rezBody_' + rezId + '" style="display:block;padding:8px 12px">';
+        (recipe.produkte || []).forEach(function(p) {
           html += '<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">';
-          html += '<span style="font-size:12px">&#128225;</span>';
+          html += '<span style="font-size:12px;flex-shrink:0">&#128225;</span>';
           html += '<span style="font-size:12px;font-weight:600;flex:1">' + esc(p.name) + '</span>';
           html += '<span style="font-size:11px;color:var(--text-dim);text-align:right">' + esc(p.menge);
           if (p.mischung) html += '<br><em style="font-size:10px;color:var(--gold)">' + esc(p.mischung) + '</em>';
           html += '</span></div>';
         });
-        html += '</div>';
+        html += '</div></div>';
       } else {
-        html += '<div style="padding:16px 12px;text-align:center;color:var(--text-dim);font-size:12px">Keine Rezeptur fuer diesen Service hinterlegt</div>';
+        html += '<div style="padding:14px 12px;text-align:center;color:var(--text-dim);font-size:12px">&#128203; Keine Rezeptur fuer diesen Service hinterlegt</div>';
       }
-      html += '</div>';
+      html += '</div></div>'; // ablaufBody + Wrapper
 
       // === KI-EMPFEHLUNGEN fuer diesen Termin ===
       var kiTerminHints = [];
