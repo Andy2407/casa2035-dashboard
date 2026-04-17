@@ -70,8 +70,10 @@
       --shadow-gold: 0 4px 20px rgba(201,168,76,0.15);
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
       --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+      /* FB 17.04.: Fallback 44px deckt Dynamic-Island / Notch / Status-Bar auch bei Browsern, die env()=0 liefern */
       --safe-top: env(safe-area-inset-top, 20px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --min-header-pad: 44px;
       --nav-height: 64px;
     }
 
@@ -158,8 +160,10 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100dvh;
-      padding-top: var(--safe-top);
-      padding-bottom: calc(var(--nav-height) + max(env(safe-area-inset-bottom, 0px), var(--safe-bottom)) + 8px);
+      /* FB 17.04.: body braucht KEIN safe-top — Header hat sein eigenes. Sonst doppelt gezaehlt -> Content zu tief. */
+      padding-top: 0;
+      /* +16px statt +8px -> Bottom-Nav ueberlappt nie Content mehr (Capo-Tickets 753a0055, 520c72fc, 2cd49862) */
+      padding-bottom: calc(var(--nav-height) + max(env(safe-area-inset-bottom, 0px), var(--safe-bottom)) + 16px);
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
       overscroll-behavior: none;
@@ -223,7 +227,8 @@
     /* === Header (FB-24: iOS safe-area fix) === */
     .header {
       position: sticky; top: 0; z-index: 100;
-      padding: calc(env(safe-area-inset-top, 0px) + 14px) max(20px, env(safe-area-inset-right, 20px)) 12px max(20px, env(safe-area-inset-left, 20px));
+      /* FB 17.04. Ticket 351f8adc: iPhone-Status-Leiste (Uhrzeit/WLAN/Batterie) ueberlappt Header -> Mindest-Pad-Top 44px */
+      padding: max(calc(env(safe-area-inset-top, 0px) + 14px), var(--min-header-pad, 44px)) max(20px, env(safe-area-inset-right, 20px)) 12px max(20px, env(safe-area-inset-left, 20px));
       background: rgba(250,248,246,0.92);
       backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
       border-bottom: 1px solid var(--border);
@@ -1246,12 +1251,16 @@
       /* FB-51/60 17.04.2026: width:100vw + left:0 + right:0 verhindert "schwebendes" Tab-Leiste-Problem.
          bottom:0 mit safe-area haelt die Leiste am unteren Rand (kein "zu weit oben"). */
       .bottom-nav {
+        /* FB 17.04. Ticket 2cd49862: Querformat iPhone -> Tab-Leiste volle Breite, kein max-width, kein translateX */
         height: var(--nav-height);
         padding-bottom: max(0px, env(safe-area-inset-bottom, 0px));
-        left: 0;
-        right: 0;
+        left: 0 !important;
+        right: 0 !important;
         bottom: 0;
-        width: 100vw;
+        width: 100vw !important;
+        max-width: none !important;
+        transform: none !important;
+        border-radius: 0 !important;
       }
       /* Landscape: Nav NICHT verstecken */
       .bottom-nav.landscape-hidden {
@@ -10071,24 +10080,40 @@
         showChrome();
         scheduleHide();
       }, { passive: true });
-      // Bei Orientierungswechsel zurücksetzen
-      // FB-49/74 17.04.2026: Nach Drehen setzt iOS Safari manchmal den Zoom zurück.
-      // Viewport-Meta dynamisch neu schreiben erzwingt scale=1 nach jedem Wechsel.
+      // Bei Orientierungswechsel Zoom sicher auf 1 zuruecksetzen (iOS Safari Bug).
+      // 17.04. Capo-Tickets ac1ee030, 520c72fc, 8590defe, 4f29ab70, 3bbdd3d9 - Zoom komplett falsch nach Rotation oder beim Login.
+      // Loesung: 3-Stufen-Reset — scroll nach top, visualViewport.scale pruefen, viewport-meta neu schreiben.
+      function resetZoomAndLayout() {
+        try {
+          window.scrollTo(0,0);
+          var vp = document.querySelector('meta[name="viewport"]');
+          if (vp) {
+            // 1. Kurzzeitig entsperren damit Reflow passiert
+            vp.setAttribute('content', 'width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover');
+            setTimeout(function() {
+              // 2. Wieder lock
+              vp.setAttribute('content', 'width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover');
+            }, 80);
+          }
+          // 3. Wochen-Ansicht neu rendern (5 Hoch / 7 Quer)
+          if (typeof terminViewMode !== 'undefined' && terminViewMode === 'woche' && typeof renderTermine === 'function') renderTermine();
+        } catch(e) {}
+      }
       window.addEventListener('orientationchange', function() {
         setTimeout(function() {
           if (!isLandscape()) showChrome();
-          var vp = document.querySelector('meta[name="viewport"]');
-          if (vp) {
-            vp.setAttribute('content', 'width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=10, minimum-scale=1, user-scalable=no, viewport-fit=cover');
-            setTimeout(function() {
-              vp.setAttribute('content', 'width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover');
-            }, 100);
-          }
-          // FB-50 17.04.2026: Nach Drehung Wochen-Ansicht neu rendern (5 Tage Hoch / 7 Tage Quer)
-          try {
-            if (typeof terminViewMode !== 'undefined' && terminViewMode === 'woche' && typeof renderTermine === 'function') renderTermine();
-          } catch(e) {}
-        }, 300);
+          resetZoomAndLayout();
+        }, 250);
+      });
+      // Auch beim ersten Anzeigen (Login/Tab-Wechsel) Zoom forcieren
+      window.addEventListener('pageshow', function() { setTimeout(resetZoomAndLayout, 150); });
+      // Sicher bei Input-Focus (iOS zoomt manchmal auf Form-Felder)
+      document.addEventListener('focusin', function(e) {
+        var t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) {
+          // 16px+ Input-Schrift verhindert iOS-Auto-Zoom (schon in CSS, aber sicher ist sicher)
+          if (parseFloat(getComputedStyle(t).fontSize) < 16) t.style.fontSize = '16px';
+        }
       });
     })();
 
