@@ -5925,37 +5925,38 @@
       var kiTerminHints = [];
       // Farbtermin-Hinweis
       if (/farb|balayage|straeh|glossing/i.test(t.Service || '')) {
-        kiTerminHints.push({ icon: '&#127912;', title: 'Farbtermin — Olaplex empfehlen', desc: 'Strukturschutz mit Olaplex No. 1 + No. 2 anbieten.', detail: 'Upselling-Potenzial: +25 EUR pro Behandlung. Olaplex schuetzt die Haarstruktur waehrend der chemischen Behandlung und reduziert Haarbruch um bis zu 68%. Kunden mit Olaplex kommen haeufiger zurueck (bessere Haarqualitaet = mehr Vertrauen).' });
-        kiTerminHints.push({ icon: '&#128247;', title: 'Vorher/Nachher-Foto machen', desc: 'Perfekt fuer Instagram & Google-Bewertung.', detail: 'Foto VOR dem Faerben nicht vergessen! Gute Beleuchtung, gleicher Winkel. Kunden fragen: "Darf ich das Ergebnis fuer unsere Seite verwenden?" — 80% sagen ja. Bringt durchschnittlich 2-3 Neukunden pro Post.' });
+        kiTerminHints.push({ iconKey: 'droplet', title: 'Olaplex No.1+2 als Strukturschutz empfehlen', desc: '+25 EUR Umsatz pro Behandlung, Haarbruch sichtbar reduziert.', detail: 'Olaplex waehrend der chemischen Behandlung einsetzen — reduziert Haarbruch nachweislich. Direkt ansprechen: "Zum Schutz Ihrer Haarstruktur empfehle ich heute Olaplex dazu." Kunden, die Olaplex erhalten, buchen 30% oefter den naechsten Farbtermin.' });
+        kiTerminHints.push({ iconKey: 'camera', title: 'Vorher-Foto jetzt machen, Nachher-Foto nach Styling', desc: 'Bestes Werbematerial fuer Instagram und Google-Profil.', detail: 'Einwilligung vor dem Start einholen: "Darf ich das Ergebnis fuer unseren Kanal verwenden?" — 80% sagen ja. Gleiche Beleuchtung, gleicher Winkel fuer echten Vergleich. Ein gutes Vorher/Nachher bringt im Schnitt 2-3 Anfragen.' });
       }
       // Neukunden-Hinweis
       var kundenMatch = kundenCache.find(function(k) { return (k.Name || k.name) === t.Kundenname; });
       if (kundenMatch && (kundenMatch.Besuche || 0) <= 2) {
-        kiTerminHints.push({ icon: '&#11088;', title: 'Neukundin — Willkommens-Erlebnis', desc: 'Erster/zweiter Besuch! Extra aufmerksam sein.', detail: 'Getraenk anbieten, kurzen Salonrundgang machen, Pflegetipps mitgeben. Am Ende Visitenkarte + 10%-Gutschein fuer naechsten Besuch. Fragen: "Wie haben Sie uns gefunden?" — wichtig fuer Marketing-Auswertung.' });
+        kiTerminHints.push({ iconKey: 'star', title: esc(t.Kundenname) + ' — Besuch Nr. ' + ((kundenMatch.Besuche || 0) + 1), desc: 'Neukunde: besondere Aufmerksamkeit jetzt entscheidet ueber Wiederkommen.', detail: 'Getraenk anbieten, kurzen Rundgang machen, Pflegetipps zum Mitnehmen geben. Am Ende fragen: "Wie haben Sie uns gefunden?" — wichtig fuer Marketing. Visitenkarte + 10%-Gutschein fuer naechsten Besuch mitgeben.' });
       }
       if (kundenMatch && kundenMatch.VIP) {
-        kiTerminHints.push({ icon: '&#128081;', title: 'VIP-Kundin', desc: 'Stammkundin mit ' + (kundenMatch.Besuche || 0) + ' Besuchen.', detail: 'Persoenliche Ansprache, Lieblingsprodukte bereitstellen. Fragen: "Sind Sie mit Ihrem aktuellen Pflegeprodukt zufrieden?" — Nachbestellungspotenzial pruefen. Ggf. neues Produkt zum Testen anbieten (Probiergroesse).' });
+        kiTerminHints.push({ iconKey: 'crown', title: esc(t.Kundenname) + ' — VIP mit ' + (kundenMatch.Besuche || 0) + ' Besuchen', desc: 'Lieblingsprodukte bereitstellen, persoenlich ansprechen.', detail: 'VIPs merken sofort ob man vorbereitet ist. Fragen: "Sind Sie mit Ihrem Pflegeprodukt noch zufrieden?" — oeffnet Nachkauf-Gespraech. Neue Produktneuheit als Probe anbieten (Probiergroesse kostet kaum etwas, wirkt aber sehr wertschatzend).' });
       }
       // Zeitdruck-Hinweis
       if ((parseInt(t.Dauer_Min) || 0) >= 90) {
-        kiTerminHints.push({ icon: '&#9200;', title: 'Langer Termin — ' + t.Dauer_Min + ' Min', desc: 'Getraenk + Zeitschrift anbieten.', detail: 'Einwirkzeiten fuer Beratung und Produktempfehlungen nutzen. Kaffee/Tee/Wasser anbieten. Bei >120 Min: Kleinen Snack bereitstellen. Waehrend Einwirkzeit: "Ich kann Ihnen in der Zwischenzeit zeigen, welche Pflegeprodukte perfekt zu Ihrem Haartyp passen."' });
+        kiTerminHints.push({ iconKey: 'clock', title: 'Langer Termin — ' + t.Dauer_Min + ' Min Einwirkzeit nutzen', desc: 'Getraenk anbieten, Produktberatung waehrend der Einwirkzeit.', detail: 'Kaffee, Tee oder Wasser gleich zu Beginn anbieten. Einwirkzeit aktiv nutzen: "In der Zwischenzeit zeige ich Ihnen, welche Pflege zu Ihrem Haartyp passt." Bei mehr als 120 Min: kleinen Snack bereitstellen.' });
       }
       // Produktempfehlung
       if (/schnitt|feminin|maskulin|styling/i.test(t.Service || '')) {
-        kiTerminHints.push({ icon: '&#128161;', title: 'Pflegeprodukt empfehlen', desc: 'Passendes Styling-Produkt fuer zuhause mitgeben.', detail: 'Steigert Umsatz + Kundenzufriedenheit. Beim Foehnen zeigen: "Dieses Produkt benutze ich gerade — damit koennen Sie das Ergebnis zuhause nachstylen." Kunden kaufen 3x haeufiger, wenn sie das Produkt im Einsatz sehen.' });
+        kiTerminHints.push({ iconKey: 'shoppingBag', title: 'Styling-Produkt beim Foehnen zeigen', desc: 'Kunden kaufen 3x haeufiger was sie in Aktion sehen.', detail: 'Waehrend des Foehnens sagen: "Dieses Produkt benutze ich gerade — damit koennen Sie das Ergebnis zuhause genauso nachstylen." Produkt sichtbar auf dem Tisch lassen, nicht wegpacken. Kurze Demo = bester Verkauf.' });
       }
       // Fallback
       if (kiTerminHints.length < 2) {
-        kiTerminHints.push({ icon: '&#128172;', title: 'Feedback einholen', desc: 'Am Ende fragen: "Sind Sie zufrieden?"', detail: 'Zeigt Wertschaetzung und bringt Google-Bewertungen. Timing: Genau wenn der Kunde das Ergebnis im Spiegel sieht. "Wenn Sie zufrieden sind, wuerden wir uns ueber eine Google-Bewertung freuen — das hilft anderen Kunden, uns zu finden."' });
+        kiTerminHints.push({ iconKey: 'star', title: 'Google-Bewertung beim Spiegel-Moment anfragen', desc: 'Genau wenn der Kunde zufrieden im Spiegel schaut — bester Moment.', detail: 'Direkt sagen: "Wenn Sie zufrieden sind, wuerden wir uns sehr ueber eine kurze Google-Bewertung freuen — das hilft anderen Kunden uns zu finden." Handy-Link zeigen oder QR-Code bereitstellen.' });
       }
       // KI-Empfehlungen rendern — klickbar mit Detail + KI fragen
       html += '<div style="margin-top:12px">';
-      html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:6px;display:flex;align-items:center;gap:4px"><span style="font-size:12px">&#129302;</span> KI-Empfehlungen</div>';
+      html += '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim);margin-bottom:6px;display:flex;align-items:center;gap:4px"><svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> KI-Empfehlungen</div>';
       kiTerminHints.slice(0, 4).forEach(function(h, idx) {
         var detailId = 'kiEmpDetail_' + idx;
+        var hIconHtml = h.iconKey ? (ICONS && ICONS[h.iconKey] ? ICONS[h.iconKey] : '') : (h.icon || '');
         html += '<div style="background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--gold);border-radius:var(--radius-sm);margin-bottom:4px;overflow:hidden;cursor:pointer" onclick="(function(){var d=document.getElementById(\'' + detailId + '\');d.style.display=d.style.display===\'none\'?\'block\':\'none\';})()">';
         html += '<div style="display:flex;gap:8px;padding:8px 10px;font-size:11px;line-height:1.4;align-items:center">';
-        html += '<span style="font-size:14px;flex-shrink:0">' + h.icon + '</span>';
+        html += '<span style="width:20px;height:20px;flex-shrink:0;color:var(--gold);display:inline-flex;align-items:center;justify-content:center">' + hIconHtml + '</span>';
         html += '<div style="flex:1"><strong>' + h.title + '</strong> <span class="ki-badge" style="font-size:8px">KI</span></div>';
         html += '<span style="font-size:10px;color:var(--text-dim);flex-shrink:0">&#9660;</span>';
         html += '</div>';
@@ -8860,7 +8861,7 @@
         var b = openAnfragen[0];
         var replyPreview = generateKiReply(b).substring(0, 80) + '...';
         suggestions.push({
-          icon: '&#128172;', title: esc(b.Kundenname) + ' wartet auf Antwort',
+          iconKey: 'message', title: esc(b.Kundenname) + ' wartet auf Antwort',
           desc: 'KI-Antwortvorschlag: "' + esc(replyPreview) + '"',
           action: 'Jetzt antworten ›', click: function() { showPage('beratung'); }
         });
@@ -8872,7 +8873,7 @@
         var recipe = findRecipe(nextTermin.Service);
         var produktHint = recipe ? recipe.produkte.slice(0, 2).map(function(p) { return p.name; }).join(', ') : 'Standardprodukte';
         suggestions.push({
-          icon: '&#128197;', title: 'Naechster Termin: ' + fmtTime(nextTermin.Start_ISO) + ' ' + esc(nextTermin.Service),
+          iconKey: 'calendar', title: 'Naechster Termin: ' + fmtTime(nextTermin.Start_ISO) + ' ' + esc(nextTermin.Service),
           desc: 'Kunde: ' + esc(nextTermin.Kundenname) + ' | Bereitlegen: ' + produktHint,
           action: 'Termin oeffnen ›', click: function() { showPage('termine'); openTerminDetail(nextTermin); }
         });
@@ -8882,8 +8883,8 @@
       if (lowStock.length > 0) {
         var names = lowStock.slice(0, 3).map(function(p) { return (p.Produkt || p.Name) + ' (' + (p.Bestand || 0) + ')'; }).join(', ');
         suggestions.push({
-          icon: '&#128230;', title: lowStock.length + ' Produkte unter Mindestbestand',
-          desc: 'Nachbestellen: ' + names,
+          iconKey: 'package', title: lowStock.length + ' Produkte unter Mindestbestand',
+          desc: 'Jetzt bestellen: ' + names,
           action: 'Lager pruefen ›', click: function() { showPage('lager'); setLagerFilter('low'); }
         });
       }
@@ -8892,8 +8893,8 @@
       if (followUps.length > 0) {
         var fName = followUps[0].Name || followUps[0].name || '';
         suggestions.push({
-          icon: '&#128100;', title: followUps.length + ' Kunden mit Follow-Up',
-          desc: fName + (followUps[0].Notiz ? ': ' + esc(followUps[0].Notiz).substring(0, 60) : '') + ' — Kontaktieren empfohlen',
+          iconKey: 'users', title: followUps.length + ' Kunden mit offenem Follow-Up',
+          desc: fName + (followUps[0].Notiz ? ': ' + esc(followUps[0].Notiz).substring(0, 60) : '') + ' — persoenlicher Kontakt empfohlen',
           action: 'Kunden oeffnen ›', click: function() { showPage('kunden'); setKundenFilter('followup'); }
         });
       }
@@ -8902,8 +8903,8 @@
       if (h >= 17 && perms.kasseGesamt) {
         var umsatz = finanzenCache ? finanzenCache.tagesUmsatz : 0;
         suggestions.push({
-          icon: '&#128202;', title: 'Tagesabschluss noch offen',
-          desc: 'Tagesumsatz: ' + fmtEur(umsatz) + ' EUR — GoBD-Pflicht! Jetzt abschliessen.',
+          iconKey: 'receipt', title: 'Tagesabschluss noch offen',
+          desc: 'Tagesumsatz: ' + fmtEur(umsatz) + ' EUR — Finanzamt-Pflicht, Frist laeuft um Mitternacht.',
           action: 'Kasse oeffnen ›', click: function() { showPage('kasse'); openTagesabschluss(); }
         });
       }
@@ -8913,8 +8914,8 @@
         var farbTermine = todayTermine.filter(function(t) { return (t.Service || '').indexOf('Farb') > -1 || (t.Service || '').indexOf('Balayage') > -1; });
         if (farbTermine.length > 0) {
           suggestions.push({
-            icon: '&#128161;', title: 'Upselling-Tipp: Olaplex zu Farbbehandlungen',
-            desc: farbTermine.length + ' Farbtermin(e) heute — Olaplex No.1 als Zusatzschutz empfehlen (+ ' + fmtEur(farbTermine.length * 25) + ' EUR Umsatzpotenzial)',
+            iconKey: 'droplet', title: 'Olaplex bei ' + farbTermine.length + ' Farbtermin(en) empfehlen',
+            desc: 'Strukturschutz direkt ansprechen — Umsatzpotenzial heute: +' + fmtEur(farbTermine.length * 25) + ' EUR',
             action: 'Details ›', click: function() { showPage('beratung'); showKiTool('farbcode'); }
           });
         }
@@ -8923,8 +8924,8 @@
       // Leer-Zeiten nutzen
       if (todayTermine.length < 3 && h < 14) {
         suggestions.push({
-          icon: '&#9728;', title: 'Ruhiger Tag — perfekt fuer Bestandspflege',
-          desc: 'Nur ' + todayTermine.length + ' Termine heute. Empfehlung: Lager pruefen, Follow-Ups kontaktieren, Social Media posten.',
+          iconKey: 'sun', title: 'Ruhiger Tag — freie Zeit sinnvoll nutzen',
+          desc: 'Nur ' + todayTermine.length + ' Termine heute. Lager pruefen, Follow-Ups anschreiben oder Vorher/Nachher-Fotos aufbereiten.',
           action: 'Lager pruefen ›', click: function() { showPage('lager'); }
         });
       }
@@ -8933,12 +8934,13 @@
         var card = document.createElement('div');
         card.className = 'ki-suggestion-card touch-scale';
         card.style.cursor = 'pointer';
-        card.innerHTML = '<div class="ki-icon">' + s.icon + '</div>'
+        var iconHtml = s.iconKey ? getIcon(s.iconKey) : (s.icon || '');
+        card.innerHTML = '<div class="ki-icon">' + iconHtml + '</div>'
           + '<div class="ki-body"><div class="ki-title">' + s.title + ' <span class="ki-badge">KI</span></div>'
           + '<div class="ki-desc">' + s.desc + '</div>'
           + '<div class="ki-action">' + s.action + '</div></div>';
         (function(suggestion) {
-          card.onclick = function() { openKiHintDetail({ icon: suggestion.icon, title: suggestion.title, desc: suggestion.desc, navigateClick: suggestion.click }); };
+          card.onclick = function() { openKiHintDetail({ iconKey: suggestion.iconKey, icon: suggestion.icon, title: suggestion.title, desc: suggestion.desc, navigateClick: suggestion.click }); };
         })(s);
         container.appendChild(card);
       });
@@ -8961,7 +8963,7 @@
       var hasOverlaps = Object.keys(overlaps).length > 0;
 
       if (hasOverlaps) {
-        hints.push({ icon: '&#9888;', title: 'Terminueberschneidung erkannt!', desc: 'Es gibt ueberlappende Termine heute. Bitte pruefen und ggf. umbuchen.', prio: 'danger' });
+        hints.push({ iconKey: 'warning', title: 'Terminueberschneidung erkannt!', desc: 'Zwei oder mehr Termine ueberlappen sich im Tagesplan — jetzt pruefen und umbuchen, bevor Kunden warten.', prio: 'danger' });
       }
       var gaps = [];
       var sorted = todayTermine.slice().sort(function(a,b) { return (a.Start_ISO||'').localeCompare(b.Start_ISO||''); });
@@ -8975,24 +8977,24 @@
       }
       if (gaps.length > 0) {
         var g = gaps[0];
-        hints.push({ icon: '&#128161;', title: g.gap + ' Min. Luecke bei ' + g.stylist + ' ab ' + g.after, desc: 'Ideal fuer Walk-In oder Nachholtermin. Laufkundschaft nutzen!' });
+        hints.push({ iconKey: 'clock', title: g.gap + ' Min. freie Zeit bei ' + g.stylist + ' ab ' + g.after, desc: 'Freies Fenster fuer Walk-In oder Kurztermin — jetzt aktiv ansprechen oder Warteliste pruefen.' });
       }
       if (todayTermine.length >= 20) {
-        hints.push({ icon: '&#128293;', title: 'Voller Tag! ' + todayTermine.length + ' Termine', desc: 'Empfehlung: Produktwagen vorbereiten, Pausen einplanen, Kaffee fuer Wartebereich.' });
+        hints.push({ iconKey: 'zap', title: 'Voller Tag — ' + todayTermine.length + ' Termine', desc: 'Produktwagen jetzt vorbereiten, Einwirkzeiten straff planen, Getraenke-Station auffuellen.' });
       }
       if (todayTermine.length > 0 && todayTermine.length < 5) {
-        hints.push({ icon: '&#128197;', title: 'Ruhiger Tag — ' + todayTermine.length + ' Termine', desc: 'Perfekt fuer Weiterbildung, Schaufenster umdekorieren oder Social-Media-Content erstellen.' });
+        hints.push({ iconKey: 'sun', title: 'Ruhiger Tag — ' + todayTermine.length + ' Termine', desc: 'Ideal fuer Produktpflege, Lager-Check oder Vorher/Nachher-Fotos der letzten Ergebnisse fuer Social Media.' });
       }
       var farbTermine = todayTermine.filter(function(t) { return /farb|balayage|straeh/i.test(t.Service||''); });
       if (farbTermine.length >= 2) {
-        hints.push({ icon: '&#127912;', title: farbTermine.length + ' Farbtermine heute', desc: 'Farbe + Entwickler vorab anmischen spart ~15 Min. Olaplex als Upsell empfehlen!' });
+        hints.push({ iconKey: 'palette', title: farbTermine.length + ' Farbtermine — Vorbereitung jetzt', desc: 'Mischverhaeltnisse vorab notieren spart pro Termin ~15 Min. Olaplex No.1+2 bereitstellen — direkt als Zusatzschutz empfehlen.' });
       }
       // Fallback-Hinweise damit immer mind. 3 angezeigt werden
       var fallbacks = [
-        { icon: '&#128161;', title: 'Upselling-Tipp: Pflegeprodukte', desc: 'Bei jedem Farbtermin Olaplex No.3 empfehlen — steigert Umsatz um ~25 EUR pro Kunde.' },
-        { icon: '&#128197;', title: 'Naechste Woche vorplanen', desc: 'Montags die Woche durchgehen: Welche Produkte werden gebraucht? Welche Kunden brauchen Erinnerung?' },
-        { icon: '&#11088;', title: 'Google-Bewertung anfragen', desc: 'Zufriedene Kunden nach Bewertung fragen — 5-Sterne-Reviews bringen neue Laufkundschaft.' },
-        { icon: '&#128247;', title: 'Vorher/Nachher-Foto machen', desc: 'Bei Farb- und Styling-Terminen ein Foto fuer Instagram — beste Werbung!' }
+        { iconKey: 'droplet', title: 'Olaplex zu jedem Farbtermin anbieten', desc: 'Strukturschutz kostet den Kunden ~25 EUR extra und verdoppelt die Zufriedenheit — Haarbruch sichtbar reduziert.' },
+        { iconKey: 'calendar', title: 'Naechste Woche schon vorplanen', desc: 'Montag-Check: Welche Produkte werden gebraucht? Welche Kunden haben seit 6 Wochen keinen Termin?' },
+        { iconKey: 'star', title: 'Google-Bewertung gezielt anfragen', desc: 'Direkt nach dem Spiegel-Moment fragen: "Wenn Sie zufrieden sind — eine kurze Google-Bewertung hilft uns sehr." 5-Sterne-Reviews bringen neue Laufkundschaft.' },
+        { iconKey: 'camera', title: 'Vorher/Nachher-Foto bei Farbservice', desc: 'Einwilligung einholen, dann beide Fotos machen — bestes Werbematerial fuer Instagram und Google-Profil.' }
       ];
       var fi = 0;
       while (hints.length < 3 && fi < fallbacks.length) { hints.push(fallbacks[fi++]); }
@@ -9015,25 +9017,25 @@
       var avg = kasseCache.length > 0 ? total / kasseCache.length : 0;
 
       if (barCount > karteCount * 2 && kasseCache.length > 3) {
-        hints.push({ icon: '&#128179;', title: 'Hoher Baranteil heute', desc: 'Mehr Kartenzahlung empfehlen — spart Wechselgeld und ist schneller. QR-Aufsteller sichtbar platzieren.' });
+        hints.push({ iconKey: 'coin', title: 'Hoher Baranteil — ' + barCount + ' von ' + kasseCache.length + ' Zahlungen bar', desc: 'QR-Aufsteller gut sichtbar am Tresen platzieren — Kartenzahlung spart Wechselgeld und beschleunigt den Ablauf.' });
       }
       if (avg > 0 && avg < 40) {
-        hints.push({ icon: '&#128161;', title: 'Durchschnittl. Bonwert: ' + fmtEur(avg) + ' EUR', desc: 'Tipp: Bei jeder Rechnung Pflegeprodukt empfehlen. +1 Produkt = +15-25 EUR pro Kunde.' });
+        hints.push({ iconKey: 'trending', title: 'Durchschnittlicher Bon: ' + fmtEur(avg) + ' EUR', desc: 'Noch Luft nach oben: Ein LA Biosthetique Pflegeprodukt direkt am Stuhl zeigen bringt durchschnittlich +18 EUR je Kunde.', prio: 'warning' });
       }
       if (avg >= 80) {
-        hints.push({ icon: '&#11088;', title: 'Starker Bonwert: ' + fmtEur(avg) + ' EUR', desc: 'Top-Tag! Weiter so — das Team macht einen grossartigen Job beim Produktverkauf.' });
+        hints.push({ iconKey: 'star', title: 'Starker Tageswert: ' + fmtEur(avg) + ' EUR Schnitt', desc: 'Hervorragende Leistung beim Produktverkauf — das Muster von heute fuer die naechste Woche festhalten.', prio: 'success' });
       }
       if (h >= 17 && perms.kasseGesamt) {
-        hints.push({ icon: '&#128202;', title: 'Tagesabschluss nicht vergessen!', desc: 'GoBD-Pflicht: Kasse abschliessen, Barentnahmen dokumentieren. Finanzamt-sicher!' });
+        hints.push({ iconKey: 'receipt', title: 'Tagesabschluss noch offen', desc: 'Finanzamt-Pflicht: Kasse jetzt abschliessen, Barentnahmen dokumentieren — Frist laeuft um Mitternacht.', prio: 'warning' });
       }
       if (kasseCache.length === 0 && h > 10) {
-        hints.push({ icon: '&#9203;', title: 'Noch keine Buchungen heute', desc: 'Erster Termin wird erwartet. Kasse pruefbereit? Wechselgeld ausreichend?' });
+        hints.push({ iconKey: 'clock', title: 'Noch keine Buchungen heute', desc: 'Kasse vorbereitet? Wechselgeld auffuellen, Quittungsrolle pruefen, Terminal eingeschaltet?' });
       }
       var kFallbacks = [
-        { icon: '&#128176;', title: 'Produktverkauf steigern', desc: 'Tipp: Pflegeprodukte direkt am Stuhl empfehlen. Durchschnittlich +18 EUR pro Kunde moeglich.' },
-        { icon: '&#128202;', title: 'Monatsvergleich nutzen', desc: 'Vergleiche den heutigen Umsatz mit dem gleichen Wochentag letzten Monat — Trends erkennen!' },
-        { icon: '&#128179;', title: 'Kartenzahlung foerdern', desc: 'QR-Aufsteller am Tresen platzieren — schneller, hygienischer, weniger Wechselgeld noetig.' },
-        { icon: '&#9997;', title: 'Belege digitalisieren', desc: 'Papierbelege abfotografieren und digital archivieren — spart Platz und ist GoBD-konform.' }
+        { iconKey: 'shoppingBag', title: 'Pflegeprodukt direkt am Stuhl empfehlen', desc: 'Beim Foehnen zeigen was genutzt wird — Kunden kaufen 3x haeufiger wenn sie das Produkt in Aktion sehen.' },
+        { iconKey: 'barChart', title: 'Tagesumsatz mit Vorwoche vergleichen', desc: 'Gleicher Wochentag, letzter Monat als Referenz — zeigt ob Aktionen wirken oder Schwaechen aufdecken.' },
+        { iconKey: 'coin', title: 'Kartenzahlung aktiv foerdern', desc: 'QR-Code-Aufsteller gut platzieren — kuerzere Abrechnung, kein Rueckgeld, weniger Fehler.' },
+        { iconKey: 'receipt', title: 'Belege sofort erfassen', desc: 'Kassenbeleg direkt nach jedem Termin buchen — Monatende-Stress vermeiden, Finanzamt-sicher bleiben.' }
       ];
       var kfi = 0;
       while (hints.length < 3 && kfi < kFallbacks.length) { hints.push(kFallbacks[kfi++]); }
@@ -9056,22 +9058,22 @@
 
       if (followUps.length > 0) {
         var fn = followUps[0].Name || followUps[0].name || 'Kunde';
-        hints.push({ icon: '&#128172;', title: followUps.length + ' offene Follow-Ups', desc: fn + ' als naechstes kontaktieren. Tipp: Persoenliche Nachricht per WhatsApp wirkt am besten.' });
+        hints.push({ iconKey: 'message', title: followUps.length + ' offene Follow-Ups', desc: fn + ' als naechstes kontaktieren — eine persoenliche WhatsApp-Nachricht wirkt dreimal besser als eine Standard-E-Mail.' });
       }
       if (noVisit60.length > 0) {
-        hints.push({ icon: '&#128148;', title: noVisit60.length + ' Kunden seit 60+ Tagen nicht da', desc: 'Reaktivierungs-Aktion: "Wir vermissen Sie!" mit 10% Rabatt auf naechsten Besuch.' });
+        hints.push({ iconKey: 'heart', title: noVisit60.length + ' Kunden seit 60+ Tagen nicht mehr im Salon', desc: 'Reaktivierung per WhatsApp: "Wir denken an Sie — 10% auf den naechsten Besuch." Guenstigste Form der Neukunden-Werbung.' });
       }
       if (vips.length > 0) {
-        hints.push({ icon: '&#128081;', title: vips.length + ' VIP-Kunden im System', desc: 'Geburtstags-Check: VIPs erhalten Glueckwuensche + Gutschein. Kundenbindung #1!' });
+        hints.push({ iconKey: 'crown', title: vips.length + ' VIP-Kunden — persoenliche Betreuung', desc: 'Geburtstags-Check jetzt: VIPs erhalten Glueckwunsch + Gutschein vorab — staerkste Bindungsmassnahme im Salon.' });
       }
       if (kundenCache.length > 0 && kundenCache.length < 30) {
-        hints.push({ icon: '&#128200;', title: 'Kundenstamm ausbauen', desc: 'Tipp: Jeden Walk-In-Kunden nach E-Mail/Handy fragen. +1 Kontakt pro Tag = +365 im Jahr.' });
+        hints.push({ iconKey: 'users', title: 'Kundenstamm noch im Aufbau — ' + kundenCache.length + ' Kontakte', desc: 'Jeden Walk-In nach Handynummer fragen. Nur 1 neuer Kontakt pro Tag ergibt 365 Stammkunden im Jahr.' });
       }
       var kuFallbacks = [
-        { icon: '&#127873;', title: 'Geburtstags-Aktion starten', desc: 'Kunden mit Geburtstag diesen Monat eine persoenliche Nachricht + 10% Gutschein senden.' },
-        { icon: '&#128172;', title: 'WhatsApp-Nachricht senden', desc: 'Persoenliche Nachrichten wirken 3x besser als E-Mail — kurze "Wie geht es Ihren Haaren?"-Nachricht.' },
-        { icon: '&#128200;', title: 'Stammkunden belohnen', desc: 'Ab dem 5. Besuch ein kleines Geschenk — Kundenbindung ist guenstiger als Neukundengewinnung.' },
-        { icon: '&#128247;', title: 'Kunden-Feedback einholen', desc: 'Nach dem Termin kurz fragen: "Sind Sie zufrieden?" — zeigt Wertschaetzung und verbessert den Service.' }
+        { iconKey: 'gift', title: 'Geburtstags-Aktion diesen Monat', desc: 'Kunden mit Geburtstag jetzt heraussuchen und persoenliche Nachricht + 10%-Gutschein senden — kostet nichts, wirkt viel.' },
+        { iconKey: 'message', title: 'Kurze Pflege-Nachricht senden', desc: '"Wie geht es Ihren Haaren?" per WhatsApp — zeigt echtes Interesse und bringt Folgetermine ohne Rabatt.' },
+        { iconKey: 'star', title: 'Stammkunden ab 5. Besuch belohnen', desc: 'Kleines Dankeschoens bei Besuch Nr. 5 merkt sich jeder Kunde — Weiterempfehlungsrate steigt deutlich.' },
+        { iconKey: 'camera', title: 'Kunden um Bewertung bitten', desc: 'Direkt nach dem Spiegel-Moment fragen — Google-Bewertungen sind die wirksamste Werbung fuer neue Laufkundschaft.' }
       ];
       var kufi = 0;
       while (hints.length < 3 && kufi < kuFallbacks.length) { hints.push(kuFallbacks[kufi++]); }
@@ -9091,33 +9093,63 @@
       if (outOfStock.length > 0) {
         var names = outOfStock.slice(0,3).map(function(p) { return p.Produkt || p.Name; }).join(', ');
         var oosData = outOfStock.map(function(p) { return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>' + esc(p.Produkt || p.Name) + '</span><span style="color:var(--danger);font-weight:600">0 Stk.</span></div>'; }).join('');
-        hints.push({ icon: '&#9888;', title: outOfStock.length + ' Produkte ausverkauft!', desc: names + ' — Sofort nachbestellen. Kunden fragen nach!', prio: 'danger', daten: oosData });
+        hints.push({ iconKey: 'warning', title: outOfStock.length + ' Produkte komplett ausverkauft', desc: names + ' — Kunden fragen aktiv danach. Sofortbestellung bei LA Biosthetique ausloesen (3-5 Werktage Lieferzeit).', prio: 'danger', daten: oosData });
       }
       if (lowStock.length > 0) {
         var lsData = lowStock.map(function(p) { return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span>' + esc(p.Produkt || p.Name) + '</span><span style="color:var(--warning);font-weight:600">' + (p.Bestand || 0) + '/' + (p.Min_Bestand || 3) + ' Stk.</span></div>'; }).join('');
-        hints.push({ icon: '&#128230;', title: lowStock.length + ' Produkte unter Mindestbestand', desc: 'Sammelbestellung empfohlen — Lieferzeiten beachten (LA Biosthetique: 3-5 Werktage).', daten: lsData });
+        hints.push({ iconKey: 'package', title: lowStock.length + ' Produkte unter Mindestbestand', desc: 'Sammelbestellung jetzt zusammenstellen — LA Biosthetique liefert in 3-5 Werktagen. Einzelbestellungen kosten mehr Porto.', prio: 'warning', daten: lsData });
       }
       if (highValue.length > 0) {
         var hv = highValue[0];
-        hints.push({ icon: '&#128161;', title: 'Hoher Bestand: ' + (hv.Produkt || hv.Name), desc: (hv.Bestand || 0) + ' Stueck auf Lager (VK ' + fmtEur(hv.VK_Preis) + ' EUR). Aktiv empfehlen oder Aktion starten!' });
+        hints.push({ iconKey: 'shoppingBag', title: 'Grosser Vorrat: ' + (hv.Produkt || hv.Name), desc: (hv.Bestand || 0) + ' Stueck auf Lager (Verkaufspreis ' + fmtEur(hv.VK_Preis) + ' EUR) — aktiv am Stuhl empfehlen oder als Saisonaktion hervorheben.' });
       }
       if (lagerCache.length > 0) {
         var totalValue = 0;
         lagerCache.forEach(function(p) { totalValue += (parseInt(p.Bestand)||0) * (parseFloat(p.EK_Preis||p.VK_Preis)||0) * 0.5; });
         if (totalValue > 500) {
-          hints.push({ icon: '&#128176;', title: 'Lagerwert ca. ' + fmtEur(totalValue) + ' EUR', desc: 'Tipp: Langsam drehende Artikel identifizieren und mit Rabattaktion abverkaufen.' });
+          hints.push({ iconKey: 'coin', title: 'Gebundenes Kapital: ca. ' + fmtEur(totalValue) + ' EUR', desc: 'Langsam drehende Artikel identifizieren und als Duo-Set mit Bestseller anbieten — Marge erhalten, Lager entlasten.' });
         }
       }
       var laFallbacks = [
-        { icon: '&#128230;', title: 'Sammelbestellung planen', desc: 'Freitags Bestand pruefen und Montags bestellen — LA Biosthetique liefert in 3-5 Werktagen.' },
-        { icon: '&#128161;', title: 'Verkaufsregal auffuellen', desc: 'Produkte auf Augenhoehe platzieren. Shampoo + Conditioner als Set anbieten = hoehere Marge.' },
-        { icon: '&#128200;', title: 'Bestseller identifizieren', desc: 'Die Top 5 Produkte immer doppelt auf Lager halten — Nachschub-Engpaesse kosten Umsatz.' },
-        { icon: '&#127912;', title: 'Saisonale Produkte', desc: 'Im Sommer: Sonnenschutz-Spray + Leave-In-Conditioner promoten. Im Winter: Feuchtigkeitskuren.' }
+        { iconKey: 'package', title: 'Freitags bestellen, montags im Regal', desc: 'Wochenend-Uebersicht Freitagmittag machen, Bestellung direkt ausloesen — LA Biosthetique liefert in 3-5 Werktagen.' },
+        { iconKey: 'shoppingBag', title: 'Sichtbarkeit im Verkaufsregal erhoehen', desc: 'Shampoo + passender Conditioner als Set auf Augenhoehe platzieren — Sets verkaufen sich 40% besser als Einzelstuecke.' },
+        { iconKey: 'barChart', title: 'Top-5-Produkte immer doppelt vorhalten', desc: 'Die fuenf meistverkauften Artikel nie unter 5 Stueck fallen lassen — Engpaesse kosten direkt Umsatz.' },
+        { iconKey: 'leaf', title: 'Saisonale Empfehlungen jetzt aufstellen', desc: 'Fruehling/Sommer: Sonnenschutz-Spray + Leave-In. Herbst/Winter: intensive Feuchtigkeitskuren an den Spiegel stellen.' }
       ];
       var lafi = 0;
       while (hints.length < 3 && lafi < laFallbacks.length) { hints.push(laFallbacks[lafi++]); }
       renderKiHintCards(c, hints);
     }
+
+    // === SVG Icon Library (Lucide-style, stroke-width 1.75) — kein Emoji, kein Unicode ===
+    var ICONS = {
+      warning:     '<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+      scissors:    '<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>',
+      calendar:    '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+      clock:       '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+      trending:    '<svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+      star:        '<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+      camera:      '<svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>',
+      package:     '<svg viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
+      crown:       '<svg viewBox="0 0 24 24"><path d="M2 20h20M5 20l-1-9 5 4 3-6 3 6 5-4-1 9"/></svg>',
+      heart:       '<svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>',
+      message:     '<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+      users:       '<svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>',
+      gift:        '<svg viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>',
+      coin:        '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v2m0 8v2M9.5 9.5a2.5 2.5 0 015 0c0 1.5-1.5 2-2.5 2.5S9.5 13 9.5 14.5a2.5 2.5 0 005 0"/></svg>',
+      barChart:    '<svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>',
+      zap:         '<svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+      droplet:     '<svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>',
+      checkCircle: '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+      alertCircle: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+      shoppingBag: '<svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>',
+      sun:         '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>',
+      palette:     '<svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c.55 0 1-.45 1-1v-.5c0-.28-.11-.53-.28-.71-.17-.18-.28-.43-.28-.71 0-.55.45-1 1-1h1.5C18.44 18 22 14.44 22 10c0-4.41-4.48-8-10-8z"/></svg>',
+      leaf:        '<svg viewBox="0 0 24 24"><path d="M17 8C8 10 5.9 16.17 3.82 19.5c4.28 0 7.16-1.13 9.18-3 5.14-4.83 3-12.5 3-12.5s-2 2-2.5 4z"/><path d="M3 19.5c0 0 1.5 0 2.5-1"/></svg>',
+      receipt:     '<svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>',
+      phone:       '<svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.9 11.11a19.79 19.79 0 01-3.07-8.67A2 2 0 012.81 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 9.91a16 16 0 006 6l.91-.91a2 2 0 012.11-.45c.91.384 1.856.657 2.81.7A2 2 0 0122 16.92z"/></svg>'
+    };
+    function getIcon(key) { return ICONS[key] || ICONS.alertCircle; }
 
     // === Gemeinsamer KI-Hint-Card-Renderer ===
     // Zeigt den wichtigsten Hinweis als sichtbare Kachel, Rest aufklappbar
@@ -9125,8 +9157,10 @@
       var card = document.createElement('div');
       card.className = 'ki-suggestion-card touch-scale';
       card.style.cursor = 'pointer';
-      if (h.prio === 'danger') card.style.borderLeftColor = 'var(--danger)';
-      card.innerHTML = '<div class="ki-icon">' + h.icon + '</div>'
+      var prioColors = { danger: 'var(--danger)', warning: 'var(--warning)', success: 'var(--success)' };
+      if (prioColors[h.prio]) { card.style.borderLeftColor = prioColors[h.prio]; card.dataset.prio = h.prio; }
+      var iconHtml = h.iconKey ? getIcon(h.iconKey) : (h.icon || '');
+      card.innerHTML = '<div class="ki-icon">' + iconHtml + '</div>'
         + '<div class="ki-body"><div class="ki-title">' + h.title + ' <span class="ki-badge">KI</span></div>'
         + '<div class="ki-desc">' + h.desc + '</div>'
         + '<div class="ki-action" style="font-size:10px;color:var(--gold);font-weight:600;margin-top:4px">Details &amp; Chat &#8250;</div></div>';
