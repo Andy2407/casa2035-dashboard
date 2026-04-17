@@ -10932,6 +10932,9 @@
     (function initKeyboardHelp(){
       var overlay = document.createElement('div');
       overlay.id = 'kbHelpOverlay';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', 'Tastaturkürzel-Hilfe');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);z-index:10002;display:none;align-items:center;justify-content:center;padding:20px';
       overlay.innerHTML = '<div style="background:var(--card-solid,#fff);border:1px solid var(--border);border-radius:14px;max-width:480px;width:100%;box-shadow:0 24px 72px rgba(0,0,0,0.3);overflow:hidden">'
         + '<div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:15px;font-family:Playfair Display,serif">Tastaturkuerzel</span><span onclick="document.getElementById(\'kbHelpOverlay\').style.display=\'none\'" style="cursor:pointer;color:var(--text-dim);font-size:20px;line-height:1">&times;</span></div>'
@@ -11050,6 +11053,9 @@
     (function initGlobalSearch(){
       var overlay = document.createElement('div');
       overlay.id = 'globalSearchOverlay';
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', 'Globale Suche');
       overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(6px);z-index:10001;display:none;align-items:flex-start;justify-content:center;padding-top:12vh';
       overlay.innerHTML = '<div style="background:var(--card-solid,#fff);border:1px solid var(--border);border-radius:14px;width:92%;max-width:560px;box-shadow:0 24px 72px rgba(0,0,0,0.3);overflow:hidden">'
         + '<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)">'
