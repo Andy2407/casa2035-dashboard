@@ -304,6 +304,56 @@
     [data-style="maskulin"] .demo-badge { background: #1a1a1a; border: 1px solid rgba(201,168,76,0.4); color: #E0C870; border-radius: 4px; font-weight: 800; }
     [data-style="feminin"] .demo-badge { background: rgba(232,201,160,0.3); border: 1px solid rgba(212,169,94,0.4); color: #8b6f3a; border-radius: var(--radius-full); font-family: var(--font-display); font-style: italic; }
 
+    /* Feedback-Widget */
+    [data-style="maskulin"] #dashFeedbackPanel {
+      background: linear-gradient(180deg, #1a1a1a 0%, #0c0c0c 100%);
+      border: 1px solid rgba(201,168,76,0.25); border-radius: 10px; color: #e8e4de;
+    }
+    [data-style="maskulin"] .fb-header { background: linear-gradient(135deg, #0a0a0a, #1a1a1a); border-bottom: 1px solid rgba(201,168,76,0.25); }
+    [data-style="maskulin"] .fb-header h4 { font-family: var(--font-body); font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #E0C870; }
+    [data-style="maskulin"] .fb-chip { background: #141414; color: #a0998e; border-color: rgba(201,168,76,0.25); border-radius: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+    [data-style="maskulin"] .fb-chip.active { background: rgba(201,168,76,0.2); color: #E0C870; border-color: #C9A84C; }
+    [data-style="feminin"] #dashFeedbackPanel { background: linear-gradient(180deg, #fffcf7 0%, #fdf5e8 100%); border: 1px solid rgba(212,169,94,0.2); border-radius: 24px; }
+    [data-style="feminin"] .fb-header { background: linear-gradient(135deg, #E8C9A0 0%, #D4A95E 100%); }
+    [data-style="feminin"] .fb-header h4 { font-family: var(--font-display); font-style: italic; font-weight: 500; }
+    [data-style="feminin"] .fb-chip { border-radius: var(--radius-full); font-family: var(--font-body); font-weight: 400; }
+    [data-style="feminin"] .fb-chip.active { background: rgba(212,169,94,0.18); color: #8b6f3a; border-color: #D4A95E; font-weight: 500; }
+
+    /* Jarvis-Chat-Panel */
+    [data-style="maskulin"] #jarvisPanel,
+    [data-style="maskulin"] .jarvis-panel {
+      background: radial-gradient(circle at top, #1a1a1a 0%, #000 80%);
+      border: 1px solid rgba(201,168,76,0.3);
+      color: #e8e4de;
+      border-radius: 10px;
+    }
+    [data-style="maskulin"] .jarvis-input,
+    [data-style="maskulin"] #jarvisInput { background: #0a0a0a; color: #e8e4de; border: 1px solid rgba(201,168,76,0.3); font-weight: 500; }
+    [data-style="feminin"] #jarvisPanel,
+    [data-style="feminin"] .jarvis-panel {
+      background: linear-gradient(180deg, #fffcf7 0%, #fdf5e8 100%);
+      border: 1px solid rgba(212,169,94,0.22);
+      border-radius: 24px;
+    }
+
+    /* Cockpit-Widgets */
+    [data-style="maskulin"] .cockpit-card { border-radius: 10px; border: 1px solid rgba(201,168,76,0.2); }
+    [data-style="maskulin"] .cockpit-card h3 { text-transform: uppercase; letter-spacing: 1px; font-size: 10px; color: #a0998e; font-weight: 800; }
+    [data-style="maskulin"] .cockpit-value { font-family: var(--font-body); font-weight: 700; font-variant-numeric: tabular-nums; color: #f0ebdf; }
+    [data-style="feminin"] .cockpit-card { border-radius: 20px; background: linear-gradient(135deg, #ffffff 0%, #fdf9f3 100%); }
+    [data-style="feminin"] .cockpit-card h3 { font-family: var(--font-display); font-style: italic; font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 13px; }
+    [data-style="feminin"] .cockpit-value { font-family: var(--font-display); font-weight: 500; font-style: italic; }
+
+    /* Karten + Listen-Items im Content */
+    [data-style="maskulin"] .event-card, [data-style="maskulin"] .lager-kachel, [data-style="maskulin"] .ki-suggestion-card {
+      background: linear-gradient(135deg, #181818 0%, #0c0c0c 100%);
+      border: 1px solid rgba(201,168,76,0.18); border-radius: 10px; color: #e8e4de;
+    }
+    [data-style="feminin"] .event-card, [data-style="feminin"] .lager-kachel, [data-style="feminin"] .ki-suggestion-card {
+      background: linear-gradient(135deg, #ffffff 0%, #fdf9f3 100%);
+      border: 1px solid rgba(212,169,94,0.15); border-radius: 18px;
+    }
+
     [data-theme="dark"] {
       --bg: #0a0a0a;
       --bg-warm: #111111;
