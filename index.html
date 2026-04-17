@@ -157,7 +157,10 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      /* Ironman-2035-Upgrade 18.04.: subtiler Gradient statt flat */
       background: var(--bg);
+      background-image: radial-gradient(ellipse at top, rgba(201,168,76,0.04) 0%, transparent 55%);
+      background-attachment: fixed;
       color: var(--text);
       min-height: 100dvh;
       /* FB 17.04.: body braucht KEIN safe-top — Header hat sein eigenes. Sonst doppelt gezaehlt -> Content zu tief. */
@@ -283,18 +286,28 @@
 
     /* === Stat Cards (Home) === */
     .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    /* Ironman-2035-Upgrade 18.04.: Gradient-Hintergründe, Gold-Glow, Premium-Tiefe */
     .stat-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 14px;
-      transition: transform 250ms var(--ease), box-shadow 250ms var(--ease);
+      background: linear-gradient(135deg, var(--surface) 0%, var(--surface-hover) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px;
+      transition: transform 250ms var(--ease), box-shadow 250ms var(--ease), border-color 250ms;
       position: relative; overflow: hidden;
     }
-    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-medium); }
+    .stat-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at top right, rgba(201,168,76,0.12) 0%, transparent 55%);
+      opacity: 0.7; pointer-events: none;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(201,168,76,0.18), 0 2px 6px rgba(0,0,0,0.06); border-color: rgba(201,168,76,0.4); }
     .stat-card::after {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: var(--gold-gradient); opacity: 0; transition: opacity 300ms;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0; transition: opacity 300ms;
     }
     .stat-card:hover::after { opacity: 1; }
+    [data-theme="dark"] .stat-card { background: linear-gradient(135deg, #161616 0%, #1e1e1e 100%); box-shadow: inset 0 1px 0 rgba(201,168,76,0.08); }
+    [data-theme="dark"] .stat-card:hover { box-shadow: 0 16px 40px rgba(201,168,76,0.25), inset 0 1px 0 rgba(201,168,76,0.2); }
     .stat-card:active { transform: scale(0.96); }
     .stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
     .stat-icon svg { width: 18px; height: 18px; }
@@ -304,23 +317,50 @@
     .stat-card .stat-arrow { font-size: 10px; color: var(--gold); opacity: 0; transition: opacity 200ms, transform 200ms; position: absolute; right: 12px; top: 50%; transform: translateY(-50%) translateX(-4px); }
     .stat-card:hover .stat-arrow { opacity: 1; transform: translateY(-50%) translateX(0); }
 
-    /* === Hero Card (Home) === */
+    /* === Hero Card (Home) — Ironman-2035-Upgrade 18.04. === */
     .hero-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+      border: 1px solid rgba(201,168,76,0.25);
       border-left: 3px solid var(--gold);
       border-radius: var(--radius);
-      padding: 14px 16px;
-      color: var(--text);
-      margin-bottom: 12px;
+      padding: 22px 24px;
+      color: #f5f2ee;
+      margin-bottom: 16px;
       position: relative;
       overflow: hidden;
       transition: transform 200ms var(--ease), box-shadow 200ms var(--ease);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(201,168,76,0.15);
     }
-    .hero-card:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
-    .hero-card h3 { font-family: 'Playfair Display', serif; font-size: 16px; margin: 0 0 2px; color: var(--text); font-weight: 600; }
-    .hero-card p { font-size: 11px; color: var(--text-dim); margin: 0; }
-    .hero-card .hero-time { font-size: 10px; font-weight: 600; color: var(--gold); font-variant-numeric: tabular-nums; margin-top: 4px; letter-spacing: 0.5px; }
+    /* Jarvis-HUD-Gradient-Pulse im Hintergrund */
+    .hero-card::before {
+      content: ''; position: absolute; inset: -50%;
+      background: radial-gradient(circle at 20% 30%, rgba(201,168,76,0.18) 0%, transparent 35%),
+                  radial-gradient(circle at 80% 70%, rgba(201,168,76,0.10) 0%, transparent 40%);
+      animation: heroFlow 16s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes heroFlow {
+      0%,100% { transform: translate(0,0) rotate(0deg); }
+      50% { transform: translate(4%, -3%) rotate(1deg); }
+    }
+    .hero-card::after {
+      content: ''; position: absolute; top: 0; right: 0; width: 140px; height: 140px;
+      background: radial-gradient(circle, rgba(201,168,76,0.22) 0%, transparent 70%);
+      filter: blur(30px);
+      pointer-events: none;
+    }
+    .hero-card:hover { transform: translateY(-2px); box-shadow: 0 14px 48px rgba(201,168,76,0.22), inset 0 1px 0 rgba(201,168,76,0.3); }
+    .hero-card h3 { font-family: 'Playfair Display', serif; font-size: 22px; margin: 0 0 4px; color: #f5f2ee; font-weight: 600; letter-spacing: -0.3px; position: relative; z-index: 1; }
+    .hero-card h3 em { font-style: italic; color: var(--gold); font-weight: 500; }
+    .hero-card p { font-size: 13px; color: #c9c3b8; margin: 0; position: relative; z-index: 1; line-height: 1.5; }
+    .hero-card .hero-time { font-size: 11px; font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; margin-top: 8px; letter-spacing: 1.2px; text-transform: uppercase; position: relative; z-index: 1; }
+    [data-theme="dark"] .hero-card { background: linear-gradient(135deg, #1a1a1a 0%, #050505 100%); }
+
+    /* === Stats-Grid: mehr Luft, Premium-Typo === */
+    .stat-value { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; line-height: 1; transition: color 300ms; letter-spacing: -0.5px; position: relative; z-index: 1; }
+    .stat-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; background: linear-gradient(135deg, rgba(201,168,76,0.18), rgba(201,168,76,0.06)); position: relative; z-index: 1; }
+    .stat-icon svg { width: 20px; height: 20px; color: var(--gold); }
+    .stat-card .stat-label { position: relative; z-index: 1; }
 
     /* === Kontext-Hint-Leiste (FB-48, global pro Seite) === */
     .page-hint-bar {
