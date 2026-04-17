@@ -2600,7 +2600,8 @@
     // Fallback auf USERS (Login-Map) falls DB-Load scheitert.
     var mitarbeiterCache = [];
     var mitarbeiterLoading = false;
-    var RENA_SALON_ID = '26230de8-a46e-4610-937c-c302547b5a73';
+    // Demo-Modus-Fallback: Rena-Salon (NUR wenn isBackendMode() false ist)
+    var DEMO_SALON_ID = '26230de8-a46e-4610-937c-c302547b5a73';
     function currentSalonId() {
       try {
         var metaStr = sessionStorage.getItem('casa_meta');
@@ -2615,7 +2616,15 @@
           if (payload && payload.user_metadata && payload.user_metadata.salon_id) return payload.user_metadata.salon_id;
         }
       } catch (_) {}
-      return RENA_SALON_ID;
+      // Nur im Demo-Modus (ohne eingeloggten Nutzer) auf Rena-Fallback zurueckfallen.
+      // Multi-Tenant-Sicherheit: im Backend-Modus niemals, sonst Cross-Tenant-Leck.
+      try {
+        if (typeof isBackendMode === 'function' && isBackendMode()) {
+          console.error('[Security] currentSalonId(): Kein salon_id im Token. Kein Fallback moeglich.');
+          return null;
+        }
+      } catch (_) {}
+      return DEMO_SALON_ID;
     }
     async function loadMitarbeiterFromDB() {
       if (!isBackendMode()) { mitarbeiterCache = []; return []; }
