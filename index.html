@@ -1719,6 +1719,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Abmelden
       </div>
+      <div class="profile-action" onclick="forceReloadApp()" style="border-top:1px solid var(--border);margin-top:4px;padding-top:10px" title="Neue Version holen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Update pruefen
+      </div>
+      <div style="font-size:9px;color:var(--text-dim);text-align:center;padding:6px 4px 2px;letter-spacing:0.5px;border-top:1px solid var(--border);margin-top:4px" id="appVersionLabel" title="Klick kopiert Version">Version wird geladen…</div>
     </div>
   </header>
 
@@ -10152,12 +10157,33 @@
           swReloadDone = true;
           location.reload();
         });
-        // Broadcast vom SW: neue Version aktiv — Toast
+        // Broadcast vom SW: neue Version aktiv — Toast + Version-Label aktualisieren
         navigator.serviceWorker.addEventListener('message', function(ev) {
           if (ev.data && ev.data.type === 'SW_UPDATED') {
-            if (typeof showToast === 'function') showToast('Dashboard wurde aktualisiert', 'success', 2500);
+            if (typeof showToast === 'function') showToast('Neue Version aktiv — Dashboard wurde aktualisiert', 'success', 3500);
+            try {
+              var lbl = document.getElementById('appVersionLabel');
+              if (lbl && ev.data.version) lbl.textContent = ev.data.version;
+            } catch(e) {}
           }
         });
+        // Einmal Version beim Start in Label setzen (via Controller oder letzte bekannte)
+        setTimeout(function() {
+          try {
+            var lbl = document.getElementById('appVersionLabel');
+            if (!lbl) return;
+            if (navigator.serviceWorker.controller) {
+              fetch('/sw.js?v=' + Date.now()).then(function(r){ return r.text(); }).then(function(txt){
+                var m = txt.match(/CACHE_NAME\s*=\s*['"]([^'"]+)['"]/);
+                if (m) lbl.textContent = m[1];
+                lbl.style.cursor = 'pointer';
+                lbl.onclick = function(){ try { navigator.clipboard.writeText(m?m[1]:'unbekannt'); showToast('Version kopiert', 'info', 1500); } catch(e){} };
+              }).catch(function(){ lbl.textContent = 'offline'; });
+            } else {
+              lbl.textContent = 'installiert sich…';
+            }
+          } catch(e) {}
+        }, 1500);
         navigator.serviceWorker.register('sw.js').then(function(reg) {
           // Alle 30s (vorher 60s) auf SW-Update pruefen
           setInterval(function() { try { reg.update(); } catch(e) {} }, 30000);
@@ -10676,6 +10702,27 @@
     // FB 17.04. Ticket 4db3e7c0: Feedback-Widget soll nicht jedes Mal nach Mic-Erlaubnis fragen -> localStorage
     var fbMicGranted = localStorage.getItem('casa_mic_granted') === '1';
     // Voice Interpunktions-Heuristik (FB-14/29): "punkt"/"komma"/"fragezeichen" -> Zeichen
+    // Force-Reload: entleert alle Caches + re-registriert SW + reload. Capo-Pflicht 17.04.2026:
+    // Nach Sprint/Review muss Capo Updates garantiert sehen, auch auf iOS-PWA.
+    function forceReloadApp() {
+      try {
+        if (typeof showToast === 'function') showToast('Lade neue Version…', 'info', 1500);
+        var clear = Promise.resolve();
+        if ('caches' in window) {
+          clear = caches.keys().then(function(keys){ return Promise.all(keys.map(function(k){ return caches.delete(k); })); });
+        }
+        clear.then(function(){
+          if ('serviceWorker' in navigator) {
+            return navigator.serviceWorker.getRegistrations().then(function(regs){
+              return Promise.all(regs.map(function(r){ return r.update().then(function(){ if (r.waiting) r.waiting.postMessage({type:'SKIP_WAITING'}); }); }));
+            });
+          }
+        }).finally(function(){
+          setTimeout(function(){ location.reload(true); }, 400);
+        });
+      } catch(e) { location.reload(true); }
+    }
+
     function applyVoicePunctuation(text) {
       if (!text) return text;
       // FB 17.04. Ticket 2f50368e/f74b2f6c: Grammatik der Spracheingabe verbessern.
