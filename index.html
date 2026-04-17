@@ -10928,6 +10928,38 @@
       try { localStorage.setItem('casa2035_a2h_dismissed', Date.now()); } catch(e){}
     }
 
+    // === Keyboard-Shortcuts-Overlay (? oder Shift+/) — Linear-/Workday-Vorbild 17.04.2026 ===
+    (function initKeyboardHelp(){
+      var overlay = document.createElement('div');
+      overlay.id = 'kbHelpOverlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);z-index:10002;display:none;align-items:center;justify-content:center;padding:20px';
+      overlay.innerHTML = '<div style="background:var(--card-solid,#fff);border:1px solid var(--border);border-radius:14px;max-width:480px;width:100%;box-shadow:0 24px 72px rgba(0,0,0,0.3);overflow:hidden">'
+        + '<div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700;font-size:15px;font-family:Playfair Display,serif">Tastaturkuerzel</span><span onclick="document.getElementById(\'kbHelpOverlay\').style.display=\'none\'" style="cursor:pointer;color:var(--text-dim);font-size:20px;line-height:1">&times;</span></div>'
+        + '<div style="padding:14px 20px;font-size:12px">'
+        + '<div style="margin-bottom:12px"><div style="color:var(--text-dim);text-transform:uppercase;font-size:10px;font-weight:700;letter-spacing:0.8px;margin-bottom:6px">Suche & Navigation</div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Globale Suche</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Cmd/Ctrl + K</kbd></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Tastaturkuerzel-Hilfe</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">?</kbd></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Schliessen / Abbrechen</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Esc</kbd></div></div>'
+        + '<div style="margin-bottom:12px"><div style="color:var(--text-dim);text-transform:uppercase;font-size:10px;font-weight:700;letter-spacing:0.8px;margin-bottom:6px">In der Suche</div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Hoch / Runter</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">&uarr; &darr;</kbd></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Oeffnen</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">&crarr;</kbd></div></div>'
+        + '<div><div style="color:var(--text-dim);text-transform:uppercase;font-size:10px;font-weight:700;letter-spacing:0.8px;margin-bottom:6px">Im Termine-Kalender</div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Heute</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Heute-Knopf</kbd></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Ansicht wechseln</span><span style="color:var(--text-dim)">Liste / Tag / Woche</span></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Woche 5/7 Tage</span><span style="color:var(--text-dim)">Handy drehen</span></div></div>'
+        + '</div></div>';
+      document.body.appendChild(overlay);
+      overlay.addEventListener('click', function(e){ if (e.target === overlay) overlay.style.display = 'none'; });
+      document.addEventListener('keydown', function(e){
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+        if (!isTyping && (e.key === '?' || (e.key === '/' && e.shiftKey))) {
+          e.preventDefault();
+          overlay.style.display = 'flex';
+        }
+      });
+    })();
+
     // === Benachrichtigungs-Glocke (Workday-Quick-Win, 17.04.2026) ===
     window.toggleNotifDropdown = function(ev) {
       if (ev) ev.stopPropagation();
