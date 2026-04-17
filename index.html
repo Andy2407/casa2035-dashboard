@@ -6255,7 +6255,9 @@
       var statusClass = statusLabel === 'abgeschlossen' ? 'abgeschlossen' : (statusLabel === 'storniert' ? 'storniert' : (statusLabel === 'offen' ? 'offen' : 'bestätigt'));
       var html = '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">';
       html += '<div><div style="font-family:Playfair Display,serif;font-size:22px;font-weight:700">' + esc(t.Service || 'Termin') + '</div>';
-      html += '<div style="font-size:13px;color:var(--text-secondary);margin-top:2px">' + esc(t.Kundenname || t.Kunde || '') + '</div>';
+      // Kundenname klickbar -> Kunden-Tab öffnen + suchen (17.04. UX-Polish)
+      var kName = esc(t.Kundenname || t.Kunde || '');
+      html += '<div onclick="event.stopPropagation();document.getElementById(\'detailSheet\').classList.remove(\'open\');showPage(\'kunden\');setTimeout(function(){var f=document.getElementById(\'kundenSearch\');if(f){f.value=\'' + kName.replace(/'/g,"\\'") + '\';f.dispatchEvent(new Event(\'input\'));}},300);" style="font-size:13px;color:var(--text-secondary);margin-top:2px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color 200ms" onmouseover="this.style.textDecorationColor=\'var(--gold)\'" onmouseout="this.style.textDecorationColor=\'transparent\'" title="Kundendetail oeffnen">' + kName + '</div>';
       html += '<span class="termin-status ' + statusClass + '" style="margin-top:6px">' + esc(statusLabel) + '</span></div>';
       html += '<div style="text-align:right"><div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;color:var(--gold)">' + fmtEur(t.Preis) + ' &euro;</div></div></div>';
 
