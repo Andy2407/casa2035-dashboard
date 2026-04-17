@@ -10960,6 +10960,16 @@
           e.preventDefault();
           overlay.style.display = 'flex';
         }
+        // Esc schliesst egal welches Overlay offen ist
+        if (e.key === 'Escape') {
+          ['globalSearchOverlay','kbHelpOverlay','notifDropdown','detailSheet','profileDropdown'].forEach(function(id){
+            var el = document.getElementById(id);
+            if (el && (el.style.display === 'flex' || el.style.display === 'block' || el.classList.contains('open') || el.classList.contains('show'))) {
+              el.style.display = 'none';
+              el.classList.remove('open','show');
+            }
+          });
+        }
       });
     })();
 
@@ -11174,6 +11184,15 @@
           e.preventDefault();
           openSearch();
         }
+      });
+      // Focus-Trap: Tab + Shift+Tab bleiben im Modal
+      overlay.addEventListener('keydown', function(e) {
+        if (e.key !== 'Tab') return;
+        var focusables = overlay.querySelectorAll('input, button, [tabindex]:not([tabindex="-1"])');
+        if (!focusables.length) return;
+        var first = focusables[0], last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
       });
     })();
   </script>
