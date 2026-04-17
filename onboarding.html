@@ -670,6 +670,35 @@
     <h3>Alles prüfen</h3>
     <p class="step-desc">Kurzer Blick auf alle Eingaben — dann geht's los.</p>
     <div id="review-content"></div>
+
+    <!-- DSGVO Art. 28 Auftragsverarbeitung -->
+    <div style="margin-top:24px; padding:16px; background:rgba(201,169,113,0.08); border-left:4px solid var(--gold,#c9a971); border-radius:8px;">
+      <h4 style="margin:0 0 8px 0; font-size:1rem;">📜 Auftragsverarbeitungs-Vertrag (Pflicht nach DSGVO Art. 28)</h4>
+      <p style="font-size:0.9rem; margin:8px 0; color:var(--text-muted,#aaa);">
+        Casa 2035 verarbeitet Kundendaten des Salons im Auftrag. Vor der Aktivierung
+        muss der Inhaber den AV-Vertrag lesen und bestätigen.
+      </p>
+      <p style="margin:10px 0;">
+        <a href="/rechtliches/AV_VERTRAG_CASA2035.pdf" target="_blank" rel="noopener"
+           style="color:var(--gold,#c9a971); text-decoration:underline;">
+          ➜ AV-Vertrag als PDF öffnen
+        </a>
+      </p>
+      <label style="display:flex; align-items:flex-start; gap:10px; margin-top:12px; cursor:pointer;">
+        <input type="checkbox" id="chk-av" style="margin-top:4px; transform:scale(1.2);">
+        <span style="font-size:0.92rem;">
+          Ich habe den AV-Vertrag gelesen und akzeptiere ihn als rechtsverbindlichen
+          Vertrag zwischen Casa 2035 und dem Salon.
+        </span>
+      </label>
+      <label style="display:flex; align-items:flex-start; gap:10px; margin-top:10px; cursor:pointer;">
+        <input type="checkbox" id="chk-dsgvo" style="margin-top:4px; transform:scale(1.2);">
+        <span style="font-size:0.92rem;">
+          Ich habe die <a href="/rechtliches/DATENSCHUTZERKLAERUNG_CASA2035.pdf"
+          target="_blank" style="color:var(--gold,#c9a971);">Datenschutzerklärung</a> zur Kenntnis genommen.
+        </span>
+      </label>
+    </div>
   </div>
 
   <!-- Submit Status -->
@@ -880,7 +909,15 @@ function selectService(choice) {
 // =============================================================
 function goNext() {
   if (!validateStep(currentStep)) return;
-  if (currentStep === 5) { submitWizard(); return; }
+  if (currentStep === 5) {
+    // AV + DSGVO Checkboxen pruefen
+    var av = document.getElementById('chk-av');
+    var ds = document.getElementById('chk-dsgvo');
+    if (!av || !av.checked) { alert('Bitte AV-Vertrag lesen und bestätigen (Pflicht nach DSGVO Art. 28).'); return; }
+    if (!ds || !ds.checked) { alert('Bitte Datenschutzerklärung bestätigen.'); return; }
+    submitWizard();
+    return;
+  }
   if (currentStep === 4) { buildReview(); }
   currentStep++;
   updateStep();
