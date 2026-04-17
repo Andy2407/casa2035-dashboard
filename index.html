@@ -265,7 +265,7 @@
 
     /* === Main Content === */
     main { position: relative; z-index: 1; padding: 0 16px; }
-    .page { display: none; padding: 16px 0; animation: fadeIn 300ms var(--ease); }
+    .page { display: none; padding: 16px 0; animation: fadeIn 300ms var(--ease); overflow-x: hidden; }
     .page.active { display: block; }
     .section-title {
       font-size: 11px; font-weight: 700; color: var(--text-dim);
@@ -2327,10 +2327,10 @@
       <div class="sheet-handle"></div>
       <div class="sheet-title" id="mitarbeiterSheetTitle">Mitarbeiter</div>
       <input type="hidden" id="mitId">
-      <label>Vorname *</label>
-      <input type="text" id="mitVorname" placeholder="z.B. Sarah">
-      <label style="margin-top:8px">Nachname</label>
-      <input type="text" id="mitNachname" placeholder="z.B. Mueller">
+      <div class="sheet-row">
+        <div><label>Vorname *</label><input type="text" id="mitVorname" placeholder="z.B. Sarah"></div>
+        <div><label>Nachname</label><input type="text" id="mitNachname" placeholder="z.B. Mueller"></div>
+      </div>
       <div class="sheet-row" style="margin-top:8px">
         <div><label>Rolle *</label>
           <select id="mitRolle">
@@ -2348,15 +2348,45 @@
           </select>
         </div>
       </div>
-      <label style="margin-top:8px">Kann bedienen</label>
-      <div style="display:flex;gap:14px;align-items:center;font-size:13px;margin-top:4px">
-        <label style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="mitKannDamen" checked> Damen</label>
-        <label style="display:flex;align-items:center;gap:6px;font-weight:500"><input type="checkbox" id="mitKannHerren" checked> Herren</label>
+      <div class="sheet-row" style="margin-top:8px">
+        <div><label>E-Mail (Login)</label><input type="email" id="mitEmail" placeholder="sarah@salon.de"></div>
+        <div><label>Stundenlohn (EUR)</label><input type="number" id="mitStundenlohn" step="0.50" min="0" placeholder="14.50"></div>
       </div>
-      <label style="margin-top:8px"><input type="checkbox" id="mitAktiv" checked> Aktiv (sichtbar im Salon)</label>
+      <label style="margin-top:12px">Kann bedienen</label>
+      <div style="display:flex;gap:16px;align-items:center;font-size:13px;margin-top:6px;padding:10px;background:var(--bg-warm);border-radius:var(--radius-sm)">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:500;margin:0;text-transform:none;letter-spacing:0"><input type="checkbox" id="mitKannDamen" checked> Damen</label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:500;margin:0;text-transform:none;letter-spacing:0"><input type="checkbox" id="mitKannHerren" checked> Herren</label>
+      </div>
+      <div style="margin-top:8px;padding:10px;background:var(--bg-warm);border-radius:var(--radius-sm)">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;margin:0;text-transform:none;letter-spacing:0"><input type="checkbox" id="mitAktiv" checked> Aktiv — im Dienstplan sichtbar</label>
+      </div>
       <div class="sheet-actions">
         <button class="btn btn-secondary" onclick="closeSheet('mitarbeiterSheet')">Abbrechen</button>
         <button class="btn btn-primary" onclick="submitMitarbeiter()">Speichern</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Salonregel bearbeiten Sheet (FB-71) -->
+  <div class="sheet-overlay" id="regelEditSheet">
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Regel bearbeiten</div>
+      <input type="hidden" id="regelEditId">
+      <label>Kategorie</label>
+      <select id="regelEditKategorie">
+        <option value="service">Service</option>
+        <option value="farbe">Farbe</option>
+        <option value="produkt">Produkt</option>
+        <option value="kapazitaet">Kapazitaet</option>
+        <option value="kunde">Kunde</option>
+        <option value="sonstiges">Sonstiges</option>
+      </select>
+      <label style="margin-top:8px">Regeltext *</label>
+      <textarea id="regelEditText" rows="3" maxlength="200" style="resize:none" placeholder="z.B. Olaplex bei jeder Blondierung"></textarea>
+      <div class="sheet-actions">
+        <button class="btn btn-secondary" onclick="document.getElementById('regelEditSheet').classList.remove('show')">Abbrechen</button>
+        <button class="btn btn-primary" onclick="saveRegelEdit()">Speichern</button>
       </div>
     </div>
   </div>
@@ -6908,7 +6938,7 @@
       fields.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px';
       var nameIn = document.createElement('input');
       nameIn.type = 'text'; nameIn.id = 'wfName'; nameIn.placeholder = 'Kundenname';
-      nameIn.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif';
+      nameIn.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;max-width:100%;box-sizing:border-box';
       var selHaar = document.createElement('select');
       selHaar.id = 'wfHaartyp';
       selHaar.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif';
@@ -7308,6 +7338,25 @@
       renderSalonRegeln();
       showToast('Regel geloescht', 'info');
     }
+    function editSalonRegel(id, kat, text) {
+      document.getElementById('regelEditId').value = id;
+      document.getElementById('regelEditKategorie').value = kat || 'sonstiges';
+      document.getElementById('regelEditText').value = text || '';
+      document.getElementById('regelEditSheet').classList.add('show');
+    }
+    function saveRegelEdit() {
+      var id = document.getElementById('regelEditId').value;
+      var kat = document.getElementById('regelEditKategorie').value;
+      var text = document.getElementById('regelEditText').value.trim();
+      if (!text) { showToast('Bitte Regeltext eingeben', 'error'); return; }
+      if (text.length > 200) { showToast('Max 200 Zeichen', 'error'); return; }
+      var regeln = getSalonRegeln();
+      regeln.forEach(function(r) { if (r.id === id) { r.kategorie = kat; r.text = text; } });
+      saveSalonRegeln(regeln);
+      document.getElementById('regelEditSheet').classList.remove('show');
+      renderSalonRegeln();
+      showToast('Regel aktualisiert', 'success');
+    }
     function renderSalonRegeln() {
       var regeln = getSalonRegeln();
       var container = document.getElementById('salonRegelnList');
@@ -7321,9 +7370,15 @@
         var kat = REGEL_KATEGORIEN[r.kategorie] || REGEL_KATEGORIEN.sonstiges;
         var card = document.createElement('div');
         card.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px' + (r.aktiv ? '' : ';opacity:0.5');
+        var editBtn = document.createElement('button');
+        editBtn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:13px;color:var(--gold);padding:4px';
+        editBtn.textContent = '✏️';
+        editBtn.title = 'Bearbeiten';
+        (function(rid, rkat, rtxt) { editBtn.onclick = function(e) { e.stopPropagation(); editSalonRegel(rid, rkat, rtxt); }; })(r.id, r.kategorie, r.text);
         card.innerHTML = '<span style="font-size:16px">' + kat.icon + '</span>'
           + '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(r.text) + '</div>'
           + '<span style="font-size:9px;font-weight:600;color:' + kat.color + ';text-transform:uppercase">' + kat.label + '</span></div>';
+        card.appendChild(editBtn);
         var toggle = document.createElement('div');
         toggle.style.cssText = 'width:36px;height:20px;border-radius:10px;cursor:pointer;position:relative;transition:background 200ms;flex-shrink:0;background:' + (r.aktiv ? 'var(--success)' : 'var(--border)');
         toggle.innerHTML = '<div style="width:16px;height:16px;border-radius:50%;background:#fff;position:absolute;top:2px;transition:left 200ms;box-shadow:0 1px 3px rgba(0,0,0,0.2);left:' + (r.aktiv ? '18px' : '2px') + '"></div>';
