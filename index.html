@@ -2060,6 +2060,19 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Abmelden
       </div>
+      <!-- Jarvis-Stimme waehlen (18.04. Capo-Wunsch: alles optional) -->
+      <div style="padding:8px 4px 4px;border-top:1px solid var(--border);margin-top:4px">
+        <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Jarvis-Stimme</div>
+        <select id="jarvisStimmeSel" onchange="setJarvisStimme(this.value)" style="width:100%;padding:6px 8px;font-size:11px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:Inter,sans-serif">
+          <option value="">Stumm (nur Text)</option>
+          <option value="lina">Lina — sanft, warm (Feminin-Default)</option>
+          <option value="bruno">Bruno — tief, kameradschaftlich (Maskulin-Default)</option>
+          <option value="emma">Emma — jung, frisch</option>
+          <option value="thomas">Thomas — Mentor-Ton</option>
+          <option value="henrik">Henrik — Best Bro, leicht rauh</option>
+          <option value="matilda">Matilda — warm, mütterlich</option>
+        </select>
+      </div>
       <div class="profile-action" onclick="forceReloadApp()" style="border-top:1px solid var(--border);margin-top:4px;padding-top:10px" title="Neue Version holen">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
         Update pruefen
@@ -9030,8 +9043,30 @@
       if (transcript && transcript.children.length === 0) {
         var uName = (currentUser && USERS && USERS[currentUser]) ? USERS[currentUser].name : 'Chef';
         var h = new Date().getHours();
-        var gruß = h < 12 ? 'Guten Morgen' : h < 17 ? 'Guten Tag' : 'Guten Abend';
-        jarvisRenderMessage(gruß + ', ' + uName + '. Wie kann ich helfen?', [], 'assistant');
+        var gruß = h < 12 ? 'Guten Morgen' : h < 17 ? 'Hallo' : 'Guten Abend';
+        // Dale-Carnegie-Ton: erst Raum geben, nicht direkt drängen
+        jarvisRenderMessage(gruß + ', ' + uName + '. Schön, dass du da bist. Was kann ich für dich tun?', [], 'assistant');
+        // Quick-Command-Chips: „ich sage X und es passiert"
+        var quick = document.createElement('div');
+        quick.style.cssText = 'display:flex;flex-wrap:wrap;gap:6px;padding:8px 4px 12px;';
+        [
+          { q: 'Was steht heute an?', icon: '📅' },
+          { q: 'Wer arbeitet morgen?', icon: '👥' },
+          { q: 'Welche Produkte sollte ich nachbestellen?', icon: '📦' },
+          { q: 'Welche Kundin war lange nicht mehr da?', icon: '💌' },
+          { q: 'Wie läuft der Umsatz diese Woche?', icon: '📊' },
+          { q: 'Gib mir eine Idee für heute Nachmittag', icon: '💡' }
+        ].forEach(function(qc){
+          var chip = document.createElement('button');
+          chip.type = 'button';
+          chip.style.cssText = 'padding:8px 12px;border-radius:var(--radius-full);border:1px solid rgba(201,168,76,0.32);background:rgba(201,168,76,0.06);color:var(--text);font-size:12px;cursor:pointer;font-family:Inter,sans-serif;display:inline-flex;align-items:center;gap:6px;transition:all 150ms';
+          chip.innerHTML = '<span style="font-size:14px">' + qc.icon + '</span> ' + esc(qc.q);
+          chip.onmouseenter = function(){ chip.style.background = 'rgba(201,168,76,0.14)'; chip.style.borderColor = 'rgba(201,168,76,0.5)'; };
+          chip.onmouseleave = function(){ chip.style.background = 'rgba(201,168,76,0.06)'; chip.style.borderColor = 'rgba(201,168,76,0.32)'; };
+          chip.onclick = function(){ try { var i = document.getElementById('jarvisInput'); if (i) { i.value = qc.q; if (typeof jarvisSubmitInput === 'function') jarvisSubmitInput(); } } catch(e){} };
+          quick.appendChild(chip);
+        });
+        transcript.appendChild(quick);
       }
     }
 
@@ -11248,6 +11283,22 @@
     // Automatisch triggern
     setTimeout(renderAllSparklines, 2000);
     setInterval(renderAllSparklines, 60000);
+
+    // === Jarvis-Stimm-Auswahl (Capo 18.04.): ElevenLabs EU, optional per User ===
+    (function initJarvisStimme(){
+      var saved = localStorage.getItem('casa_jarvis_stimme') || '';
+      var sel = document.getElementById('jarvisStimmeSel');
+      if (sel) sel.value = saved;
+    })();
+    window.setJarvisStimme = function(val) {
+      try { localStorage.setItem('casa_jarvis_stimme', val || ''); } catch(e) {}
+      if (val) {
+        var labels = { lina:'Lina (sanft, warm)', bruno:'Bruno (tief, kameradschaftlich)', emma:'Emma (jung, frisch)', thomas:'Thomas (Mentor)', henrik:'Henrik (Best Bro)', matilda:'Matilda (warm, mütterlich)' };
+        if (typeof showToast === 'function') showToast('Jarvis spricht jetzt als ' + (labels[val] || val), 'success', 2500);
+      } else {
+        if (typeof showToast === 'function') showToast('Jarvis bleibt stumm — nur Text', 'info', 1800);
+      }
+    };
 
     // === Design-Stil-Toggle (Capo 18.04.): 3-Wege Maskulin → Balance → Feminin ===
     (function initStyleMode(){
