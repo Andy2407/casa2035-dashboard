@@ -2828,8 +2828,16 @@
       var pw = document.getElementById('loginPw').value;
       if (!uname) { showLoginError('Bitte Benutzernamen oder E-Mail eingeben'); return; }
       if (!pw) { showLoginError('Bitte Passwort eingeben'); return; }
-      // E-Mail direkt verwenden (z.B. andreas.schengel@gmx.de), sonst @casa2035.local anhaengen
-      var emailForAuth = uname.indexOf('@') !== -1 ? uname : uname + '@casa2035.local';
+      // E-Mail direkt verwenden (z.B. andreas.schengel@gmx.de), sonst Benutzername zu Salon-E-Mail ergaenzen
+      // admin -> admin@casa2035.de | rena/sarah/julia/lena -> *@renarados.casa2035.de
+      var emailForAuth;
+      if (uname.indexOf('@') !== -1) {
+        emailForAuth = uname;
+      } else if (uname === 'admin') {
+        emailForAuth = 'admin@casa2035.de';
+      } else {
+        emailForAuth = uname + '@renarados.casa2035.de';
+      }
       // currentUser fuer UI: bei E-Mail den lokalen Teil pruefen, ob USERS-Eintrag passt
       var unameForUI = uname;
       if (uname.indexOf('@') !== -1) {
