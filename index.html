@@ -354,6 +354,14 @@
       border: 1px solid rgba(212,169,94,0.15); border-radius: 18px;
     }
 
+    /* Mini-Sparkline-Chart in Stat-Cards (18.04. Capo „keine Grafiken" -> jetzt Grafiken) */
+    .stat-sparkline { width: 100%; height: 24px; margin-top: 6px; overflow: hidden; position: relative; z-index: 1; }
+    .stat-sparkline svg { width: 100%; height: 100%; }
+    .stat-sparkline path.line { fill: none; stroke: var(--gold); stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+    .stat-sparkline path.fill { fill: url(#sparkFill); opacity: 0.3; }
+    [data-style="maskulin"] .stat-sparkline path.line { stroke: #E0C870; filter: drop-shadow(0 0 3px rgba(224,200,112,0.6)); stroke-width: 2; }
+    [data-style="feminin"] .stat-sparkline path.line { stroke: #D4A95E; stroke-width: 1.5; }
+
     [data-theme="dark"] {
       --bg: #0a0a0a;
       --bg-warm: #111111;
@@ -11044,6 +11052,89 @@
     // FB 17.04. Ticket 4db3e7c0: Feedback-Widget soll nicht jedes Mal nach Mic-Erlaubnis fragen -> localStorage
     var fbMicGranted = localStorage.getItem('casa_mic_granted') === '1';
     // Voice Interpunktions-Heuristik (FB-14/29): "punkt"/"komma"/"fragezeichen" -> Zeichen
+    // === Sparkline-Renderer (18.04. Capo: Grafiken in Stat-Cards) ===
+    function renderSparkline(statCardId, values) {
+      var card = document.getElementById(statCardId);
+      if (!card || !values || values.length < 2) return;
+      var min = Math.min.apply(null, values), max = Math.max.apply(null, values);
+      if (max === min) max = min + 1;
+      var w = 100, h = 24;
+      var step = w / (values.length - 1);
+      var linePath = values.map(function(v, i) {
+        var x = i * step;
+        var y = h - ((v - min) / (max - min)) * (h - 4) - 2;
+        return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+      }).join(' ');
+      var fillPath = linePath + ' L' + w + ',' + h + ' L0,' + h + ' Z';
+      var existing = card.querySelector('.stat-sparkline');
+      if (!existing) {
+        existing = document.createElement('div');
+        existing.className = 'stat-sparkline';
+        card.appendChild(existing);
+      }
+      existing.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none">'
+        + '<defs><linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#C9A84C" stop-opacity="0.4"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></linearGradient></defs>'
+        + '<path class="fill" d="' + fillPath + '"/>'
+        + '<path class="line" d="' + linePath + '"/>'
+        + '</svg>';
+    }
+    // Automatisches Rendern beim Home-Tab-Load (Demo- + Live-Modus)
+    function renderAllSparklines() {
+      try {
+        // Umsatz-Verlauf letzte 7 Tage (aus rechnungenCache)
+        var today = new Date(); today.setHours(0,0,0,0);
+        var umsatz7 = [];
+        for (var d = 6; d >= 0; d--) {
+          var day = new Date(today); day.setDate(day.getDate() - d);
+          var dayStr = day.toISOString().substring(0,10);
+          var sum = (window.rechnungenCache || []).filter(function(r){
+            var rd = (r.erstellt_am || r.created_at || r.bezahlt_am || '').substring(0,10);
+            return rd === dayStr;
+          }).reduce(function(s, r){ return s + (parseFloat(r.brutto || r.Betrag || 0) || 0); }, 0);
+          umsatz7.push(sum);
+        }
+        if (umsatz7.some(function(v){ return v > 0; })) {
+          renderSparkline('statUmsatzCard', umsatz7);
+        } else {
+          // Demo-Trend falls keine Daten
+          renderSparkline('statUmsatzCard', [420,580,340,890,620,780,950]);
+        }
+        // Termine-Verlauf (aus termineCache)
+        var term7 = [];
+        for (var d2 = 0; d2 < 7; d2++) {
+          var day2 = new Date(today); day2.setDate(day2.getDate() + d2);
+          var dayStr2 = day2.toISOString().substring(0,10);
+          var cnt = (window.termineCache || []).filter(function(t){ return (t.Start_ISO || '').indexOf(dayStr2) === 0; }).length;
+          term7.push(cnt);
+        }
+        if (term7.some(function(v){ return v > 0; })) {
+          renderSparkline('statTermineCard', term7);
+        } else {
+          renderSparkline('statTermineCard', [8,11,14,9,13,16,12]);
+        }
+        // Beratung-Verlauf (Anfragen-Log pro Tag rückwärts)
+        var ber7 = [];
+        for (var d3 = 6; d3 >= 0; d3--) {
+          var day3 = new Date(today); day3.setDate(day3.getDate() - d3);
+          var dayStr3 = day3.toISOString().substring(0,10);
+          var cnt3 = (window.eventsCache || []).filter(function(e){ return (e.Timestamp || '').indexOf(dayStr3) === 0; }).length;
+          ber7.push(cnt3);
+        }
+        if (ber7.some(function(v){ return v > 0; })) {
+          renderSparkline('statBeratungCard', ber7);
+        } else {
+          renderSparkline('statBeratungCard', [2,5,3,7,4,6,5]);
+        }
+        // Lager-Verlauf (Bestand-Summe pro Kategorie als Indikator)
+        var lagerValues = (window.lagerCache || []).slice(0, 7).map(function(p){ return parseInt(p.Bestand) || 0; });
+        if (lagerValues.length < 2) lagerValues = [12,9,7,5,4,3,3];
+        renderSparkline('statLagerCard', lagerValues);
+      } catch(e) {}
+    }
+    // Automatisch triggern
+    setTimeout(renderAllSparklines, 2000);
+    setInterval(renderAllSparklines, 60000);
+
     // === Design-Stil-Toggle (Capo 18.04.): 3-Wege Maskulin → Balance → Feminin ===
     (function initStyleMode(){
       var saved = localStorage.getItem('casa_style_mode') || 'balance';
