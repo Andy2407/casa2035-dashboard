@@ -1690,6 +1690,9 @@
       </div>
       <div class="header-right">
         <span class="live-dot" id="liveIndicator">DEMO</span>
+        <button class="theme-toggle" onclick="openGlobalSearch()" title="Suche (Cmd/Ctrl + K)" aria-label="Suche" style="width:34px;height:34px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
         <button class="jarvis-btn" id="jarvisBtn" onclick="toggleJarvis()" title="Sprachsteuerung (Jarvis)" aria-label="Sprachsteuerung">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         </button>
@@ -10914,6 +10917,131 @@
       if (el) el.classList.remove('show');
       try { localStorage.setItem('casa2035_a2h_dismissed', Date.now()); } catch(e){}
     }
+
+    // === Globale Suche (Cmd/Ctrl+K) — Workday/Linear-Vorbild, 17.04.2026 Capo-Quick-Win ===
+    (function initGlobalSearch(){
+      var overlay = document.createElement('div');
+      overlay.id = 'globalSearchOverlay';
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.4);backdrop-filter:blur(6px);z-index:10001;display:none;align-items:flex-start;justify-content:center;padding-top:12vh';
+      overlay.innerHTML = '<div style="background:var(--card-solid,#fff);border:1px solid var(--border);border-radius:14px;width:92%;max-width:560px;box-shadow:0 24px 72px rgba(0,0,0,0.3);overflow:hidden">'
+        + '<div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)">'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--text-dim)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>'
+        + '<input id="globalSearchInput" placeholder="Kunde, Termin, Service, Produkt suchen…" style="flex:1;border:none;outline:none;background:transparent;font-size:15px;font-family:Inter,sans-serif;color:var(--text)" autocomplete="off">'
+        + '<kbd style="font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;color:var(--text-dim);font-family:monospace">Esc</kbd>'
+        + '</div>'
+        + '<div id="globalSearchResults" style="max-height:52vh;overflow-y:auto;padding:4px"></div>'
+        + '<div style="padding:8px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--text-dim);display:flex;gap:10px;justify-content:space-between"><span>&uarr;&darr; navigieren · &crarr; oeffnen</span><span>Cmd/Ctrl+K</span></div>'
+        + '</div>';
+      document.body.appendChild(overlay);
+      var input = overlay.querySelector('#globalSearchInput');
+      var results = overlay.querySelector('#globalSearchResults');
+      var selectedIdx = 0;
+      var currentItems = [];
+
+      function openSearch() {
+        overlay.style.display = 'flex';
+        setTimeout(function(){ input.focus(); input.value=''; renderResults(''); }, 50);
+      }
+      function closeSearch() { overlay.style.display = 'none'; }
+      window.openGlobalSearch = openSearch;
+
+      function getIndex() {
+        var items = [];
+        // Termine
+        (window.termineCache||[]).forEach(function(t){
+          items.push({
+            type:'termin',
+            label:(t.Kundenname||t.Kunde||'Termin')+' · '+(t.Service||''),
+            sub:(t.Start_ISO||'').substring(0,16).replace('T',' ')+' · '+(t.Stylist||''),
+            icon:'📅',
+            action:function(){ closeSearch(); showPage('termine'); setTimeout(function(){ try{ openTerminDetail(t); }catch(e){} }, 300); }
+          });
+        });
+        // Kunden
+        (window.kundenCache||window.beratungenCache||[]).forEach(function(k){
+          var name = k.Name || k.name || k.Kundenname;
+          if (!name) return;
+          items.push({
+            type:'kunde',
+            label:name,
+            sub:'Kundin · '+(k.Telefon||k.telefon||k.Email||k.email||''),
+            icon:'👤',
+            action:function(){ closeSearch(); showPage('kunden'); }
+          });
+        });
+        // Services
+        (window.servicesCache||[]).forEach(function(s){
+          items.push({
+            type:'service',
+            label:s.Service||s.Name||s.bezeichnung,
+            sub:'Service · '+(s.VK_Preis||s.preis_brutto||s.Preis||'')+' €',
+            icon:'✂️',
+            action:function(){ closeSearch(); showPage('kasse'); }
+          });
+        });
+        // Lager
+        (window.lagerCache||[]).forEach(function(p){
+          items.push({
+            type:'produkt',
+            label:p.Produkt||p.Name,
+            sub:'Produkt · '+(p.Bestand||0)+' Stk · '+(p.Marke||''),
+            icon:'🧴',
+            action:function(){ closeSearch(); showPage('lager'); setTimeout(function(){ try{ openProduktDetail(p); }catch(e){} }, 300); }
+          });
+        });
+        // Seiten
+        [
+          {label:'Home / Cockpit', sub:'Dashboard-Startseite', icon:'🏠', action:function(){ closeSearch(); showPage('dashboard'); }},
+          {label:'Termine', sub:'Kalender & Buchungen', icon:'📅', action:function(){ closeSearch(); showPage('termine'); }},
+          {label:'Beratung', sub:'Wunschfrisur, Farbcode, Haaranalyse', icon:'💡', action:function(){ closeSearch(); showPage('beratung'); }},
+          {label:'Kunden', sub:'Kundenliste + Historie', icon:'👥', action:function(){ closeSearch(); showPage('kunden'); }},
+          {label:'Lager', sub:'Produkte + Nachbestellung', icon:'🧴', action:function(){ closeSearch(); showPage('lager'); }},
+          {label:'Kasse', sub:'Rechnungen + Tagesabschluss', icon:'💶', action:function(){ closeSearch(); showPage('kasse'); }},
+          {label:'Admin', sub:'Einstellungen, Mitarbeiter, Services', icon:'⚙️', action:function(){ closeSearch(); showPage('admin'); }}
+        ].forEach(function(p){ items.push(Object.assign({type:'page'}, p)); });
+        return items;
+      }
+
+      function renderResults(q) {
+        var all = getIndex();
+        var filtered = q ? all.filter(function(i){ return (i.label+' '+i.sub).toLowerCase().indexOf(q.toLowerCase()) !== -1; }) : all;
+        currentItems = filtered.slice(0, 40);
+        selectedIdx = 0;
+        if (!currentItems.length) { results.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-dim);font-size:13px">Keine Treffer</div>'; return; }
+        results.innerHTML = currentItems.map(function(it, idx){
+          return '<div class="gs-item" data-idx="'+idx+'" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;border-radius:8px;margin:2px 4px;'+(idx===0?'background:var(--surface-hover,#f5f2ee)':'')+'">'
+            + '<span style="font-size:18px;flex-shrink:0">'+it.icon+'</span>'
+            + '<div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(it.label)+'</div><div style="font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(it.sub||'')+'</div></div>'
+            + '<kbd style="font-size:9px;padding:1px 4px;border:1px solid var(--border);border-radius:3px;color:var(--text-dim);font-family:monospace;text-transform:uppercase">'+it.type+'</kbd>'
+            + '</div>';
+        }).join('');
+        results.querySelectorAll('.gs-item').forEach(function(el){
+          el.addEventListener('click', function(){ var i = parseInt(el.getAttribute('data-idx')); if (currentItems[i]) currentItems[i].action(); });
+        });
+      }
+      function highlight() {
+        results.querySelectorAll('.gs-item').forEach(function(el, i){
+          el.style.background = (i===selectedIdx) ? 'var(--surface-hover,#f5f2ee)' : '';
+        });
+      }
+
+      input.addEventListener('input', function(){ renderResults(input.value); });
+      input.addEventListener('keydown', function(e){
+        if (e.key === 'Escape') { closeSearch(); return; }
+        if (e.key === 'ArrowDown') { e.preventDefault(); selectedIdx = Math.min(currentItems.length-1, selectedIdx+1); highlight(); results.children[selectedIdx] && results.children[selectedIdx].scrollIntoView({block:'nearest'}); }
+        if (e.key === 'ArrowUp')   { e.preventDefault(); selectedIdx = Math.max(0, selectedIdx-1); highlight(); results.children[selectedIdx] && results.children[selectedIdx].scrollIntoView({block:'nearest'}); }
+        if (e.key === 'Enter')     { e.preventDefault(); if (currentItems[selectedIdx]) currentItems[selectedIdx].action(); }
+      });
+      overlay.addEventListener('click', function(e){ if (e.target === overlay) closeSearch(); });
+
+      // Shortcut Cmd/Ctrl + K
+      document.addEventListener('keydown', function(e){
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+          e.preventDefault();
+          openSearch();
+        }
+      });
+    })();
   </script>
 </body>
 </html>
