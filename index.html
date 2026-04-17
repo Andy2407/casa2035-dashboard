@@ -3347,7 +3347,8 @@
     function openGoLive() { document.getElementById('goliveOverlay').classList.add('open'); }
     function closeGoLive() { document.getElementById('goliveOverlay').classList.remove('open'); }
     function updateDemoBadges() {
-      var show = !isBackendMode();
+      // Capo 17.04.: Badges nur zeigen wenn WIRKLICH Demo-Modus (kein Backend ODER Backend-Fallback)
+      var show = !isBackendMode() || isDemoMode;
       document.querySelectorAll('.demo-badge').forEach(function(b) { b.style.display = show ? 'inline-flex' : 'none'; });
       var banner = document.getElementById('demoBanner');
       if (banner) banner.style.display = show ? 'inline-flex' : 'none';
@@ -3790,6 +3791,8 @@
         updateHeroSubtitle();
         isDemoMode = false;
         document.getElementById('liveIndicator').textContent = 'LIVE';
+        // Capo 17.04.: Demo-Badges verschwinden sobald echte DB-Daten kommen (Rena-Live-Ready)
+        try { updateDemoBadges(); } catch(e) {}
       } catch(e) {
         /* fetch error — falling back to demo */
         showToast('Verbindung fehlgeschlagen — Demo-Modus aktiv', 'warning');
