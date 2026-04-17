@@ -181,6 +181,129 @@
     [data-style="feminin"] .day-termin-block { border-radius: 10px; }
     [data-style="feminin"] .btn, [data-style="feminin"] button.btn { border-radius: var(--radius-full); font-weight: 500; letter-spacing: 0; }
 
+    /* === Zusatzliche Komponenten pro Stil (18.04.2026 Capo-Vollgas) === */
+
+    /* Bottom-Nav */
+    [data-style="maskulin"] .bottom-nav {
+      background: rgba(10,10,10,0.92); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-top: 1px solid rgba(201,168,76,0.22); box-shadow: 0 -4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(201,168,76,0.1);
+    }
+    [data-style="maskulin"] .nav-item svg { stroke-width: 2.2; color: #a0998e; }
+    [data-style="maskulin"] .nav-item.active svg { color: #E0C870; filter: drop-shadow(0 0 6px rgba(224,200,112,0.55)); }
+    [data-style="maskulin"] .nav-item .nav-label { color: #a0998e; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+    [data-style="maskulin"] .nav-item.active .nav-label { color: #E0C870; }
+
+    [data-style="feminin"] .bottom-nav {
+      background: rgba(255, 252, 247, 0.92); backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(212,169,94,0.18); box-shadow: 0 -4px 20px rgba(212,169,94,0.08);
+    }
+    [data-style="feminin"] .nav-item svg { stroke-width: 1.6; color: #a88b7c; }
+    [data-style="feminin"] .nav-item.active svg { color: #D4A95E; }
+    [data-style="feminin"] .nav-item .nav-label { color: #a88b7c; font-weight: 400; text-transform: none; letter-spacing: 0; }
+    [data-style="feminin"] .nav-item.active .nav-label { color: #D4A95E; font-weight: 500; font-family: var(--font-display); font-style: italic; }
+
+    /* Toasts */
+    [data-style="maskulin"] .toast { border-radius: 8px; text-transform: uppercase; letter-spacing: 1.2px; font-weight: 700; font-size: 11px; padding: 10px 18px; border: 1px solid rgba(255,255,255,0.12); }
+    [data-style="feminin"] .toast { border-radius: var(--radius-full); font-family: var(--font-display); font-style: italic; font-weight: 500; padding: 12px 22px; }
+
+    /* Inputs + Selects + Textareas */
+    [data-style="maskulin"] input, [data-style="maskulin"] select, [data-style="maskulin"] textarea {
+      border-radius: 8px; border: 1px solid rgba(201,168,76,0.25); background: #141414; color: #e8e4de;
+      font-family: var(--font-body); font-weight: 500; letter-spacing: 0.2px;
+    }
+    [data-style="maskulin"] input:focus, [data-style="maskulin"] select:focus, [data-style="maskulin"] textarea:focus {
+      outline: none; border-color: #C9A84C; box-shadow: 0 0 0 3px rgba(201,168,76,0.18);
+    }
+    [data-style="feminin"] input, [data-style="feminin"] select, [data-style="feminin"] textarea {
+      border-radius: 16px; border: 1px solid rgba(212,169,94,0.25); background: #fffcf7; color: #2a2520;
+      font-family: var(--font-body); font-weight: 400;
+    }
+    [data-style="feminin"] input:focus, [data-style="feminin"] select:focus, [data-style="feminin"] textarea:focus {
+      outline: none; border-color: #D4A95E; box-shadow: 0 0 0 4px rgba(212,169,94,0.12);
+    }
+
+    /* Profile-Dropdown + Glocken-Dropdown + Suche-Modal */
+    [data-style="maskulin"] .profile-dropdown,
+    [data-style="maskulin"] #notifDropdown,
+    [data-style="maskulin"] #globalSearchOverlay > div,
+    [data-style="maskulin"] #kbHelpOverlay > div {
+      background: linear-gradient(135deg, #1a1a1a 0%, #0c0c0c 100%);
+      border: 1px solid rgba(201,168,76,0.28);
+      border-radius: 10px;
+      color: #e8e4de;
+      box-shadow: 0 24px 72px rgba(0,0,0,0.5), inset 0 1px 0 rgba(201,168,76,0.15);
+    }
+    [data-style="maskulin"] .profile-action:hover,
+    [data-style="maskulin"] #notifList .notif-item:hover,
+    [data-style="maskulin"] .gs-item { color: #e8e4de; }
+    [data-style="maskulin"] #notifList .notif-item:hover { background: rgba(201,168,76,0.12) !important; }
+
+    [data-style="feminin"] .profile-dropdown,
+    [data-style="feminin"] #notifDropdown,
+    [data-style="feminin"] #globalSearchOverlay > div,
+    [data-style="feminin"] #kbHelpOverlay > div {
+      background: linear-gradient(135deg, #fffcf7 0%, #fdf5e8 100%);
+      border: 1px solid rgba(212,169,94,0.22);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(212,169,94,0.18);
+    }
+
+    /* Termin-Sheet */
+    [data-style="maskulin"] .sheet {
+      background: linear-gradient(180deg, #1a1a1a 0%, #0c0c0c 100%);
+      border-top: 1px solid rgba(201,168,76,0.25);
+      border-radius: 12px 12px 0 0;
+      color: #e8e4de;
+    }
+    [data-style="feminin"] .sheet {
+      background: linear-gradient(180deg, #fffcf7 0%, #fdf5e8 100%);
+      border-top: 2px solid rgba(212,169,94,0.2);
+      border-radius: 22px 22px 0 0;
+    }
+
+    /* Header */
+    [data-style="maskulin"] .header {
+      background: rgba(5,5,5,0.94); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid rgba(201,168,76,0.22);
+    }
+    [data-style="maskulin"] .header-salon { color: #f0ebdf; font-weight: 800; letter-spacing: -0.3px; }
+    [data-style="maskulin"] .header-salon em { color: #E0C870; font-style: normal; font-weight: 900; }
+    [data-style="maskulin"] .header-greeting { color: #E0C870; font-weight: 800; letter-spacing: 2px; }
+
+    [data-style="feminin"] .header {
+      background: rgba(255, 252, 247, 0.94); backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(212,169,94,0.18);
+    }
+    [data-style="feminin"] .header-salon { color: #2a2520; font-family: var(--font-display); font-style: italic; font-weight: 500; }
+    [data-style="feminin"] .header-salon em { color: #D4A95E; font-style: italic; font-weight: 500; }
+    [data-style="feminin"] .header-greeting { color: #D4A95E; font-family: var(--font-display); font-style: italic; font-weight: 500; text-transform: none; letter-spacing: 0; font-size: 12px; }
+
+    /* Kalender Now-Line */
+    [data-style="maskulin"] .now-line { background: #E63946; box-shadow: 0 0 8px rgba(230,57,70,0.6); height: 2px; }
+    [data-style="feminin"] .now-line { background: #D4A95E; height: 2px; box-shadow: 0 0 12px rgba(212,169,94,0.5); }
+    [data-style="feminin"] .now-line::before { background: #D4A95E; }
+
+    /* Page-Hint-Bar */
+    [data-style="maskulin"] #pageHintBar {
+      background: linear-gradient(90deg, rgba(201,168,76,0.14), rgba(201,168,76,0.05));
+      border: 1px solid rgba(201,168,76,0.25); border-left: 3px solid #C9A84C;
+      border-radius: 8px; color: #d8d4cc;
+    }
+    [data-style="feminin"] #pageHintBar {
+      background: linear-gradient(90deg, rgba(212,169,94,0.08), rgba(232,201,160,0.15));
+      border: 1px solid rgba(212,169,94,0.22); border-left: 2px solid #D4A95E;
+      border-radius: 16px; color: #6a645c;
+      font-family: var(--font-display); font-style: italic;
+    }
+
+    /* FAB + Avatar */
+    [data-style="maskulin"] .avatar { border-radius: 8px; font-family: var(--font-body); font-weight: 800; letter-spacing: 0.5px; }
+    [data-style="feminin"] .avatar { border-radius: 50%; font-family: var(--font-display); font-weight: 500; }
+
+    /* Demo-Badge */
+    [data-style="maskulin"] .demo-badge { background: #1a1a1a; border: 1px solid rgba(201,168,76,0.4); color: #E0C870; border-radius: 4px; font-weight: 800; }
+    [data-style="feminin"] .demo-badge { background: rgba(232,201,160,0.3); border: 1px solid rgba(212,169,94,0.4); color: #8b6f3a; border-radius: var(--radius-full); font-family: var(--font-display); font-style: italic; }
+
     [data-theme="dark"] {
       --bg: #0a0a0a;
       --bg-warm: #111111;
