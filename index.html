@@ -9149,10 +9149,26 @@
       var text = inp.value.trim();
       if (!text) return;
       inp.value = '';
+      // Carnegie-Beauty-Fachgebiet-Filter (nie schroff abweisen, nur umlenken)
+      var tLow = text.toLowerCase();
+      var offTopic = /\b(aktie|bitcoin|crypto|krypto|fussball|politik|wahl|religion|steuern im allgemeinen|rezept|kochen|reisen|auto kauf|immobilien|urlaub)\b/i;
+      if (offTopic.test(tLow) && !/\b(salon|friseur|bart|haar|beauty|kosmetik|kunde|termin|rechnung|produkt|lager|team|mitarbeiter)\b/i.test(tLow)) {
+        jarvisRenderMessage(text, [], 'user');
+        jarvisRenderMessage('Darf ich ehrlich sein? Da kann ich dir weniger gut helfen als bei Haar, Bart, Wimpern oder deinem Salon-Alltag. Wenn du dazu etwas hast — ich hoere gern zu.', [], 'assistant');
+        return;
+      }
       jarvisSendMessage(text);
     }
 
     function jarvisSendMessage(userText) {
+      // Carnegie-Prinzip: Wenn vorher noch eine Jarvis-Antwort lief -> stoppen.
+      // Jarvis unterbricht NIE den Menschen, auch nicht durch laufende Streams.
+      try {
+        if (window.jarvisAbortCtrl) { window.jarvisAbortCtrl.abort(); }
+        window.jarvisAbortCtrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+        var running = document.querySelectorAll('#jarvisTranscript .jarvis-streaming');
+        running.forEach(function(el){ el.classList.remove('jarvis-streaming'); el.setAttribute('data-interrupted','1'); });
+      } catch(e) {}
       // Show user bubble
       jarvisRenderMessage(userText, [], 'user');
       // Push to history
