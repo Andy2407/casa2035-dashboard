@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="UTF-8">
+<title>Auftragsverarbeitungsvertrag — Casa 2035</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body { font-family: Georgia, 'Times New Roman', serif; max-width: 780px; margin: 2em auto; padding: 1em; line-height: 1.6; color: #222; }
+h1 { color: #1a1a1a; border-bottom: 2px solid #c9a971; padding-bottom: 0.3em; }
+h2 { color: #333; margin-top: 1.5em; }
+h3 { color: #555; }
+ul { padding-left: 1.2em; }
+code, pre { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
+.print-hint { background: #fff7e6; border-left: 4px solid #c9a971; padding: 12px; margin: 1em 0; }
+@media print { .print-hint { display: none; } }
+</style></head><body>
+<div class="print-hint">📄 <strong>Zum Speichern als PDF:</strong> Rechtsklick → Drucken → als PDF speichern. <a href="javascript:window.print()">Jetzt drucken</a></div>
+<p><h1>CASA 2035 — Auftragsverarbeitungsvertrag (AVV) gemaess Art. 28 DSGVO</h1>
+<h2>Agent: @recht + @datenschutz | Stand: 09.04.2026 | Version 1.1</h2></p><p>---</p><p>> <strong>ENTWURF — Keine Rechtsberatung.</strong>
+> Dieses Dokument ist ein Entwurf und ersetzt keine anwaltliche Beratung.
+> Vor Verwendung wird eine Pruefung durch einen qualifizierten Rechtsanwalt empfohlen.</p><p>---</p><p><h2>Praeambel</h2></p><p>Dieser Vertrag zur Auftragsverarbeitung (nachfolgend "AVV") wird geschlossen zwischen:</p><p><strong>Verantwortlicher (Auftraggeber):</strong>
+[Name des Salonbetreibers]
+[Adresse des Salons]
+(nachfolgend "Verantwortlicher" oder "Auftraggeber")</p><p>und</p><p><strong>Auftragsverarbeiter:</strong>
+Andreas Schengel — Casa 2035
+[PLATZHALTER — Firmenadresse]
+(nachfolgend "Auftragsverarbeiter" oder "Casa 2035")</p><p>Der Verantwortliche nutzt die SaaS-Loesung "Casa 2035" (KI-gestuetzter Omnichannel-Assistent fuer Friseursalons). Im Rahmen dieser Nutzung verarbeitet Casa 2035 personenbezogene Daten im Auftrag des Verantwortlichen. Dieser AVV regelt die Rechte und Pflichten beider Parteien gemaess Art. 28 DSGVO.</p><p>---</p><p><h2>1. Gegenstand und Dauer der Verarbeitung</h2></p><p><h3>1.1 Gegenstand</h3></p><p>Gegenstand dieses AVV ist die Verarbeitung personenbezogener Daten durch den Auftragsverarbeiter im Rahmen der Bereitstellung der SaaS-Loesung "Casa 2035". Die Loesung umfasst:</p><p><ul><li>KI-gestuetzte Terminbuchung und -verwaltung ueber 5 Kommunikationskanaele (WhatsApp, Instagram, Facebook, E-Mail, Homepage)</li>
+<li>Automatisierte Kundenkommunikation (Terminbestaetigungen, Erinnerungen, Stornierungen)</li>
+<li>Rechnungserstellung und Finanzverwaltung (Kassenbuch, Tagesabschluss, Ausgaben)</li>
+<li>KI-gestuetzte Wunschfrisur-Analyse (Bildanalyse mittels Vision-Modell)</li>
+<li>Lagerbestandsverwaltung und Nachbestellungen</li>
+<li>Mitarbeiterverwaltung und Authentifizierung</li>
+<li>PWA-Dashboard fuer die Salonverwaltung</li>
+</ul>
+<h3>1.2 Dauer</h3></p><p>Dieser AVV gilt fuer die Dauer der Nutzung der SaaS-Loesung Casa 2035 durch den Verantwortlichen. Er beginnt mit Abschluss des Nutzungsvertrages und endet automatisch mit dessen Beendigung. Die Pflichten zur Loeschung und Rueckgabe (Abschnitt 10) gelten ueber das Vertragsende hinaus.</p><p>---</p><p><h2>2. Art und Zweck der Verarbeitung</h2></p><p><h3>2.1 Art der Verarbeitung</h3></p><p>Die Verarbeitung umfasst folgende Taetigkeiten:</p><p>| Taetigkeit | Beschreibung |
+|------------|-------------|
+| Erheben | Entgegennahme von Kundendaten ueber 5 Kommunikationskanaele |
+| Speichern | Persistente Speicherung in Supabase Self-Hosted (PostgreSQL-Datenbank auf Hetzner Cloud, Rechenzentrum Nuernberg, Deutschland) |
+| Veraendern | Aktualisierung von Terminstatus, Rechnungsstatus, Lagerbestaenden |
+| Abfragen | Suche nach Terminen, Kunden, Services mittels KI und Datenbank |
+| Uebermitteln | Versand von Nachrichten ueber WhatsApp, Instagram, Facebook, E-Mail |
+| Verknuepfen | Zuordnung von Kunden zu Terminen, Rechnungen, Frisuranalysen |
+| Loeschen | Automatisierte und manuelle Loeschung nach Ablauf der Aufbewahrungsfristen |
+| KI-Verarbeitung | Sprachverarbeitung (Intent-Erkennung), Bildanalyse (Wunschfrisur), Antwortgenerierung |
+| Embedding | Vektorisierung von Salon-Wissensdaten fuer RAG-basierte Antworten |</p><p><h3>2.2 Zweck der Verarbeitung</h3></p><p>Die Verarbeitung erfolgt ausschliesslich zum Zweck der:</p><p>1. Erbringung der vertraglich vereinbarten SaaS-Dienstleistungen
+2. Terminverwaltung und Kundenkommunikation im Auftrag des Salons
+3. Erstellung und Verwaltung von Rechnungen (steuerrechtliche Pflicht)
+4. Fuehrung des Kassenbuchs (GoBD-Pflicht)
+5. KI-gestuetzten Beratung auf Basis von Kundenbildern (nur mit Einwilligung)
+6. Lager- und Nachbestellungsverwaltung
+7. Erstellung von Tagesabschluessen und Finanzberichten</p><p>Der Auftragsverarbeiter verarbeitet die Daten ausschliesslich auf Weisung des Verantwortlichen und nicht zu eigenen Zwecken.</p><p>---</p><p><h2>3. Art der personenbezogenen Daten</h2></p><p><h3>3.1 Kategorien personenbezogener Daten</h3></p><p>| Datenkategorie | Datenfelder | Speicherort (Tab) |
+|----------------|-------------|-------------------|
+| <strong>Kundenstammdaten</strong> | Name, Kontakt (Telefon/E-Mail), Bevorzugter Kanal, Lieblingsservice, Bevorzugter Friseur | Kunden |
+| <strong>Termindaten</strong> | Kundenname, Kontakt, Dienstleistung, Mitarbeiter, Datum/Uhrzeit | Terminvorschlaege |
+| <strong>Rechnungsdaten</strong> | Kundenname, Kontakt, Rechnungspositionen, Betraege, Mitarbeiter_ID | Rechnungen |
+| <strong>Stornierungsdaten</strong> | Kundenname, Kontakt, Stornierungsgrund | Stornierungen |
+| <strong>Kommunikationsdaten</strong> | Empfaenger (Telefon/E-Mail), Nachrichtentext | Versand_Protokoll |
+| <strong>Biometrische Daten</strong> | Bild-URL (Frisurfotos), Stilbeschreibung, Farbempfehlung | Frisuranalysen |
+| <strong>Mitarbeiterdaten</strong> | Name, E-Mail, Telefon, Rolle, Auth-Token, Spezialisierung | Mitarbeiter |
+| <strong>Buchhaltungsdaten</strong> | Mitarbeiter_ID, Buchungsbeschreibung (kann Kundennamen enthalten) | Kassenbuch, Ausgaben, Tagesabschluss |</p><p><h3>3.2 Besondere Kategorien (Art. 9 DSGVO)</h3></p><p><strong>Biometrische Daten:</strong> Die Wunschfrisur-Analyse verarbeitet Fotografien von Kunden, die als biometrische Daten im Sinne von Art. 9 Abs. 1 DSGVO einzustufen sind. Diese Verarbeitung ist nur zulaessig mit:</p><p><ul><li><strong>Ausdruecklicher Einwilligung</strong> des Betroffenen (Art. 9 Abs. 2 lit. a DSGVO)</li>
+<li>Die Einwilligung muss <strong>vor</strong> dem Upload des Bildes eingeholt werden</li>
+<li>Die Einwilligung muss <strong>freiwillig, informiert, spezifisch und eindeutig</strong> sein</li>
+<li>Widerruf muss jederzeit moeglich sein</li>
+</ul>
+Der Verantwortliche stellt sicher, dass die Einwilligung ordnungsgemaess eingeholt und dokumentiert wird. Der Auftragsverarbeiter stellt hierfuer einen technischen Einwilligungsmechanismus bereit.</p><p>---</p><p><h2>4. Kategorien betroffener Personen</h2></p><p>| Kategorie | Beschreibung | Betroffene Daten |
+|-----------|-------------|-----------------|
+| <strong>Kunden des Salons</strong> | Personen, die Termine buchen, Dienstleistungen in Anspruch nehmen oder Produkte kaufen | Stammdaten, Termine, Rechnungen, Kommunikation, ggf. Frisurfotos |
+| <strong>Mitarbeiter des Salons</strong> | Angestellte Friseure, Auszubildende, Salonleitung | Stammdaten, Rollen, Authentifizierung, Umsatzdaten |
+| <strong>Kommunikationspartner</strong> | Personen, die ueber die 5 Kanaele mit dem Salon kommunizieren | Kontaktdaten, Nachrichteninhalte |</p><p>---</p><p><h2>5. Pflichten des Auftragsverarbeiters (Casa 2035)</h2></p><p><h3>5.1 Weisungsgebundenheit</h3></p><p>(a) Der Auftragsverarbeiter verarbeitet personenbezogene Daten ausschliesslich auf dokumentierte Weisung des Verantwortlichen, einschliesslich in Bezug auf die Uebermittlung personenbezogener Daten an ein Drittland oder eine internationale Organisation (Art. 28 Abs. 3 lit. a DSGVO).</p><p>(b) Falls der Auftragsverarbeiter durch Unionsrecht oder mitgliedstaatliches Recht zur Verarbeitung verpflichtet wird, teilt er dies dem Verantwortlichen vor der Verarbeitung mit, sofern das betreffende Recht dies nicht wegen eines wichtigen oeffentlichen Interesses verbietet.</p><p><h3>5.2 Vertraulichkeit</h3></p><p>(a) Der Auftragsverarbeiter stellt sicher, dass sich alle zur Verarbeitung befugten Personen zur Vertraulichkeit verpflichtet haben oder einer angemessenen gesetzlichen Verschwiegenheitspflicht unterliegen (Art. 28 Abs. 3 lit. b DSGVO).</p><p>(b) Diese Verpflichtung besteht auch nach Beendigung des Auftrags fort.</p><p><h3>5.3 Technische und organisatorische Massnahmen</h3></p><p>(a) Der Auftragsverarbeiter ergreift alle gemaess Art. 32 DSGVO erforderlichen technischen und organisatorischen Massnahmen (TOMs), um ein dem Risiko angemessenes Schutzniveau zu gewaehrleisten.</p><p>(b) Die aktuellen TOMs sind in <strong>Anlage 1</strong> dieses Vertrages dokumentiert.</p><p>(c) Der Auftragsverarbeiter ist berechtigt, die TOMs zu aendern, sofern das vertraglich vereinbarte Schutzniveau nicht unterschritten wird.</p><p><h3>5.4 Unterauftragsverarbeiter</h3></p><p>(a) Der Auftragsverarbeiter darf Unterauftragsverarbeiter nur mit vorheriger schriftlicher Genehmigung des Verantwortlichen einsetzen (Art. 28 Abs. 2 DSGVO).</p><p>(b) Die zum Zeitpunkt des Vertragsschlusses genehmigten Unterauftragsverarbeiter sind in <strong>Anlage 2</strong> aufgefuehrt.</p><p>(c) Bei beabsichtigten Aenderungen informiert der Auftragsverarbeiter den Verantwortlichen vorab und raumt ihm die Moeglichkeit ein, Einspruch zu erheben.</p><p>(d) Der Auftragsverarbeiter legt dem Unterauftragsverarbeiter die gleichen Datenschutzpflichten auf wie in diesem AVV festgelegt.</p><p><h3>5.5 Unterstuetzungspflichten</h3></p><p>(a) Der Auftragsverarbeiter unterstuetzt den Verantwortlichen durch geeignete technische und organisatorische Massnahmen bei der Erfuellung der Pflicht zur Beantwortung von Antraegen betroffener Personen auf Wahrnehmung ihrer Rechte gemaess Kapitel III DSGVO (Art. 15-22):
+<ul><li>Auskunftsrecht (Art. 15)</li>
+<li>Recht auf Berichtigung (Art. 16)</li>
+<li>Recht auf Loeschung (Art. 17)</li>
+<li>Recht auf Einschraenkung der Verarbeitung (Art. 18)</li>
+<li>Mitteilungspflicht (Art. 19)</li>
+<li>Recht auf Datenuebertragbarkeit (Art. 20)</li>
+<li>Widerspruchsrecht (Art. 21)</li>
+<li>Automatisierte Entscheidungsfindung (Art. 22)</li>
+</ul>
+(b) Der Auftragsverarbeiter unterstuetzt den Verantwortlichen bei der Einhaltung der Pflichten gemaess Art. 32-36 DSGVO (Sicherheit der Verarbeitung, Meldung von Verletzungen, Datenschutz-Folgenabschaetzung).</p><p><h3>5.6 Meldepflicht bei Datenschutzverletzungen</h3></p><p>(a) Der Auftragsverarbeiter meldet dem Verantwortlichen jede Verletzung des Schutzes personenbezogener Daten unverzueglich, spaetestens aber innerhalb von <strong>24 Stunden</strong> nach Bekanntwerden (Art. 33 Abs. 2 DSGVO).</p><p>(b) Die Meldung muss mindestens folgende Informationen enthalten:
+<ul><li>Art der Verletzung</li>
+<li>Betroffene Datenkategorien und ungefaehre Anzahl betroffener Personen</li>
+<li>Wahrscheinliche Folgen der Verletzung</li>
+<li>Ergriffene und vorgeschlagene Massnahmen zur Behebung</li>
+</ul>
+<h3>5.7 Kein Drittlandtransfer</h3></p><p>(a) Der Auftragsverarbeiter verarbeitet alle personenbezogenen Daten ausschliesslich innerhalb der Europaeischen Union (EU) bzw. des Europaeischen Wirtschaftsraums (EWR).</p><p>(b) Es findet <strong>kein Transfer</strong> personenbezogener Daten in Drittlaender statt.</p><p>(c) Alle eingesetzten Unterauftragsverarbeiter betreiben ihre Dienste auf Servern innerhalb der EU (siehe Anlage 2).</p><p><h3>5.8 EU AI Act Konformitaet</h3></p><p>(a) Die KI-Komponenten von Casa 2035 fallen unter die Kategorie "Begrenztes Risiko" gemaess EU AI Act (Verordnung (EU) 2024/1689).</p><p>(b) Der Auftragsverarbeiter gewaehrleistet:
+<ul><li>Transparente Kennzeichnung aller KI-generierten Inhalte</li>
+<li>Dokumentation der eingesetzten KI-Systeme und ihrer Faehigkeiten</li>
+<li>Human-in-the-Loop bei kritischen Entscheidungen (Stornierung, Reklamation, Finanzen)</li>
+<li>Keine autonome Entscheidungsfindung ohne menschliche Kontrolle</li>
+</ul>
+---</p><p><h2>6. Pflichten des Verantwortlichen (Salon)</h2></p><p><h3>6.1 Rechtmaessigkeit der Verarbeitung</h3></p><p>(a) Der Verantwortliche ist fuer die Rechtmaessigkeit der Datenverarbeitung verantwortlich (Art. 5, Art. 6 DSGVO).</p><p>(b) Der Verantwortliche stellt sicher, dass eine gueltige Rechtsgrundlage fuer jede Verarbeitung vorliegt:
+<ul><li><strong>Vertragserfuellung</strong> (Art. 6 Abs. 1 lit. b) fuer Terminbuchungen und Rechnungsstellung</li>
+<li><strong>Steuerrechtliche Pflicht</strong> (Art. 6 Abs. 1 lit. c) fuer Kassenbuch, Rechnungsarchivierung</li>
+<li><strong>Berechtigtes Interesse</strong> (Art. 6 Abs. 1 lit. f) fuer CRM und Event-Logging</li>
+<li><strong>Ausdrueckliche Einwilligung</strong> (Art. 9 Abs. 2 lit. a) fuer Wunschfrisur-Analyse (biometrisch!)</li>
+</ul>
+<h3>6.2 Einwilligungsmanagement</h3></p><p>(a) Der Verantwortliche ist verantwortlich fuer die Einholung, Dokumentation und Verwaltung aller erforderlichen Einwilligungen, insbesondere:
+<ul><li>Einwilligung zur KI-gestuetzten Kommunikation</li>
+<li>Einwilligung zur Verarbeitung biometrischer Daten (Wunschfrisur-Fotos)</li>
+<li>Einwilligung zum Versand von Erinnerungen und Follow-Up-Nachrichten</li>
+</ul>
+<h3>6.3 Informationspflichten</h3></p><p>(a) Der Verantwortliche kommt seinen Informationspflichten gemaess Art. 13 und Art. 14 DSGVO gegenueber den betroffenen Personen nach.</p><p>(b) Der Verantwortliche informiert seine Kunden und Mitarbeiter ueber:
+<ul><li>Die Nutzung der SaaS-Loesung Casa 2035</li>
+<li>Den Einsatz von KI-Technologie (EU AI Act Transparenzpflicht)</li>
+<li>Die eingesetzten Unterauftragsverarbeiter</li>
+<li>Die Rechte der betroffenen Personen</li>
+</ul>
+<h3>6.4 Weisungen</h3></p><p>(a) Der Verantwortliche erteilt Weisungen zur Datenverarbeitung schriftlich oder in dokumentierter elektronischer Form.</p><p>(b) Muendliche Weisungen sind unverzueglich schriftlich zu bestaetigen.</p><p>---</p><p><h2>7. Unterauftragsverarbeiter</h2></p><p><h3>7.1 Genehmigte Unterauftragsverarbeiter</h3></p><p>Der Verantwortliche genehmigt den Einsatz der in <strong>Anlage 2</strong> aufgefuehrten Unterauftragsverarbeiter. Alle Unterauftragsverarbeiter haben ihren Sitz und ihre Datenverarbeitung in der EU.</p><p><h3>7.2 Aenderungen</h3></p><p>(a) Der Auftragsverarbeiter informiert den Verantwortlichen mindestens <strong>30 Tage</strong> vor dem beabsichtigten Einsatz eines neuen Unterauftragsverarbeiters oder dem Wechsel eines bestehenden.</p><p>(b) Der Verantwortliche kann dem Einsatz innerhalb von <strong>14 Tagen</strong> nach Information widersprechen. Der Widerspruch muss begruendet sein.</p><p>(c) Kann der begruendete Widerspruch nicht ausgeraeumt werden, hat der Verantwortliche ein ausserordentliches Kuendigungsrecht.</p><p><h3>7.3 Verantwortlichkeit</h3></p><p>Der Auftragsverarbeiter haftet gegenueber dem Verantwortlichen fuer die Einhaltung der Datenschutzpflichten durch die Unterauftragsverarbeiter wie fuer eigenes Handeln.</p><p>---</p><p><h2>8. Technische und organisatorische Massnahmen (TOMs)</h2></p><p>Die detaillierten technischen und organisatorischen Massnahmen sind in <strong>Anlage 1</strong> dokumentiert. Sie umfassen insbesondere:</p><p>| Massnahmenbereich | Zusammenfassung |
+|-------------------|-----------------|
+| <strong>Vertraulichkeit</strong> | Zugriffskontrolle, Rollensystem (AZU/STY/FRM/CHF), Authentifizierung |
+| <strong>Integritaet</strong> | Input-Sanitierung (XSS-Schutz), Whitelist-Validierung, Anti-Hallucination |
+| <strong>Verfuegbarkeit</strong> | Hetzner Cloud Infrastruktur (Rechenzentrum Nuernberg, Deutschland), automatische Backups, Fehlerbehandlung |
+| <strong>Belastbarkeit</strong> | n8n Cloud-Infrastruktur, Error-Handling in allen Workflows |
+| <strong>Verschluesselung</strong> | HTTPS/TLS fuer alle Datenuebertagungen, Verschluesselung at Rest (Hetzner Cloud, Nuernberg) |
+| <strong>Pseudonymisierung</strong> | Referenz-IDs statt Klarnamen wo moeglich, DSGVO-konforme Metadaten |
+| <strong>Wiederherstellbarkeit</strong> | Supabase Self-Hosted Datenbank-Backups, Audit-Trail ueber Event-Log |</p><p>---</p><p><h2>9. Kontrollrechte</h2></p><p><h3>9.1 Pruefungsrechte des Verantwortlichen</h3></p><p>(a) Der Verantwortliche hat das Recht, die Einhaltung dieses AVV durch den Auftragsverarbeiter zu ueberpruefen (Art. 28 Abs. 3 lit. h DSGVO), insbesondere durch:
+<ul><li>Einholung von Auskuenften</li>
+<li>Einsichtnahme in Verarbeitungsprotokolle und Audit-Trails</li>
+<li>Vor-Ort-Inspektionen (mit angemessener Vorankuendigung von mindestens 14 Tagen)</li>
+<li>Pruefungen durch einen vom Verantwortlichen beauftragten Pruefer</li>
+</ul>
+(b) Der Auftragsverarbeiter stellt dem Verantwortlichen alle erforderlichen Informationen zur Verfuegung und traegt zu Ueberpruefungen bei.</p><p><h3>9.2 Nachweispflicht</h3></p><p>Der Auftragsverarbeiter weist die Einhaltung der in diesem AVV festgelegten Pflichten auf Verlangen des Verantwortlichen nach. Der Nachweis kann durch:
+<ul><li>Aktuelle Zertifizierungen oder Pruefberichte</li>
+<li>Selbstauskunft mit Dokumentation</li>
+<li>Vor-Ort-Inspektion</li>
+</ul>
+erfolgen.</p><p><h3>9.3 Haeufigkeit</h3></p><p>(a) Regelmaessige Pruefungen koennen einmal jaehrlich durchgefuehrt werden.</p><p>(b) Anlassbezogene Pruefungen (z.B. nach einer Datenschutzverletzung) sind jederzeit moeglich.</p><p>---</p><p><h2>10. Loeschung und Rueckgabe</h2></p><p><h3>10.1 Nach Vertragsende</h3></p><p>(a) Nach Beendigung des Nutzungsvertrages loescht der Auftragsverarbeiter saemtliche im Auftrag verarbeiteten personenbezogenen Daten, sofern nicht gesetzliche Aufbewahrungspflichten entgegenstehen (Art. 28 Abs. 3 lit. g DSGVO).</p><p>(b) Vor der Loeschung stellt der Auftragsverarbeiter dem Verantwortlichen auf Wunsch eine vollstaendige Kopie aller Daten in einem gaengigen, maschinenlesbaren Format zur Verfuegung (Datenexport).</p><p>(c) Die Loeschung erfolgt innerhalb von <strong>30 Tagen</strong> nach Vertragsende.</p><p><h3>10.2 Aufbewahrungsfristen</h3></p><p>Folgende gesetzliche Aufbewahrungsfristen sind zu beachten und gehen der Loeschung vor:</p><p>| Datentyp | Aufbewahrungsfrist | Rechtsgrundlage |
+|----------|-------------------|-----------------|
+| Rechnungen | 10 Jahre | § 147 AO, § 257 HGB |
+| Kassenbuch | 10 Jahre | § 147 AO (GoBD) |
+| Ausgaben/Belege | 10 Jahre | § 147 AO |
+| Tagesabschluss | 10 Jahre | § 147 AO |
+| Geschaeftskorrespondenz (Versand_Protokoll) | 6 Jahre | § 257 HGB |
+| Terminvorschlaege | 3 Jahre nach Ablauf | Verjaehrungsfrist (§ 195 BGB) |
+| Kundendaten (CRM) | 3 Jahre nach letztem Kontakt | Art. 6 Abs. 1 lit. f DSGVO |
+| Mitarbeiterdaten (nach Austritt) | 3 Jahre nach Austritt | Verjaehrungsfrist |
+| Stornierungen | 3 Jahre | Verjaehrungsfrist |
+| Wunschfrisur-Fotos (biometrisch!) | 30 Tage nach Analyse | Art. 9 DSGVO — Minimierung! |
+| Event-Log | 90 Tage | Art. 6 Abs. 1 lit. f DSGVO |</p><p><h3>10.3 Loeschnachweis</h3></p><p>Der Auftragsverarbeiter bestaetigt dem Verantwortlichen die vollstaendige Loeschung schriftlich.</p><p>---</p><p><h2>11. Haftung</h2></p><p><h3>11.1 Haftung nach DSGVO</h3></p><p>Die Haftung der Parteien richtet sich nach Art. 82 DSGVO:</p><p>(a) Jede an der Verarbeitung beteiligte Person, die einen Verstoss gegen die DSGVO verursacht hat, haftet fuer den entstandenen Schaden.</p><p>(b) Der Auftragsverarbeiter haftet nur dann, wenn er seinen speziell auferlegten Pflichten nicht nachgekommen ist oder ueber die rechtmaessigen Anweisungen des Verantwortlichen hinaus oder diesen zuwider gehandelt hat.</p><p><h3>11.2 Freistellung</h3></p><p>(a) Sofern eine Partei von betroffenen Personen oder Aufsichtsbehoerden wegen eines Verstosses der anderen Partei gegen diesen AVV oder die DSGVO in Anspruch genommen wird, stellt die verstossende Partei die andere Partei von allen Anspruechen frei.</p><p>(b) Die Parteien unterstuetzen sich gegenseitig bei der Abwehr von Anspruechen Dritter.</p><p><h3>11.3 Bussgelder</h3></p><p>Sofern gegen eine Partei ein Bussgeld verhaengt wird, das auf ein Verschulden der anderen Partei zurueckzufuehren ist, stellt die verantwortliche Partei die andere Partei im Innenverhaeltnis frei.</p><p>---</p><p><h2>12. Schlussbestimmungen</h2></p><p><h3>12.1 Vorrang</h3></p><p>Bei Widerspruechen zwischen diesem AVV und dem Nutzungsvertrag hat dieser AVV in Bezug auf den Schutz personenbezogener Daten Vorrang.</p><p><h3>12.2 Aenderungen</h3></p><p>Aenderungen und Ergaenzungen dieses AVV beduerften der Schriftform. Dies gilt auch fuer die Aufhebung dieser Schriftformklausel.</p><p><h3>12.3 Salvatorische Klausel</h3></p><p>Sollten einzelne Bestimmungen dieses AVV unwirksam oder undurchfuehrbar sein oder werden, bleibt die Wirksamkeit der uebrigen Bestimmungen unberuehrt. Die Parteien verpflichten sich, die unwirksame Bestimmung durch eine wirksame Regelung zu ersetzen, die dem wirtschaftlichen Zweck der unwirksamen Bestimmung moeglichst nahe kommt.</p><p><h3>12.4 Anwendbares Recht und Gerichtsstand</h3></p><p>(a) Dieser AVV unterliegt dem Recht der Bundesrepublik Deutschland.</p><p>(b) Gerichtsstand ist [PLATZHALTER — Sitz des Auftragsverarbeiters].</p><p>---</p><p><h2>Unterschriften</h2></p><p>| | Verantwortlicher (Salon) | Auftragsverarbeiter (Casa 2035) |
+|---|---|---|
+| Name | _________________________ | Andreas Schengel |
+| Funktion | Saloninhaber/in | Gruender & CEO |
+| Datum | _________________________ | _________________________ |
+| Unterschrift | _________________________ | _________________________ |</p><p>---</p><p>---</p><p><h2>Anlage 1: Technische und organisatorische Massnahmen (TOMs)</h2></p><p>Gemaess Art. 32 DSGVO ergreift der Auftragsverarbeiter folgende Massnahmen:</p><p><h3>A1.1 Vertraulichkeit (Art. 32 Abs. 1 lit. b DSGVO)</h3></p><p>| Massnahme | Umsetzung | Status |
+|-----------|-----------|--------|
+| <strong>Zutrittskontrolle</strong> | Cloud-basierte Infrastruktur (Hetzner Cloud, Rechenzentrum Nuernberg, Deutschland). Rechenzentren der Unterauftragsverarbeiter (Hetzner Nuernberg, n8n Berlin) mit physischer Zugangssicherung. | Umgesetzt |
+| <strong>Zugangskontrolle</strong> | Rollenbasiertes Authentifizierungssystem (WF-09) mit 4 Rollen: AZU (Auszubildende), STY (Stylisten), FRM (Friseurmeister), CHF (Chef/Inhaber). Token-basierte Authentifizierung fuer PWA-Dashboard. | Umgesetzt |
+| <strong>Zugriffskontrolle</strong> | Jede Rolle hat definierte Zugriffsrechte. Finanzdaten (Kassenbuch, Tagesabschluss) nur fuer CHF und FRM. Mitarbeiterdaten nur fuer CHF. | Umgesetzt |
+| <strong>Trennungskontrolle</strong> | Mandantentrennung ueber Row Level Security (RLS) in Supabase Self-Hosted (PostgreSQL-Datenbank auf Hetzner Cloud, Rechenzentrum Nuernberg, Deutschland). Keine Datenvermischung zwischen verschiedenen Salons. | Umgesetzt |
+| <strong>Vertraulichkeitsverpflichtung</strong> | Alle Mitarbeiter des Auftragsverarbeiters sind zur Vertraulichkeit verpflichtet. | Umgesetzt |</p><p><h3>A1.2 Integritaet (Art. 32 Abs. 1 lit. b DSGVO)</h3></p><p>| Massnahme | Umsetzung | Status |
+|-----------|-----------|--------|
+| <strong>Weitergabekontrolle</strong> | Alle Datenuebertragungen erfolgen verschluesselt ueber HTTPS/TLS. Keine unverschluesselten Verbindungen. | Umgesetzt |
+| <strong>Eingabekontrolle</strong> | Input-Sanitierung (XSS-Schutz) in allen Code-Nodes. Laengenbegrenzung fuer alle Eingabefelder. Whitelist-Validierung fuer Services, Intents und Kanaele. | Umgesetzt |
+| <strong>Anti-Hallucination</strong> | LLM-Ausgaben werden durch Structured Output und Validator-Nodes geprueft. Keine Berechnungen durch das LLM — alle Preise, Termine und MwSt-Saetze werden deterministisch im Code berechnet. | Umgesetzt |
+| <strong>Audit-Trail</strong> | Lueckenloses Protokoll ueber Anfragen_Log (13 Spalten) und Ereignis_Protokoll (8 Spalten). Jede Aktion wird mit Timestamp, Ereignis_ID und ausloesendem Node protokolliert. | Umgesetzt |</p><p><h3>A1.3 Verfuegbarkeit und Belastbarkeit (Art. 32 Abs. 1 lit. b, c DSGVO)</h3></p><p>| Massnahme | Umsetzung | Status |
+|-----------|-----------|--------|
+| <strong>Verfuegbarkeit</strong> | Betrieb auf Hetzner Cloud (99.9% SLA, Rechenzentrum Nuernberg, Deutschland) und n8n Cloud-Infrastruktur. | Umgesetzt |
+| <strong>Datensicherung</strong> | Supabase Self-Hosted (PostgreSQL) mit automatischen Datenbank-Backups auf Hetzner Cloud. Workflow-Definitionen werden als JSON-Dateien versioniert. | Umgesetzt |
+| <strong>Wiederherstellung</strong> | Wiederherstellung aus Supabase/PostgreSQL Datenbank-Backups moeglich. n8n Workflows koennen aus JSON-Backups reimportiert werden. | Umgesetzt |
+| <strong>Fehlerbehandlung</strong> | Alle n8n Workflows enthalten Error-Handling-Pfade. Fehler werden im Anfragen_Log protokolliert und im Dashboard angezeigt. | Umgesetzt |</p><p><h3>A1.4 Verfahren zur regelmaessigen Ueberpruefung (Art. 32 Abs. 1 lit. d DSGVO)</h3></p><p>| Massnahme | Umsetzung | Status |
+|-----------|-----------|--------|
+| <strong>DSGVO-Review</strong> | Vierteljaehrlicher Review aller Verarbeitungstaetigkeiten und TOMs (dokumentiert in `DSGVO_REVIEW.md`). | Geplant |
+| <strong>Loeschkonzept</strong> | Automatisierte Loeschung nach Ablauf der Aufbewahrungsfristen (WF-12 DSGVO-Bereinigung). | In Umsetzung |
+| <strong>Vorfalls-Management</strong> | Definierter Prozess fuer Datenschutzverletzungen: Erkennung, Meldung innerhalb 24h, Analyse, Massnahmen. | Dokumentiert |
+| <strong>Datenschutz-Folgenabschaetzung</strong> | DSFA fuer die Verarbeitung biometrischer Daten (Wunschfrisur-Analyse) gemaess Art. 35 DSGVO. | Geplant |</p><p><h3>A1.5 KI-spezifische Massnahmen (EU AI Act)</h3></p><p>| Massnahme | Umsetzung | Status |
+|-----------|-----------|--------|
+| <strong>KI-Transparenz</strong> | Jede KI-generierte Nachricht wird als solche gekennzeichnet: "Diese Nachricht wurde mit KI-Unterstuetzung erstellt." | In Umsetzung |
+| <strong>Anti-Hallucination-Pipeline</strong> | 6-stufige Validierung: 1) LLM+RAG extrahiert, 2) Code validiert gegen Whitelist, 3) Code berechnet Dauer/Preis, 4) Code sucht Kalenderslots, 5) LLM formuliert Antwort mit Fakten, 6) Code validiert Output. | Umgesetzt |
+| <strong>Human-in-the-Loop</strong> | Bei Stornierungen, Reklamationen und Finanztransaktionen entscheidet ein Mensch (ueber PWA-Dashboard). | Umgesetzt |
+| <strong>Datenminimierung fuer KI</strong> | LLM verarbeitet nur Intent-Klassifikation (20 Tokens) im Router. Personenbezogene Daten werden nicht an das LLM uebergeben, sondern im Code verarbeitet. | Umgesetzt |
+| <strong>EU-Server</strong> | Alle KI-Verarbeitungen erfolgen auf EU-Servern (Mistral AI, Paris). Kein Datenfluss an OpenAI oder andere US-Anbieter. | Umgesetzt |</p><p>---</p><p><h2>Anlage 2: Genehmigte Unterauftragsverarbeiter</h2></p><p>Stand: 09.03.2026</p><p>| # | Unterauftragsverarbeiter | Sitz | Land | Serverstandort | Verarbeitungszweck | Verarbeitete Datenkategorien | AVV-Status |
+|---|-------------------------|------|------|----------------|-------------------|------------------------------|------------|
+| 1 | <strong>n8n GmbH</strong> | Berlin | Deutschland | EU (Berlin) | Workflow-Automation: Ausfuehrung aller 18 Workflows fuer Terminbuchung, Kommunikation, Rechnungserstellung, Tagesabschluss | Alle Datenkategorien (Transit-Verarbeitung im Workflow) | Abzuschliessen |
+| 2 | <strong>Hetzner Online GmbH</strong> | Gunzenhausen | Deutschland | EU (Nuernberg) | Server-Hosting: Supabase Self-Hosted (PostgreSQL-Datenbank), eigener Kalender in Supabase, E-Mail-Versand (Postfix auf eigenem Server) | Kundenstammdaten, Termindaten, Rechnungsdaten, Mitarbeiterdaten, Kommunikationsdaten, Buchhaltungsdaten | Hetzner DPA |
+| 3 | <strong>Mistral AI</strong> | Paris | Frankreich | EU (Paris) | LLM-Verarbeitung: Intent-Erkennung, Antwortgenerierung, Bildanalyse (Pixtral), Embedding-Erstellung | Nachrichtentexte (anonymisiert), Bilddaten (Wunschfrisur), Saloninformationen (nicht-personenbezogen fuer RAG) | Abzuschliessen |
+| 4 | <strong>pgvector (in Supabase integriert)</strong> | — (Self-Hosted) | Deutschland | EU (Nuernberg) | Vektor-Datenbank: Speicherung von Embeddings fuer RAG-basierte Antworten in 4 Kategorien (salon_wissen, service_wissen, produkt_wissen, haaranalyse_wissen) | Salon-Wissensdaten (nicht-personenbezogen): Service-Beschreibungen, Oeffnungszeiten, FAQ, Produktinfos, Haaranalyse-Fachwissen | Entfaellt (Self-Hosted, kein separater Auftragsverarbeiter) |</p><p><h3>Hinweise zu Unterauftragsverarbeitern</h3></p><p><strong>Meta Platforms (WhatsApp, Instagram, Facebook):</strong>
+Meta wird NICHT als Unterauftragsverarbeiter im Sinne dieses AVV eingestuft, da die Nutzung der Meta Business APIs (WhatsApp Business API, Instagram Messaging API, Facebook Messenger API) eine eigenstaendige Verarbeitung durch Meta darstellt. Der Verantwortliche (Salon) muss fuer die Nutzung der Meta-Kanaele eigene Vereinbarungen mit Meta treffen (Meta Business Data Processing Terms). Besondere Sorgfalt ist geboten, da Meta Daten moeglicherweise in die USA transferiert.</p><p><strong>Kein Drittlandtransfer:</strong>
+Alle in Anlage 2 aufgefuehrten Unterauftragsverarbeiter verarbeiten personenbezogene Daten ausschliesslich auf Servern innerhalb der Europaeischen Union. Ein Transfer in Drittlaender findet nicht statt.</p><p><strong>Aenderungsinformation:</strong>
+Der Auftragsverarbeiter wird den Verantwortlichen ueber jede beabsichtigte Aenderung der Unterauftragsverarbeiter-Liste mindestens 30 Tage im Voraus schriftlich informieren.</p><p>---</p><p><em>Stand: 09.04.2026 | Version 1.1 | Erstellt von: @recht + @datenschutz | Aktualisiert: @leitung (Supabase Self-Hosted Migration, Qdrant→pgvector, Google entfernt)</em>
+<em>Naechster Review: Vor Go-Live und dann alle 12 Monate</em></p><p>> <strong>Dieses Dokument ersetzt keine anwaltliche Beratung. Vor Verwendung wird eine Pruefung durch einen qualifizierten Rechtsanwalt empfohlen.</strong>
+</p>
+</body></html>
