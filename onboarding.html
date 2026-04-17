@@ -731,10 +731,11 @@ async function doLogin() {
   }
 }
 
-// Anon-Key aus meta (wird von App.js gesetzt) oder fallback
+// Anon-Key fuer Supabase Auth Login
+// Stand 17.04.2026: Anon-Key aus Konzept Supabase Zugangsdaten
 async function getAnonKey() {
-  // Fallback: key wird vom n8n-Webhook nicht benötigt, nur für Login
-  return window._anonKey || '';
+  if (window._anonKey) return window._anonKey;
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzc1NTA0NzY1LCJleHAiOjE5MzMxODQ3NjV9.5YsRP4FLKHp7hTae7-RAyi13ofRfSGmjm8P2Ved2Wu4';
 }
 
 // Login auch per Enter
