@@ -2799,14 +2799,20 @@
       if (openA.length > 0) parts.push(openA.length + ' Anfragen');
       var lowStock = (lagerCache||[]).filter(function(p){ return (parseInt(p.Bestand)||0) <= (parseInt(p.Min_Bestand)||3); });
       if (lowStock.length > 0) parts.push(lowStock.length + ' Lager-Alarm');
+      // Workday-Inspiration 17.04.2026: persoenliche Begruessung mit Vornamen
+      var userKey = sessionStorage.getItem('casa_user') || '';
+      var uObj = (typeof USERS === 'object' && USERS[userKey]) ? USERS[userKey] : null;
+      var vorname = uObj && uObj.name ? uObj.name : '';
+      var anrede = h < 10 ? 'Guten Morgen' : (h < 14 ? 'Guten Mittag' : (h < 18 ? 'Guten Tag' : 'Guten Abend'));
+      var greet = vorname ? (anrede + ' ' + vorname) : anrede;
       if (parts.length > 0) {
-        el.textContent = parts.join(' · ') + ' — Alles im Blick.';
+        el.textContent = greet + ', ' + parts.join(' · ') + '.';
       } else if (h < 10) {
-        el.textContent = 'Guten Morgen — dein Salon wartet auf dich.';
+        el.textContent = greet + ' — dein Salon wartet auf dich.';
       } else if (h >= 17) {
-        el.textContent = 'Fast geschafft — gleich Tagesabschluss machen.';
+        el.textContent = greet + ' — Zeit fuer den Tagesabschluss.';
       } else {
-        el.textContent = 'Alles laeuft rund. Dein Salon auf einen Blick.';
+        el.textContent = greet + ' — alles laeuft rund.';
       }
     }
 
