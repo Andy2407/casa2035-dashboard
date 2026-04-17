@@ -683,7 +683,9 @@
     .hint-card.critical { border-left: 3px solid var(--danger); }
     .hint-card.info { border-left: 3px solid var(--info); }
     .hint-card.success { border-left: 3px solid var(--success); }
-    .hint-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+    .hint-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; overflow: hidden; }
+    .hint-icon.casa-icon-wrap { background: transparent; padding: 0; box-shadow: 0 4px 14px rgba(201,168,76,0.22); }
+    .hint-icon.casa-icon-wrap svg { width: 40px; height: 40px; display: block; }
     .hint-text { flex: 1; font-size: 13px; font-weight: 500; line-height: 1.4; }
     .hint-action { font-size: 11px; color: var(--gold); font-weight: 600; white-space: nowrap; }
 
@@ -6221,40 +6223,40 @@
       var todayTermine = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(todayStr) === 0; });
       if (todayTermine.length > 0) {
         var nextT = todayTermine.find(function(t) { return new Date(t.Start_ISO) > now; });
-        hints.push({ type: 'info', icon: '&#128197;', text: todayTermine.length + ' Termine heute' + (nextT ? ' — Naechster: ' + fmtTime(nextT.Start_ISO) + ' ' + (nextT.Service || '') : ''), action: 'termine', prio: 1 });
+        hints.push({ type: 'info', iconKey: 'calendar', text: todayTermine.length + ' Termine heute' + (nextT ? ' — Naechster: ' + fmtTime(nextT.Start_ISO) + ' ' + (nextT.Service || '') : ''), action: 'termine', prio: 1 });
       }
 
       // Ungelesene Anfragen
       var unread = eventsCache.filter(function(e) { return e.Is_Read === 0 || e.Status === 'ungelesen'; });
       if (unread.length > 0) {
-        hints.push({ type: 'urgent', icon: '&#128172;', text: unread.length + ' ungelesene Anfragen warten auf Antwort', action: 'beratung', prio: 2 });
+        hints.push({ type: 'urgent', iconKey: 'message', text: unread.length + ' ungelesene Anfragen warten auf Antwort', action: 'beratung', prio: 2 });
       }
 
       // Lager niedrig
       var lowStock = lagerCache.filter(function(p) { return (parseInt(p.Bestand) || 0) <= (parseInt(p.Min_Bestand) || 3); });
       if (lowStock.length > 0) {
-        hints.push({ type: 'urgent', icon: '&#128230;', text: lowStock.length + ' Produkt(e) unter Mindestbestand', action: 'lager', prio: 3 });
+        hints.push({ type: 'urgent', iconKey: 'box', text: lowStock.length + ' Produkt(e) unter Mindestbestand', action: 'lager', prio: 3 });
       }
 
       // Tagesabschluss faellig (nach 17 Uhr)
       if (h >= 17 && perms.kasseGesamt) {
-        hints.push({ type: 'critical', icon: '&#128202;', text: 'Tagesabschluss noch offen — GoBD-Pflicht!', action: 'kasse', prio: 0 });
+        hints.push({ type: 'critical', iconKey: 'chart', text: 'Tagesabschluss noch offen — GoBD-Pflicht!', action: 'kasse', prio: 0 });
       }
 
       // Guten-Morgen-Tipp
       if (h < 10 && todayTermine.length === 0) {
-        hints.push({ type: 'success', icon: '&#9728;', text: 'Ruhiger Vormittag — perfekt für Beratungen oder Lager-Check', action: 'beratung', prio: 10 });
+        hints.push({ type: 'success', iconKey: 'sunrise', text: 'Ruhiger Vormittag — perfekt fuer Beratungen oder Lager-Check', action: 'beratung', prio: 10 });
       }
 
       // Samstag = Hochbetrieb
       if (dow === 6) {
-        hints.push({ type: 'info', icon: '&#128170;', text: 'Samstag — erfahrungsgemaess Hochbetrieb. Alles bereit?', action: 'termine', prio: 5 });
+        hints.push({ type: 'info', iconKey: 'bolt', text: 'Samstag — erfahrungsgemaess Hochbetrieb. Alles bereit?', action: 'termine', prio: 5 });
       }
 
       // Follow-Up Kunden
       var followUps = kundenCache.filter(function(k) { return k.Follow_Up || k.follow_up; });
       if (followUps.length > 0) {
-        hints.push({ type: 'info', icon: '&#128100;', text: followUps.length + ' Kunden mit offenen Follow-Ups', action: 'kunden', prio: 6 });
+        hints.push({ type: 'info', iconKey: 'user', text: followUps.length + ' Kunden mit offenen Follow-Ups', action: 'kunden', prio: 6 });
       }
 
       hints.sort(function(a, b) { return a.prio - b.prio; });
@@ -6263,7 +6265,11 @@
         card.className = 'hint-card ' + hint.type;
         var bgMap = { critical: 'danger', urgent: 'warning', success: 'success', info: 'info' };
         var bgVar = bgMap[hint.type] || hint.type;
-        card.innerHTML = '<div class="hint-icon" style="background:var(--' + bgVar + '-bg, var(--bg-warm))">' + hint.icon + '</div>'
+        // Casa-Icon statt Emoji (18.04.2026 Capo: 'ich will was eigenes')
+        var iconHtml = hint.iconKey && CASA_ICONS[hint.iconKey]
+          ? '<div class="hint-icon casa-icon-wrap">' + CASA_ICONS[hint.iconKey] + '</div>'
+          : '<div class="hint-icon" style="background:var(--' + bgVar + '-bg, var(--bg-warm))">' + (hint.icon || '') + '</div>';
+        card.innerHTML = iconHtml
           + '<div class="hint-text">' + hint.text + '</div>'
           + '<div class="hint-action">Ansehen ›</div>';
         card.onclick = function() { showPage(hint.action); };
@@ -9941,8 +9947,24 @@
     }
 
     // === SVG Icon Library (Lucide-style, stroke-width 1.75) — kein Emoji, kein Unicode ===
+    // CASA-2035-Premium-Icons (18.04.2026, Capo: 'kein WhatsApp-Emoji, ich will was eigenes')
+    // Gold-Gradient-Fill + scharfe Linien + Stark-Industries-Feel
+    var CASA_ICONS = {
+      message:  '<svg viewBox="0 0 40 40"><defs><linearGradient id="cg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E0C870"/><stop offset="100%" stop-color="#8a7230"/></linearGradient></defs><rect x="2" y="2" width="36" height="36" rx="8" fill="#141414" stroke="url(#cg1)" stroke-width="1.5"/><path d="M28 15a2 2 0 01-2 2H15l-4 4V11a2 2 0 012-2h13a2 2 0 012 2z" fill="none" stroke="url(#cg1)" stroke-width="2" stroke-linejoin="round" transform="translate(0 2)"/><circle cx="15" cy="20" r="1.2" fill="#E0C870"/><circle cx="20" cy="20" r="1.2" fill="#E0C870"/><circle cx="25" cy="20" r="1.2" fill="#E0C870"/></svg>',
+      bolt:     '<svg viewBox="0 0 40 40"><defs><linearGradient id="cg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E0C870"/><stop offset="100%" stop-color="#8a7230"/></linearGradient></defs><rect x="2" y="2" width="36" height="36" rx="8" fill="#141414" stroke="url(#cg2)" stroke-width="1.5"/><path d="M22 8l-10 14h7l-2 10 10-14h-7z" fill="url(#cg2)" stroke="url(#cg2)" stroke-width="1" stroke-linejoin="round"/></svg>',
+      sunrise:  '<svg viewBox="0 0 40 40"><defs><linearGradient id="cg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#E0C870"/><stop offset="100%" stop-color="#8a7230"/></linearGradient></defs><rect x="2" y="2" width="36" height="36" rx="8" fill="#141414" stroke="url(#cg3)" stroke-width="1.5"/><circle cx="20" cy="24" r="5" fill="url(#cg3)"/><line x1="20" y1="14" x2="20" y2="11" stroke="#E0C870" stroke-width="1.8" stroke-linecap="round"/><line x1="12.5" y1="17" x2="10.5" y2="15" stroke="#E0C870" stroke-width="1.8" stroke-linecap="round"/><line x1="27.5" y1="17" x2="29.5" y2="15" stroke="#E0C870" stroke-width="1.8" stroke-linecap="round"/><line x1="9" y1="24" x2="6" y2="24" stroke="#E0C870" stroke-width="1.8" stroke-linecap="round"/><line x1="31" y1="24" x2="34" y2="24" stroke="#E0C870" stroke-width="1.8" stroke-linecap="round"/><line x1="8" y1="30" x2="32" y2="30" stroke="url(#cg3)" stroke-width="1.8" stroke-linecap="round"/></svg>',
+      calendar: '<svg viewBox="0 0 40 40"><defs><linearGradient id="cg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E0C870"/><stop offset="100%" stop-color="#8a7230"/></linearGradient></defs><rect x="2" y="2" width="36" height="36" rx="8" fill="#141414" stroke="url(#cg4)" stroke-width="1.5"/><rect x="10" y="12" width="20" height="18" rx="3" fill="none" stroke="url(#cg4)" stroke-width="2"/><line x1="10" y1="17" x2="30" y2="17" stroke="url(#cg4)" stroke-width="2"/><line x1="15" y1="9" x2="15" y2="14" stroke="#E0C870" stroke-width="2" stroke-linecap="round"/><line x1="25" y1="9" x2="25" y2="14" stroke="#E0C870" stroke-width="2" stroke-linecap="round"/><circle cx="15" cy="22" r="1.5" fill="#E0C870"/><circle cx="20" cy="22" r="1.5" fill="#E0C870"/><circle cx="25" cy="22" r="1.5" fill="#E0C870"/></svg>',
+      chart:    '<svg viewBox="0 0 40 40"><defs><linearGradient id="cg5" x1="0" y1="1" x2="1" y2="0"><stop offset="0%" stop-color="#8a7230"/><stop offset="100%" stop-color="#E0C870"/></linearGradient></defs><rect x="2" y="2" width="36" height="36" rx="8" fill="#141414" stroke="url(#cg5)" stroke-width="1.5"/><polyline points="8,28 14,22 19,25 25,16 31,19" fill="none" stroke="url(#cg5)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="31" cy="19" r="2.5" fill="#E0C870"/></svg>',
+      box:      '<svg viewBox="0 0 40 40"><defs><linearGradient id="cg6" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E0C870"/><stop offset="100%" stop-color="#8a7230"/></linearGradient></defs><rect x="2" y="2" width="36" height="36" rx="8" fill="#141414" stroke="url(#cg6)" stroke-width="1.5"/><path d="M10 16L20 10l10 6v8l-10 6-10-6z" fill="none" stroke="url(#cg6)" stroke-width="2" stroke-linejoin="round"/><path d="M10 16l10 6 10-6" fill="none" stroke="url(#cg6)" stroke-width="2" stroke-linejoin="round"/><line x1="20" y1="22" x2="20" y2="30" stroke="url(#cg6)" stroke-width="2"/></svg>',
+      user:     '<svg viewBox="0 0 40 40"><defs><linearGradient id="cg7" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E0C870"/><stop offset="100%" stop-color="#8a7230"/></linearGradient></defs><rect x="2" y="2" width="36" height="36" rx="8" fill="#141414" stroke="url(#cg7)" stroke-width="1.5"/><circle cx="20" cy="16" r="5" fill="none" stroke="url(#cg7)" stroke-width="2"/><path d="M10 32c0-5 5-8 10-8s10 3 10 8" fill="none" stroke="url(#cg7)" stroke-width="2" stroke-linecap="round"/></svg>',
+      coin:     '<svg viewBox="0 0 40 40"><defs><linearGradient id="cg8" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E0C870"/><stop offset="100%" stop-color="#8a7230"/></linearGradient></defs><rect x="2" y="2" width="36" height="36" rx="8" fill="#141414" stroke="url(#cg8)" stroke-width="1.5"/><circle cx="20" cy="20" r="9" fill="none" stroke="url(#cg8)" stroke-width="2"/><text x="20" y="25" text-anchor="middle" fill="url(#cg8)" font-family="Playfair Display, serif" font-size="14" font-weight="700">€</text></svg>',
+      alert:    '<svg viewBox="0 0 40 40"><defs><linearGradient id="cg9" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F0B060"/><stop offset="100%" stop-color="#C47020"/></linearGradient></defs><rect x="2" y="2" width="36" height="36" rx="8" fill="#141414" stroke="url(#cg9)" stroke-width="1.5"/><path d="M20 8L8 30h24z" fill="none" stroke="url(#cg9)" stroke-width="2" stroke-linejoin="round"/><line x1="20" y1="16" x2="20" y2="22" stroke="url(#cg9)" stroke-width="2.5" stroke-linecap="round"/><circle cx="20" cy="26" r="1.5" fill="#F0B060"/></svg>',
+      heart:    '<svg viewBox="0 0 40 40"><defs><linearGradient id="cgA" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E0C870"/><stop offset="100%" stop-color="#8a7230"/></linearGradient></defs><rect x="2" y="2" width="36" height="36" rx="8" fill="#141414" stroke="url(#cgA)" stroke-width="1.5"/><path d="M20 30c-6-4-10-8-10-13a5 5 0 019-3 5 5 0 019 3c0 5-4 9-10 13z" fill="url(#cgA)" fill-opacity="0.35" stroke="url(#cgA)" stroke-width="2" stroke-linejoin="round"/></svg>',
+      spark:    '<svg viewBox="0 0 40 40"><defs><linearGradient id="cgB" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E0C870"/><stop offset="100%" stop-color="#8a7230"/></linearGradient></defs><rect x="2" y="2" width="36" height="36" rx="8" fill="#141414" stroke="url(#cgB)" stroke-width="1.5"/><path d="M20 8l2.5 7L30 17.5 22.5 20 20 27l-2.5-7L10 17.5 17.5 15z" fill="url(#cgB)" fill-opacity="0.25" stroke="url(#cgB)" stroke-width="1.8" stroke-linejoin="round"/></svg>'
+    };
+    // Backwards-compat: neue Keys auf CASA_ICONS mappen, alte aus feather-Set
     var ICONS = {
-      warning:     '<svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+      warning:     CASA_ICONS.alert,
       scissors:    '<svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>',
       calendar:    '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
       clock:       '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
