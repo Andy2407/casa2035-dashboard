@@ -7710,10 +7710,21 @@
 
     // === Service-Preisliste-Verwaltung (CRUD) ===
     var servicesCache = [];
+    // Demo-Services fuer Vorschau wenn kein Backend
+    var DEMO_SERVICES = [
+      { id: 'd1', name: 'Damenhaarschnitt', preis: 45.00, dauer_min: 60, kategorie: 'schnitt', service_typ: 'damen', aktiv: true },
+      { id: 'd2', name: 'Herrenhaarschnitt', preis: 28.00, dauer_min: 30, kategorie: 'schnitt', service_typ: 'herren', aktiv: true },
+      { id: 'd3', name: 'Balayage', preis: 120.00, dauer_min: 180, kategorie: 'farbe', service_typ: 'damen', aktiv: true },
+      { id: 'd4', name: 'Glossing', preis: 35.00, dauer_min: 45, kategorie: 'pflege', service_typ: 'unisex', aktiv: true },
+    ];
     async function loadServicesList() {
       var box = document.getElementById('servicesList');
       if (!box) return;
-      if (!isBackendMode()) { box.innerHTML = '<div style="padding:8px;color:var(--text-micro)">Backend nicht verbunden.</div>'; return; }
+      if (!isBackendMode()) {
+        servicesCache = DEMO_SERVICES;
+        renderServicesBox(box);
+        return;
+      }
       try {
         var rows = await apiGet('services_preisliste', 'order=name.asc&limit=500');
         servicesCache = Array.isArray(rows) ? rows : [];
@@ -7721,6 +7732,9 @@
         box.innerHTML = '<div style="padding:8px;color:var(--danger)">Fehler beim Laden: ' + esc(e.message || '') + '</div>';
         return;
       }
+      renderServicesBox(box);
+    }
+    function renderServicesBox(box) {
       if (!servicesCache.length) { box.innerHTML = '<div style="padding:8px;color:var(--text-micro)">Noch keine Services. Klicke "+ Service".</div>'; return; }
       var html = '';
       servicesCache.forEach(function(s) {
@@ -7767,7 +7781,26 @@
       openSheet('serviceSheet');
     }
     async function submitService() {
-      if (!isBackendMode()) { showToast('Backend nicht verbunden.', 'warning'); return; }
+      if (!isBackendMode()) {
+        // Demo-Modus: lokal im Cache speichern
+        var id = document.getElementById('svcId').value.trim();
+        var name = document.getElementById('svcName').value.trim();
+        var preis = parseFloat(document.getElementById('svcPreis').value);
+        var dauer = parseInt(document.getElementById('svcDauer').value, 10);
+        if (!name || isNaN(preis) || isNaN(dauer)) { showToast('Name, Preis und Dauer sind Pflicht.', 'warning'); return; }
+        var demoData = { id: id || ('d' + Date.now()), name: name, preis: preis, dauer_min: dauer,
+          kategorie: document.getElementById('svcKategorie').value,
+          service_typ: document.getElementById('svcServiceTyp').value,
+          mwst_satz: parseFloat(document.getElementById('svcMwst').value),
+          beschreibung: document.getElementById('svcBeschreibung').value.trim(),
+          aktiv: document.getElementById('svcAktiv').checked };
+        if (id) { servicesCache = servicesCache.map(function(s){ return String(s.id)===id ? demoData : s; }); }
+        else { servicesCache.push(demoData); }
+        closeSheet('serviceSheet');
+        showToast('Service gespeichert (Demo-Modus — nur lokal).', 'success');
+        var box = document.getElementById('servicesList'); if (box) renderServicesBox(box);
+        return;
+      }
       var id = document.getElementById('svcId').value.trim();
       var name = document.getElementById('svcName').value.trim();
       var preis = parseFloat(document.getElementById('svcPreis').value);
