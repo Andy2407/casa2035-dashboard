@@ -1,7 +1,7 @@
 // Cache-Version bei jedem Release bumpen, damit PWA-Updates durchkommen.
 // 17.04.2026 21:50 — Capo-Tickets c34643c0 + 753a0055: Updates kommen in PWA nicht an.
 // Loesung: network-first fuer HTML, immediate skipWaiting+claim, Clients anzeigen "neue Version".
-const CACHE_NAME = 'casa2035-v17-20260417-2334';
+const CACHE_NAME = 'casa2035-v18-20260417-2335';
 const STATIC_ASSETS = ['/manifest.json'];
 
 self.addEventListener('install', (e) => {
