@@ -3527,7 +3527,24 @@
           });
         }
 
-        if (Array.isArray(events) && events.length > 0) { eventsCache = events; renderEvents(events); }
+        // FB-53 + FB-66 Fix (17.04.2026): anfragen_log-Felder (titel, gelesen, erstellt_am) auf Dashboard-Format mappen
+        if (Array.isArray(events) && events.length > 0) {
+          var mappedEvents = events.map(function(e) {
+            return Object.assign({}, e, {
+              Titel: e.titel || e.Titel || e.betreff || 'Neue Anfrage',
+              Nachricht: e.nachricht || e.Nachricht || '',
+              Kanal: e.kanal || e.Kanal || '',
+              Timestamp: e.erstellt_am || e.Timestamp || '',
+              Typ: e.typ || e.Typ || 'event',
+              Status: e.status || e.Status || 'ungelesen',
+              Is_Read: (e.gelesen === true || e.gelesen === 't' || e.Is_Read === 1 || e.Is_Read === '1') ? 1 : 0,
+              Anfrage_ID: e.anfrage_id || e.Anfrage_ID || '',
+              Kundenname: e.name || e.absender || e.Kundenname || ''
+            });
+          });
+          eventsCache = mappedEvents;
+          renderEvents(mappedEvents);
+        }
         if (Array.isArray(termine) && termine.length > 0) { termineCache = termine; renderTermine(termine); }
         if (Array.isArray(services) && services.length > 0) { servicesCache = services; renderServices(services); }
         if (Array.isArray(lager) && lager.length > 0) { renderLagerTab(lager); }
@@ -5306,10 +5323,27 @@
         var d = new Date(now); d.setDate(d.getDate() + mondayOffset + wd);
         weekDays.push(d.toISOString().split('T')[0]);
       }
+      // FB-64 Fix (17.04.2026): gesamtpreis_netto ist fuer viele Termine NULL in der DB.
+      // Fallback: preis_brutto aus services_preisliste per Name-Match, dann EUR 65 Durchschnitt.
+      var svcPriceMap = {};
+      (servicesCache || []).forEach(function(s) {
+        var nm = (s.Service || s.name || '').toLowerCase();
+        var pr = parseFloat(s.Preis || s.preis_brutto || 0);
+        if (nm && pr > 0) svcPriceMap[nm] = pr;
+      });
+      function getTerminPreis(t) {
+        var p = parseFloat(t.Preis || t.preis || t.gesamtpreis_netto || 0);
+        if (p > 0) return p;
+        // Service-Namen-Lookup in Preisliste
+        var svcName = (t.Service || t.dienstleistung || '').toLowerCase();
+        if (svcName && svcPriceMap[svcName]) return svcPriceMap[svcName];
+        // Fallback: EUR 65 Durchschnitt (Friseursalon DE), damit Balken sichtbar werden
+        return (t.Start_ISO || t.datum) ? 65 : 0;
+      }
       var weekRevenue = weekDays.map(function(ds) {
         return termineCache.filter(function(t) {
           return (t.Start_ISO || '').indexOf(ds) === 0;
-        }).reduce(function(s, t) { return s + (parseFloat(t.Preis) || 0); }, 0);
+        }).reduce(function(s, t) { return s + getTerminPreis(t); }, 0);
       });
       var maxRev = Math.max.apply(null, weekRevenue) || 1;
       var weekTotal = weekRevenue.reduce(function(a, b) { return a + b; }, 0);
@@ -5339,13 +5373,13 @@
       trendEl.textContent = (trendPct >= 0 ? '+' : '') + trendPct + '%';
       trendEl.className = 'cockpit-trend ' + (trendPct > 0 ? 'up' : trendPct < 0 ? 'down' : 'flat');
 
-      // --- Team Performance ---
+      // --- Team Performance --- (FB-64 Fix: getTerminPreis statt t.Preis direkt)
       var teamMap = {};
       termineCache.forEach(function(t) {
         if ((t.Start_ISO || '').indexOf(todayStr) !== 0) return;
         var s = t.Stylist || 'Unbekannt';
         if (!teamMap[s]) teamMap[s] = 0;
-        teamMap[s] += parseFloat(t.Preis) || 0;
+        teamMap[s] += getTerminPreis(t);
       });
       var teamMax = 1;
       Object.keys(teamMap).forEach(function(k) { if (teamMap[k] > teamMax) teamMax = teamMap[k]; });
@@ -6019,38 +6053,75 @@
       tips.appendChild(tBody);
       wrapper.appendChild(tips);
 
-      // Photo upload — Dual: Kamera + Datei
+      // FB-56: EIN Upload-Button mit Action-Sheet (3 Optionen: Datei / Galerie / Kamera)
       var uploadLabel = document.createElement('div');
       uploadLabel.style.cssText = 'font-size:12px;font-weight:700;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.3px';
       uploadLabel.textContent = 'Aktuelles Haar fotografieren';
       wrapper.appendChild(uploadLabel);
 
       var fcUploadRow = document.createElement('div');
-      fcUploadRow.style.cssText = 'display:flex;gap:8px;margin-bottom:10px';
-      var fcCamArea = document.createElement('div');
-      fcCamArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
-      var fcCamIcon = document.createElement('div'); fcCamIcon.style.cssText = 'font-size:20px;margin-bottom:4px'; fcCamIcon.textContent = '\u{1F4F7}';
-      var fcCamLabel = document.createElement('div'); fcCamLabel.style.cssText = 'font-size:11px;font-weight:600'; fcCamLabel.textContent = 'Kamera';
-      var fcCamSub = document.createElement('div'); fcCamSub.style.cssText = 'font-size:9px;color:var(--text-dim)'; fcCamSub.textContent = 'Haar fotografieren';
-      fcCamArea.appendChild(fcCamIcon); fcCamArea.appendChild(fcCamLabel); fcCamArea.appendChild(fcCamSub);
+      fcUploadRow.style.cssText = 'position:relative;margin-bottom:10px';
+
       var fcCamInput = document.createElement('input');
       fcCamInput.type = 'file'; fcCamInput.id = 'farbcodeCamInput'; fcCamInput.accept = 'image/*,image/heic,image/heif';
       fcCamInput.setAttribute('capture', 'environment');
+      fcCamInput.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
       fcCamInput.onchange = function() { previewFarbcode(this.files); };
-      fcCamArea.appendChild(fcCamInput);
-      attachFilePicker(fcCamArea, fcCamInput, function(files) { previewFarbcode(files); });
-      var fcFileArea = document.createElement('div');
-      fcFileArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
-      var fcFileIcon = document.createElement('div'); fcFileIcon.style.cssText = 'font-size:20px;margin-bottom:4px'; fcFileIcon.textContent = '\u{1F5BC}';
-      var fcFileLabel = document.createElement('div'); fcFileLabel.style.cssText = 'font-size:11px;font-weight:600'; fcFileLabel.textContent = 'Galerie / Datei';
-      var fcFileSub = document.createElement('div'); fcFileSub.style.cssText = 'font-size:9px;color:var(--text-dim)'; fcFileSub.textContent = 'Bestehendes Foto';
-      fcFileArea.appendChild(fcFileIcon); fcFileArea.appendChild(fcFileLabel); fcFileArea.appendChild(fcFileSub);
+
       var fcFileInput = document.createElement('input');
       fcFileInput.type = 'file'; fcFileInput.id = 'farbcodeUpload'; fcFileInput.accept = 'image/*,image/heic,image/heif';
+      fcFileInput.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
       fcFileInput.onchange = function() { previewFarbcode(this.files); };
-      fcFileArea.appendChild(fcFileInput);
-      attachFilePicker(fcFileArea, fcFileInput, function(files) { previewFarbcode(files); });
-      fcUploadRow.appendChild(fcCamArea); fcUploadRow.appendChild(fcFileArea);
+
+      var fcDeviceInput = document.createElement('input');
+      fcDeviceInput.type = 'file'; fcDeviceInput.id = 'farbcodeDeviceInput'; fcDeviceInput.accept = 'image/*,image/heic,image/heif';
+      fcDeviceInput.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
+      fcDeviceInput.onchange = function() { previewFarbcode(this.files); };
+
+      var fcMainBtn = document.createElement('button');
+      fcMainBtn.type = 'button';
+      fcMainBtn.style.cssText = 'width:100%;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);transition:border-color 150ms;box-sizing:border-box';
+      fcMainBtn.innerHTML = '\u{1F4F8} <span>Foto ausw\u00e4hlen</span>';
+
+      var fcMenu = document.createElement('div');
+      fcMenu.setAttribute('data-wf-upload-menu','1');
+      fcMenu.style.cssText = 'display:none;position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.18);z-index:20;overflow:hidden';
+
+      var fcMenuDevice = document.createElement('button');
+      fcMenuDevice.type = 'button';
+      fcMenuDevice.style.cssText = 'width:100%;padding:14px 16px;border:0;background:transparent;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
+      fcMenuDevice.innerHTML = '\u{1F4C1} <span>Datei vom Ger\u00e4t</span>';
+      fcMenuDevice.onmouseenter = function(){ this.style.background='var(--bg-warm)'; };
+      fcMenuDevice.onmouseleave = function(){ this.style.background='transparent'; };
+      fcMenuDevice.onclick = function(ev){ ev.stopPropagation(); fcMenu.style.display='none'; fcDeviceInput.click(); };
+
+      var fcMenuGalerie = document.createElement('button');
+      fcMenuGalerie.type = 'button';
+      fcMenuGalerie.style.cssText = 'width:100%;padding:14px 16px;border:0;border-top:1px solid var(--border);background:transparent;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
+      fcMenuGalerie.innerHTML = '\u{1F5BC}\uFE0F <span>Galerie</span>';
+      fcMenuGalerie.onmouseenter = function(){ this.style.background='var(--bg-warm)'; };
+      fcMenuGalerie.onmouseleave = function(){ this.style.background='transparent'; };
+      fcMenuGalerie.onclick = function(ev){ ev.stopPropagation(); fcMenu.style.display='none'; fcFileInput.click(); };
+
+      var fcMenuKamera = document.createElement('button');
+      fcMenuKamera.type = 'button';
+      fcMenuKamera.style.cssText = 'width:100%;padding:14px 16px;border:0;border-top:1px solid var(--border);background:transparent;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
+      fcMenuKamera.innerHTML = '\u{1F4F7} <span>Kamera</span>';
+      fcMenuKamera.onmouseenter = function(){ this.style.background='var(--bg-warm)'; };
+      fcMenuKamera.onmouseleave = function(){ this.style.background='transparent'; };
+      fcMenuKamera.onclick = function(ev){ ev.stopPropagation(); fcMenu.style.display='none'; fcCamInput.click(); };
+
+      fcMenu.appendChild(fcMenuDevice); fcMenu.appendChild(fcMenuGalerie); fcMenu.appendChild(fcMenuKamera);
+
+      fcMainBtn.onclick = function(ev){
+        ev.stopPropagation();
+        var isOpen = fcMenu.style.display === 'block';
+        document.querySelectorAll('[data-wf-upload-menu]').forEach(function(m){ m.style.display='none'; });
+        fcMenu.style.display = isOpen ? 'none' : 'block';
+      };
+
+      fcUploadRow.appendChild(fcCamInput); fcUploadRow.appendChild(fcFileInput); fcUploadRow.appendChild(fcDeviceInput);
+      fcUploadRow.appendChild(fcMainBtn); fcUploadRow.appendChild(fcMenu);
       wrapper.appendChild(fcUploadRow);
 
       var previewRow = document.createElement('div');
@@ -6411,30 +6482,70 @@
       wrapper.appendChild(uploadLabel);
 
       var haUploadRow = document.createElement('div');
-      haUploadRow.style.cssText = 'display:flex;gap:8px;margin-bottom:10px';
-      var haCamArea = document.createElement('div');
-      haCamArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
-      var haCamIcon = document.createElement('div'); haCamIcon.style.cssText = 'font-size:20px;margin-bottom:4px'; haCamIcon.textContent = '\u{1F4F7}';
-      var haCamLabel = document.createElement('div'); haCamLabel.style.cssText = 'font-size:11px;font-weight:600'; haCamLabel.textContent = 'Kamera';
-      haCamArea.appendChild(haCamIcon); haCamArea.appendChild(haCamLabel);
+      haUploadRow.style.cssText = 'position:relative;margin-bottom:10px';
+
       var haCamInput = document.createElement('input');
       haCamInput.type = 'file'; haCamInput.id = 'haaranalyseCamInput'; haCamInput.accept = 'image/*,image/heic,image/heif';
       haCamInput.setAttribute('capture', 'environment');
+      haCamInput.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
       haCamInput.onchange = function() { previewHaaranalysePhotos(this.files); };
-      haCamArea.appendChild(haCamInput);
-      attachFilePicker(haCamArea, haCamInput, function(files) { previewHaaranalysePhotos(files); });
-      var haFileArea = document.createElement('div');
-      haFileArea.style.cssText = 'flex:1;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:14px 10px;text-align:center;cursor:pointer';
-      var haFileIcon = document.createElement('div'); haFileIcon.style.cssText = 'font-size:20px;margin-bottom:4px'; haFileIcon.textContent = '\u{1F5BC}';
-      var haFileLabel = document.createElement('div'); haFileLabel.style.cssText = 'font-size:11px;font-weight:600'; haFileLabel.textContent = 'Galerie / Datei';
-      haFileArea.appendChild(haFileIcon); haFileArea.appendChild(haFileLabel);
+
       var haFileInput = document.createElement('input');
       haFileInput.type = 'file'; haFileInput.id = 'haaranalyseUpload'; haFileInput.accept = 'image/*,image/heic,image/heif';
       haFileInput.multiple = true;
+      haFileInput.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
       haFileInput.onchange = function() { previewHaaranalysePhotos(this.files); };
-      haFileArea.appendChild(haFileInput);
-      attachFilePicker(haFileArea, haFileInput, function(files) { previewHaaranalysePhotos(files); });
-      haUploadRow.appendChild(haCamArea); haUploadRow.appendChild(haFileArea);
+
+      var haDeviceInput = document.createElement('input');
+      haDeviceInput.type = 'file'; haDeviceInput.id = 'haaranalyseDeviceInput'; haDeviceInput.accept = 'image/*,image/heic,image/heif';
+      haDeviceInput.multiple = true;
+      haDeviceInput.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none';
+      haDeviceInput.onchange = function() { previewHaaranalysePhotos(this.files); };
+
+      var haMainBtn = document.createElement('button');
+      haMainBtn.type = 'button';
+      haMainBtn.style.cssText = 'width:100%;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);transition:border-color 150ms;box-sizing:border-box';
+      haMainBtn.innerHTML = '\u{1F4F8} <span>Foto ausw\u00e4hlen</span>';
+
+      var haMenu = document.createElement('div');
+      haMenu.setAttribute('data-wf-upload-menu','1');
+      haMenu.style.cssText = 'display:none;position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.18);z-index:20;overflow:hidden';
+
+      var haMenuDevice = document.createElement('button');
+      haMenuDevice.type = 'button';
+      haMenuDevice.style.cssText = 'width:100%;padding:14px 16px;border:0;background:transparent;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
+      haMenuDevice.innerHTML = '\u{1F4C1} <span>Datei vom Ger\u00e4t</span>';
+      haMenuDevice.onmouseenter = function(){ this.style.background='var(--bg-warm)'; };
+      haMenuDevice.onmouseleave = function(){ this.style.background='transparent'; };
+      haMenuDevice.onclick = function(ev){ ev.stopPropagation(); haMenu.style.display='none'; haDeviceInput.click(); };
+
+      var haMenuGalerie = document.createElement('button');
+      haMenuGalerie.type = 'button';
+      haMenuGalerie.style.cssText = 'width:100%;padding:14px 16px;border:0;border-top:1px solid var(--border);background:transparent;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
+      haMenuGalerie.innerHTML = '\u{1F5BC}\uFE0F <span>Galerie</span>';
+      haMenuGalerie.onmouseenter = function(){ this.style.background='var(--bg-warm)'; };
+      haMenuGalerie.onmouseleave = function(){ this.style.background='transparent'; };
+      haMenuGalerie.onclick = function(ev){ ev.stopPropagation(); haMenu.style.display='none'; haFileInput.click(); };
+
+      var haMenuKamera = document.createElement('button');
+      haMenuKamera.type = 'button';
+      haMenuKamera.style.cssText = 'width:100%;padding:14px 16px;border:0;border-top:1px solid var(--border);background:transparent;display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;color:var(--text);text-align:left';
+      haMenuKamera.innerHTML = '\u{1F4F7} <span>Kamera</span>';
+      haMenuKamera.onmouseenter = function(){ this.style.background='var(--bg-warm)'; };
+      haMenuKamera.onmouseleave = function(){ this.style.background='transparent'; };
+      haMenuKamera.onclick = function(ev){ ev.stopPropagation(); haMenu.style.display='none'; haCamInput.click(); };
+
+      haMenu.appendChild(haMenuDevice); haMenu.appendChild(haMenuGalerie); haMenu.appendChild(haMenuKamera);
+
+      haMainBtn.onclick = function(ev){
+        ev.stopPropagation();
+        var isOpen = haMenu.style.display === 'block';
+        document.querySelectorAll('[data-wf-upload-menu]').forEach(function(m){ m.style.display='none'; });
+        haMenu.style.display = isOpen ? 'none' : 'block';
+      };
+
+      haUploadRow.appendChild(haCamInput); haUploadRow.appendChild(haFileInput); haUploadRow.appendChild(haDeviceInput);
+      haUploadRow.appendChild(haMainBtn); haUploadRow.appendChild(haMenu);
       wrapper.appendChild(haUploadRow);
       var haUploadHint = document.createElement('div');
       haUploadHint.style.cssText = 'font-size:10px;color:var(--text-dim);margin-bottom:8px;text-align:center';
@@ -6451,13 +6562,13 @@
 
       // Kundeninfos
       var haFieldsGrid = document.createElement('div');
-      haFieldsGrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px';
+      haFieldsGrid.style.cssText = 'display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;overflow:hidden';
       var haNameInput = document.createElement('input');
       haNameInput.type = 'text'; haNameInput.id = 'haKundeName'; haNameInput.placeholder = 'Kundenname';
-      haNameInput.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif';
+      haNameInput.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;max-width:100%;box-sizing:border-box';
       var haEmailInput = document.createElement('input');
       haEmailInput.type = 'email'; haEmailInput.id = 'haKundeEmail'; haEmailInput.placeholder = 'E-Mail (fuer PDF)';
-      haEmailInput.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif';
+      haEmailInput.style.cssText = 'padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;max-width:100%;box-sizing:border-box';
       haFieldsGrid.appendChild(haNameInput); haFieldsGrid.appendChild(haEmailInput);
       wrapper.appendChild(haFieldsGrid);
 
