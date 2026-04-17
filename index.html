@@ -2683,8 +2683,10 @@
         var r = (m.rolle || 'STY').toUpperCase();
         if (rolleFilter && rolleFilter.indexOf(r) === -1) return;
         // FB-41/VETO: XSS-esc für alle aus DB stammenden Strings, die in HTML/<option> landen können
-        var first = esc(m.vorname || m.name || '');
-        var last = esc(m.nachname || '');
+        // FIX 17.04.2026: DB-Spalte `name` enthält Full Name ("Rena Rados"). Splitten, damit USERS-Match (nur Vorname) funktioniert und Farbe greift.
+        var parts = String(m.vorname || m.name || '').trim().split(/\s+/);
+        var first = esc(parts[0] || '');
+        var last = esc(m.nachname || parts.slice(1).join(' ') || '');
         if (!first) return;
         var key = first.toLowerCase();
         if (seen[key]) return; seen[key] = true;
@@ -4247,11 +4249,14 @@
 
       var grid = document.createElement('div');
       grid.className = 'week-view-grid';
-      // SPRINT5-FIX (16.04.2026): Woche = Mo-So (7 Tage, nicht 6). Vorher fehlte Sonntag.
+      // FB-50 (17.04.2026): Hochformat = 5 Tage (Mo-Fr), Querformat = 7 Tage (Mo-So). Auf iPhone/iPad Hochformat ist sonntägliche Spalte zu schmal.
+      var isLandscape = (window.innerWidth > window.innerHeight);
+      var weekDaysCount = isLandscape ? 7 : 5;
       var days = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+      grid.style.gridTemplateColumns = 'repeat(' + weekDaysCount + ', 1fr)';
       var today = new Date().toISOString().split('T')[0];
 
-      for (var i = 0; i < 7; i++) {
+      for (var i = 0; i < weekDaysCount; i++) {
         var d = new Date(start); d.setDate(d.getDate() + i);
         var dStr = d.toISOString().split('T')[0];
         var col = document.createElement('div');
@@ -10073,6 +10078,10 @@
               vp.setAttribute('content', 'width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover');
             }, 100);
           }
+          // FB-50 17.04.2026: Nach Drehung Wochen-Ansicht neu rendern (5 Tage Hoch / 7 Tage Quer)
+          try {
+            if (typeof terminViewMode !== 'undefined' && terminViewMode === 'woche' && typeof renderTermine === 'function') renderTermine();
+          } catch(e) {}
         }, 300);
       });
     })();
