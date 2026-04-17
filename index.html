@@ -10032,7 +10032,9 @@
         initApp();
       }
 
-      // FB-42: Service Worker mit Auto-Update + Page-Reload bei Update
+      // Service Worker mit Auto-Update + Update-Hinweis
+      // 17.04.2026: Tickets c34643c0 + 753a0055 — PWA-Updates kommen in iPhone-App nicht an.
+      // Fix: alle 30s auf Update pruefen, bei neuer Version Toast + Reload-Button.
       if ('serviceWorker' in navigator) {
         var swReloadDone = false;
         navigator.serviceWorker.addEventListener('controllerchange', function() {
@@ -10040,10 +10042,27 @@
           swReloadDone = true;
           location.reload();
         });
+        // Broadcast vom SW: neue Version aktiv — Toast
+        navigator.serviceWorker.addEventListener('message', function(ev) {
+          if (ev.data && ev.data.type === 'SW_UPDATED') {
+            if (typeof showToast === 'function') showToast('Dashboard wurde aktualisiert', 'success', 2500);
+          }
+        });
         navigator.serviceWorker.register('sw.js').then(function(reg) {
-          // Alle 60s auf SW-Update prüfen (für lang-offene PWA-Tabs)
-          setInterval(function() { try { reg.update(); } catch(e) {} }, 60000);
+          // Alle 30s (vorher 60s) auf SW-Update pruefen
+          setInterval(function() { try { reg.update(); } catch(e) {} }, 30000);
           reg.update().catch(function() {});
+          // Wenn Wait-Waiting-Worker bereit -> sofort aktivieren
+          if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+          reg.addEventListener('updatefound', function() {
+            var newW = reg.installing;
+            if (!newW) return;
+            newW.addEventListener('statechange', function() {
+              if (newW.state === 'installed' && navigator.serviceWorker.controller) {
+                newW.postMessage({ type: 'SKIP_WAITING' });
+              }
+            });
+          });
         }).catch(function() {});
       }
     });
@@ -10549,17 +10568,40 @@
     // Voice Interpunktions-Heuristik (FB-14/29): "punkt"/"komma"/"fragezeichen" -> Zeichen
     function applyVoicePunctuation(text) {
       if (!text) return text;
+      // FB 17.04. Ticket 2f50368e/f74b2f6c: Grammatik der Spracheingabe verbessern.
+      // 1. Kommando-Woerter ersetzen  2. Auto-Satzpunkt nach Pausen (Doppel-Leerzeichen)
+      // 3. Einfache Satz-Erkennung: nach 8+ Woertern ohne Zeichensetzung Satzpunkt + Leerzeichen
       var t = text
-        .replace(/\s+(neuer absatz|absatz)/gi, '\n\n')
+        .replace(/\s+(neuer absatz|absatz|neue zeile)/gi, '\n\n')
         .replace(/\s+(fragezeichen|frage zeichen)/gi, '?')
         .replace(/\s+(ausrufezeichen|ausrufe zeichen)/gi, '!')
-        .replace(/\s+(komma)/gi, ',')
-        .replace(/\s+(semikolon)/gi, ';')
+        .replace(/\s+(komma|beistrich)/gi, ',')
+        .replace(/\s+(semikolon|strichpunkt)/gi, ';')
         .replace(/\s+(doppelpunkt)/gi, ':')
-        .replace(/\s+(punkt)\b/gi, '.')
+        .replace(/\s+(punkt|satzende|satzzeichen)\b/gi, '.')
+        .replace(/\s+(bindestrich|gedankenstrich)/gi, ' — ')
+        .replace(/\s+(anfuehrungsstriche|zitat anfang)/gi, ' „')
+        .replace(/\s+(zitat ende)/gi, '" ')
         .replace(/\s+([,.!?;:])/g, '$1')
         .replace(/\s{2,}/g, ' ')
         .trim();
+      // Auto-Satzpunkt nach ca. 12 Woertern wenn kein Zeichen
+      var parts = t.split(/([.!?])/);
+      var out = [];
+      for (var i=0; i<parts.length; i++) {
+        var p = parts[i];
+        if (/^[.!?]$/.test(p)) { out.push(p); continue; }
+        var words = p.trim().split(/\s+/);
+        if (words.length > 14) {
+          // grob nach 12 Woertern einen Punkt setzen
+          var chunks = [];
+          for (var k=0; k<words.length; k+=12) chunks.push(words.slice(k, k+12).join(' '));
+          out.push(chunks.join('. '));
+        } else {
+          out.push(p);
+        }
+      }
+      t = out.join('');
       // Satz-Anfang gross schreiben
       t = t.replace(/(^|[.!?]\s+)([a-zaeoeue])/g, function(m, pre, c) { return pre + c.toUpperCase(); });
       // Erster Buchstabe immer gross
