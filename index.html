@@ -766,8 +766,13 @@
     .hint-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; overflow: hidden; }
     .hint-icon.casa-icon-wrap { background: transparent; padding: 0; box-shadow: 0 4px 18px rgba(201,168,76,0.28); }
     .hint-icon.casa-icon-wrap svg { width: 44px; height: 44px; display: block; }
-    /* Feminin: Icon-Rahmen cream + weicher Rose-Schatten — passt auf Feminin-Cream-Background */
-    [data-style="feminin"] .casa-icon-wrap svg rect:first-of-type { fill: #fffcf7; stroke-opacity: 0.8; }
+    /* Feminin: Icon-Rahmen cream + weicher Rose-Schatten — passt auf Feminin-Cream-Background.
+       18.04.2026 Chrome-Bug-Fix: Selektor erweitert, damit Jarvis-Briefing-Findings, Glocken-Dropdown-Items
+       und Home-Hint-Icons alle den cream-Rahmen bekommen (nicht nur .casa-icon-wrap). */
+    [data-style="feminin"] .casa-icon-wrap svg rect:first-of-type,
+    [data-style="feminin"] #jarvisBriefing svg rect:first-of-type,
+    [data-style="feminin"] #notifList svg rect:first-of-type,
+    [data-style="feminin"] .hint-icon svg rect:first-of-type { fill: #fffcf7; stroke-opacity: 0.8; }
     [data-style="feminin"] .casa-icon-wrap { box-shadow: 0 6px 22px rgba(212,169,94,0.22); border-radius: 16px; }
     [data-style="feminin"] .casa-icon-wrap svg { border-radius: 16px; }
     /* Maskulin: aggressive Gold-Glow, scharfe Ecken, harte Kante — Stark-Feel */
@@ -782,6 +787,13 @@
     [data-style="maskulin"] .stat-icon.casa-stat-ic svg { border-radius: 8px; }
     [data-style="feminin"] .stat-icon.casa-stat-ic { box-shadow: 0 6px 22px rgba(212,169,94,0.22); border-radius: 14px; }
     [data-style="feminin"] .stat-icon.casa-stat-ic svg { border-radius: 14px; }
+    /* 18.04.2026 CHROME-BUG-FIX: im Feminin-Mode war rect-fill nur fuer .casa-icon-wrap gesetzt,
+       nicht fuer Stat-Icons (.casa-stat-ic). Folge: schwarze Bloecke statt Icon-Inhalt. */
+    [data-style="feminin"] .casa-stat-ic svg rect:first-of-type,
+    [data-style="feminin"] .stat-icon.casa-stat-ic svg rect:first-of-type {
+      fill: #fffcf7 !important;
+      stroke-opacity: 0.7;
+    }
 
     /* Hint-Card-Kohaerenz pro Modus (18.04. Capo: ‚feminin + maskulin‘) */
     [data-style="maskulin"] .hint-card {
