@@ -3359,6 +3359,21 @@
 
     // === Helpers ===
     function esc(s) { if (!s) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+    // 18.04.2026 Chrome-Bug-Fix: Supabase-Enum-Werte ohne Umlaute -> UI-Labels MIT Umlauten
+    function formatStatus(s) {
+      if (!s) return 'Bestätigt';
+      var low = String(s).toLowerCase();
+      var map = {
+        'bestaetigt': 'Bestätigt', 'bestätigt': 'Bestätigt',
+        'vorgeschlagen': 'Vorgeschlagen',
+        'pending_approval': 'Prüfung ausstehend',
+        'abgesagt': 'Abgesagt', 'storniert': 'Storniert',
+        'gebucht': 'Gebucht', 'erschienen': 'Erschienen',
+        'no_show': 'Nicht erschienen',
+        'abgeschlossen': 'Abgeschlossen', 'offen': 'Offen'
+      };
+      return map[low] || (low.charAt(0).toUpperCase() + low.slice(1));
+    }
     function fmtEur(n) { return (parseFloat(n) || 0).toFixed(2).replace('.', ','); }
     function localDateStr(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
     function fmtDate(iso) {
@@ -4726,7 +4741,7 @@
           + '<div class="termin-kunde">' + esc(t.Kundenname || t.Kunde || '') + '</div>'
           + '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">'
           + '<div class="termin-stylist"><span class="dot" style="background:' + stylistColor + '"></span>' + esc(t.Stylist || '') + '</div>'
-          + '<span class="termin-status ' + statusClass + '">' + esc(statusLabel) + '</span></div></div>'
+          + '<span class="termin-status ' + statusClass + '">' + esc(formatStatus(statusLabel)) + '</span></div></div>'
           + '<div style="position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:4px">'
           + '<div class="termin-preis">' + fmtEur(t.Preis) + ' &euro;' + demoDot() + '</div>'
           + (function(){
@@ -6802,7 +6817,7 @@
       // Kundenname klickbar -> Kunden-Tab öffnen + suchen (17.04. UX-Polish)
       var kName = esc(t.Kundenname || t.Kunde || '');
       html += '<div onclick="event.stopPropagation();document.getElementById(\'detailSheet\').classList.remove(\'open\');showPage(\'kunden\');setTimeout(function(){var f=document.getElementById(\'kundenSearch\');if(f){f.value=\'' + kName.replace(/'/g,"\\'") + '\';f.dispatchEvent(new Event(\'input\'));}},300);" style="font-size:13px;color:var(--text-secondary);margin-top:2px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color 200ms" onmouseover="this.style.textDecorationColor=\'var(--gold)\'" onmouseout="this.style.textDecorationColor=\'transparent\'" title="Kundendetail öffnen">' + kName + '</div>';
-      html += '<span class="termin-status ' + statusClass + '" style="margin-top:6px">' + esc(statusLabel) + '</span></div>';
+      html += '<span class="termin-status ' + statusClass + '" style="margin-top:6px">' + esc(formatStatus(statusLabel)) + '</span></div>';
       html += '<div style="text-align:right"><div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;color:var(--gold)">' + fmtEur(t.Preis) + ' &euro;</div></div></div>';
 
       html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">';
@@ -7041,7 +7056,7 @@
       } else if (statusLabel === 'bestätigt') {
         html += '<button class="btn btn-primary" style="flex:1;min-width:120px;opacity:0.5" disabled>&#10003; Bestätigt</button>';
       } else {
-        html += '<button class="btn btn-primary" style="flex:1;min-width:120px;opacity:0.5" disabled>' + esc(statusLabel) + '</button>';
+        html += '<button class="btn btn-primary" style="flex:1;min-width:120px;opacity:0.5" disabled>' + esc(formatStatus(statusLabel)) + '</button>';
       }
       if (statusLabel !== 'storniert' && statusLabel !== 'abgeschlossen') {
         html += '<button class="btn btn-secondary" style="flex:1;min-width:100px" onclick="openTerminVerschieben(\'' + esc(t.Start_ISO) + '\',\'' + esc(t.Kundenname || '') + '\')">&#128337; Verschieben</button>';
