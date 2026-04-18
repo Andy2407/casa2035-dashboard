@@ -1,7 +1,7 @@
 // Cache-Version bei jedem Release bumpen, damit PWA-Updates durchkommen.
 // 17.04.2026 21:50 — Capo-Tickets c34643c0 + 753a0055: Updates kommen in PWA nicht an.
 // Loesung: network-first fuer HTML, immediate skipWaiting+claim, Clients anzeigen "neue Version".
-const CACHE_NAME = 'casa2035-v59-20260418-1020';
+const CACHE_NAME = 'casa2035-v60-20260418-1100';
 const STATIC_ASSETS = ['/manifest.json'];
 
 self.addEventListener('install', (e) => {
@@ -16,9 +16,12 @@ self.addEventListener('activate', (e) => {
     caches.keys().then((keys) =>
       Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim()).then(() => {
-      // Clients informieren, dass neue Version aktiv ist → Client kann reloaden
+      // Capo 18.04.2026: neue Version zwangsweise bei allen Clients aktiv — HARD-Reload trigger
       return self.clients.matchAll({ type: 'window' }).then(clients => {
-        clients.forEach(c => c.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME }));
+        clients.forEach(c => {
+          c.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
+          c.postMessage({ type: 'FORCE_RELOAD', version: CACHE_NAME });
+        });
       });
     })
   );

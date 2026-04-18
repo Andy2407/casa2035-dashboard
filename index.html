@@ -10995,6 +10995,14 @@
               if (lbl && ev.data.version) lbl.textContent = ev.data.version;
             } catch(e) {}
           }
+          // Capo 18.04.2026: FORCE_RELOAD bei Activate — alter Inhalt raus, neue Version sofort
+          if (ev.data && ev.data.type === 'FORCE_RELOAD') {
+            var last = sessionStorage.getItem('casa_last_reload_ver');
+            if (last !== ev.data.version) {
+              sessionStorage.setItem('casa_last_reload_ver', ev.data.version);
+              setTimeout(function(){ location.reload(); }, 600);
+            }
+          }
         });
         // Einmal Version beim Start in Label setzen (via Controller oder letzte bekannte)
         setTimeout(function() {
@@ -11013,9 +11021,10 @@
             }
           } catch(e) {}
         }, 1500);
-        navigator.serviceWorker.register('sw.js').then(function(reg) {
-          // Alle 30s (vorher 60s) auf SW-Update prüfen
-          setInterval(function() { try { reg.update(); } catch(e) {} }, 30000);
+        // Capo 18.04.2026: SW mit Cachebuster registrieren damit alter SW GARANTIERT ersetzt wird
+        navigator.serviceWorker.register('sw.js?v=' + Date.now()).then(function(reg) {
+          // Alle 15s auf Update prüfen (vorher 30s)
+          setInterval(function() { try { reg.update(); } catch(e) {} }, 15000);
           reg.update().catch(function() {});
           // Wenn Wait-Waiting-Worker bereit -> sofort aktivieren
           if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
