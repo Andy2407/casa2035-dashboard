@@ -10995,14 +10995,7 @@
               if (lbl && ev.data.version) lbl.textContent = ev.data.version;
             } catch(e) {}
           }
-          // Capo 18.04.2026: FORCE_RELOAD bei Activate — alter Inhalt raus, neue Version sofort
-          if (ev.data && ev.data.type === 'FORCE_RELOAD') {
-            var last = sessionStorage.getItem('casa_last_reload_ver');
-            if (last !== ev.data.version) {
-              sessionStorage.setItem('casa_last_reload_ver', ev.data.version);
-              setTimeout(function(){ location.reload(); }, 600);
-            }
-          }
+          // FORCE_RELOAD entfernt — controllerchange-Listener oben reloaded bereits automatisch (Endless-Loop vermeiden)
         });
         // Einmal Version beim Start in Label setzen (via Controller oder letzte bekannte)
         setTimeout(function() {
