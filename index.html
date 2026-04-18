@@ -2130,7 +2130,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:20px;height:20px"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         </div>
         <div>
-          <div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:0.5px">Jarvis</div>
+          <div style="font-size:15px;font-weight:700;color:#fff;letter-spacing:0.5px" id="jarvisDisplayName">Lina</div>
           <div style="font-size:11px;color:var(--gold);font-weight:500" id="jarvisStatusLine">Bereit</div>
         </div>
         <button id="jarvisMicToggle" onclick="toggleJarvisMic()" title="Mikrofon" style="margin-left:auto;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(201,168,76,0.4);background:transparent;color:var(--gold);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 200ms">
@@ -2478,10 +2478,10 @@
       <!-- F4 15.04.2026: Sticky Kasse-Toolbar mit Primaer-Aktionen -->
       <div class="kasse-toolbar">
         <div class="action-grid">
-          <div class="action-card" onclick="openRechnungSheet()"><div class="icon">&#9998;</div><div class="title">Rechnung</div><div class="desc">Neue Rechnung erstellen</div></div>
-          <div class="action-card" onclick="openAusgabeSheet()"><div class="icon">&#128181;</div><div class="title">Ausgabe</div><div class="desc">Betriebsausgabe buchen</div></div>
-          <div class="action-card" onclick="openTagesabschluss()" id="tagesabschlussCard"><div class="icon">&#128202;</div><div class="title">Tagesabschluss</div><div class="desc">GoBD-konform abschliessen</div></div>
-          <div class="action-card" onclick="openDatevExport()"><div class="icon">&#128230;</div><div class="title">DATEV-Export</div><div class="desc">CSV + XML für Steuerberater</div></div>
+          <div class="action-card" onclick="openRechnungSheet()"><div class="icon casa-ac-ic" data-casa-icon="coin"></div><div class="title">Rechnung</div><div class="desc">Neue Rechnung erstellen</div></div>
+          <div class="action-card" onclick="openAusgabeSheet()"><div class="icon casa-ac-ic" data-casa-icon="box"></div><div class="title">Ausgabe</div><div class="desc">Betriebsausgabe buchen</div></div>
+          <div class="action-card" onclick="openTagesabschluss()" id="tagesabschlussCard"><div class="icon casa-ac-ic" data-casa-icon="chart"></div><div class="title">Tagesabschluss</div><div class="desc">GoBD-konform abschliessen</div></div>
+          <div class="action-card" onclick="openDatevExport()"><div class="icon casa-ac-ic" data-casa-icon="sunrise"></div><div class="title">DATEV-Export</div><div class="desc">CSV + XML für Steuerberater</div></div>
         </div>
       </div>
       <div class="section-title">KI-Hinweise</div>
@@ -2491,7 +2491,7 @@
       <div id="kasseFilterBar" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
         <input type="date" id="kasseFilterDatum" onchange="filterKasseEntries()" style="flex:1;min-width:120px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif" title="Datum-Filter">
         <select id="kasseFilterStylist" onchange="filterKasseEntries()" style="flex:1;min-width:120px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">
-          <option value="">Alle Stylisten</option>
+          <option value="" id="kasseAlleStylistenOpt">Alle Mitarbeiter</option>
         </select>
         <select id="kasseFilterZahlart" onchange="filterKasseEntries()" style="flex:1;min-width:100px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">
           <option value="">Alle Zahlarten</option>
@@ -2594,10 +2594,10 @@
     <div class="page" id="pageBeratung">
       <div class="section-title" style="margin-top:0">BERATUNG <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten">D</span></div>
       <div class="action-grid">
-        <div class="action-card" onclick="showKiTool('farbcode')"><div class="icon">&#127912;</div><div class="title">Farbcode</div><div class="desc">Mischungsformel berechnen</div></div>
-        <div class="action-card" onclick="showKiTool('haaranalyse')"><div class="icon">&#128269;</div><div class="title">Haaranalyse</div><div class="desc">KI-Diagnostik starten</div></div>
-        <div class="action-card" onclick="showKiTool('wunschfrisur')"><div class="icon">&#10024;</div><div class="title">Wunschlook</div><div class="desc">Frisur &amp; Bart-Check</div></div>
-        <div class="action-card" onclick="showPage('kunden')"><div class="icon">&#128100;</div><div class="title">Kunden</div><div class="desc">CRM &amp; Follow-Ups</div></div>
+        <div class="action-card" onclick="showKiTool('farbcode')"><div class="icon casa-ac-ic" data-casa-icon="spark"></div><div class="title">Farbcode</div><div class="desc">Mischungsformel berechnen</div></div>
+        <div class="action-card" onclick="showKiTool('haaranalyse')"><div class="icon casa-ac-ic" data-casa-icon="heart"></div><div class="title">Haaranalyse</div><div class="desc">KI-Diagnostik starten</div></div>
+        <div class="action-card" onclick="showKiTool('wunschfrisur')"><div class="icon casa-ac-ic" data-casa-icon="sunrise"></div><div class="title">Wunschlook</div><div class="desc">Frisur &amp; Bart-Check</div></div>
+        <div class="action-card" onclick="showPage('kunden')"><div class="icon casa-ac-ic" data-casa-icon="user"></div><div class="title">Kunden</div><div class="desc">CRM &amp; Follow-Ups</div></div>
       </div>
       <div class="ki-tool-panel" id="kiToolPanel">
         <h3 id="kiToolTitle"></h3>
@@ -3736,7 +3736,7 @@
     var PAGE_HINTS = {
       dashboard: [
         '<b>Cmd/Ctrl + K</b> öffnet die globale Suche &mdash; findet Kunde, Termin, Produkt sofort.',
-        '<b>Jarvis:</b> Mikro oben rechts oder tippen &rarr; &ldquo;Wie viele Termine heute?&rdquo; &middot; &ldquo;Umsatz diese Woche?&rdquo;',
+        '<b class="lina-hint">Lina:</b> Mikro oben rechts oder tippen &rarr; &ldquo;Wie viele Termine heute?&rdquo; &middot; &ldquo;Umsatz diese Woche?&rdquo;',
         '<b>Kachel per Drag verschieben:</b> &#9881; oben rechts aktiviert den Anpassen-Modus, dann &#9776;-Griff ziehen.',
         '<b>Live-Werte:</b> Alle Zahlen kommen direkt aus der Datenbank &mdash; keine Schaetzungen, keine Verzögerung.',
         '<b>Pull-to-refresh:</b> Seite kurz nach unten ziehen laedt alles neu (auch auf iPad).'
@@ -3745,7 +3745,7 @@
         '<b>Cmd/Ctrl + K</b> öffnet die globale Suche &mdash; findet Kunde, Termin, Produkt sofort.',
         '<b>Begrüßung</b> zeigt deine wichtigsten Zahlen für heute &mdash; Termine, Anfragen, Lager-Alarm in einem Satz.',
         '<b>Tipp vom Tag:</b> Wenn etwas rot ist (z.B. Lager-Alarm), ein Tipp auf die Kachel bringt dich direkt hin.',
-        '<b>Jarvis:</b> Nach dem Login einmal probieren &mdash; je mehr du fragst, desto besser passt er sich an deinen Salon an.'
+        '<b class="lina-hint">Lina:</b> Nach dem Login einmal probieren &mdash; je mehr du fragst, desto besser passt er sich an deinen Salon an.'
       ],
       termine: [
         '<b>Heute-Knopf</b> oben springt auf den aktuellen Tag. Datumsfeld akzeptiert Direkt-Eingabe.',
@@ -11631,7 +11631,7 @@
         + '<div style="width:32px;height:32px;border-radius:50%;background:radial-gradient(circle,#E0C870 0%,#C9A84C 50%,#8a7230 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px rgba(201,168,76,0.5);animation:jarvisPulse 3s ease-in-out infinite">'
         + '<svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.5" style="width:16px;height:16px"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>'
         + '</div>'
-        + '<div><div style="font-size:10px;font-weight:800;color:#E0C870;letter-spacing:2px;text-transform:uppercase">Jarvis</div>'
+        + '<div><div style="font-size:10px;font-weight:800;color:#E0C870;letter-spacing:2px;text-transform:uppercase" class="jarvis-persona-label">Lina</div>'
         + '<div style="font-family:\'Playfair Display\',serif;font-size:17px;font-weight:600;color:#f0ebdf">' + esc(greeting) + '. ' + (styleMode === 'feminin' ? 'Hier sind ein paar sanfte Gedanken' : (styleMode === 'maskulin' ? 'Hier ist die Lage' : 'Ein paar Gedanken für dich — falls du magst')) + ':</div></div></div>'
         + '<div style="position:relative;z-index:1">';
       findings.forEach(function(f, i){
@@ -11699,6 +11699,24 @@
       });
     }
     setTimeout(injectCasaStatIcons, 300);
+    // Capo 18.04.2026: Casa-Icons in action-cards (Beratung/Kasse) statt Emojis
+    function injectCasaActionIcons() {
+      document.querySelectorAll('.casa-ac-ic[data-casa-icon]').forEach(function(el){
+        if (el.dataset.injected) return;
+        var key = el.getAttribute('data-casa-icon');
+        if (CASA_ICONS && CASA_ICONS[key]) {
+          el.innerHTML = CASA_ICONS[key];
+          el.style.cssText += ';width:40px;height:40px;padding:0;overflow:hidden;';
+          el.dataset.injected = '1';
+        }
+      });
+    }
+    setTimeout(injectCasaActionIcons, 400);
+    // Bei Page-Wechsel erneut pr\u00fcfen
+    var _origShowPage = window.showPage;
+    if (typeof _origShowPage === 'function') {
+      window.showPage = function(){ _origShowPage.apply(this, arguments); setTimeout(injectCasaActionIcons, 60); };
+    }
 
     // Stat-Labels + Section-Titles pro Stil umschreiben (Capo 18.04. ‚Design feminin/maskulin‘)
     function applyStyleLabels() {
@@ -11740,6 +11758,15 @@
         var s2 = document.getElementById('statUmsatzSub'); if (s2 && L.umsatz) s2.textContent = L.umsatz;
         var s3 = document.getElementById('statBeratungSub'); if (s3 && L.beratung) s3.textContent = L.beratung;
         var s4 = document.getElementById('statLagerAlarmSub'); if (s4 && L.lager) s4.textContent = L.lager;
+      } catch(e){}
+      // Capo 18.04.2026: "Alle Stylisten" -> "Alle Friseurinnen" im Feminin-Mode. Andere Stylist-Labels auch anpassen.
+      try {
+        var alleOpts = document.querySelectorAll('#stylistFilter option[value=""], #terminStylistFilter option[value=""], #kasseAlleStylistenOpt');
+        var alleTxt = mode === 'feminin' ? 'Alle Friseurinnen' : (mode === 'maskulin' ? 'Alle Stylisten' : 'Alle Mitarbeiter');
+        alleOpts.forEach(function(o){ o.textContent = alleTxt; });
+        document.querySelectorAll('[data-role-label="stylist-group"]').forEach(function(el){
+          el.textContent = mode === 'feminin' ? 'Friseurinnen' : (mode === 'maskulin' ? 'Stylisten' : 'Team');
+        });
       } catch(e){}
     }
     setTimeout(applyStyleLabels, 400);
@@ -11909,9 +11936,19 @@
         try { if (typeof renderJarvisBriefing === 'function') renderJarvisBriefing(); } catch(e){}
         try { if (typeof updateHeroSubtitle === 'function') updateHeroSubtitle(); } catch(e){}
         try { if (typeof renderHints === 'function') renderHints(); } catch(e){}
+        try { applyPersonaName(next); } catch(e){}
       }, 80);
       if (typeof showToast === 'function') showToast(next === 'maskulin' ? 'Ironman-Modus aktiv — Command-Deck' : 'Spa-Modus aktiv — weiblich, weich', 'info', 2200);
     };
+    // Capo 18.04.2026: externe KI-Persona heisst Lina (Feminin) / Bruno (Maskulin). Intern bleibt "Jarvis".
+    window.applyPersonaName = function(mode) {
+      var name = (mode || document.documentElement.getAttribute('data-style') || 'feminin') === 'maskulin' ? 'Bruno' : 'Lina';
+      var el = document.getElementById('jarvisDisplayName');
+      if (el) el.textContent = name;
+      document.querySelectorAll('.jarvis-persona-label').forEach(function(l){ l.textContent = name; });
+      document.querySelectorAll('.lina-hint').forEach(function(l){ l.textContent = name + ':'; });
+    };
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(applyPersonaName, 300); });
 
     // Force-Reload: entleert alle Caches + re-registriert SW + reload. Capo-Pflicht 17.04.2026:
     // Nach Sprint/Review muss Capo Updates garantiert sehen, auch auf iOS-PWA.
