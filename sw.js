@@ -1,7 +1,7 @@
 // Cache-Version bei jedem Release bumpen, damit PWA-Updates durchkommen.
 // 17.04.2026 21:50 — Capo-Tickets c34643c0 + 753a0055: Updates kommen in PWA nicht an.
 // Loesung: network-first fuer HTML, immediate skipWaiting+claim, Clients anzeigen "neue Version".
-const CACHE_NAME = 'casa2035-v63-20260418-1215';
+const CACHE_NAME = 'casa2035-v64-20260418-1300';
 const STATIC_ASSETS = ['/manifest.json'];
 
 self.addEventListener('install', (e) => {
@@ -27,13 +27,16 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
-  // HTML immer network-first (damit Index-Updates durchkommen)
+  // HTML immer network-first mit cache:'reload' — Capo 18.04.2026: umgeht iOS-HTTP-Cache der HTML-Updates verhindert.
   const isHtml = e.request.mode === 'navigate' || (e.request.headers.get('accept') || '').includes('text/html');
+  // Auch fuer sw.js, manifest.json + index.html no-store
+  const isCritical = isHtml || url.pathname.endsWith('/sw.js') || url.pathname.endsWith('/manifest.json') || url.pathname === '/' || url.pathname.endsWith('/index.html');
+  const fetchOpts = isCritical ? { cache: 'reload' } : undefined;
+  const req = isCritical ? new Request(e.request.url, fetchOpts) : e.request;
   e.respondWith(
-    fetch(e.request)
+    fetch(req)
       .then((res) => {
-        // Nicht-HTML cachen
-        if (res.ok && !isHtml) {
+        if (res.ok && !isHtml && !isCritical) {
           const clone = res.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(e.request, clone));
         }
