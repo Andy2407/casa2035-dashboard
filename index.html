@@ -4823,8 +4823,13 @@
       if (!slot) {
         slot = document.createElement('div');
         slot.id = 'dayWeekStripSlot';
-        var tc = document.getElementById('terminContent');
-        tc.parentElement.insertBefore(slot, tc);
+        slot.style.cssText = 'padding:0 16px 8px;';
+        var toolbar = document.getElementById('termineToolbar');
+        if (toolbar) toolbar.appendChild(slot);
+        else {
+          var tc = document.getElementById('terminContent');
+          tc.parentElement.insertBefore(slot, tc);
+        }
       }
       slot.textContent = '';
       var strip = document.createElement('div');
