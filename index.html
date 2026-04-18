@@ -4112,7 +4112,7 @@
       closeSheet('configSheet');
       showToast('Verbindung gespeichert', 'success');
       applyUserUI();
-      if (isBackendMode()) fetchAll();
+      if (isBackendMode()) { fetchAll(); startAutoRefresh(); }
     }
 
     // === Profile Settings ===
@@ -4305,6 +4305,22 @@
     }
 
     // === Fetch All Data ===
+    // Capo 19.04.2026: Auto-Refresh alle 20s wenn Tab sichtbar — Multi-Device-Sync ohne Reload
+    var _refreshTimer = null;
+    function startAutoRefresh() {
+      if (_refreshTimer) return;
+      _refreshTimer = setInterval(function(){
+        if (document.visibilityState !== 'visible') return;
+        if (!isBackendMode()) return;
+        // Drag gerade aktiv? Nicht stören.
+        if (document.querySelector('.dragging')) return;
+        fetchAll().catch(function(){});
+      }, 20000);
+      document.addEventListener('visibilitychange', function(){
+        if (document.visibilityState === 'visible' && isBackendMode()) fetchAll().catch(function(){});
+      });
+      window.addEventListener('focus', function(){ if (isBackendMode()) fetchAll().catch(function(){}); });
+    }
     async function fetchAll() {
       if (!isBackendMode()) { loadDemoData(); return; }
       try {
@@ -7563,11 +7579,41 @@
         renderTermine(termineCache);
         return;
       }
+      // Lokal optimistisch anwenden
+      var oldStart = termin.Start_ISO, oldEnde = termin.Ende_ISO;
       termin.Start_ISO = localIsoStamp(newD);
       var end = new Date(newD); end.setMinutes(end.getMinutes() + dur);
       termin.Ende_ISO = end.toISOString();
       renderTermine(termineCache);
-      if (typeof showToast === 'function') showToast('Termin verschoben auf ' + fmtHM(newD) + ' · ' + termin.Stylist, 'success', 2500);
+      // Capo 19.04.2026: Persistenz in Supabase — sonst kein Multi-Device-Sync
+      persistTerminMove(termin, newD, dur)
+        .then(function(){
+          if (typeof showToast === 'function') showToast('✓ Gespeichert: ' + fmtHM(newD) + ' · ' + termin.Stylist, 'success', 2500);
+        })
+        .catch(function(err){
+          // Rollback
+          termin.Start_ISO = oldStart; termin.Ende_ISO = oldEnde;
+          renderTermine(termineCache);
+          if (typeof showToast === 'function') showToast('⚠ Speichern fehlgeschlagen: ' + (err.message || err) + ' — lokal rueckgaengig', 'error', 5000);
+        });
+    }
+    // Schreibt Termin-Verschiebung in Supabase (datum, start_zeit, end_zeit, ggf. stylist_id)
+    function persistTerminMove(termin, newD, dur) {
+      if (!termin.id) return Promise.reject(new Error('keine termin-id'));
+      if (!isBackendMode()) return Promise.reject(new Error('offline-mode'));
+      var pad = function(n){ return (n<10?'0':'')+n; };
+      var datum = newD.getFullYear() + '-' + pad(newD.getMonth()+1) + '-' + pad(newD.getDate());
+      var start_zeit = pad(newD.getHours()) + ':' + pad(newD.getMinutes()) + ':00';
+      var endD = new Date(newD); endD.setMinutes(endD.getMinutes() + dur);
+      var end_zeit = pad(endD.getHours()) + ':' + pad(endD.getMinutes()) + ':00';
+      // stylist-id aus mitarbeiterCache by name
+      var stylistId = null;
+      (mitarbeiterCache||[]).forEach(function(m){ if (m.name === termin.Stylist) stylistId = m.id; });
+      var body = { datum: datum, start_zeit: start_zeit, end_zeit: end_zeit, gesamtdauer_min: dur };
+      if (stylistId) body.stylist_id = stylistId;
+      var url = (config.baseUrl || 'https://api.casa2035.de') + '/rest/v1/termine?id=eq.' + encodeURIComponent(termin.id);
+      return fetch(url, { method: 'PATCH', headers: Object.assign(authHeaders(), {'Prefer':'return=minimal'}), body: JSON.stringify(body) })
+        .then(function(res){ if (!res.ok) return res.text().then(function(t){ throw new Error(res.status + ' ' + t.slice(0,120)); }); });
     }
     // Finde naechsten freien Slot bei selbem Stylist im +/-2h Fenster um Zielzeit
     function findNextFreeSlot(termin, targetD, durMin) {
@@ -7609,14 +7655,23 @@
       var zeit = document.getElementById('verschiebenZeit').value;
       var stylist = document.getElementById('verschiebenStylist').value;
       var neueISO = datum + 'T' + zeit + ':00';
+      var oldStart = found.Start_ISO, oldStylist = found.Stylist, oldEnde = found.Ende_ISO;
+      var dur = parseInt(found.Dauer_Min) || 30;
       found.Start_ISO = neueISO;
       var d = new Date(neueISO);
-      d.setMinutes(d.getMinutes() + (parseInt(found.Dauer_Min) || 30));
+      d.setMinutes(d.getMinutes() + dur);
       found.Ende_ISO = d.toISOString();
       found.Stylist = stylist;
       renderTermine(termineCache);
       closeSheet('detailSheet');
-      showToast('Termin verschoben: ' + kundenname + ' auf ' + datum + ' ' + zeit + ' bei ' + stylist, 'success');
+      // Capo 19.04.2026: Persistenz
+      persistTerminMove(found, new Date(neueISO), dur)
+        .then(function(){ showToast('✓ Termin gespeichert: ' + kundenname + ' auf ' + datum + ' ' + zeit + ' bei ' + stylist, 'success'); })
+        .catch(function(err){
+          found.Start_ISO = oldStart; found.Ende_ISO = oldEnde; found.Stylist = oldStylist;
+          renderTermine(termineCache);
+          showToast('⚠ Speichern fehlgeschlagen: ' + (err.message || err), 'error', 5000);
+        });
     }
 
     var selectedIstFarbe = null;
@@ -11181,6 +11236,8 @@
       if (perms.personalTab) renderPersonalPerms();
       loadCockpitLayout();
       fetchAll();
+      // Capo 19.04.2026: Multi-Device-Sync nach Login starten
+      if (typeof startAutoRefresh === 'function') startAutoRefresh();
     }
 
     // =============================================================
