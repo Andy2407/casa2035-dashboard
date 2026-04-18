@@ -794,6 +794,15 @@
       fill: #fffcf7 !important;
       stroke-opacity: 0.7;
     }
+    /* 18.04.2026 CHROME-DRITTER-BUG: Hell-Gold-Icons auf cream-Hintergrund fast unsichtbar.
+       Filter dunkelt die goldenen Shapes ab, Rose-Hue dreht Richtung warm. */
+    [data-style="feminin"] .casa-stat-ic svg,
+    [data-style="feminin"] .casa-icon-wrap svg,
+    [data-style="feminin"] #jarvisBriefing svg[viewBox="0 0 40 40"],
+    [data-style="feminin"] #notifList svg[viewBox="0 0 40 40"],
+    [data-style="feminin"] .hint-icon svg {
+      filter: contrast(1.4) saturate(0.95) brightness(0.78);
+    }
 
     /* Hint-Card-Kohaerenz pro Modus (18.04. Capo: ‚feminin + maskulin‘) */
     [data-style="maskulin"] .hint-card {
