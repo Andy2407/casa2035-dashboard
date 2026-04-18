@@ -1361,15 +1361,16 @@
     }
     .termin-view-btn.active { background: var(--gold); color: #fff; }
     /* === Apple-iCal-Look (17.04.2026, Capo-Ticket 45b8a93a) === */
-    /* Capo 18.04.2026: Wochen-Streifen ueber Tag/Liste — Heute Gold, Sel Unterstrich */
-    .day-week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 0 0 12px; }
-    .day-week-cell { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); cursor: pointer; color: var(--text-dim); font-family: inherit; transition: all 150ms; }
-    .day-week-cell .dw-dow { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.7; }
-    .day-week-cell .dw-num { font-size: 16px; font-weight: 700; color: var(--text); }
-    .day-week-cell:hover { border-color: var(--gold); }
-    .day-week-cell.today { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+    /* Capo 18.04.2026: Wochen-Streifen ueber Tag/Liste — Heute Gold, Sel Gradient, gut sichtbar in Dark+Hell */
+    .day-week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 4px 0 14px; padding: 8px; background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2); border-radius: var(--radius-sm); }
+    .day-week-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 2px; border: 1.5px solid var(--border); background: var(--bg-warm, var(--surface)); border-radius: 10px; cursor: pointer; color: var(--text-dim); font-family: inherit; transition: all 150ms; min-height: 58px; }
+    .day-week-cell .dw-dow { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; opacity: 0.75; }
+    .day-week-cell .dw-num { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1; }
+    .day-week-cell:hover { border-color: var(--gold); transform: translateY(-1px); }
+    .day-week-cell.today { border-color: var(--gold); background: rgba(201,168,76,0.14); box-shadow: 0 0 0 2px rgba(201,168,76,0.25); }
     .day-week-cell.today .dw-num { color: var(--gold); }
-    .day-week-cell.sel { background: var(--gold-gradient); border-color: var(--gold); }
+    .day-week-cell.today .dw-dow { color: var(--gold); opacity: 1; }
+    .day-week-cell.sel { background: var(--gold-gradient); border-color: var(--gold); box-shadow: var(--shadow-gold, 0 4px 12px rgba(201,168,76,0.4)); }
     .day-week-cell.sel .dw-dow, .day-week-cell.sel .dw-num { color: #fff; opacity: 1; }
     .day-view-grid { position: relative; min-height: 600px; background: var(--surface); border-radius: var(--radius-sm); overflow: hidden; }
     .day-hour-row { display: flex; align-items: stretch; min-height: 52px; border-bottom: 1px solid rgba(0,0,0,0.06); }
