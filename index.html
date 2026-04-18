@@ -910,7 +910,7 @@
     .termin-status::before {
       content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor;
     }
-    /* BUG-FIX 15.04.2026: Ueberlappung uebermalte Stylist-Farbe + sah aus wie Storno.
+    /* BUG-FIX 15.04.2026: Überlappung uebermalte Stylist-Farbe + sah aus wie Storno.
        Jetzt: Stylist-Farbe bleibt links, oben feiner amber Warn-Streifen, dezenter Hintergrund. */
     .termin-overlap-warn {
       box-shadow: inset 0 2px 0 0 #d4a24c !important;
@@ -4106,10 +4106,22 @@
         if (!endeISO && r.datum && r.end_zeit) {
           endeISO = r.datum + 'T' + r.end_zeit;
         }
+        // 18.04.2026 Chrome-Live-Bug-Fix: Service aus service_ids[0] ueber servicesCache aufloesen
+        var serviceResolved = r.dienstleistung || r.Service || r.service || '';
+        if (!serviceResolved && Array.isArray(r.service_ids) && r.service_ids.length > 0) {
+          try {
+            var firstId = r.service_ids[0];
+            if (Array.isArray(window.servicesCache) && window.servicesCache.length) {
+              var match = window.servicesCache.find(function(s){ return s.service_id === firstId || s.id === firstId; });
+              if (match) serviceResolved = match.name || match.Name || match.bezeichnung || '';
+            }
+          } catch(e) {}
+        }
+        if (!serviceResolved) serviceResolved = 'Termin';
         return Object.assign({}, r, {
           Start_ISO: startISO,
           Ende_ISO: endeISO,
-          Service: r.dienstleistung || r.Service || r.service || '',
+          Service: serviceResolved,
           Kundenname: kundennameResolved,
           Stylist: normalizeStylist(stylistRaw),
           Stylist_Wunsch: r.stylist_wunsch || r.Stylist_Wunsch || '',
@@ -4514,7 +4526,7 @@
         return newStart < tEnd && tStart < newEnd;
       });
       if (hasOverlap) {
-        showToast('Achtung: Ueberlappung mit bestehendem Termin von ' + stylist + '!', 'warning');
+        showToast('Achtung: Überlappung mit bestehendem Termin von ' + stylist + '!', 'warning');
       }
 
       var newTermin = {
@@ -4645,7 +4657,7 @@
         return newStart < tEnd && tStart < newEnd;
       });
       if (hasOverlap) {
-        showToast('Achtung: Ueberlappung mit bestehendem Termin von ' + stylist + '!', 'warning');
+        showToast('Achtung: Überlappung mit bestehendem Termin von ' + stylist + '!', 'warning');
       }
 
       termineCache.push({
@@ -4737,7 +4749,7 @@
         card.innerHTML = '<div class="termin-time-block"><div class="time">' + fmtTime(t.Start_ISO) + '</div><div class="mins">' + (t.Dauer_Min || '?') + ' Min</div></div>'
           + '<div class="termin-body"><div class="termin-service">' + esc(t.Service || 'Termin')
           + (hasRecipe ? ' <span title="Rezeptur hinterlegt" style="font-size:11px;opacity:0.6">&#128203;</span>' : '')
-          + (overlaps[idx] ? '<span class="termin-overlap-badge">&#9888; Ueberlappung</span>' : '') + '</div>'
+          + (overlaps[idx] ? '<span class="termin-overlap-badge">&#9888; Überlappung</span>' : '') + '</div>'
           + '<div class="termin-kunde">' + esc(t.Kundenname || t.Kunde || '') + '</div>'
           + '<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap">'
           + '<div class="termin-stylist"><span class="dot" style="background:' + stylistColor + '"></span>' + esc(t.Stylist || '') + '</div>'
@@ -6979,7 +6991,7 @@
              + 'style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif;resize:none;box-sizing:border-box">' + esc(t.Notiz || '') + '</textarea></div>';
       }
 
-      // Ueberlappungs-Vorschlaege
+      // Überlappungs-Vorschlaege
       if (statusLabel !== 'storniert' && statusLabel !== 'abgeschlossen') {
         var todayStr = (t.Start_ISO || '').split('T')[0];
         var sameStylistTermine = termineCache.filter(function(x) { return x.Stylist === t.Stylist && (x.Start_ISO||'').indexOf(todayStr) === 0 && x !== t && x.Status !== 'storniert'; });
