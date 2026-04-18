@@ -181,6 +181,51 @@
     /* Section-Titles pro Stil: feminin weiblicher Ton, maskulin Command-Deck */
     [data-style="feminin"] .section-title::before { content: '〜 '; color: var(--accent-primary); }
     [data-style="maskulin"] .section-title::before { content: '// '; color: #C9A84C; font-weight: 900; letter-spacing: 0.1em; }
+
+    /* HUD-Scan-Line (Maskulin/Ironman) + Atem-Puls (Feminin/Spa) 18.04.2026 */
+    @keyframes hudScan {
+      0% { transform: translateY(-100%); opacity: 0; }
+      15% { opacity: 0.85; }
+      85% { opacity: 0.85; }
+      100% { transform: translateY(100%); opacity: 0; }
+    }
+    @keyframes spaBreathe {
+      0%,100% { transform: scale(1); opacity: 0.6; }
+      50% { transform: scale(1.02); opacity: 0.85; }
+    }
+    [data-style="maskulin"] .hero-card {
+      position: relative; overflow: hidden;
+    }
+    [data-style="maskulin"] .hero-card::after {
+      content: ''; position: absolute; left: 0; right: 0; top: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(224,200,112,0.7), transparent);
+      animation: hudScan 5s ease-in-out infinite;
+      pointer-events: none;
+      filter: drop-shadow(0 0 8px rgba(224,200,112,0.5));
+      z-index: 2;
+    }
+    [data-style="feminin"] .hero-card {
+      animation: spaBreathe 8s ease-in-out infinite;
+      transform-origin: center center;
+    }
+    [data-style="feminin"] .hero-card::after {
+      content: ''; position: absolute; top: -20%; left: -20%; right: -20%; bottom: -20%;
+      background: radial-gradient(circle, rgba(244,210,180,0.35) 0%, transparent 55%);
+      filter: blur(30px);
+      animation: spaBreathe 6s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Tabular-Numerics Erzwingen fuer Maskulin */
+    [data-style="maskulin"] .stat-value, [data-style="maskulin"] .cockpit-value,
+    [data-style="maskulin"] .tabular { font-variant-numeric: tabular-nums; }
+
+    /* Playfair-Numerics Erzwingen fuer Feminin */
+    [data-style="feminin"] .stat-value, [data-style="feminin"] .cockpit-value {
+      font-family: var(--font-display); font-style: italic; font-weight: 500;
+    }
     [data-style="feminin"] h1, [data-style="feminin"] h2, [data-style="feminin"] h3,
     [data-style="feminin"] .hero-card h3 {
       font-family: var(--font-display);
@@ -8811,10 +8856,12 @@
       var html = '';
       servicesCache.forEach(function(s) {
         var aktiv = s.aktiv !== false;
+        var typRaw = (s.service_typ || 'unisex').toString().toLowerCase();
         var typBadge = s.service_typ ? '<span style="font-size:9px;background:var(--surface-hover);padding:2px 5px;border-radius:4px;margin-left:4px">' + esc(s.service_typ) + '</span>' : '';
         var preis = (typeof s.preis === 'number' ? s.preis.toFixed(2) : s.preis || '-') + ' EUR';
         var dauer = (s.dauer_min || s.dauer || '-') + ' Min';
-        html += '<div class="settings-item" style="opacity:' + (aktiv ? '1' : '0.5') + '">'
+        // data-typ fuer Style-Toggle-Dimming (18.04.2026 Capo Maskulin/Feminin)
+        html += '<div class="settings-item" data-typ="' + esc(typRaw) + '" style="opacity:' + (aktiv ? '1' : '0.5') + ';transition:opacity 300ms">'
           + '<div class="left"><div><div class="title">' + esc(s.name) + typBadge + '</div>'
           + '<div class="desc">' + preis + ' &middot; ' + dauer + ' &middot; ' + esc(s.kategorie || 'sonstiges') + '</div></div></div>'
           + '<button onclick="editService(\'' + esc(s.id) + '\')" style="background:transparent;border:none;color:var(--gold);cursor:pointer;padding:6px;font-size:14px" title="Bearbeiten">&#9998;</button>'
