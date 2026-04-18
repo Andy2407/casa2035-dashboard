@@ -133,24 +133,40 @@
     [data-style="maskulin"] .btn, [data-style="maskulin"] button.btn { border-radius: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
     [data-style="maskulin"] .header::after { background: linear-gradient(90deg, transparent, #C9A84C 30%, #C9A84C 70%, transparent); opacity: 0.75; height: 2px; }
 
-    /* === FEMININ — weich, warm, soft-golden, Rose-Akzent === */
+    /* === FEMININ — Spa-Atmosphäre, weich, weiblich, warm (Capo 18.04. ‚feminin muss weiblich, Spa-Atmosphäre‘) === */
     [data-style="feminin"] {
       --font-display: 'Playfair Display', Georgia, serif;
       --font-body: 'Inter', -apple-system, sans-serif;
       --tracking-tight: -0.2px;
       --tracking-wide: 0.8px;
-      --edge-radius: 20px; /* weichere, runder */
-      --radius-sm: 14px;
-      --radius: 20px;
-      --radius-lg: 28px;
-      --accent-primary: #D4A95E;
-      --accent-secondary: #E8C9A0; /* Rose-Gold-Touch */
-      --accent-shadow: 0 10px 30px rgba(212,169,94,0.18);
-      --glow-intensity: 0.14;
-      --hero-grain: 0.04;
-      --gold-gradient: linear-gradient(135deg, #E8C9A0 0%, #D4A95E 50%, #C9A84C 100%);
+      --edge-radius: 22px;
+      --radius-sm: 16px;
+      --radius: 22px;
+      --radius-lg: 30px;
+      --accent-primary: #D4A578; /* weicheres Rose-Peach, nicht hart gold */
+      --accent-secondary: #EED4B8; /* Champagner */
+      --accent-shadow: 0 14px 38px rgba(212,165,120,0.22);
+      --glow-intensity: 0.12;
+      --hero-grain: 0.03;
+      --gold-gradient: linear-gradient(135deg, #F5E3CC 0%, #EAC7A3 50%, #D4A578 100%);
+      --bg: #faf4ed;
+      --bg-warm: #f5ece0;
+      --surface: #ffffff;
+      --surface-hover: #f9f1e5;
     }
-    [data-style="feminin"] body { letter-spacing: -0.1px; font-weight: 400; }
+    [data-style="feminin"] body {
+      letter-spacing: -0.1px; font-weight: 400;
+      /* Spa-Radial-Glows: warm-peach oben rechts, champagner unten links */
+      background-image: radial-gradient(ellipse at top right, rgba(244,210,180,0.2) 0%, transparent 55%),
+                        radial-gradient(ellipse at bottom left, rgba(230,195,165,0.12) 0%, transparent 50%);
+    }
+    /* Spa-Schatten: weich, fast ohne Harte Kanten */
+    [data-style="feminin"] .stat-card,
+    [data-style="feminin"] .cockpit-card,
+    [data-style="feminin"] .hint-card,
+    [data-style="feminin"] .event-card {
+      box-shadow: 0 10px 36px rgba(212,165,120,0.15), 0 2px 8px rgba(200,170,130,0.08);
+    }
     [data-style="feminin"] h1, [data-style="feminin"] h2, [data-style="feminin"] h3,
     [data-style="feminin"] .hero-card h3 {
       font-family: var(--font-display);
@@ -1130,7 +1146,7 @@
       /* Fullscreen-Modal etwas luftiger */
       .modal-content { max-width: 640px; }
     }
-    /* ULTRAWIDE / grosse iMac (>=1600px): zweispaltige Seiten-Aufteilung moeglich */
+    /* ULTRAWIDE / grosse iMac (>=1600px): zweispaltige Seiten-Aufteilung möglich */
     @media (min-width: 1600px) {
       main { max-width: 1400px; }
       .stats-grid { grid-template-columns: repeat(4, 1fr); }
@@ -1472,7 +1488,7 @@
       padding: 14px 16px; backdrop-filter: blur(12px);
       transition: all 300ms var(--ease);
       /* FB 17.04. Ticket ea701a1f: Widgets ueberlappen auf schmalem iPhone (293-390 px).
-         min-width:0 + word-break laesst Karten in Spalte bleiben statt zu ueberlaufen. */
+         min-width:0 + word-break laesst Karten in Spalte bleiben statt zu überlaufen. */
       position: relative; overflow: hidden; cursor: pointer;
       min-width: 0; word-break: break-word;
     }
@@ -2103,7 +2119,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         Abmelden
       </div>
-      <!-- Jarvis-Stimme waehlen (18.04. Capo-Wunsch: alles optional) -->
+      <!-- Jarvis-Stimme wählen (18.04. Capo-Wunsch: alles optional) -->
       <div style="padding:8px 4px 4px;border-top:1px solid var(--border);margin-top:4px">
         <div style="font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px">Jarvis-Stimme</div>
         <select id="jarvisStimmeSel" onchange="setJarvisStimme(this.value)" style="width:100%;padding:6px 8px;font-size:11px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-family:Inter,sans-serif">
@@ -2118,7 +2134,7 @@
       </div>
       <div class="profile-action" onclick="forceReloadApp()" style="border-top:1px solid var(--border);margin-top:4px;padding-top:10px" title="Neue Version holen">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        Update pruefen
+        Update prüfen
       </div>
       <div style="font-size:9px;color:var(--text-dim);text-align:center;padding:6px 4px 2px;letter-spacing:0.5px;border-top:1px solid var(--border);margin-top:4px" id="appVersionLabel" title="Klick kopiert Version">Version wird geladen…</div>
     </div>
@@ -2281,7 +2297,7 @@
           <div class="termine-date-inline">
             <button onclick="changeTerminDate(-1)" aria-label="Vorheriger Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="15 18 9 12 15 6"/></svg></button>
             <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer;font-size:12px;white-space:nowrap" title="Zurück zu Heute">Heute</div>
-            <button onclick="changeTerminDate(1)" aria-label="Naechster Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg></button>
+            <button onclick="changeTerminDate(1)" aria-label="Nächster Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg></button>
           </div>
         </div>
         <!-- FB-61: Termin-Suchleiste mit erhöhtem z-index -->
@@ -2473,7 +2489,7 @@
     <div class="page" id="pageEinstellungen">
       <div class="section-title" style="margin-top:0">EINSTELLUNGEN</div>
 
-      <!-- Capo 16.04.2026: Personalisierung pro User (Schriftgroesse + Farbe + Kuerzel) -->
+      <!-- Capo 16.04.2026: Personalisierung pro User (Schriftgroesse + Farbe + Kürzel) -->
       <div class="settings-section" id="personalisierungSection">
         <div class="section-title">Meine Ansicht</div>
         <div style="display:flex;flex-direction:column;gap:10px;padding:12px;background:var(--surface);border-radius:var(--radius-sm);border:1px solid var(--border)">
@@ -2491,7 +2507,7 @@
             <div style="display:flex;flex-wrap:wrap;gap:6px" id="userColorPicker"></div>
           </div>
           <div>
-            <label style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.3px;display:block;margin-bottom:6px">Mein Kuerzel (max 3 Zeichen)</label>
+            <label style="font-size:11px;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.3px;display:block;margin-bottom:6px">Mein Kürzel (max 3 Zeichen)</label>
             <input type="text" id="userKuerzelInput" maxlength="3" placeholder="z.B. RR" style="width:100%;padding:10px;border:1px solid var(--border);background:var(--bg-warm);color:var(--text);border-radius:var(--radius-sm);font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:2px;text-align:center;font-weight:700">
           </div>
           <button type="button" onclick="savePersonalisierung()" style="padding:10px;border:none;background:var(--gold-gradient);color:#fff;border-radius:var(--radius-sm);font-weight:600;cursor:pointer;font-family:Inter,sans-serif">Speichern</button>
@@ -2534,7 +2550,7 @@
         <div class="settings-item" onclick="openProfileSettings()">
           <div class="left">
             <div class="icon" style="background:var(--gold-glow);color:var(--gold)">&#128100;</div>
-            <div><div class="title">Profil anpassen</div><div class="desc">Kuerzel, Farbe, Name</div></div>
+            <div><div class="title">Profil anpassen</div><div class="desc">Kürzel, Farbe, Name</div></div>
           </div>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;color:var(--text-dim)"><polyline points="9 18 15 12 9 6"/></svg>
         </div>
@@ -2736,7 +2752,7 @@
     <div class="sheet">
       <div class="sheet-handle"></div>
       <div class="sheet-title">Tagesabschluss</div>
-      <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">GoBD-konformer Tagesabschluss gemaess &sect;146 AO. Unveraenderbar nach Speicherung.</div>
+      <div style="font-size:12px;color:var(--text-dim);margin-bottom:12px">GoBD-konformer Tagesabschluss gemäß &sect;146 AO. Unveraenderbar nach Speicherung.</div>
       <div class="kasse-summary" style="margin-bottom:12px">
         <div class="kasse-box"><div class="value tabular" id="taUmsatz">0,00</div><div class="label">Umsatz</div></div>
         <div class="kasse-box"><div class="value tabular" id="taBar">0,00</div><div class="label">Bar</div></div>
@@ -2822,7 +2838,7 @@
       <div class="sheet-title">Profil anpassen</div>
       <label>Anzeigename</label>
       <input type="text" id="profName" placeholder="Dein Name">
-      <label style="margin-top:8px">Kuerzel (2 Buchstaben)</label>
+      <label style="margin-top:8px">Kürzel (2 Buchstaben)</label>
       <input type="text" id="profKuerzel" maxlength="2" placeholder="RR" style="text-transform:uppercase">
       <label style="margin-top:8px">Farbe</label>
       <input type="color" id="profFarbe" value="#C9A84C" style="height:40px;padding:4px">
@@ -2992,21 +3008,21 @@
     // =============================================================
 
     // === Users & Auth ===
-    // Display-Daten nur (kein Passwort!). Passwort-Check laeuft serverseitig
+    // Display-Daten nur (kein Passwort!). Passwort-Check läuft serverseitig
     // via Supabase Auth (auth.users, bcrypt). Passwoerter: siehe SECRETS/VAULT
     var USERS = {
-      'rena':  { rolle: 'CHF', name: 'Rena', nachname: 'Rados', titel: 'Inhaberin & Friseurmeisterin', isAdmin: false, kuerzel: 'RR', farbe: '#C9A84C' },
-      'sarah': { rolle: 'FRM', name: 'Sarah', nachname: 'Mueller', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'SM', farbe: '#e06b8f' },
-      'julia': { rolle: 'FRM', name: 'Julia', nachname: 'Weber', titel: 'Friseurmeisterin', isAdmin: false, kuerzel: 'JW', farbe: '#6b8fe0' },
-      'lena':  { rolle: 'STY', name: 'Lena', nachname: 'Fischer', titel: 'Stylistin', isAdmin: false, kuerzel: 'LF', farbe: '#8f6be0' },
-      'admin': { rolle: 'CHF', name: 'Andreas', nachname: 'Schengel', titel: 'Administrator', isAdmin: true, kuerzel: 'AS', farbe: '#2eb87a' }
+      'rena':  { rolle: 'CHF', name: 'Rena', nachname: 'Rados', titel: 'Inhaberin & Friseurmeisterin', isAdmin: false, kürzel: 'RR', farbe: '#C9A84C' },
+      'sarah': { rolle: 'FRM', name: 'Sarah', nachname: 'Mueller', titel: 'Friseurmeisterin', isAdmin: false, kürzel: 'SM', farbe: '#e06b8f' },
+      'julia': { rolle: 'FRM', name: 'Julia', nachname: 'Weber', titel: 'Friseurmeisterin', isAdmin: false, kürzel: 'JW', farbe: '#6b8fe0' },
+      'lena':  { rolle: 'STY', name: 'Lena', nachname: 'Fischer', titel: 'Stylistin', isAdmin: false, kürzel: 'LF', farbe: '#8f6be0' },
+      'admin': { rolle: 'CHF', name: 'Andreas', nachname: 'Schengel', titel: 'Administrator', isAdmin: true, kürzel: 'AS', farbe: '#2eb87a' }
     };
 
     var userCustomizations = JSON.parse(localStorage.getItem('casa_user_custom') || '{}');
     Object.keys(userCustomizations).forEach(function(uname) {
       if (USERS[uname]) {
         var c = userCustomizations[uname];
-        if (c.kuerzel) USERS[uname].kuerzel = c.kuerzel;
+        if (c.kürzel) USERS[uname].kürzel = c.kürzel;
         if (c.farbe) USERS[uname].farbe = c.farbe;
         if (c.name) USERS[uname].name = c.name;
       }
@@ -3125,7 +3141,7 @@
       return mitarbeiterCache;
     }
     // Liefert eine einheitliche Stylist-Liste im Dashboard-Format
-    // { name, nachname, rolle, titel, kuerzel, farbe, isAdmin }.
+    // { name, nachname, rolle, titel, kürzel, farbe, isAdmin }.
     // Quelle: DB (mitarbeiterCache) ODER Fallback USERS.
     // rolleFilter: Array von Rollen (z.B. ['FRM','STY','CHF']) oder null für alle ausser admin.
     function getStylistList(rolleFilter) {
@@ -3146,7 +3162,7 @@
         if (seen[key]) return; seen[key] = true;
         var kz = ((first.charAt(0) || '') + (last.charAt(0) || '')).toUpperCase();
         if (!kz) kz = first.substring(0,2).toUpperCase();
-        // Versuche Farbe/Kuerzel aus USERS uebernehmen (Display-Konsistenz)
+        // Versuche Farbe/Kürzel aus USERS übernehmen (Display-Konsistenz)
         var matchUser = null;
         Object.keys(USERS).forEach(function(k) {
           if (USERS[k].name && USERS[k].name.toLowerCase() === first.toLowerCase()) matchUser = USERS[k];
@@ -3157,7 +3173,7 @@
           nachname: last,
           rolle: r,
           titel: esc(m.titel || (matchUser && matchUser.titel) || ''),
-          kuerzel: esc((matchUser && matchUser.kuerzel) || kz),
+          kürzel: esc((matchUser && matchUser.kürzel) || kz),
           farbe: (matchUser && matchUser.farbe) || '#8899aa',
           isAdmin: !!(matchUser && matchUser.isAdmin)
         });
@@ -3177,7 +3193,7 @@
           id: null,
           name: u.name, nachname: u.nachname || '',
           rolle: r, titel: u.titel || '',
-          kuerzel: u.kuerzel, farbe: u.farbe,
+          kürzel: u.kürzel, farbe: u.farbe,
           isAdmin: !!u.isAdmin
         });
       }
@@ -3264,9 +3280,9 @@
       } else if (h < 10) {
         el.textContent = greet + ' — dein Salon wartet auf dich.';
       } else if (h >= 17) {
-        el.textContent = greet + ' — Zeit fuer den Tagesabschluss.';
+        el.textContent = greet + ' — Zeit für den Tagesabschluss.';
       } else {
-        el.textContent = greet + ' — alles laeuft rund.';
+        el.textContent = greet + ' — alles läuft rund.';
       }
     }
 
@@ -3414,7 +3430,7 @@
       } catch (e) { return false; }
     }
 
-    // Capo 16.04.2026: User-Personalisierung (Schriftgroesse, Farbe, Kuerzel) persistiert per Nutzer in localStorage
+    // Capo 16.04.2026: User-Personalisierung (Schriftgroesse, Farbe, Kürzel) persistiert per Nutzer in localStorage
     function getPersonalisierung() {
       try {
         var raw = localStorage.getItem('casa_perso_' + currentUser);
@@ -3430,23 +3446,23 @@
         b.style.borderColor = b.getAttribute('data-size') === (p.fontSize || 'normal') ? 'var(--gold)' : 'var(--border)';
         b.style.background = b.getAttribute('data-size') === (p.fontSize || 'normal') ? 'var(--gold-dim)' : 'var(--bg-warm)';
       });
-      // Kuerzel + Farbe in Input + Picker
+      // Kürzel + Farbe in Input + Picker
       var ki = document.getElementById('userKuerzelInput');
-      if (ki) ki.value = p.kuerzel || (USERS[currentUser] && USERS[currentUser].kuerzel) || '';
+      if (ki) ki.value = p.kürzel || (USERS[currentUser] && USERS[currentUser].kürzel) || '';
     }
     function savePersonalisierung() {
       var fs = document.querySelector('.fontsize-opt[style*="gold"]');
       var color = window.__pickedUserColor || (USERS[currentUser] && USERS[currentUser].farbe);
-      var kuerzel = (document.getElementById('userKuerzelInput').value || '').toUpperCase().substring(0,3);
+      var kürzel = (document.getElementById('userKuerzelInput').value || '').toUpperCase().substring(0,3);
       var p = {
         fontSize: fs ? fs.getAttribute('data-size') : 'normal',
         farbe: color,
-        kuerzel: kuerzel
+        kürzel: kürzel
       };
       localStorage.setItem('casa_perso_' + currentUser, JSON.stringify(p));
       // Anwenden
       if (USERS[currentUser]) {
-        if (kuerzel) USERS[currentUser].kuerzel = kuerzel;
+        if (kürzel) USERS[currentUser].kürzel = kürzel;
         if (color) USERS[currentUser].farbe = color;
       }
       applyPersonalisierung();
@@ -3487,12 +3503,12 @@
       var u = USERS[currentUser];
       // Personalisierung-Overrides aus localStorage anwenden
       var p = getPersonalisierung();
-      if (p.kuerzel) u.kuerzel = p.kuerzel;
+      if (p.kürzel) u.kürzel = p.kürzel;
       if (p.farbe) u.farbe = p.farbe;
       document.getElementById('headerGreeting').textContent = getGreeting();
-      document.getElementById('headerAvatar').textContent = u.kuerzel;
+      document.getElementById('headerAvatar').textContent = u.kürzel;
       document.getElementById('headerAvatar').style.background = u.farbe;
-      document.getElementById('profileAvatar').textContent = u.kuerzel;
+      document.getElementById('profileAvatar').textContent = u.kürzel;
       document.getElementById('profileAvatar').style.background = u.farbe;
       document.getElementById('profileName').textContent = u.name + ' ' + (u.nachname || '');
       document.getElementById('profileRole').textContent = ROLLEN_LABEL[currentRolle] || currentRolle;
@@ -3531,15 +3547,15 @@
     // Statt generischer Tipps: „Was hilft mir JETZT auf dieser Seite" — Workday-/Linear-inspiriert.
     var PAGE_HINTS = {
       dashboard: [
-        '<b>Cmd/Ctrl + K</b> oeffnet die globale Suche &mdash; findet Kunde, Termin, Produkt sofort.',
+        '<b>Cmd/Ctrl + K</b> öffnet die globale Suche &mdash; findet Kunde, Termin, Produkt sofort.',
         '<b>Jarvis:</b> Mikro oben rechts oder tippen &rarr; &ldquo;Wie viele Termine heute?&rdquo; &middot; &ldquo;Umsatz diese Woche?&rdquo;',
         '<b>Kachel per Drag verschieben:</b> &#9881; oben rechts aktiviert den Anpassen-Modus, dann &#9776;-Griff ziehen.',
-        '<b>Live-Werte:</b> Alle Zahlen kommen direkt aus der Datenbank &mdash; keine Schaetzungen, keine Verzoegerung.',
+        '<b>Live-Werte:</b> Alle Zahlen kommen direkt aus der Datenbank &mdash; keine Schaetzungen, keine Verzögerung.',
         '<b>Pull-to-refresh:</b> Seite kurz nach unten ziehen laedt alles neu (auch auf iPad).'
       ],
       home: [
-        '<b>Cmd/Ctrl + K</b> oeffnet die globale Suche &mdash; findet Kunde, Termin, Produkt sofort.',
-        '<b>Begruessung</b> zeigt deine wichtigsten Zahlen fuer heute &mdash; Termine, Anfragen, Lager-Alarm in einem Satz.',
+        '<b>Cmd/Ctrl + K</b> öffnet die globale Suche &mdash; findet Kunde, Termin, Produkt sofort.',
+        '<b>Begruessung</b> zeigt deine wichtigsten Zahlen für heute &mdash; Termine, Anfragen, Lager-Alarm in einem Satz.',
         '<b>Tipp vom Tag:</b> Wenn etwas rot ist (z.B. Lager-Alarm), ein Tipp auf die Kachel bringt dich direkt hin.',
         '<b>Jarvis:</b> Nach dem Login einmal probieren &mdash; je mehr du fragst, desto besser passt er sich an deinen Salon an.'
       ],
@@ -3548,14 +3564,14 @@
         '<b>Hochformat = 5 Tage</b>, <b>Querformat = 7 Tage</b> &mdash; das Handy drehen reicht.',
         '<b>Farben der Mitarbeiterinnen</b> bleiben ueberall gleich. Rena = Gold, Sarah = Rose, Julia = Blau, Lena = Violett.',
         '<b>Rote Linie</b> im Kalender = gerade jetzt. Laeuft automatisch mit.',
-        '<b>Tipp auf Termin</b> oeffnet Details &mdash; Bestaetigen, Verschieben, Stornieren direkt auf der Karte.',
+        '<b>Tipp auf Termin</b> öffnet Details &mdash; Bestaetigen, Verschieben, Stornieren direkt auf der Karte.',
         '<b>Kundenwunsch &#11088;</b> markiert, wenn Kundin eine bestimmte Stylistin wollte &mdash; nicht uebersehen.'
       ],
       beratung: [
-        '<b>Wunschfrisur:</b> 1 Foto aktuell + 1 Foto Wunsch &rarr; KI zeigt, wie es aussehen koennte.',
+        '<b>Wunschfrisur:</b> 1 Foto aktuell + 1 Foto Wunsch &rarr; KI zeigt, wie es aussehen könnte.',
         '<b>Farbcode:</b> Foto + Ist-Stufe + Ziel-Stufe &rarr; du bekommst Mischformel, Einwirkzeit, Vorher/Nachher-Bild.',
         '<b>Haaranalyse Profi:</b> 3 Fotos (vorne, seitlich, Ansatz) &rarr; 3-Stufen-Prognose mit Produkt-Tipps aus deinem Lager.',
-        '<b>Schnellcheck:</b> Im Sessel in 10 Sekunden, reicht fuer 80 % der Beratungen.',
+        '<b>Schnellcheck:</b> Im Sessel in 10 Sekunden, reicht für 80 % der Beratungen.',
         '<b>Kundin sehen, was die KI sieht:</b> Vor-/Nachher-Bild zusammen mit ihr anschauen &mdash; Verkaufs-Booster.',
         '<b>Hinweis an Kundin:</b> KI-Analyse ist ein Vorschlag &mdash; deine Erfahrung entscheidet am Ende.'
       ],
@@ -3568,7 +3584,7 @@
       ],
       lager: [
         '<b>Rote Karte</b> = unter Mindestbestand, sofort nachbestellen.',
-        '<b>Bestand direkt aendern:</b> Einfach auf die Stueck-Zahl tippen &rarr; neuer Wert &rarr; fertig (17.04. neu).',
+        '<b>Bestand direkt ändern:</b> Einfach auf die Stueck-Zahl tippen &rarr; neuer Wert &rarr; fertig (17.04. neu).',
         '<b>Reichweite in Tagen</b> unten rechts zeigt, wie lang der Bestand noch reicht.',
         '<b>Sammelbestellung Freitag</b> &rarr; Lieferung Montag &mdash; spart Versandkosten bei La Biosthetique.',
         '<b>Filter "Nachbestellen"</b> zeigt nur die Produkte, die du jetzt bestellen musst.'
@@ -3576,14 +3592,14 @@
       kasse: [
         '<b>+ FAB</b> unten rechts erstellt blitzschnell eine Rechnung &mdash; Services sind vorbefuellt.',
         '<b>MwSt 19 %</b> wird automatisch gerechnet. Du gibst netto ein oder brutto, Casa macht den Rest.',
-        '<b>Tagesabschluss</b> unten: prueft Bar + Karte + Gutschein, erzeugt GoBD-konforme PDF.',
-        '<b>Filter Datum + Stylistin + Zahlart</b> kombinierbar &mdash; fuer Provisions-Abrechnung ein Gold wert.',
+        '<b>Tagesabschluss</b> unten: prüft Bar + Karte + Gutschein, erzeugt GoBD-konforme PDF.',
+        '<b>Filter Datum + Stylistin + Zahlart</b> kombinierbar &mdash; für Provisions-Abrechnung ein Gold wert.',
         '<b>Ausgabe erfassen:</b> Rechts oben &rarr; Kategorie + Netto + MwSt &rarr; direkt in der Buchhaltung.',
-        '<b>DATEV-Export:</b> kommt Q3 2026 &mdash; bis dahin CSV-Download fuer deinen Steuerberater.'
+        '<b>DATEV-Export:</b> kommt Q3 2026 &mdash; bis dahin CSV-Download für deinen Steuerberater.'
       ],
       einstellungen: [
         '<b>Salon-Regeln:</b> KI beachtet diese bei Terminvorschlaegen.',
-        '<b>Profil anpassen:</b> Kuerzel und Farbe für Termin-Chips.',
+        '<b>Profil anpassen:</b> Kürzel und Farbe für Termin-Chips.',
         '<b>Personal &amp; Rechte:</b> Nur Chefin - Rollen setzen (CHF/FRM/STY/AZU).',
         '<b>Backend-Verbindung:</b> Status des Casa-Servers prüfen.',
         '<b>Karriere:</b> Offene Stellen pflegen - auf Salon-Homepage sichtbar.'
@@ -3851,20 +3867,20 @@
       closeProfileDropdown();
       var u = USERS[currentUser];
       document.getElementById('profName').value = u.name;
-      document.getElementById('profKuerzel').value = u.kuerzel;
+      document.getElementById('profKuerzel').value = u.kürzel;
       document.getElementById('profFarbe').value = u.farbe;
       openSheet('profileSheet');
     }
     function saveProfile() {
       var name = document.getElementById('profName').value.trim();
-      var kuerzel = document.getElementById('profKuerzel').value.trim().toUpperCase();
+      var kürzel = document.getElementById('profKuerzel').value.trim().toUpperCase();
       var farbe = document.getElementById('profFarbe').value;
       if (name) USERS[currentUser].name = name;
-      if (kuerzel && kuerzel.length === 2) USERS[currentUser].kuerzel = kuerzel;
+      if (kürzel && kürzel.length === 2) USERS[currentUser].kürzel = kürzel;
       if (farbe) USERS[currentUser].farbe = farbe;
       if (!userCustomizations[currentUser]) userCustomizations[currentUser] = {};
       userCustomizations[currentUser].name = name;
-      userCustomizations[currentUser].kuerzel = kuerzel;
+      userCustomizations[currentUser].kürzel = kürzel;
       userCustomizations[currentUser].farbe = farbe;
       localStorage.setItem('casa_user_custom', JSON.stringify(userCustomizations));
       closeSheet('profileSheet');
@@ -4419,7 +4435,7 @@
       if (!box || !datum || !zeit) return;
       var svcSel = document.getElementById('terminSvcSelect');
       var dauer = svcSel ? (parseInt((svcSel.options[svcSel.selectedIndex] || {}).getAttribute('data-dauer')) || 60) : 60;
-      var warn = pruefeOeffnungszeit(datum, zeit, dauer);
+      var warn = prüfeOeffnungszeit(datum, zeit, dauer);
       if (warn) {
         box.textContent = '\u26A0\uFE0F ' + warn;
         box.style.display = 'block';
@@ -4431,7 +4447,7 @@
     // FB-63: Öffnungszeiten-Prüfung (Rena Rados: Mo-Fr 9-19h, Sa 9-17h, So geschlossen)
     // Wird aus öffnungszeiten-Tabelle befüllt sobald DB live; bis dahin Rena-Demo-Werte
     var OEFFNUNGSZEITEN = { 1:[9,19], 2:[9,19], 3:[9,19], 4:[9,19], 5:[9,19], 6:[9,17], 0:null };
-    function pruefeOeffnungszeit(datum, zeit, dauerMin) {
+    function prüfeOeffnungszeit(datum, zeit, dauerMin) {
       // datum: 'YYYY-MM-DD', zeit: 'HH:MM', dauerMin: number
       // Gibt null zurück wenn OK, sonst Warn-String
       var d = new Date(datum + 'T' + zeit + ':00');
@@ -4440,7 +4456,7 @@
       if (!oef) return 'Sonntag: Der Salon ist geschlossen.';
       var startH = d.getHours() + d.getMinutes() / 60;
       var endH = startH + (dauerMin || 0) / 60;
-      if (startH < oef[0]) return 'Vor Öffnung: Der Salon oeffnet um ' + oef[0] + ':00 Uhr.';
+      if (startH < oef[0]) return 'Vor Öffnung: Der Salon öffnet um ' + oef[0] + ':00 Uhr.';
       if (endH > oef[1]) return 'Nach Schluss: Der Salon schließt um ' + oef[1] + ':00 Uhr (Termin endet ' + Math.round((endH - oef[1]) * 60) + ' Min nach Schluss).';
       return null;
     }
@@ -4459,7 +4475,7 @@
       if (!datum || !zeit) { showToast('Bitte Datum und Uhrzeit eingeben', 'warning'); return; }
 
       // FB-63: Öffnungszeiten-Warnung — Abbruch bei geschlossen, Hinweis bei Randzeiten
-      var oefWarn = pruefeOeffnungszeit(datum, zeit, dauer);
+      var oefWarn = prüfeOeffnungszeit(datum, zeit, dauer);
       if (oefWarn) {
         showToast('Ausserhalb der Öffnungszeiten: ' + oefWarn, 'warning');
         return; // Abbruch — Termin wird NICHT eingetragen
@@ -4541,7 +4557,7 @@
 
       // BUG-FIX 15.04.2026: Liste konsistent mit Tag/Woche — kein impliziter Stylist-Filter
       // (frueher: !perms.alleTermine + currentUser versteckte Termine anderer Stylisten in Liste,
-      //  waehrend Tag/Woche alle zeigten. Staff-Filter-Chips uebernehmen diese Funktion explizit.)
+      //  während Tag/Woche alle zeigten. Staff-Filter-Chips übernehmen diese Funktion explizit.)
       var filtered = termine.filter(function(t) {
         var match = (t.Start_ISO || '').indexOf(dateStr) === 0;
         if (terminStaffFilter !== 'alle') match = match && t.Stylist === terminStaffFilter;
@@ -5058,11 +5074,11 @@
       container.textContent = '';
       if (!perms.umsatzSehen || !data) return;
       Object.keys(data).forEach(function(name) {
-        // SPRINT5 (16.04.2026): getStylistColor + Kuerzel aus getStylistList konsolidiert
+        // SPRINT5 (16.04.2026): getStylistColor + Kürzel aus getStylistList konsolidiert
         var color = getStylistColor(name);
         var kz = (function(){
           var list = getStylistList(null);
-          for (var i=0;i<list.length;i++){ if ((list[i].name||'').toLowerCase() === String(name||'').toLowerCase()) return list[i].kuerzel; }
+          for (var i=0;i<list.length;i++){ if ((list[i].name||'').toLowerCase() === String(name||'').toLowerCase()) return list[i].kürzel; }
           return String(name||'??').substring(0,2).toUpperCase();
         })();
         var div = document.createElement('div');
@@ -5319,7 +5335,7 @@
 
         card.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">'
           + '<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 6px;border-radius:6px;background:' + katColor + '20;color:' + katColor + '">' + esc(p.Kategorie || 'Sonstiges') + '</span>'
-          + '<span class="lager-bestand-edit" data-id="' + esc(p.id || '') + '" data-prod="' + esc(p.Produkt || p.Name || '') + '" data-current="' + bestand + '" style="font-size:11px;font-weight:700;color:' + barColor + ';cursor:pointer;padding:1px 6px;border-radius:4px;border:1px dashed ' + barColor + '33" title="Klick: Bestand direkt aendern">' + bestand + ' Stk.</span></div>'
+          + '<span class="lager-bestand-edit" data-id="' + esc(p.id || '') + '" data-prod="' + esc(p.Produkt || p.Name || '') + '" data-current="' + bestand + '" style="font-size:11px;font-weight:700;color:' + barColor + ';cursor:pointer;padding:1px 6px;border-radius:4px;border:1px dashed ' + barColor + '33" title="Klick: Bestand direkt ändern">' + bestand + ' Stk.</span></div>'
           + '<div class="produkt-name">' + esc(p.Produkt || p.Name || '') + demoDot() + '</div>'
           + '<div style="font-size:10px;color:var(--text-dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(p.Marke || '') + (p.VK_Preis ? ' — ' + fmtEur(p.VK_Preis) + ' EUR' : '') + '</div>'
           + '<div style="margin-top:7px;height:5px;background:var(--bg-warm);border-radius:3px;overflow:hidden;position:relative">'
@@ -5356,7 +5372,7 @@
           var id = el.getAttribute('data-id');
           var prod = el.getAttribute('data-prod');
           var current = parseInt(el.getAttribute('data-current')) || 0;
-          var neu = prompt('Neuer Bestand fuer "' + prod + '":', current);
+          var neu = prompt('Neuer Bestand für "' + prod + '":', current);
           if (neu === null) return;
           neu = parseInt(neu);
           if (isNaN(neu) || neu < 0) { showToast('Ungueltiger Wert', 'error'); return; }
@@ -5715,7 +5731,7 @@
         + '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">'
         + (isVip ? '<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:var(--radius-full);background:var(--gold-glow);color:var(--gold)">VIP</span>' : '')
         + (isStamm ? '<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:var(--radius-full);background:var(--success-bg);color:var(--success)">Stammkunde</span>' : '')
-        + (k.Follow_Up || k.follow_up ? '<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:var(--radius-full);background:var(--warning-bg);color:var(--warning)">Follow-Up faellig</span>' : '')
+        + (k.Follow_Up || k.follow_up ? '<span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:var(--radius-full);background:var(--warning-bg);color:var(--warning)">Follow-Up fällig</span>' : '')
         + '</div>'
         + (k.Lieblings_Service || k.lieblings_service ? '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:10px;font-size:12px;margin-bottom:10px"><span style="color:var(--text-dim)">Lieblingsservice: </span><strong>' + esc(k.Lieblings_Service || k.lieblings_service) + '</strong></div>' : '')
         + (k.Notiz || k.notiz ? '<div style="background:var(--bg-warm);border-radius:var(--radius-sm);padding:10px;font-size:12px;color:var(--text-secondary);line-height:1.5;margin-bottom:10px"><strong>Notiz:</strong> ' + esc(k.Notiz || k.notiz) + '</div>' : '')
@@ -5908,7 +5924,7 @@
 
     // === DSGVO Art. 17 — Kundendaten-Löschung (Human-in-the-Loop) ===
     function requestKundeLoeschung(name) {
-      if (!confirm('DSGVO Art. 17: Moechtest du wirklich ALLE Daten von "' + name + '" zur Löschung vormerken?\n\nDies umfasst: Kontaktdaten, Terminhistorie, Beratungen, Nachrichten.\n\nOffene Rechnungen werden 10 Jahre aufbewahrt (GoBD §147 AO).\n\nDer Saloninhaber muss die Löschung bestätigen.')) return;
+      if (!confirm('DSGVO Art. 17: Möchtest du wirklich ALLE Daten von "' + name + '" zur Löschung vormerken?\n\nDies umfasst: Kontaktdaten, Terminhistorie, Beratungen, Nachrichten.\n\nOffene Rechnungen werden 10 Jahre aufbewahrt (GoBD §147 AO).\n\nDer Saloninhaber muss die Löschung bestätigen.')) return;
       showToast('Löschanfrage für ' + name + ' vorgemerkt. Der Saloninhaber wird benachrichtigt.', 'info', 5000);
       closeSheet('detailSheet');
     }
@@ -6264,7 +6280,7 @@
       var todayTermine = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(todayStr) === 0; });
       if (todayTermine.length > 0) {
         var nextT = todayTermine.find(function(t) { return new Date(t.Start_ISO) > now; });
-        hints.push({ type: 'info', iconKey: 'calendar', text: todayTermine.length + ' Termine heute' + (nextT ? ' — Naechster: ' + fmtTime(nextT.Start_ISO) + ' ' + (nextT.Service || '') : ''), action: 'termine', prio: 1 });
+        hints.push({ type: 'info', iconKey: 'calendar', text: todayTermine.length + ' Termine heute' + (nextT ? ' — Nächster: ' + fmtTime(nextT.Start_ISO) + ' ' + (nextT.Service || '') : ''), action: 'termine', prio: 1 });
       }
 
       // Ungelesene Anfragen
@@ -6279,19 +6295,19 @@
         hints.push({ type: 'urgent', iconKey: 'box', text: lowStock.length + ' Produkt(e) unter Mindestbestand', action: 'lager', prio: 3 });
       }
 
-      // Tagesabschluss faellig (nach 17 Uhr)
+      // Tagesabschluss fällig (nach 17 Uhr)
       if (h >= 17 && perms.kasseGesamt) {
         hints.push({ type: 'critical', iconKey: 'chart', text: 'Tagesabschluss noch offen — GoBD-Pflicht!', action: 'kasse', prio: 0 });
       }
 
       // Guten-Morgen-Tipp
       if (h < 10 && todayTermine.length === 0) {
-        hints.push({ type: 'success', iconKey: 'sunrise', text: 'Ruhiger Vormittag — perfekt fuer Beratungen oder Lager-Check', action: 'beratung', prio: 10 });
+        hints.push({ type: 'success', iconKey: 'sunrise', text: 'Ruhiger Vormittag — perfekt für Beratungen oder Lager-Check', action: 'beratung', prio: 10 });
       }
 
       // Samstag = Hochbetrieb
       if (dow === 6) {
-        hints.push({ type: 'info', iconKey: 'bolt', text: 'Samstag — erfahrungsgemaess Hochbetrieb. Alles bereit?', action: 'termine', prio: 5 });
+        hints.push({ type: 'info', iconKey: 'bolt', text: 'Samstag — erfahrungsgemäß Hochbetrieb. Alles bereit?', action: 'termine', prio: 5 });
       }
 
       // Follow-Up Kunden
@@ -6648,7 +6664,7 @@
       html += '<div><div style="font-family:Playfair Display,serif;font-size:22px;font-weight:700">' + esc(t.Service || 'Termin') + '</div>';
       // Kundenname klickbar -> Kunden-Tab öffnen + suchen (17.04. UX-Polish)
       var kName = esc(t.Kundenname || t.Kunde || '');
-      html += '<div onclick="event.stopPropagation();document.getElementById(\'detailSheet\').classList.remove(\'open\');showPage(\'kunden\');setTimeout(function(){var f=document.getElementById(\'kundenSearch\');if(f){f.value=\'' + kName.replace(/'/g,"\\'") + '\';f.dispatchEvent(new Event(\'input\'));}},300);" style="font-size:13px;color:var(--text-secondary);margin-top:2px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color 200ms" onmouseover="this.style.textDecorationColor=\'var(--gold)\'" onmouseout="this.style.textDecorationColor=\'transparent\'" title="Kundendetail oeffnen">' + kName + '</div>';
+      html += '<div onclick="event.stopPropagation();document.getElementById(\'detailSheet\').classList.remove(\'open\');showPage(\'kunden\');setTimeout(function(){var f=document.getElementById(\'kundenSearch\');if(f){f.value=\'' + kName.replace(/'/g,"\\'") + '\';f.dispatchEvent(new Event(\'input\'));}},300);" style="font-size:13px;color:var(--text-secondary);margin-top:2px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color 200ms" onmouseover="this.style.textDecorationColor=\'var(--gold)\'" onmouseout="this.style.textDecorationColor=\'transparent\'" title="Kundendetail öffnen">' + kName + '</div>';
       html += '<span class="termin-status ' + statusClass + '" style="margin-top:6px">' + esc(statusLabel) + '</span></div>';
       html += '<div style="text-align:right"><div style="font-family:Playfair Display,serif;font-size:20px;font-weight:700;color:var(--gold)">' + fmtEur(t.Preis) + ' &euro;</div></div></div>';
 
@@ -6719,7 +6735,7 @@
           // Detail-Zeile (eingeklappt)
           html += '<div id="' + stepId + '" style="display:none;padding:4px 10px 8px 38px;border-top:1px solid var(--border);font-size:11px;color:var(--text-secondary)">';
           if (a.hinweis) html += '<div>' + esc(a.hinweis) + '</div>';
-          else html += '<div style="color:var(--text-dim);font-style:italic">Kein zusaetzlicher Hinweis.</div>';
+          else html += '<div style="color:var(--text-dim);font-style:italic">Kein zusätzlicher Hinweis.</div>';
           html += '</div></div>';
         });
         html += '<div style="text-align:right;padding:4px 0 8px;font-size:11px;font-weight:700;color:var(--gold)">Gesamt: ' + totalMin + ' Min</div>';
@@ -6753,20 +6769,20 @@
       var kiTerminHints = [];
       // Farbtermin-Hinweis
       if (/farb|balayage|straeh|glossing/i.test(t.Service || '')) {
-        kiTerminHints.push({ iconKey: 'droplet', title: 'Olaplex No.1+2 als Strukturschutz empfehlen', desc: '+25 EUR Umsatz pro Behandlung, Haarbruch sichtbar reduziert.', detail: 'Olaplex waehrend der chemischen Behandlung einsetzen — reduziert Haarbruch nachweislich. Direkt ansprechen: "Zum Schutz Ihrer Haarstruktur empfehle ich heute Olaplex dazu." Kunden, die Olaplex erhalten, buchen 30% oefter den naechsten Farbtermin.' });
+        kiTerminHints.push({ iconKey: 'droplet', title: 'Olaplex No.1+2 als Strukturschutz empfehlen', desc: '+25 EUR Umsatz pro Behandlung, Haarbruch sichtbar reduziert.', detail: 'Olaplex während der chemischen Behandlung einsetzen — reduziert Haarbruch nachweislich. Direkt ansprechen: "Zum Schutz Ihrer Haarstruktur empfehle ich heute Olaplex dazu." Kunden, die Olaplex erhalten, buchen 30% oefter den nächsten Farbtermin.' });
         kiTerminHints.push({ iconKey: 'camera', title: 'Vorher-Foto jetzt machen, Nachher-Foto nach Styling', desc: 'Bestes Werbematerial für Instagram und Google-Profil.', detail: 'Einwilligung vor dem Start einholen: "Darf ich das Ergebnis für unseren Kanal verwenden?" — 80% sagen ja. Gleiche Beleuchtung, gleicher Winkel für echten Vergleich. Ein gutes Vorher/Nachher bringt im Schnitt 2-3 Anfragen.' });
       }
       // Neukunden-Hinweis
       var kundenMatch = kundenCache.find(function(k) { return (k.Name || k.name) === t.Kundenname; });
       if (kundenMatch && (kundenMatch.Besuche || 0) <= 2) {
-        kiTerminHints.push({ iconKey: 'star', title: esc(t.Kundenname) + ' — Besuch Nr. ' + ((kundenMatch.Besuche || 0) + 1), desc: 'Neukunde: besondere Aufmerksamkeit jetzt entscheidet über Wiederkommen.', detail: 'Getraenk anbieten, kurzen Rundgang machen, Pflegetipps zum Mitnehmen geben. Am Ende fragen: "Wie haben Sie uns gefunden?" — wichtig für Marketing. Visitenkarte + 10%-Gutschein für naechsten Besuch mitgeben.' });
+        kiTerminHints.push({ iconKey: 'star', title: esc(t.Kundenname) + ' — Besuch Nr. ' + ((kundenMatch.Besuche || 0) + 1), desc: 'Neukunde: besondere Aufmerksamkeit jetzt entscheidet über Wiederkommen.', detail: 'Getraenk anbieten, kurzen Rundgang machen, Pflegetipps zum Mitnehmen geben. Am Ende fragen: "Wie haben Sie uns gefunden?" — wichtig für Marketing. Visitenkarte + 10%-Gutschein für nächsten Besuch mitgeben.' });
       }
       if (kundenMatch && kundenMatch.VIP) {
-        kiTerminHints.push({ iconKey: 'crown', title: esc(t.Kundenname) + ' — VIP mit ' + (kundenMatch.Besuche || 0) + ' Besuchen', desc: 'Lieblingsprodukte bereitstellen, persönlich ansprechen.', detail: 'VIPs merken sofort ob man vorbereitet ist. Fragen: "Sind Sie mit Ihrem Pflegeprodukt noch zufrieden?" — oeffnet Nachkauf-Gespraech. Neue Produktneuheit als Probe anbieten (Probiergroesse kostet kaum etwas, wirkt aber sehr wertschatzend).' });
+        kiTerminHints.push({ iconKey: 'crown', title: esc(t.Kundenname) + ' — VIP mit ' + (kundenMatch.Besuche || 0) + ' Besuchen', desc: 'Lieblingsprodukte bereitstellen, persönlich ansprechen.', detail: 'VIPs merken sofort ob man vorbereitet ist. Fragen: "Sind Sie mit Ihrem Pflegeprodukt noch zufrieden?" — öffnet Nachkauf-Gespraech. Neue Produktneuheit als Probe anbieten (Probiergroesse kostet kaum etwas, wirkt aber sehr wertschatzend).' });
       }
       // Zeitdruck-Hinweis
       if ((parseInt(t.Dauer_Min) || 0) >= 90) {
-        kiTerminHints.push({ iconKey: 'clock', title: 'Langer Termin — ' + t.Dauer_Min + ' Min Einwirkzeit nutzen', desc: 'Getraenk anbieten, Produktberatung waehrend der Einwirkzeit.', detail: 'Kaffee, Tee oder Wasser gleich zu Beginn anbieten. Einwirkzeit aktiv nutzen: "In der Zwischenzeit zeige ich Ihnen, welche Pflege zu Ihrem Haartyp passt." Bei mehr als 120 Min: kleinen Snack bereitstellen.' });
+        kiTerminHints.push({ iconKey: 'clock', title: 'Langer Termin — ' + t.Dauer_Min + ' Min Einwirkzeit nutzen', desc: 'Getraenk anbieten, Produktberatung während der Einwirkzeit.', detail: 'Kaffee, Tee oder Wasser gleich zu Beginn anbieten. Einwirkzeit aktiv nutzen: "In der Zwischenzeit zeige ich Ihnen, welche Pflege zu Ihrem Haartyp passt." Bei mehr als 120 Min: kleinen Snack bereitstellen.' });
       }
       // Produktempfehlung
       if (/schnitt|feminin|maskulin|styling/i.test(t.Service || '')) {
@@ -6926,7 +6942,7 @@
       input.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;z-index:10;font-size:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation';
       // Sicherstellen, dass der Input wirklich ein Kind der Area ist und ans Ende kommt (z-Index über Icons)
       area.appendChild(input);
-      // Sofortiges visuelles Feedback beim File-Wahl (bevor FileReader laeuft)
+      // Sofortiges visuelles Feedback beim File-Wahl (bevor FileReader läuft)
       input.addEventListener('change', function() {
         if (input.files && input.files.length) {
           // Short-term visual feedback: area kurz goldig blitzen lassen (ersetzt das "nix passiert"-Gefuehl)
@@ -7121,7 +7137,7 @@
       tips.appendChild(tSum);
       var tBody = document.createElement('div');
       tBody.style.cssText = 'padding:8px 14px 12px;font-size:11px;color:var(--text-secondary);line-height:1.8';
-      ['\u2022 Tageslicht ist Pflicht (Kunstlicht verfaelscht Farben)','\u2022 Haar vor neutralem Hintergrund fotografieren','\u2022 Nah an die Haarstraehne herangehen','\u2022 Ansatz UND Laengen getrennt zeigen','\u2022 Keine Filter oder Auto-Korrektur'].forEach(function(t) { var p = document.createElement('div'); p.textContent = t; tBody.appendChild(p); });
+      ['\u2022 Tageslicht ist Pflicht (Kunstlicht verfaelscht Farben)','\u2022 Haar vor neutralem Hintergrund fotografieren','\u2022 Nah an die Haarstraehne herangehen','\u2022 Ansatz UND Längen getrennt zeigen','\u2022 Keine Filter oder Auto-Korrektur'].forEach(function(t) { var p = document.createElement('div'); p.textContent = t; tBody.appendChild(p); });
       tips.appendChild(tBody);
       wrapper.appendChild(tips);
 
@@ -7806,7 +7822,7 @@
         { name: 'Farbhistorie', value: 'Balayage (3 Monate)', score: 6 },
         { name: 'Feuchtigkeitsgehalt', value: 'Leicht reduziert', score: 5 }
       ],
-      empfehlung: 'Feuchtigkeitskur 1x/Woche, Hitzeschutz beim Föhnen. Olaplex Nr. 3 als Home-Treatment. Naechste Balayage-Auffrischung in 4-6 Wochen.'
+      empfehlung: 'Feuchtigkeitskur 1x/Woche, Hitzeschutz beim Föhnen. Olaplex Nr. 3 als Home-Treatment. Nächste Balayage-Auffrischung in 4-6 Wochen.'
     };
 
     function renderHaaranalyseResult(result, data, isDemo) {
@@ -7988,7 +8004,7 @@
       fields.appendChild(nameIn); fields.appendChild(selHaar);
       wrapper.appendChild(fields);
       var notiz = document.createElement('textarea');
-      notiz.id = 'wfNotiz'; notiz.placeholder = 'Aktuelle Laenge, Vorbehandlungen, Wuensche...'; notiz.rows = 2;
+      notiz.id = 'wfNotiz'; notiz.placeholder = 'Aktuelle Länge, Vorbehandlungen, Wünsche...'; notiz.rows = 2;
       notiz.style.cssText = 'width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none;margin-bottom:12px;box-sizing:border-box';
       wrapper.appendChild(notiz);
 
@@ -8270,7 +8286,7 @@
       var loadWrap = document.createElement('div');
       loadWrap.style.cssText = 'text-align:center;padding:20px';
       var skel = document.createElement('div'); skel.className = 'skeleton'; skel.style.cssText = 'width:100%;height:12px;margin-bottom:8px'; loadWrap.appendChild(skel);
-      var loadMsg = document.createElement('div'); loadMsg.style.cssText = 'font-size:11px;color:var(--text-dim)'; loadMsg.textContent = 'KI prueft Machbarkeit...'; loadWrap.appendChild(loadMsg);
+      var loadMsg = document.createElement('div'); loadMsg.style.cssText = 'font-size:11px;color:var(--text-dim)'; loadMsg.textContent = 'KI prüft Machbarkeit...'; loadWrap.appendChild(loadMsg);
       result.appendChild(loadWrap);
 
       var wfName = (document.getElementById('wfName') || {}).value || '';
@@ -8506,7 +8522,7 @@
 
       // Verbindungs-Check
       if (!connected) {
-        actions.push({ icon: '&#128279;', title: 'Backend nicht verbunden', desc: 'Das Dashboard laeuft im Demo-Modus. Für den Echtbetrieb muss die Backend-Verbindung hergestellt werden.', prio: 'hoch', action: 'openConfigSheet()' });
+        actions.push({ icon: '&#128279;', title: 'Backend nicht verbunden', desc: 'Das Dashboard läuft im Demo-Modus. Für den Echtbetrieb muss die Backend-Verbindung hergestellt werden.', prio: 'hoch', action: 'openConfigSheet()' });
       }
 
       // Demo-Modus Hinweis
@@ -8538,7 +8554,7 @@
         var today = now.toISOString().split('T')[0];
         var todayDone = (termineCache || []).filter(function(t) { return (t.Start_ISO || '').indexOf(today) === 0 && t.Status === 'abgeschlossen'; });
         if (todayDone.length > 0) {
-          actions.push({ icon: '&#128176;', title: 'Tagesabschluss faellig', desc: todayDone.length + ' abgeschlossene Termine heute. Finanzamt-sicherer Tagesabschluss empfohlen.', prio: 'mittel', action: 'openTagesabschluss()' });
+          actions.push({ icon: '&#128176;', title: 'Tagesabschluss fällig', desc: todayDone.length + ' abgeschlossene Termine heute. Finanzamt-sicherer Tagesabschluss empfohlen.', prio: 'mittel', action: 'openTagesabschluss()' });
         }
       }
 
@@ -8547,7 +8563,7 @@
 
       // Alles gut
       if (actions.length === 0) {
-        el.innerHTML = '<div class="admin-action-card" style="border-left:3px solid var(--success)"><div class="aa-icon">&#10024;</div><div class="aa-body"><div class="aa-title" style="color:var(--success)">Alles in Ordnung</div><div class="aa-desc">Keine dringenden Handlungsempfehlungen. System laeuft normal.</div></div></div>';
+        el.innerHTML = '<div class="admin-action-card" style="border-left:3px solid var(--success)"><div class="aa-icon">&#10024;</div><div class="aa-body"><div class="aa-title" style="color:var(--success)">Alles in Ordnung</div><div class="aa-desc">Keine dringenden Handlungsempfehlungen. System läuft normal.</div></div></div>';
         return;
       }
 
@@ -8636,7 +8652,7 @@
     }
 
     function runSystemCheck() {
-      showToast('System-Check laeuft...', 'info');
+      showToast('System-Check läuft...', 'info');
       setTimeout(function() {
         renderAdminZentrale();
         showToast('System-Check abgeschlossen', 'success');
@@ -8684,7 +8700,7 @@
           if (u.kann_herren !== false) who.push('H');
           bedHtml = '<span style="font-size:9px;background:var(--surface-hover);color:var(--text-dim);padding:2px 5px;border-radius:4px;margin-right:6px" title="Kann bedienen">' + who.join('+') + '</span>';
         }
-        card.innerHTML = '<div class="left"><div class="avatar" style="width:32px;height:32px;background:' + u.farbe + ';font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border-radius:50%">' + u.kuerzel + '</div>'
+        card.innerHTML = '<div class="left"><div class="avatar" style="width:32px;height:32px;background:' + u.farbe + ';font-size:11px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border-radius:50%">' + u.kürzel + '</div>'
           + '<div><div class="title">' + esc(u.name) + ' ' + esc(u.nachname || '') + '</div><div class="desc">' + (ROLLEN_LABEL[u.rolle] || u.rolle) + '</div></div></div>'
           + '<div style="display:flex;align-items:center">' + bedHtml + rolleHtml + editBtn + '</div>';
         container.appendChild(card);
@@ -9201,7 +9217,7 @@
       var offTopic = /\b(aktie|bitcoin|crypto|krypto|fussball|politik|wahl|religion|steuern im allgemeinen|rezept|kochen|reisen|auto kauf|immobilien|urlaub)\b/i;
       if (offTopic.test(tLow) && !/\b(salon|friseur|bart|haar|beauty|kosmetik|kunde|termin|rechnung|produkt|lager|team|mitarbeiter)\b/i.test(tLow)) {
         jarvisRenderMessage(text, [], 'user');
-        jarvisRenderMessage('Darf ich ehrlich sein? Da kann ich dir weniger gut helfen als bei Haar, Bart, Wimpern oder deinem Salon-Alltag. Wenn du dazu etwas hast — ich hoere gern zu.', [], 'assistant');
+        jarvisRenderMessage('Darf ich ehrlich sein? Da kann ich dir weniger gut helfen als bei Haar, Bart, Wimpern oder deinem Salon-Alltag. Wenn du dazu etwas hast — ich höre gern zu.', [], 'assistant');
         return;
       }
       jarvisSendMessage(text);
@@ -9294,20 +9310,20 @@
       var t = text.toLowerCase();
       // Nachbestellung
       if (/nachbestell|nachorder|produkt.*bestell|bestell.*produkt/i.test(t)) {
-        return { text: 'Ich oeffne die Nachbestellung für dich.', actions: [{ type: 'execute', fn: 'nachbestellung_anlegen', label: 'Nachbestellung oeffnen', payload: {} }] };
+        return { text: 'Ich öffne die Nachbestellung für dich.', actions: [{ type: 'execute', fn: 'nachbestellung_anlegen', label: 'Nachbestellung öffnen', payload: {} }] };
       }
       // Rechnung erstellen
       if (/rechnung.*erstell|erstell.*rechnung|rechnung.*schreib|schreib.*rechnung/i.test(t)) {
-        return { text: 'Ich oeffne die Rechnungsmaske.', actions: [{ type: 'execute', fn: 'rechnung_erstellen', label: 'Rechnung oeffnen', payload: {} }] };
+        return { text: 'Ich öffne die Rechnungsmaske.', actions: [{ type: 'execute', fn: 'rechnung_erstellen', label: 'Rechnung öffnen', payload: {} }] };
       }
       // Tagesabschluss
       if (/tagesabschluss|tages.abschluss|abschluss.*heute|kasse.*abschluss/i.test(t)) {
-        return { text: 'Ich oeffne den Tagesabschluss.', actions: [{ type: 'execute', fn: 'tagesabschluss', label: 'Tagesabschluss oeffnen', payload: {} }] };
+        return { text: 'Ich öffne den Tagesabschluss.', actions: [{ type: 'execute', fn: 'tagesabschluss', label: 'Tagesabschluss öffnen', payload: {} }] };
       }
       // Navigation
-      if (/termin/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Termine direkt.', actions: [{ type: 'goto_page', label: 'Termine', payload: { page: 'termine' } }] }; }
-      if (/kasse|umsatz/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Kasse direkt.', actions: [{ type: 'goto_page', label: 'Kasse', payload: { page: 'kasse' } }] }; }
-      if (/lager/.test(t)) { return { text: 'Verbindung getrennt. Oeffne Lager direkt.', actions: [{ type: 'goto_page', label: 'Lager', payload: { page: 'lager' } }] }; }
+      if (/termin/.test(t)) { return { text: 'Verbindung getrennt. Öffne Termine direkt.', actions: [{ type: 'goto_page', label: 'Termine', payload: { page: 'termine' } }] }; }
+      if (/kasse|umsatz/.test(t)) { return { text: 'Verbindung getrennt. Öffne Kasse direkt.', actions: [{ type: 'goto_page', label: 'Kasse', payload: { page: 'kasse' } }] }; }
+      if (/lager/.test(t)) { return { text: 'Verbindung getrennt. Öffne Lager direkt.', actions: [{ type: 'goto_page', label: 'Lager', payload: { page: 'lager' } }] }; }
       return { text: 'Keine Verbindung. Bitte Internetverbindung prüfen.', actions: [] };
     }
 
@@ -9470,7 +9486,7 @@
     var dragSrcEl = null;
 
     function getWidgetStorageKey(suffix) {
-      var user = (currentUser && currentUser.Kuerzel) ? currentUser.Kuerzel : 'default';
+      var user = (currentUser && currentUser.Kürzel) ? currentUser.Kürzel : 'default';
       return suffix + user;
     }
 
@@ -9733,15 +9749,15 @@
         });
       }
 
-      // Naechster Termin Vorbereitung
+      // Nächster Termin Vorbereitung
       var nextTermin = todayTermine.find(function(t) { return new Date(t.Start_ISO) > now; });
       if (nextTermin) {
         var recipe = findRecipe(nextTermin.Service);
         var produktHint = recipe ? recipe.produkte.slice(0, 2).map(function(p) { return p.name; }).join(', ') : 'Standardprodukte';
         suggestions.push({
-          iconKey: 'calendar', title: 'Naechster Termin: ' + fmtTime(nextTermin.Start_ISO) + ' ' + esc(nextTermin.Service),
+          iconKey: 'calendar', title: 'Nächster Termin: ' + fmtTime(nextTermin.Start_ISO) + ' ' + esc(nextTermin.Service),
           desc: 'Kunde: ' + esc(nextTermin.Kundenname) + ' | Bereitlegen: ' + produktHint,
-          action: 'Termin oeffnen ›', click: function() { showPage('termine'); openTerminDetail(nextTermin); }
+          action: 'Termin öffnen ›', click: function() { showPage('termine'); openTerminDetail(nextTermin); }
         });
       }
 
@@ -9761,7 +9777,7 @@
         suggestions.push({
           iconKey: 'users', title: followUps.length + ' Kunden mit offenem Follow-Up',
           desc: fName + (followUps[0].Notiz ? ': ' + esc(followUps[0].Notiz).substring(0, 60) : '') + ' — persönlicher Kontakt empfohlen',
-          action: 'Kunden oeffnen ›', click: function() { showPage('kunden'); setKundenFilter('followup'); }
+          action: 'Kunden öffnen ›', click: function() { showPage('kunden'); setKundenFilter('followup'); }
         });
       }
 
@@ -9770,8 +9786,8 @@
         var umsatz = finanzenCache ? finanzenCache.tagesUmsatz : 0;
         suggestions.push({
           iconKey: 'receipt', title: 'Tagesabschluss noch offen',
-          desc: 'Tagesumsatz: ' + fmtEur(umsatz) + ' EUR — Finanzamt-Pflicht, Frist laeuft um Mitternacht.',
-          action: 'Kasse oeffnen ›', click: function() { showPage('kasse'); openTagesabschluss(); }
+          desc: 'Tagesumsatz: ' + fmtEur(umsatz) + ' EUR — Finanzamt-Pflicht, Frist läuft um Mitternacht.',
+          action: 'Kasse öffnen ›', click: function() { showPage('kasse'); openTagesabschluss(); }
         });
       }
 
@@ -9812,7 +9828,7 @@
       });
 
       if (suggestions.length === 0) {
-        container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-dim);font-size:12px">Keine KI-Vorschlaege gerade — alles laeuft rund!</div>';
+        container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-dim);font-size:12px">Keine KI-Vorschlaege gerade — alles läuft rund!</div>';
       }
     }
 
@@ -9858,7 +9874,7 @@
       // Fallback-Hinweise damit immer mind. 3 angezeigt werden
       var fallbacks = [
         { iconKey: 'droplet', title: 'Olaplex zu jedem Farbtermin anbieten', desc: 'Strukturschutz kostet den Kunden ~25 EUR extra und verdoppelt die Zufriedenheit — Haarbruch sichtbar reduziert.' },
-        { iconKey: 'calendar', title: 'Naechste Woche schon vorplanen', desc: 'Montag-Check: Welche Produkte werden gebraucht? Welche Kunden haben seit 6 Wochen keinen Termin?' },
+        { iconKey: 'calendar', title: 'Nächste Woche schon vorplanen', desc: 'Montag-Check: Welche Produkte werden gebraucht? Welche Kunden haben seit 6 Wochen keinen Termin?' },
         { iconKey: 'star', title: 'Google-Bewertung gezielt anfragen', desc: 'Direkt nach dem Spiegel-Moment fragen: "Wenn Sie zufrieden sind — eine kurze Google-Bewertung hilft uns sehr." 5-Sterne-Reviews bringen neue Laufkundschaft.' },
         { iconKey: 'camera', title: 'Vorher/Nachher-Foto bei Farbservice', desc: 'Einwilligung einholen, dann beide Fotos machen — bestes Werbematerial für Instagram und Google-Profil.' }
       ];
@@ -9889,10 +9905,10 @@
         hints.push({ iconKey: 'trending', title: 'Durchschnittlicher Bon: ' + fmtEur(avg) + ' EUR', desc: 'Noch Luft nach oben: Ein LA Biosthetique Pflegeprodukt direkt am Stuhl zeigen bringt durchschnittlich +18 EUR je Kunde.', prio: 'warning' });
       }
       if (avg >= 80) {
-        hints.push({ iconKey: 'star', title: 'Starker Tageswert: ' + fmtEur(avg) + ' EUR Schnitt', desc: 'Hervorragende Leistung beim Produktverkauf — das Muster von heute für die naechste Woche festhalten.', prio: 'success' });
+        hints.push({ iconKey: 'star', title: 'Starker Tageswert: ' + fmtEur(avg) + ' EUR Schnitt', desc: 'Hervorragende Leistung beim Produktverkauf — das Muster von heute für die nächste Woche festhalten.', prio: 'success' });
       }
       if (h >= 17 && perms.kasseGesamt) {
-        hints.push({ iconKey: 'receipt', title: 'Tagesabschluss noch offen', desc: 'Finanzamt-Pflicht: Kasse jetzt abschliessen, Barentnahmen dokumentieren — Frist laeuft um Mitternacht.', prio: 'warning' });
+        hints.push({ iconKey: 'receipt', title: 'Tagesabschluss noch offen', desc: 'Finanzamt-Pflicht: Kasse jetzt abschliessen, Barentnahmen dokumentieren — Frist läuft um Mitternacht.', prio: 'warning' });
       }
       if (kasseCache.length === 0 && h > 10) {
         hints.push({ iconKey: 'clock', title: 'Noch keine Buchungen heute', desc: 'Kasse vorbereitet? Wechselgeld auffuellen, Quittungsrolle prüfen, Terminal eingeschaltet?' });
@@ -9900,7 +9916,7 @@
       var kFallbacks = [
         { iconKey: 'shoppingBag', title: 'Pflegeprodukt direkt am Stuhl empfehlen', desc: 'Beim Föhnen zeigen was genutzt wird — Kunden kaufen 3x haeufiger wenn sie das Produkt in Aktion sehen.' },
         { iconKey: 'barChart', title: 'Tagesumsatz mit Vorwoche vergleichen', desc: 'Gleicher Wochentag, letzter Monat als Referenz — zeigt ob Aktionen wirken oder Schwaechen aufdecken.' },
-        { iconKey: 'coin', title: 'Kartenzahlung aktiv foerdern', desc: 'QR-Code-Aufsteller gut platzieren — kuerzere Abrechnung, kein Rueckgeld, weniger Fehler.' },
+        { iconKey: 'coin', title: 'Kartenzahlung aktiv foerdern', desc: 'QR-Code-Aufsteller gut platzieren — kürzere Abrechnung, kein Rueckgeld, weniger Fehler.' },
         { iconKey: 'receipt', title: 'Belege sofort erfassen', desc: 'Kassenbeleg direkt nach jedem Termin buchen — Monatende-Stress vermeiden, Finanzamt-sicher bleiben.' }
       ];
       var kfi = 0;
@@ -9924,13 +9940,13 @@
 
       if (followUps.length > 0) {
         var fn = followUps[0].Name || followUps[0].name || 'Kunde';
-        hints.push({ iconKey: 'message', title: followUps.length + ' offene Follow-Ups', desc: fn + ' als naechstes kontaktieren — eine persönliche WhatsApp-Nachricht wirkt dreimal besser als eine Standard-E-Mail.' });
+        hints.push({ iconKey: 'message', title: followUps.length + ' offene Follow-Ups', desc: fn + ' als nächstes kontaktieren — eine persönliche WhatsApp-Nachricht wirkt dreimal besser als eine Standard-E-Mail.' });
       }
       if (noVisit60.length > 0) {
-        hints.push({ iconKey: 'heart', title: noVisit60.length + ' Kunden seit 60+ Tagen nicht mehr im Salon', desc: 'Reaktivierung per WhatsApp: "Wir denken an Sie — 10% auf den naechsten Besuch." Guenstigste Form der Neukunden-Werbung.' });
+        hints.push({ iconKey: 'heart', title: noVisit60.length + ' Kunden seit 60+ Tagen nicht mehr im Salon', desc: 'Reaktivierung per WhatsApp: "Wir denken an Sie — 10% auf den nächsten Besuch." Guenstigste Form der Neukunden-Werbung.' });
       }
       if (vips.length > 0) {
-        hints.push({ iconKey: 'crown', title: vips.length + ' VIP-Kunden — persönliche Betreuung', desc: 'Geburtstags-Check jetzt: VIPs erhalten Glueckwunsch + Gutschein vorab — staerkste Bindungsmassnahme im Salon.' });
+        hints.push({ iconKey: 'crown', title: vips.length + ' VIP-Kunden — persönliche Betreuung', desc: 'Geburtstags-Check jetzt: VIPs erhalten Glueckwunsch + Gutschein vorab — stärkste Bindungsmassnahme im Salon.' });
       }
       if (kundenCache.length > 0 && kundenCache.length < 30) {
         hints.push({ iconKey: 'users', title: 'Kundenstamm noch im Aufbau — ' + kundenCache.length + ' Kontakte', desc: 'Jeden Walk-In nach Handynummer fragen. Nur 1 neuer Kontakt pro Tag ergibt 365 Stammkunden im Jahr.' });
@@ -9978,7 +9994,7 @@
       }
       var laFallbacks = [
         { iconKey: 'package', title: 'Freitags bestellen, montags im Regal', desc: 'Wochenend-Übersicht Freitagmittag machen, Bestellung direkt ausloesen — LA Biosthetique liefert in 3-5 Werktagen.' },
-        { iconKey: 'shoppingBag', title: 'Sichtbarkeit im Verkaufsregal erhoehen', desc: 'Shampoo + passender Conditioner als Set auf Augenhoehe platzieren — Sets verkaufen sich 40% besser als Einzelstuecke.' },
+        { iconKey: 'shoppingBag', title: 'Sichtbarkeit im Verkaufsregal erhöhen', desc: 'Shampoo + passender Conditioner als Set auf Augenhoehe platzieren — Sets verkaufen sich 40% besser als Einzelstuecke.' },
         { iconKey: 'barChart', title: 'Top-5-Produkte immer doppelt vorhalten', desc: 'Die fuenf meistverkauften Artikel nie unter 5 Stueck fallen lassen — Engpaesse kosten direkt Umsatz.' },
         { iconKey: 'leaf', title: 'Saisonale Empfehlungen jetzt aufstellen', desc: 'Fruehling/Sommer: Sonnenschutz-Spray + Leave-In. Herbst/Winter: intensive Feuchtigkeitskuren an den Spiegel stellen.' }
       ];
@@ -10130,13 +10146,13 @@
     function generateKiHintDetail(hint) {
       var t = (hint.title || '').toLowerCase();
       if (t.indexOf('nachbestellen') > -1 || t.indexOf('mindestbestand') > -1 || t.indexOf('ausverkauft') > -1) {
-        return 'Die KI hat Ihren aktuellen Lagerbestand analysiert und festgestellt, dass mehrere Produkte unter den definierten Mindestbestand gefallen sind. Bei den aktuellen Verbrauchsraten besteht das Risiko, dass diese Produkte innerhalb der naechsten 1-2 Wochen komplett aufgebraucht sind. Eine rechtzeitige Nachbestellung verhindert Lieferengpaesse und stellt sicher, dass Sie Ihren Kunden weiterhin alle Services anbieten können.';
+        return 'Die KI hat Ihren aktuellen Lagerbestand analysiert und festgestellt, dass mehrere Produkte unter den definierten Mindestbestand gefallen sind. Bei den aktuellen Verbrauchsraten besteht das Risiko, dass diese Produkte innerhalb der nächsten 1-2 Wochen komplett aufgebraucht sind. Eine rechtzeitige Nachbestellung verhindert Lieferengpaesse und stellt sicher, dass Sie Ihren Kunden weiterhin alle Services anbieten können.';
       }
       if (t.indexOf('termin') > -1 || t.indexOf('luecke') > -1 || t.indexOf('ueberschneidung') > -1) {
         return 'Die KI hat Ihren Terminkalender analysiert und Optimierungspotenzial erkannt. Terminluecken können für Walk-In-Kunden oder Nachholtermine genutzt werden. Bei Ueberschneidungen empfiehlt sich eine sofortige Umplanung, um Wartezeiten zu vermeiden und die Kundenzufriedenheit zu sichern.';
       }
       if (t.indexOf('follow') > -1 || t.indexOf('kontakt') > -1 || t.indexOf('kunde') > -1) {
-        return 'Die KI hat Kunden identifiziert, die für eine Kontaktaufnahme faellig sind. Regelmaessige Follow-Ups erhoehen die Kundenbindung nachweislich um bis zu 40%. Eine persönliche Nachricht per WhatsApp oder ein kurzer Anruf wirkt am staerksten.';
+        return 'Die KI hat Kunden identifiziert, die für eine Kontaktaufnahme fällig sind. Regelmaessige Follow-Ups erhöhen die Kundenbindung nachweislich um bis zu 40%. Eine persönliche Nachricht per WhatsApp oder ein kurzer Anruf wirkt am stärksten.';
       }
       if (t.indexOf('umsatz') > -1 || t.indexOf('bonwert') > -1 || t.indexOf('kasse') > -1 || t.indexOf('tagesabschluss') > -1) {
         return 'Die KI ueberwacht Ihre Tagesumsaetze und Kassenbewegungen in Echtzeit. Durch gezielte Empfehlungen wie Produktverkauf bei jedem Besuch oder Upselling bei Farbbehandlungen können Sie Ihren durchschnittlichen Bonwert deutlich steigern.';
@@ -10151,12 +10167,12 @@
         return 'Schnelle Antwortzeiten sind entscheidend für die Kundenzufriedenheit. Studien zeigen: Kunden, die innerhalb von 30 Minuten eine Antwort erhalten, buchen 3x haeufiger einen Termin als bei laengerer Wartezeit.';
       }
       if (t.indexOf('vip') > -1) {
-        return 'VIP-Kunden sind das Rueckgrat Ihres Salons. Ein personalisierter Geburtstagsgruss mit kleinem Gutschein staerkt die Bindung enorm. Diese Kunden empfehlen Ihren Salon durchschnittlich 4x haeufiger weiter.';
+        return 'VIP-Kunden sind das Rueckgrat Ihres Salons. Ein personalisierter Geburtstagsgruss mit kleinem Gutschein stärkt die Bindung enorm. Diese Kunden empfehlen Ihren Salon durchschnittlich 4x haeufiger weiter.';
       }
       if (t.indexOf('farb') > -1) {
         return 'Mehrere Farbtermine am selben Tag bieten die Chance, Farbe und Entwickler vorab vorzubereiten. Das spart pro Termin ca. 15 Minuten Arbeitszeit und sorgt für einen reibungsloseren Ablauf.';
       }
-      return 'Die KI hat diesen Hinweis basierend auf Ihren aktuellen Salondaten generiert. Durch regelmaessige Analyse von Terminen, Lagerbestaenden, Kundendaten und Umsaetzen erkennt das System Muster und gibt proaktive Empfehlungen.';
+      return 'Die KI hat diesen Hinweis basierend auf Ihren aktuellen Salondaten generiert. Durch regelmaessige Analyse von Terminen, Lagerbestaenden, Kundendaten und Umsätzen erkennt das System Muster und gibt proaktive Empfehlungen.';
     }
 
     function generateKiHintEmpfehlung(hint) {
@@ -10168,7 +10184,7 @@
       if (t.indexOf('follow') > -1) return 'Senden Sie heute noch eine persönliche WhatsApp-Nachricht an die ersten 3 Kunden auf der Follow-Up-Liste.';
       if (t.indexOf('tagesabschluss') > -1) return 'Schließen Sie die Kasse jetzt ab. GoBD-Pflicht: Tagesabschluss muss täglich dokumentiert werden.';
       if (t.indexOf('upsell') > -1 || t.indexOf('olaplex') > -1) return 'Empfehlen Sie bei jedem Farbtermin heute aktiv Olaplex No.1. Bereiten Sie das Produkt vorab vor und erklären Sie den Schutzeffekt in einem Satz.';
-      return 'Nehmen Sie sich 5 Minuten Zeit, um diesen Hinweis zu prüfen und die empfohlene Massnahme umzusetzen.';
+      return 'Nehmen Sie sich 5 Minuten Zeit, um diesen Hinweis zu prüfen und die empfohlene Maßnahme umzusetzen.';
     }
 
     function sendKiHintChat() {
@@ -10204,7 +10220,7 @@
         return 'Hallo ' + name + '! Vielen Dank für Ihre Anfrage. Gerne schaue ich für Sie nach freien Terminen. Wann wuerde es Ihnen am besten passen? Wir haben aktuell noch Verfügbarkeiten diese Woche.';
       }
       if (msg.indexOf('storn') > -1 || msg.indexOf('absa') > -1) {
-        return 'Hallo ' + name + ', kein Problem — ich storniere Ihren Termin kostenfrei. Moechten Sie gleich einen neuen Termin vereinbaren?';
+        return 'Hallo ' + name + ', kein Problem — ich storniere Ihren Termin kostenfrei. Möchten Sie gleich einen neuen Termin vereinbaren?';
       }
       if (msg.indexOf('balayage') > -1 || msg.indexOf('farb') > -1 || msg.indexOf('straeh') > -1) {
         return 'Hallo ' + name + '! Für Ihre Farbbehandlung empfehle ich ein Beratungsgespraech im Salon. So können wir den idealen Farbton bestimmen. Soll ich einen Termin vorschlagen?';
@@ -10219,7 +10235,7 @@
         return 'Hallo ' + name + '! Unser Herrenschnitt mit Bartpflege ist sehr beliebt. Die Behandlung dauert ca. 45 Minuten. Haben Sie einen Wunschtermin?';
       }
       if (msg.indexOf('danke') > -1 || msg.indexOf('super') > -1 || msg.indexOf('toll') > -1) {
-        return 'Vielen Dank, ' + name + '! Das freut uns sehr. Wir freuen uns auf Ihren naechsten Besuch!';
+        return 'Vielen Dank, ' + name + '! Das freut uns sehr. Wir freuen uns auf Ihren nächsten Besuch!';
       }
       return 'Hallo ' + name + '! Vielen Dank für Ihre Nachricht. Wie kann ich Ihnen weiterhelfen? Gerne vereinbare ich einen Termin oder berate Sie zu unseren Services.';
     }
@@ -10232,12 +10248,12 @@
       replies.push(generateKiReply(b));
       // Kurze Variante
       if (msg.indexOf('termin') > -1) {
-        replies.push('Hallo ' + name + ', gerne! Wie waere es am Donnerstag um 14:00?');
+        replies.push('Hallo ' + name + ', gerne! Wie wäre es am Donnerstag um 14:00?');
         replies.push('Hi ' + name + '! Ich habe noch Freitag 10:00 oder Samstag 11:00 frei. Was passt besser?');
       } else if (msg.indexOf('storn') > -1) {
         replies.push('Ist erledigt, ' + name + '. Ihr Termin ist storniert.');
       } else {
-        replies.push('Hi ' + name + '! Ich melde mich in Kuerze bei Ihnen.');
+        replies.push('Hi ' + name + '! Ich melde mich in Kürze bei Ihnen.');
         replies.push('Hallo ' + name + ', vielen Dank! Darf ich Sie morgen dazu beraten?');
       }
       return replies;
@@ -10296,7 +10312,7 @@
         produkte: [{name:'Blondierpulver',menge:'30 g'},{name:'Oxid 6%',menge:'60 ml',mischung:'1:2 mit Blondierpulver'},{name:'Balayage Folie 30cm',menge:'15-20 Stueck'},{name:'Olaplex No. 1',menge:'3.75 ml',mischung:'In Blondierung einmischen'},{name:'Olaplex No. 2',menge:'15 ml',mischung:'Nach Auswaschen, 10 Min einwirken'},{name:'Shampoo Silber',menge:'15 ml'},{name:'Pflegekur',menge:'20 ml'}]
       },
       'Farbbehandlung Komplett': {
-        aufgaben: [{schritt:'Farbberatung',dauer_min:5},{schritt:'Farbe anmischen',dauer_min:5},{schritt:'Auftragen (Ansatz + Laengen)',dauer_min:20},{schritt:'Einwirkzeit',dauer_min:30,einwirkzeit:true},{schritt:'Auswaschen + Emulgieren',dauer_min:8},{schritt:'Pflege + Föhnen',dauer_min:15}],
+        aufgaben: [{schritt:'Farbberatung',dauer_min:5},{schritt:'Farbe anmischen',dauer_min:5},{schritt:'Auftragen (Ansatz + Längen)',dauer_min:20},{schritt:'Einwirkzeit',dauer_min:30,einwirkzeit:true},{schritt:'Auswaschen + Emulgieren',dauer_min:8},{schritt:'Pflege + Föhnen',dauer_min:15}],
         produkte: [{name:'Haarfarbe (lt. Farbcode)',menge:'60 ml',mischung:'1:1 mit Oxid'},{name:'Oxid (lt. Stufe)',menge:'60 ml',mischung:'3% Tonung / 6% Aufhellung'},{name:'Handschuhe',menge:'1 Paar'},{name:'Farbschale + Pinsel',menge:'1 Set'},{name:'Pflegekur Color',menge:'20 ml'}]
       },
       'Farbbehandlung': {
@@ -10344,7 +10360,7 @@
         produkte: [{name:'Glossing-Behandlung',menge:'30 ml'},{name:'Pflegekur',menge:'15 ml'}]
       },
       'Farbbehandlung + Olaplex': {
-        aufgaben: [{schritt:'Farbberatung',dauer_min:5},{schritt:'Farbe anmischen',dauer_min:5},{schritt:'Auftragen (Ansatz + Laengen)',dauer_min:20},{schritt:'Einwirkzeit',dauer_min:30,einwirkzeit:true},{schritt:'Auswaschen + Emulgieren',dauer_min:8},{schritt:'Olaplex No. 1 + No. 2',dauer_min:20,einwirkzeit:true},{schritt:'Pflege + Föhnen',dauer_min:15}],
+        aufgaben: [{schritt:'Farbberatung',dauer_min:5},{schritt:'Farbe anmischen',dauer_min:5},{schritt:'Auftragen (Ansatz + Längen)',dauer_min:20},{schritt:'Einwirkzeit',dauer_min:30,einwirkzeit:true},{schritt:'Auswaschen + Emulgieren',dauer_min:8},{schritt:'Olaplex No. 1 + No. 2',dauer_min:20,einwirkzeit:true},{schritt:'Pflege + Föhnen',dauer_min:15}],
         produkte: [{name:'Haarfarbe (lt. Farbcode)',menge:'60 ml',mischung:'1:1 mit Oxid'},{name:'Oxid (lt. Stufe)',menge:'60 ml'},{name:'Olaplex No. 1',menge:'3.75 ml',mischung:'In Farbe einmischen'},{name:'Olaplex No. 2',menge:'15 ml',mischung:'Nach Auswaschen, 10 Min einwirken'},{name:'Handschuhe',menge:'1 Paar'},{name:'Pflegekur Color',menge:'20 ml'}]
       }
     };
@@ -10382,16 +10398,16 @@
 
       // Events — 12 Eintraege für realistischen Posteingang
       renderEvents([
-        { Timestamp: iso(9, 45), Typ: 'termin_vorschlag', Status: 'ungelesen', Is_Read: 0, Titel: 'Terminvorschlag: Balayage + Schnitt', Nachricht: 'Clara Wolf moechte eine Balayage-Auffrischung + Schnitt (135 Min, 185 EUR). Bevorzugt bei Rena.', Kanal: 'whatsapp', Anfrage_ID: 'EVT-002', Kontakt: '0171-8765432', Kundenname: 'Clara Wolf', Service: 'Balayage + Schnitt', Dauer_Min: 135, Preis: 185,
+        { Timestamp: iso(9, 45), Typ: 'termin_vorschlag', Status: 'ungelesen', Is_Read: 0, Titel: 'Terminvorschlag: Balayage + Schnitt', Nachricht: 'Clara Wolf möchte eine Balayage-Auffrischung + Schnitt (135 Min, 185 EUR). Bevorzugt bei Rena.', Kanal: 'whatsapp', Anfrage_ID: 'EVT-002', Kontakt: '0171-8765432', Kundenname: 'Clara Wolf', Service: 'Balayage + Schnitt', Dauer_Min: 135, Preis: 185,
           Slots: [{ tag: 'Do 10.04.', zeit: '09:00', ende: '11:15' }, { tag: 'Fr 11.04.', zeit: '10:00', ende: '12:15' }, { tag: 'Sa 12.04.', zeit: '09:30', ende: '11:45' }],
-          Antwortvorschlaege: ['Liebe Clara, super! Ich haette am Donnerstag ab 9 Uhr Zeit für deine Balayage — 135 Min, 185 EUR. Soll ich reservieren? LG Rena', 'Hi Clara! Freie Plaetze: Do 09:00, Fr 10:00, Sa 09:30. Welcher passt dir am besten? LG Rena', 'Hallo Clara! Ich freue mich auf deine Balayage. Am besten waere Freitag 10:00 — da habe ich extra viel Zeit. Passt dir das? LG Rena'] },
-        { Timestamp: iso(9, 30), Typ: 'termin_vorschlag', Status: 'ungelesen', Is_Read: 0, Titel: 'Terminvorschlag: Haarschnitt & Styling Damen M', Nachricht: 'Maria Testkundin moechte einen Termin für Haarschnitt & Styling Damen M (60 Min, 75 EUR)', Kanal: 'email', Anfrage_ID: 'EVT-001', Kontakt: 'maria@test.de', Kundenname: 'Maria Testkundin', Service: 'Haarschnitt & Styling Damen M', Dauer_Min: 60, Preis: 75,
+          Antwortvorschlaege: ['Liebe Clara, super! Ich hätte am Donnerstag ab 9 Uhr Zeit für deine Balayage — 135 Min, 185 EUR. Soll ich reservieren? LG Rena', 'Hi Clara! Freie Plaetze: Do 09:00, Fr 10:00, Sa 09:30. Welcher passt dir am besten? LG Rena', 'Hallo Clara! Ich freue mich auf deine Balayage. Am besten wäre Freitag 10:00 — da habe ich extra viel Zeit. Passt dir das? LG Rena'] },
+        { Timestamp: iso(9, 30), Typ: 'termin_vorschlag', Status: 'ungelesen', Is_Read: 0, Titel: 'Terminvorschlag: Haarschnitt & Styling Damen M', Nachricht: 'Maria Testkundin möchte einen Termin für Haarschnitt & Styling Damen M (60 Min, 75 EUR)', Kanal: 'email', Anfrage_ID: 'EVT-001', Kontakt: 'maria@test.de', Kundenname: 'Maria Testkundin', Service: 'Haarschnitt & Styling Damen M', Dauer_Min: 60, Preis: 75,
           Slots: [{ tag: 'Mo 07.04.', zeit: '10:00', ende: '11:00' }, { tag: 'Mo 07.04.', zeit: '10:30', ende: '11:30' }, { tag: 'Mo 07.04.', zeit: '11:00', ende: '12:00' }, { tag: 'Di 08.04.', zeit: '09:00', ende: '10:00' }, { tag: 'Di 08.04.', zeit: '14:00', ende: '15:00' }],
-          Antwortvorschlaege: ['Liebe Maria, vielen Dank für Ihre Anfrage! Ich habe folgende Termine: Mo 07.04. um 10:00 Uhr — Haarschnitt & Styling (60 Min, 75 EUR). Passt Ihnen? Herzliche Gruesse, Rena Rados', 'Hallo Maria! Schoen, dass Sie sich melden. Ich haette am Montag ab 10 Uhr Zeit — 75 EUR für 60 Min. Soll ich reservieren? LG Rena', 'Hi Maria! Freie Plaetze: Mo (10:00, 10:30, 11:00) und Di (09:00, 14:00). Preis: 75 EUR / 60 Min. Welcher passt am besten? LG Rena'] },
+          Antwortvorschlaege: ['Liebe Maria, vielen Dank für Ihre Anfrage! Ich habe folgende Termine: Mo 07.04. um 10:00 Uhr — Haarschnitt & Styling (60 Min, 75 EUR). Passt Ihnen? Herzliche Gruesse, Rena Rados', 'Hallo Maria! Schön, dass Sie sich melden. Ich hätte am Montag ab 10 Uhr Zeit — 75 EUR für 60 Min. Soll ich reservieren? LG Rena', 'Hi Maria! Freie Plaetze: Mo (10:00, 10:30, 11:00) und Di (09:00, 14:00). Preis: 75 EUR / 60 Min. Welcher passt am besten? LG Rena'] },
         { Timestamp: iso(9, 20), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Haaranalyse-Anfrage', Nachricht: 'Helena Richter hat 3 Fotos für eine Haaranalyse hochgeladen. Haar wirkt trocken und strapaeziert.', Kanal: 'homepage', Anfrage_ID: 'ANF-044' },
         { Timestamp: iso(9, 15), Typ: 'termin_bestaetigt', Status: 'ungelesen', Is_Read: 0, Titel: 'Termin bestätigt', Nachricht: 'Maria Mueller — Haarschnitt Feminin, 14:00', Kanal: 'whatsapp', Anfrage_ID: 'ANF-042' },
         { Timestamp: iso(9, 2), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Neue Anfrage', Nachricht: 'Stefan Braun fragt nach Maskulin Schnitt + Bart', Kanal: 'instagram', Anfrage_ID: 'ANF-043' },
-        { Timestamp: iso(8, 50), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Wunschfrisur-Anfrage', Nachricht: 'Mia Lehmann moechte eine Wunschfrisur-Beratung. Hat 2 Referenzbilder mitgeschickt (Bob, schulterlang).', Kanal: 'homepage', Anfrage_ID: 'ANF-045' },
+        { Timestamp: iso(8, 50), Typ: 'event', Status: 'ungelesen', Is_Read: 0, Titel: 'Wunschfrisur-Anfrage', Nachricht: 'Mia Lehmann möchte eine Wunschfrisur-Beratung. Hat 2 Referenzbilder mitgeschickt (Bob, schulterlang).', Kanal: 'homepage', Anfrage_ID: 'ANF-045' },
         { Timestamp: iso(8, 45), Typ: 'nachbestellung', Status: 'gelesen', Is_Read: 1, Titel: 'Lagerbestand niedrig', Nachricht: 'Shampoo Vital: nur noch 3 Stueck (Min: 5). Olaplex No. 1: nur noch 2 Stueck (Min: 3).', Kanal: 'system' },
         { Timestamp: iso(8, 30), Typ: 'storno', Status: 'erledigt', Is_Read: 1, Titel: 'Stornierung', Nachricht: 'Lisa Wagner hat Termin am 04.04. storniert (Grund: krank)', Kanal: 'whatsapp', Anfrage_ID: 'ANF-040' },
         { Timestamp: iso(8, 10), Typ: 'termin_bestaetigt', Status: 'gelesen', Is_Read: 1, Titel: 'Termin bestätigt', Nachricht: 'Anna Schmidt — Balayage, 10:00', Kanal: 'email', Anfrage_ID: 'ANF-039' },
@@ -10541,13 +10557,13 @@
       // Demo Beratungen — 8 Eintraege mit verschiedenen Typen
       renderBeratungen([
         { Kundenname: 'Helena Richter', Typ: 'haaranalyse', Nachricht: 'Meine Haare sind seit Monaten extrem trocken und brechen ab. Habe 3 Fotos gemacht. Können Sie mir sagen, was los ist?', Kanal: 'homepage', Timestamp: iso(9, 20), Status: 'offen' },
-        { Kundenname: 'Mia Lehmann', Typ: 'wunschfrisur', Nachricht: 'Ich haette gerne einen schulterlangen Bob wie auf den Bildern. Ist das mit meinem Haartyp machbar?', Kanal: 'homepage', Timestamp: iso(8, 50), Status: 'offen' },
-        { Kundenname: 'Maria Testkundin', Nachricht: 'Hallo, ich moechte gerne einen Termin für Haarschnitt & Styling. Haben Sie naechste Woche noch was frei?', Kanal: 'email', Timestamp: iso(9, 30), Status: 'offen' },
+        { Kundenname: 'Mia Lehmann', Typ: 'wunschfrisur', Nachricht: 'Ich hätte gerne einen schulterlangen Bob wie auf den Bildern. Ist das mit meinem Haartyp machbar?', Kanal: 'homepage', Timestamp: iso(8, 50), Status: 'offen' },
+        { Kundenname: 'Maria Testkundin', Nachricht: 'Hallo, ich möchte gerne einen Termin für Haarschnitt & Styling. Haben Sie nächste Woche noch was frei?', Kanal: 'email', Timestamp: iso(9, 30), Status: 'offen' },
         { Kundenname: 'Stefan Braun', Nachricht: 'Hi, ich braeuchte einen Maskulin Schnitt + Bartpflege. Am liebsten Samstag.', Kanal: 'instagram', Timestamp: iso(9, 2), Status: 'offen' },
-        { Kundenname: 'Sophie Klein', Typ: 'farbcode', Nachricht: 'Ich bin aktuell Stufe 5 (Hellbraun) und moechte Stufe 8 (Hellblond). Geht das in einer Sitzung?', Kanal: 'whatsapp', Timestamp: iso(8, 15), Status: 'offen' },
+        { Kundenname: 'Sophie Klein', Typ: 'farbcode', Nachricht: 'Ich bin aktuell Stufe 5 (Hellbraun) und möchte Stufe 8 (Hellblond). Geht das in einer Sitzung?', Kanal: 'whatsapp', Timestamp: iso(8, 15), Status: 'offen' },
         { Kundenname: 'Anna Schmidt', Nachricht: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', Kanal: 'whatsapp', Timestamp: isoDay(-1, 16, 30), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Hallo Rena, braeuchte dringend eine Balayage-Auffrischung. Geht noch diese Woche?', zeit: isoDay(-1, 16, 30) }, { von: 'salon', text: 'Hallo Anna! Klar, ich habe am Donnerstag um 14:00 noch einen Platz frei. Soll ich den für dich reservieren? Die Auffrischung dauert ca. 2,5 Stunden.', zeit: isoDay(-1, 17, 15) }] },
-        { Kundenname: 'Lisa Wagner', Nachricht: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', Kanal: 'email', Timestamp: isoDay(-2, 11, 0), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Ich moechte meinen Termin am Freitag stornieren. Geht das noch?', zeit: isoDay(-2, 11, 0) }, { von: 'salon', text: 'Hallo Lisa, kein Problem — Ihr Termin am Freitag ist storniert. Moechten Sie gleich einen neuen Termin vereinbaren?', zeit: isoDay(-2, 11, 45) }] },
-        { Kundenname: 'Sabine Huber', Typ: 'haaranalyse', Nachricht: 'Hatte vor 2 Monaten eine Blondierung und seitdem faellt mir vermehrt Haar aus. Brauche dringend eine Analyse.', Kanal: 'whatsapp', Timestamp: isoDay(-3, 14, 20), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Hatte vor 2 Monaten eine Blondierung und seitdem faellt mir vermehrt Haar aus. Brauche dringend eine Analyse.', zeit: isoDay(-3, 14, 20) }, { von: 'salon', text: 'Hallo Sabine, das klingt nach einer Strukturschaedigung durch die Blondierung. Kommen Sie bitte vorbei für eine professionelle Haaranalyse — wir können das genau diagnostizieren und einen Pflegeplan erstellen. Ich haette Mittwoch um 11 Uhr Zeit.', zeit: isoDay(-3, 15, 10) }] }
+        { Kundenname: 'Lisa Wagner', Nachricht: 'Ich möchte meinen Termin am Freitag stornieren. Geht das noch?', Kanal: 'email', Timestamp: isoDay(-2, 11, 0), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Ich möchte meinen Termin am Freitag stornieren. Geht das noch?', zeit: isoDay(-2, 11, 0) }, { von: 'salon', text: 'Hallo Lisa, kein Problem — Ihr Termin am Freitag ist storniert. Möchten Sie gleich einen neuen Termin vereinbaren?', zeit: isoDay(-2, 11, 45) }] },
+        { Kundenname: 'Sabine Huber', Typ: 'haaranalyse', Nachricht: 'Hatte vor 2 Monaten eine Blondierung und seitdem fällt mir vermehrt Haar aus. Brauche dringend eine Analyse.', Kanal: 'whatsapp', Timestamp: isoDay(-3, 14, 20), Status: 'beantwortet', Verlauf: [{ von: 'kunde', text: 'Hatte vor 2 Monaten eine Blondierung und seitdem fällt mir vermehrt Haar aus. Brauche dringend eine Analyse.', zeit: isoDay(-3, 14, 20) }, { von: 'salon', text: 'Hallo Sabine, das klingt nach einer Strukturschaedigung durch die Blondierung. Kommen Sie bitte vorbei für eine professionelle Haaranalyse — wir können das genau diagnostizieren und einen Pflegeplan erstellen. Ich hätte Mittwoch um 11 Uhr Zeit.', zeit: isoDay(-3, 15, 10) }] }
       ]);
 
       // Cockpit NACH allen Caches rendern
@@ -10616,7 +10632,7 @@
 
       // Service Worker mit Auto-Update + Update-Hinweis
       // 17.04.2026: Tickets c34643c0 + 753a0055 — PWA-Updates kommen in iPhone-App nicht an.
-      // Fix: alle 30s auf Update pruefen, bei neuer Version Toast + Reload-Button.
+      // Fix: alle 30s auf Update prüfen, bei neuer Version Toast + Reload-Button.
       if ('serviceWorker' in navigator) {
         var swReloadDone = false;
         navigator.serviceWorker.addEventListener('controllerchange', function() {
@@ -10652,7 +10668,7 @@
           } catch(e) {}
         }, 1500);
         navigator.serviceWorker.register('sw.js').then(function(reg) {
-          // Alle 30s (vorher 60s) auf SW-Update pruefen
+          // Alle 30s (vorher 60s) auf SW-Update prüfen
           setInterval(function() { try { reg.update(); } catch(e) {} }, 30000);
           reg.update().catch(function() {});
           // Wenn Wait-Waiting-Worker bereit -> sofort aktivieren
@@ -10709,9 +10725,9 @@
         showChrome();
         scheduleHide();
       }, { passive: true });
-      // Bei Orientierungswechsel Zoom sicher auf 1 zuruecksetzen (iOS Safari Bug).
+      // Bei Orientierungswechsel Zoom sicher auf 1 zurücksetzen (iOS Safari Bug).
       // 17.04. Capo-Tickets ac1ee030, 520c72fc, 8590defe, 4f29ab70, 3bbdd3d9 - Zoom komplett falsch nach Rotation oder beim Login.
-      // Loesung: 3-Stufen-Reset — scroll nach top, visualViewport.scale pruefen, viewport-meta neu schreiben.
+      // Loesung: 3-Stufen-Reset — scroll nach top, visualViewport.scale prüfen, viewport-meta neu schreiben.
       function resetZoomAndLayout() {
         try {
           window.scrollTo(0,0);
@@ -10765,7 +10781,7 @@
         var dx = endX - startX;
         var dy = endY - startY;
         if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.7) return;
-        if (dx < 0) changeTerminDate(1);  // Links swipen = naechster Tag/Woche
+        if (dx < 0) changeTerminDate(1);  // Links swipen = nächster Tag/Woche
         else changeTerminDate(-1);         // Rechts swipen = vorheriger Tag/Woche
       }, { passive: true });
     })();
@@ -10886,8 +10902,8 @@
         html += '<div class="pwa-banner-steps">';
         html += '<b style="color:var(--warning)">Chrome kann das leider nicht</b> — das ist eine Apple-Einschraenkung.<br><br>';
         html += '<span class="step-num">1</span> Kopiere den Link (Button unten)<br>';
-        html += '<span class="step-num">2</span> Oeffne <b>Safari</b><br>';
-        html += '<span class="step-num">3</span> Fuege den Link ein und oeffne die Seite<br>';
+        html += '<span class="step-num">2</span> Öffne <b>Safari</b><br>';
+        html += '<span class="step-num">3</span> Fuege den Link ein und öffne die Seite<br>';
         html += '<span class="step-num">4</span> Teilen &#8593; → <b>"Zum Home-Bildschirm"</b></div>';
         html += '<div class="pwa-banner-actions">';
         html += '<button class="pwa-btn-copy" onclick="copyPwaUrl()">Link kopieren</button>';
@@ -10896,7 +10912,7 @@
         // iPhone in anderem Browser (Firefox, Edge, etc.)
         html += '<div class="pwa-banner-steps">';
         html += '<b style="color:var(--warning)">Dieser Browser kann das leider nicht</b><br><br>';
-        html += '<span class="step-num">1</span> Kopiere den Link und oeffne <b>Safari</b><br>';
+        html += '<span class="step-num">1</span> Kopiere den Link und öffne <b>Safari</b><br>';
         html += '<span class="step-num">2</span> Teilen &#8593; → <b>"Zum Home-Bildschirm"</b></div>';
         html += '<div class="pwa-banner-actions">';
         html += '<button class="pwa-btn-copy" onclick="copyPwaUrl()">Link kopieren</button>';
@@ -11187,8 +11203,8 @@
           return (t.Start_ISO||'').indexOf(todayStr)===0 && (t.Status==='vorgeschlagen' || t.Status==='offen');
         });
         if (unconfirmed.length >= 3) {
-          findings.push({ prio: 1, iconKey: 'bolt', title: unconfirmed.length + ' Termine warten noch auf deine Bestaetigung',
-            text: 'Wenn du magst, schicke ich allen mit einem Klick die Bestaetigung raus. Du entscheidest.',
+          findings.push({ prio: 1, iconKey: 'bolt', title: unconfirmed.length + ' Termine warten noch auf deine Bestätigung',
+            text: 'Wenn du magst, schicke ich allen mit einem Klick die Bestätigung raus. Du entscheidest.',
             action: { label: 'Gerne ansehen', fn: function(){ showPage('termine'); } } });
         }
         // 2. Stammkunden zu lange weg
@@ -11201,7 +11217,7 @@
         });
         if (inaktiv.length >= 3) {
           findings.push({ prio: 2, iconKey: 'heart', title: inaktiv.length + ' deiner Stammkundinnen haben sich lange nicht gemeldet',
-            text: 'Ich haette die Liste sortiert nach dem, was sie frueher gern bei dir gebucht haben. Magst du gucken?',
+            text: 'Ich hätte die Liste sortiert nach dem, was sie frueher gern bei dir gebucht haben. Magst du gucken?',
             action: { label: 'Zeig mir', fn: function(){ showPage('kunden'); } } });
         }
         // 3. Lager-Alarm priorisiert nach Verbrauch
@@ -11221,11 +11237,11 @@
           var letzteWocheU = rechnungenCache.filter(function(r){ return (r.erstellt_am||r.created_at||'').indexOf(lastWeekStr)===0; }).reduce(function(s,r){ return s + (parseFloat(r.brutto||0)||0); }, 0);
           if (letzteWocheU > 0 && heuteU < letzteWocheU * 0.7) {
             findings.push({ prio: 4, iconKey: 'sunrise', title: 'Heute ist es ruhiger als gleiche Zeit vor 7 Tagen',
-              text: 'Vor einer Woche warst du zu dieser Zeit schon bei ' + letzteWocheU.toFixed(0) + ' €. Vielleicht waer das eine gute Zeit fuer eine kleine Aktion — oder einfach fuer Durchatmen.',
+              text: 'Vor einer Woche warst du zu dieser Zeit schon bei ' + letzteWocheU.toFixed(0) + ' €. Vielleicht waer das eine gute Zeit für eine kleine Aktion — oder einfach für Durchatmen.',
               action: { label: 'Mal gucken', fn: function(){ showPage('beratung'); } } });
           } else if (letzteWocheU > 0 && heuteU > letzteWocheU * 1.3) {
-            findings.push({ prio: 4, iconKey: 'chart', title: 'Heute laeuft es staerker als gleiche Zeit letzte Woche (+' + Math.round((heuteU/letzteWocheU-1)*100) + ' %)',
-              text: 'Glueckwunsch, das laeuft gut fuer dich. Wenn du magst, mache ich einen kleinen Instagram-Posting-Vorschlag aus dem Moment.',
+            findings.push({ prio: 4, iconKey: 'chart', title: 'Heute läuft es stärker als gleiche Zeit letzte Woche (+' + Math.round((heuteU/letzteWocheU-1)*100) + ' %)',
+              text: 'Glueckwunsch, das läuft gut für dich. Wenn du magst, mache ich einen kleinen Instagram-Posting-Vorschlag aus dem Moment.',
               action: { label: 'Zeig mal', fn: function(){ showPage('beratung'); } } });
           }
         }
@@ -11234,7 +11250,7 @@
         var morgenTermine = (window.termineCache||[]).filter(function(t){ return (t.Start_ISO||'').indexOf(morgenStr)===0; });
         if (morgenTermine.length === 0 && h >= 16) {
           findings.push({ prio: 5, iconKey: 'calendar', title: 'Morgen sieht dein Kalender noch ruhig aus',
-            text: 'Falls du magst, koennen wir die Zeit fuer Lager, Instagram oder ein kurzes Team-Gespraech nutzen. Oder einfach genuesslich einen Kaffee.',
+            text: 'Falls du magst, können wir die Zeit für Lager, Instagram oder ein kurzes Team-Gespraech nutzen. Oder einfach genüsslich einen Kaffee.',
             action: { label: 'Ideen sehen', fn: function(){ showPage('termine'); } } });
         }
       } catch(e) { /* silent */ }
@@ -11243,7 +11259,24 @@
       findings.sort(function(a,b){ return a.prio - b.prio; });
       findings = findings.slice(0, 3);
 
-      var greeting = h < 6 ? 'Hey, noch frueh ' + vorname : (h < 11 ? 'Guten Morgen ' + vorname : (h < 14 ? 'Schoener Mittag ' + vorname : (h < 18 ? 'Hallo ' + vorname : 'Feierabend-Zeit, ' + vorname)));
+      // Capo 18.04.: Ton je Stil — Maskulin direkt-kameradschaftlich, Feminin spa-sanft-weiblich
+      var styleMode = document.documentElement.getAttribute('data-style') || 'balance';
+      var greeting;
+      if (styleMode === 'feminin') {
+        greeting = h < 6 ? 'Schön, dass du schon wach bist, ' + vorname
+          : (h < 11 ? 'Guten Morgen, liebe ' + vorname
+          : (h < 14 ? 'Schöner Mittag, ' + vorname
+          : (h < 18 ? 'Hallo ' + vorname + ', wie geht es dir?'
+          : 'Fast Feierabend, ' + vorname)));
+      } else if (styleMode === 'maskulin') {
+        greeting = h < 6 ? 'Früh auf den Beinen, ' + vorname
+          : (h < 11 ? 'Guten Morgen ' + vorname
+          : (h < 14 ? 'Bereit für den Mittag, ' + vorname
+          : (h < 18 ? vorname + ', hier sind die Eckdaten'
+          : 'Feierabend-Zeit ' + vorname)));
+      } else {
+        greeting = h < 6 ? 'Hey, noch früh ' + vorname : (h < 11 ? 'Guten Morgen ' + vorname : (h < 14 ? 'Schöner Mittag ' + vorname : (h < 18 ? 'Hallo ' + vorname : 'Feierabend-Zeit, ' + vorname)));
+      }
       var html = '<div style="background:linear-gradient(135deg,#0f0f0f 0%,#1a1a1a 50%,#0a0a0a 100%);border:1px solid rgba(201,168,76,0.3);border-radius:14px;padding:18px 20px;color:#e8e4de;position:relative;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(201,168,76,0.2)">'
         + '<div style="position:absolute;top:0;right:0;width:160px;height:160px;background:radial-gradient(circle,rgba(201,168,76,0.25) 0%,transparent 70%);filter:blur(40px);pointer-events:none"></div>'
         + '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;position:relative;z-index:1">'
@@ -11251,7 +11284,7 @@
         + '<svg viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.5" style="width:16px;height:16px"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>'
         + '</div>'
         + '<div><div style="font-size:10px;font-weight:800;color:#E0C870;letter-spacing:2px;text-transform:uppercase">Jarvis</div>'
-        + '<div style="font-family:\'Playfair Display\',serif;font-size:17px;font-weight:600;color:#f0ebdf">' + esc(greeting) + '. Ein paar Gedanken fuer dich — falls du magst:</div></div></div>'
+        + '<div style="font-family:\'Playfair Display\',serif;font-size:17px;font-weight:600;color:#f0ebdf">' + esc(greeting) + '. ' + (styleMode === 'feminin' ? 'Hier sind ein paar sanfte Gedanken' : (styleMode === 'maskulin' ? 'Hier ist die Lage' : 'Ein paar Gedanken für dich — falls du magst')) + ':</div></div></div>'
         + '<div style="position:relative;z-index:1">';
       findings.forEach(function(f, i){
         var iconSvg = f.iconKey && CASA_ICONS[f.iconKey]
@@ -11634,7 +11667,7 @@
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Home / Termine / Beratung / Kunden / Lager / Kasse / Admin</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Alt + 1…7</kbd></div></div>'
         + '<div style="margin-bottom:12px"><div style="color:var(--text-dim);text-transform:uppercase;font-size:10px;font-weight:700;letter-spacing:0.8px;margin-bottom:6px">In der Suche</div>'
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Hoch / Runter</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">&uarr; &darr;</kbd></div>'
-        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Oeffnen</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">&crarr;</kbd></div></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Öffnen</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">&crarr;</kbd></div></div>'
         + '<div><div style="color:var(--text-dim);text-transform:uppercase;font-size:10px;font-weight:700;letter-spacing:0.8px;margin-bottom:6px">Im Termine-Kalender</div>'
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Heute</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Heute-Knopf</kbd></div>'
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Ansicht wechseln</span><span style="color:var(--text-dim)">Liste / Tag / Woche</span></div>'
@@ -11682,7 +11715,7 @@
       var unconfirmed = (window.termineCache||[]).filter(function(t){
         return (t.Start_ISO||'').indexOf(today)===0 && (t.Status==='vorgeschlagen' || t.Status==='offen');
       });
-      if (unconfirmed.length) n.push({iconKey:'calendar', text:unconfirmed.length+' Termine heute noch nicht bestaetigt', action:function(){ showPage('termine'); }});
+      if (unconfirmed.length) n.push({iconKey:'calendar', text:unconfirmed.length+' Termine heute noch nicht bestätigt', action:function(){ showPage('termine'); }});
       // Offene Anfragen
       var openAnfragen = (window.eventsCache||[]).filter(function(e){ return e.Is_Read===0 || e.Status==='ungelesen'; });
       if (openAnfragen.length) n.push({iconKey:'message', text:openAnfragen.length+' neue Anfrage'+(openAnfragen.length>1?'n':''), action:function(){ showPage('beratung'); }});
@@ -11766,7 +11799,7 @@
         + '<kbd style="font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:4px;color:var(--text-dim);font-family:monospace">Esc</kbd>'
         + '</div>'
         + '<div id="globalSearchResults" style="max-height:52vh;overflow-y:auto;padding:4px"></div>'
-        + '<div style="padding:8px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--text-dim);display:flex;gap:10px;justify-content:space-between"><span>&uarr;&darr; navigieren · &crarr; oeffnen</span><span>Cmd/Ctrl+K</span></div>'
+        + '<div style="padding:8px 14px;border-top:1px solid var(--border);font-size:10px;color:var(--text-dim);display:flex;gap:10px;justify-content:space-between"><span>&uarr;&darr; navigieren · &crarr; öffnen</span><span>Cmd/Ctrl+K</span></div>'
         + '</div>';
       document.body.appendChild(overlay);
       var input = overlay.querySelector('#globalSearchInput');
@@ -11870,7 +11903,7 @@
       });
       overlay.addEventListener('click', function(e){ if (e.target === overlay) closeSearch(); });
 
-      // Shortcut Cmd/Ctrl + K + Alt+1..7 fuer Tab-Wechsel
+      // Shortcut Cmd/Ctrl + K + Alt+1..7 für Tab-Wechsel
       document.addEventListener('keydown', function(e){
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
           e.preventDefault();
