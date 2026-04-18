@@ -1361,6 +1361,16 @@
     }
     .termin-view-btn.active { background: var(--gold); color: #fff; }
     /* === Apple-iCal-Look (17.04.2026, Capo-Ticket 45b8a93a) === */
+    /* Capo 18.04.2026: Wochen-Streifen ueber Tag/Liste — Heute Gold, Sel Unterstrich */
+    .day-week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin: 0 0 12px; }
+    .day-week-cell { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 2px; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); cursor: pointer; color: var(--text-dim); font-family: inherit; transition: all 150ms; }
+    .day-week-cell .dw-dow { font-size: 10px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.7; }
+    .day-week-cell .dw-num { font-size: 16px; font-weight: 700; color: var(--text); }
+    .day-week-cell:hover { border-color: var(--gold); }
+    .day-week-cell.today { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+    .day-week-cell.today .dw-num { color: var(--gold); }
+    .day-week-cell.sel { background: var(--gold-gradient); border-color: var(--gold); }
+    .day-week-cell.sel .dw-dow, .day-week-cell.sel .dw-num { color: #fff; opacity: 1; }
     .day-view-grid { position: relative; min-height: 600px; background: var(--surface); border-radius: var(--radius-sm); overflow: hidden; }
     .day-hour-row { display: flex; align-items: stretch; min-height: 52px; border-bottom: 1px solid rgba(0,0,0,0.06); }
     .day-hour-row:nth-child(odd) { background: rgba(255,255,255,0.02); }
@@ -2206,9 +2216,8 @@
       </div>
       <div class="header-right">
         <span class="live-dot" id="liveIndicator">DEMO</span>
-        <button class="theme-toggle" onclick="toggleStyleMode()" title="Design-Stil wechseln (Maskulin/Balance/Feminin)" aria-label="Design-Stil" style="width:34px;height:34px" id="styleToggleBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>
-        </button>
+        <!-- Capo 18.04.2026: Style-Toggle entfernt (redundant mit Theme-Toggle — Dark=Maskulin/Hell=Feminin gekoppelt) -->
+        <button aria-hidden="true" style="display:none" id="styleToggleBtn" onclick="toggleStyleMode()" tabindex="-1"></button>
         <button class="theme-toggle" onclick="openGlobalSearch()" title="Suche (Cmd/Ctrl + K)" aria-label="Suche" style="width:34px;height:34px">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </button>
@@ -4748,8 +4757,10 @@
     function renderTerminList(termine) {
       var container = document.getElementById('terminContent');
       container.textContent = '';
-      var dateStr = terminViewDate.toISOString().split('T')[0];
+      // Capo 18.04.2026: localDateStr statt toISOString (UTC-Drift). Wochenstreifen + Heute-Markierung.
+      var dateStr = localDateStr(terminViewDate);
       document.getElementById('terminDateLabel').textContent = fmtDate(dateStr);
+      renderDayWeekStrip(container, dateStr);
 
       // BUG-FIX 15.04.2026: Liste konsistent mit Tag/Woche — kein impliziter Stylist-Filter
       // (frueher: !perms.alleTermine + currentUser versteckte Termine anderer Stylisten in Liste,
@@ -4804,11 +4815,35 @@
       });
     }
 
+    // Capo 18.04.2026: Wochen-Streifen-Helper (Liste + Tag). Mo-So, Heute + Selected markiert.
+    function renderDayWeekStrip(container, dateStr) {
+      var strip = document.createElement('div');
+      strip.className = 'day-week-strip';
+      var base = new Date(terminViewDate);
+      var dow = base.getDay(); if (dow === 0) dow = 7;
+      base.setDate(base.getDate() - (dow - 1));
+      var todayIso = localDateStr(new Date());
+      var DAYS = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+      for (var i = 0; i < 7; i++) {
+        var d = new Date(base); d.setDate(base.getDate() + i);
+        var iso = localDateStr(d);
+        var isToday = iso === todayIso;
+        var isSel = iso === dateStr;
+        var cell = document.createElement('button');
+        cell.className = 'day-week-cell' + (isSel ? ' sel' : '') + (isToday ? ' today' : '');
+        cell.innerHTML = '<span class="dw-dow">' + DAYS[i] + '</span><span class="dw-num">' + d.getDate() + '</span>';
+        (function(nd){ cell.onclick = function(){ terminViewDate = nd; renderTermine(termineCache); }; })(d);
+        strip.appendChild(cell);
+      }
+      container.appendChild(strip);
+    }
     function renderDayView(termine) {
       var container = document.getElementById('terminContent');
       container.textContent = '';
-      var dateStr = terminViewDate.toISOString().split('T')[0];
+      // Capo 18.04.2026: localDateStr statt toISOString (UTC-Drift nachts). Plus Wochenstreifen oben.
+      var dateStr = localDateStr(terminViewDate);
       document.getElementById('terminDateLabel').textContent = fmtDate(dateStr);
+      renderDayWeekStrip(container, dateStr);
 
       // Filter termine ZUERST — inkl. Staff-Filter
       var filtered = termine.filter(function(t) {
@@ -4854,7 +4889,7 @@
       }
       // Apple-iCal-Now-Line (rote Linie auf heutiger Ansicht)
       var nowD = new Date();
-      var isDayToday = localDateStr(nowD) === selectedDate;
+      var isDayToday = localDateStr(nowD) === dateStr;
       if (isDayToday && nowD.getHours() >= minH && nowD.getHours() <= maxH) {
         var currentSlot = document.getElementById('daySlot' + nowD.getHours());
         if (currentSlot) {
