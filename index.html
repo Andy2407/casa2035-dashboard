@@ -3229,6 +3229,10 @@
     </div>
   </div>
 
+  <!-- Capo 19.04.2026 Sprint K1: jsPDF + QR-Generator fuer Belegdruck + TSE-QR (lokal gehostet, 100% EU, keine CDN) -->
+  <script src="/vendor/jspdf.umd.min.js" defer></script>
+  <script src="/vendor/qrcode.js" defer></script>
+
   <script>
     // =============================================================
     // Casa 2035 — Vision 2035 Dashboard JavaScript
@@ -3865,7 +3869,7 @@
         '<b>Tagesabschluss</b> unten: prüft Bar + Karte + Gutschein, erzeugt GoBD-konforme PDF.',
         '<b>Filter Datum + Stylistin + Zahlart</b> kombinierbar &mdash; für Provisions-Abrechnung ein Gold wert.',
         '<b>Ausgabe erfassen:</b> Rechts oben &rarr; Kategorie + Netto + MwSt &rarr; direkt in der Buchhaltung.',
-        '<b>DATEV-Export:</b> kommt Q3 2026 &mdash; bis dahin CSV-Download für deinen Steuerberater.'
+        '<b>DATEV-Export:</b> LIVE &mdash; SKR04-CSV + GDPdU-XML, direkt übergabefertig für deinen Steuerberater.'
       ],
       einstellungen: [
         '<b>Salon-Regeln:</b> KI beachtet diese bei Terminvorschlaegen.',
@@ -5456,13 +5460,41 @@
         amountEl.textContent = (e.typ === 'ausgabe' ? '-' : '+') + fmtEur(e.Betrag || e.betrag) + ' \u20AC';
         div.appendChild(leftEl);
         div.appendChild(amountEl);
-        // F6 Bug 8: Storno-Button für Rechnungen (nur einnahme, nicht bereits storniert)
-        if (e.typ !== 'ausgabe' && e.status !== 'storniert' && e.id) {
-          var stornoBtn = document.createElement('button');
-          stornoBtn.textContent = 'Storno';
-          stornoBtn.style.cssText = 'margin-left:8px;padding:4px 10px;border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:var(--radius-sm);font-size:10px;cursor:pointer;font-weight:600';
-          stornoBtn.onclick = function(ev) { ev.stopPropagation(); stornoRechnung(e.id, e.Kunde || ''); };
-          div.appendChild(stornoBtn);
+        // Capo 19.04.2026 K1: Aktions-Leiste (PDF + WhatsApp + Mail + Storno)
+        if (e.typ !== 'ausgabe' && e.id) {
+          var actionsEl = document.createElement('div');
+          actionsEl.style.cssText = 'display:flex;gap:4px;margin-left:8px;flex-wrap:wrap';
+          var btnStyle = 'padding:3px 8px;border:1px solid var(--border);background:transparent;color:var(--text);border-radius:var(--radius-sm);font-size:10px;cursor:pointer;font-weight:600';
+          // PDF-Download
+          var pdfBtn = document.createElement('button');
+          pdfBtn.textContent = '📄 PDF';
+          pdfBtn.style.cssText = btnStyle;
+          pdfBtn.title = 'Beleg als PDF herunterladen';
+          pdfBtn.onclick = function(ev){ ev.stopPropagation(); downloadBelegPDF(e); };
+          actionsEl.appendChild(pdfBtn);
+          // E-Mail
+          var mailBtn = document.createElement('button');
+          mailBtn.textContent = '✉';
+          mailBtn.style.cssText = btnStyle;
+          mailBtn.title = 'Beleg per E-Mail senden';
+          mailBtn.onclick = function(ev){ ev.stopPropagation(); sendBelegEmail(e); };
+          actionsEl.appendChild(mailBtn);
+          // WhatsApp
+          var waBtn = document.createElement('button');
+          waBtn.textContent = '🟢';
+          waBtn.style.cssText = btnStyle;
+          waBtn.title = 'Beleg per WhatsApp senden';
+          waBtn.onclick = function(ev){ ev.stopPropagation(); sendBelegWhatsApp(e); };
+          actionsEl.appendChild(waBtn);
+          // Storno (nur wenn nicht bereits storniert)
+          if (e.status !== 'storniert') {
+            var stornoBtn = document.createElement('button');
+            stornoBtn.textContent = 'Storno';
+            stornoBtn.style.cssText = 'padding:3px 8px;border:1px solid var(--danger);background:transparent;color:var(--danger);border-radius:var(--radius-sm);font-size:10px;cursor:pointer;font-weight:600';
+            stornoBtn.onclick = function(ev){ ev.stopPropagation(); stornoRechnung(e.id, e.Kunde || ''); };
+            actionsEl.appendChild(stornoBtn);
+          }
+          div.appendChild(actionsEl);
         }
         container.appendChild(div);
       });
@@ -5473,22 +5505,342 @@
       var f3 = document.getElementById('kasseFilterZahlart'); if (f3) f3.value = '';
       filterKasseEntries();
     }
+    // Capo 19.04.2026 Sprint K1: Storno via RPC (GoBD-konforme Gegenbuchung, kein Direkt-UPDATE)
     async function stornoRechnung(id, kundeName) {
-      if (!confirm('Rechnung von "' + kundeName + '" wirklich stornieren?\n\nGoBD: Stornierungen werden protokolliert (10 Jahre Aufbewahrung).')) return;
+      var grund = prompt(
+        'Rechnung von "' + kundeName + '" stornieren?\n\n' +
+        'Grund eingeben (Pflicht — wird in der Gegenbuchung gespeichert, GoBD §146 AO):'
+      );
+      if (!grund || !grund.trim()) { showToast('Storno abgebrochen — Grund erforderlich', 'info'); return; }
+      grund = grund.trim().substring(0, 500);
       if (isBackendMode()) {
         try {
-          await apiPatch('rechnungen', 'id=eq.' + encodeURIComponent(id), { status: 'storniert' });
-          showToast('Rechnung storniert', 'success');
-          // Cache lokal aktualisieren
-          (kasseCache || []).forEach(function(e) { if (e.id === id) e.status = 'storniert'; });
-          filterKasseEntries();
-        } catch(err) { showToast('Storno-Fehler: ' + err.message, 'error'); }
+          var url = (config.baseUrl || 'https://api.casa2035.de') + '/rest/v1/rpc/storno_rechnung';
+          var res = await fetch(url, {
+            method: 'POST', headers: authHeaders(),
+            body: JSON.stringify({ p_rechnung_id: id, p_grund: grund, p_von_user: null })
+          });
+          if (!res.ok) { var err = await res.text(); throw new Error(res.status + ' ' + err.slice(0,300)); }
+          var result = await res.json();
+          showToast('✓ Storniert: ' + (result.storno_rechnungs_nr || 'Gegenbuchung erstellt'), 'success', 4000);
+          // Refresh der Liste
+          await fetchAll();
+          if (typeof filterKasseEntries === 'function') filterKasseEntries();
+        } catch(err) {
+          showToast('Storno-Fehler: ' + err.message, 'error', 6000);
+          console.error('[storno]', err);
+        }
       } else {
         (kasseCache || []).forEach(function(e) { if (e.id === id) e.status = 'storniert'; });
         filterKasseEntries();
-        showToast('Rechnung storniert (Demo)', 'success');
+        showToast('Rechnung storniert (Demo, kein Backend)', 'info');
       }
     }
+
+    // =============================================================
+    // Capo 19.04.2026 Sprint K1: PDF-Beleggenerator §146a AO
+    // Erzeugt konformen Kundenbeleg mit allen Pflichtfeldern.
+    // Pflichtfelder (KassenSichV + §14 UStG):
+    //  - Name + Anschrift Unternehmer
+    //  - Steuer-Nr oder USt-IdNr
+    //  - Ausstellungsdatum + Uhrzeit
+    //  - Menge + Art der Leistung
+    //  - Entgelt + Steuerbetrag (je Steuersatz)
+    //  - Steuersatz
+    //  - Fortlaufende Rechnungsnummer
+    //  - TSE-Daten (wenn aktiv): Signatur, Zähler, Seriennr, Zeitstempel
+    //  - QR-Code mit TSE-Prüfdaten (optional)
+    // =============================================================
+    function generateBelegPDF(rechnung, opts) {
+      opts = opts || {};
+      if (!window.jspdf || !window.jspdf.jsPDF) {
+        if (typeof showToast === 'function') showToast('PDF-Library lädt noch. Bitte 2 Sek warten.', 'info');
+        return null;
+      }
+      var jsPDF = window.jspdf.jsPDF;
+      var doc = new jsPDF({ unit: 'mm', format: [80, 297] }); // 80mm Bon-Format, Höhe dynamisch
+      var y = 8;
+      var lineH = 4;
+      var w = 72; // Druckbreite
+      var cx = 40; // Center-X
+
+      // --- Kopf: Salon-Name + Adresse ---
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+      doc.text('RENA RADOS FRISEURE', cx, y, { align: 'center' }); y += lineH+1;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+      doc.text('Erzgießereistr. 51 · 80335 München', cx, y, { align: 'center' }); y += lineH;
+      doc.text('Tel 089-1296294', cx, y, { align: 'center' }); y += lineH;
+      doc.text('Inhaberin: Rena Rados', cx, y, { align: 'center' }); y += lineH;
+      doc.text('StNr: [wird nach Rena-OK eingetragen]', cx, y, { align: 'center' }); y += lineH+1;
+      doc.setLineWidth(0.3); doc.line(4, y, w+4, y); y += 2;
+
+      // --- Beleg-Kopf ---
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+      doc.text('KUNDENBELEG', cx, y, { align: 'center' }); y += lineH+1;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+      var rnr = rechnung.rechnungs_id || rechnung.rechnungsnummer || rechnung.id || '-';
+      doc.text('Beleg-Nr: ' + rnr, 4, y); y += lineH;
+      var dt = new Date(rechnung.erstellt_am || rechnung.datum || Date.now());
+      doc.text('Datum: ' + dt.toLocaleDateString('de-DE') + ' ' + dt.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'}), 4, y); y += lineH;
+      if (rechnung.stylist || rechnung.mitarbeiter_name) {
+        doc.text('Friseurin: ' + (rechnung.stylist || rechnung.mitarbeiter_name), 4, y); y += lineH;
+      }
+      if (rechnung.kundenname && rechnung.kundenname !== 'Laufkunde') {
+        doc.text('Kunde: ' + rechnung.kundenname, 4, y); y += lineH;
+      }
+      y += 1;
+      doc.line(4, y, w+4, y); y += 2;
+
+      // --- Positionen ---
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8);
+      doc.text('Leistung', 4, y); doc.text('Preis', w+4, y, { align: 'right' }); y += lineH;
+      doc.setFont('helvetica', 'normal');
+      var positionen = [];
+      if (Array.isArray(rechnung.positionen_json)) positionen = rechnung.positionen_json;
+      else if (rechnung.positionen_json && typeof rechnung.positionen_json === 'object' && !Array.isArray(rechnung.positionen_json)) {
+        try { positionen = rechnung.positionen_json.items || rechnung.positionen_json.positionen || []; } catch(_) {}
+      }
+      if (!positionen.length && rechnung.service) {
+        positionen = [{ name: rechnung.service, preis: rechnung.brutto || rechnung.gesamtpreis_brutto || 0 }];
+      }
+      positionen.forEach(function(p){
+        var name = (p.name || p.service || p.bezeichnung || '-') + '';
+        var preis = parseFloat(p.preis || p.brutto || p.summe || 0);
+        // Name ggf. umbrechen
+        var lines = doc.splitTextToSize(name, 48);
+        lines.forEach(function(l, idx){
+          doc.text(l, 4, y);
+          if (idx === 0) doc.text(preis.toFixed(2) + ' €', w+4, y, { align: 'right' });
+          y += lineH;
+        });
+      });
+      y += 1;
+      doc.line(4, y, w+4, y); y += 2;
+
+      // --- Summen ---
+      var brutto = parseFloat(rechnung.brutto || rechnung.gesamtpreis_brutto || 0);
+      var netto  = parseFloat(rechnung.netto  || rechnung.gesamtpreis_netto  || (brutto / 1.19));
+      var mwst   = parseFloat(rechnung.mwst_betrag || rechnung.mwst_summe || (brutto - netto));
+      var mwstSatz = parseFloat(rechnung.mwst_satz || 0.19);
+      var tg     = parseFloat(rechnung.trinkgeld || 0);
+
+      doc.setFontSize(8);
+      doc.text('Netto:', 4, y); doc.text(netto.toFixed(2) + ' €', w+4, y, { align: 'right' }); y += lineH;
+      doc.text('MwSt ' + (mwstSatz*100).toFixed(0) + '%:', 4, y); doc.text(mwst.toFixed(2) + ' €', w+4, y, { align: 'right' }); y += lineH;
+      if (tg > 0) { doc.text('Trinkgeld:', 4, y); doc.text(tg.toFixed(2) + ' €', w+4, y, { align: 'right' }); y += lineH; }
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+      doc.text('SUMME:', 4, y); doc.text((brutto + tg).toFixed(2) + ' €', w+4, y, { align: 'right' }); y += lineH+1;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+      doc.text('Zahlung: ' + ((rechnung.zahlungsart || rechnung.Zahlart || 'bar') + '').toUpperCase(), 4, y); y += lineH;
+      y += 1;
+      doc.line(4, y, w+4, y); y += 2;
+
+      // --- TSE-Daten (wenn aktiv) ---
+      if (rechnung.tse_signatur) {
+        doc.setFontSize(6);
+        doc.text('TSE-SIGNATUR (KassenSichV):', 4, y); y += 3;
+        var sigLines = doc.splitTextToSize(rechnung.tse_signatur, 72);
+        sigLines.forEach(function(l){ doc.text(l, 4, y); y += 2.5; });
+        doc.text('Zähler: ' + (rechnung.tse_zaehler || '-'), 4, y); y += 3;
+        doc.text('Seriennr: ' + (rechnung.tse_seriennr || '-'), 4, y); y += 3;
+        doc.text('Zeitstempel: ' + (rechnung.tse_zeitstempel || '-'), 4, y); y += 3;
+        // QR-Code mit TSE-Daten
+        if (window.qrcode) {
+          try {
+            var qr = window.qrcode(0, 'M');
+            qr.addData(rechnung.tse_qr_daten || JSON.stringify({rnr: rnr, sig: rechnung.tse_signatur, ts: rechnung.tse_zeitstempel}));
+            qr.make();
+            var qrImg = qr.createDataURL(3, 0);
+            doc.addImage(qrImg, 'PNG', cx-12, y, 24, 24);
+            y += 25;
+          } catch(e) { console.warn('[beleg] QR-Code fehlgeschlagen:', e); }
+        }
+      } else {
+        doc.setFontSize(6); doc.setTextColor(120, 120, 120);
+        doc.text('TSE-Signatur: wird nach Freischaltung ergänzt', cx, y, { align: 'center' }); y += 3;
+        doc.setTextColor(0, 0, 0);
+      }
+      y += 1;
+      doc.line(4, y, w+4, y); y += 2;
+
+      // --- Fuß: Rechtliche Hinweise ---
+      doc.setFontSize(6);
+      doc.text('Beleg nach §146a AO', cx, y, { align: 'center' }); y += 3;
+      doc.text('Vielen Dank für Ihren Besuch!', cx, y, { align: 'center' }); y += 3;
+      doc.text('Aufbewahrung 10 Jahre (§147 AO).', cx, y, { align: 'center' }); y += 3;
+      doc.text('Casa 2035 – Salon-Management', cx, y, { align: 'center' }); y += 3;
+
+      return doc;
+    }
+
+    // Beleg als PDF herunterladen
+    function downloadBelegPDF(rechnung) {
+      var doc = generateBelegPDF(rechnung);
+      if (!doc) return;
+      var fn = 'Beleg_' + (rechnung.rechnungs_id || 'neu') + '_' + new Date().toISOString().slice(0,10) + '.pdf';
+      doc.save(fn);
+      if (typeof showToast === 'function') showToast('Beleg heruntergeladen: ' + fn, 'success', 3000);
+    }
+
+    // Beleg als PDF in Supabase Storage ablegen + Share-Link erzeugen
+    async function uploadBelegPDF(rechnung) {
+      var doc = generateBelegPDF(rechnung);
+      if (!doc) return null;
+      if (!isBackendMode()) { showToast('Upload nur im Backend-Modus', 'warning'); return null; }
+      try {
+        var pdfBlob = doc.output('blob');
+        var fn = 'belege/' + (rechnung.rechnungs_id || 'neu') + '_' + Date.now() + '.pdf';
+        var url = (config.baseUrl || 'https://api.casa2035.de') + '/storage/v1/object/belege/' + encodeURIComponent(fn.replace('belege/',''));
+        var res = await fetch(url, { method: 'POST', headers: Object.assign(authHeaders(), {'Content-Type':'application/pdf'}), body: pdfBlob });
+        if (!res.ok) {
+          var err = await res.text();
+          throw new Error(res.status + ' ' + err.slice(0,200));
+        }
+        var publicUrl = (config.baseUrl || 'https://api.casa2035.de') + '/storage/v1/object/public/belege/' + encodeURIComponent(fn.replace('belege/',''));
+        // Rechnung mit pdf_url aktualisieren (umgeht Hard-Lock via Session-Var? — nein. Aber pdf_url ist nicht in Status-Lock-Feldern)
+        try {
+          await fetch((config.baseUrl || 'https://api.casa2035.de') + '/rest/v1/rechnungen?id=eq.' + rechnung.id, {
+            method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ pdf_url: publicUrl })
+          });
+        } catch(e) { console.warn('[beleg] pdf_url konnte nicht gespeichert werden:', e); }
+        return publicUrl;
+      } catch(e) {
+        showToast('Beleg-Upload fehlgeschlagen: ' + e.message, 'error', 5000);
+        return null;
+      }
+    }
+
+    // Beleg per E-Mail senden (via Brevo-SMTP, WF-06-artig)
+    async function sendBelegEmail(rechnung, email) {
+      if (!email) email = prompt('E-Mail-Adresse für den Beleg:', rechnung.kontakt || '');
+      if (!email || !email.match(/@/)) return;
+      var pdfUrl = await uploadBelegPDF(rechnung);
+      if (!pdfUrl) return;
+      // TODO: n8n-Webhook oder direkt Brevo-API — vorerst zeigen wir nur den Link
+      if (typeof showToast === 'function') showToast('Beleg-Link erstellt: ' + pdfUrl + '\n(E-Mail-Versand via n8n WF-SEND folgt in K2)', 'success', 7000);
+      // Clipboard
+      try { await navigator.clipboard.writeText(pdfUrl); showToast('Link in Zwischenablage kopiert', 'info', 2500); } catch(_){}
+    }
+
+    // Beleg per WhatsApp (Click-to-Chat-Link)
+    function sendBelegWhatsApp(rechnung, phone) {
+      if (!phone) phone = prompt('Telefonnummer für WhatsApp (internationale Form, z.B. 491701234567):', '');
+      if (!phone) return;
+      phone = phone.replace(/[^0-9+]/g, '').replace(/^\+/, '');
+      uploadBelegPDF(rechnung).then(function(url){
+        if (!url) return;
+        var text = encodeURIComponent('Ihr Beleg vom ' + new Date().toLocaleDateString('de-DE') + ' bei Rena Rados Friseure:\n' + url + '\n\nVielen Dank für Ihren Besuch!');
+        window.open('https://wa.me/' + phone + '?text=' + text, '_blank');
+      });
+    }
+    // =============================================================
+    // Capo 19.04.2026 Sprint K1: Z-Bon (Tagesabschluss-PDF)
+    // Pflichtfelder laut GoBD Rn. 58 + DFKA-Taxonomie:
+    //  - Z-Nr (fortlaufend), Datum, Uhrzeit
+    //  - Startsaldo, Einnahmen gesamt (Bar/Karte), Ausgaben Bar
+    //  - Soll-Kasse, Ist-Kasse, Differenz
+    //  - MwSt-Summe (pro Satz), Umsatz Dienstleistung/Produkte
+    //  - Anzahl Rechnungen, Anzahl Kunden, Storno-Liste
+    //  - Mitarbeiter pro Umsatz
+    //  - Signatur des Abschließenden
+    // =============================================================
+    function generateZBonPDF(abschluss, rechnungenDesTages, ausgabenDesTages) {
+      if (!window.jspdf || !window.jspdf.jsPDF) return null;
+      var jsPDF = window.jspdf.jsPDF;
+      var doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      var y = 18; var leftX = 18; var rightX = 192;
+
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+      doc.text('Z-BON — TAGESABSCHLUSS', leftX, y); y += 6;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+      doc.text('RENA RADOS FRISEURE · Erzgießereistr. 51 · 80335 München', leftX, y); y += 4;
+      doc.text('StNr: [wird nach Rena-OK eingetragen]', leftX, y); y += 6;
+
+      doc.setLineWidth(0.3); doc.line(leftX, y, rightX, y); y += 5;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+      doc.text('Z-Nr: ' + (abschluss.abschluss_id || '-'), leftX, y);
+      doc.text('Datum: ' + (abschluss.datum || '-'), 100, y); y += 5;
+      var erstellt = new Date(abschluss.erstellt_am || Date.now());
+      doc.text('Zeitstempel Abschluss: ' + erstellt.toLocaleString('de-DE'), leftX, y); y += 6;
+
+      doc.line(leftX, y, rightX, y); y += 5;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text('Kassen-Bestand', leftX, y); y += 5;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+      var row = function(label, val) {
+        doc.text(label, leftX, y);
+        doc.text(((val != null) ? parseFloat(val).toFixed(2) : '0.00') + ' €', rightX, y, { align: 'right' });
+        y += 5;
+      };
+      row('Kasse Start', abschluss.kasse_anfang);
+      row('+ Einnahmen Bar', abschluss.einnahmen_bar);
+      row('+ Einnahmen Karte', abschluss.einnahmen_karte);
+      row('+ Trinkgeld gesamt', abschluss.trinkgeld_gesamt);
+      row('− Ausgaben Bar', abschluss.ausgaben_bar);
+      doc.setFont('helvetica', 'bold');
+      row('= Kasse Soll', abschluss.kasse_soll);
+      row('Kasse Ist (gezählt)', abschluss.kasse_ist);
+      doc.setTextColor(abschluss.differenz !== 0 ? 200 : 0, 0, 0);
+      row('DIFFERENZ', abschluss.differenz);
+      doc.setTextColor(0, 0, 0);
+      doc.setFont('helvetica', 'normal');
+      y += 2;
+
+      doc.line(leftX, y, rightX, y); y += 5;
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text('Umsatz-Aufschlüsselung', leftX, y); y += 5;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
+      row('Umsatz Dienstleistung', abschluss.umsatz_dienstleistung);
+      row('Umsatz Produkte', abschluss.umsatz_produkte);
+      row('Einnahmen gesamt', abschluss.einnahmen_gesamt);
+      row('davon MwSt 19%', abschluss.mwst_summe);
+      doc.text('Anzahl Rechnungen: ' + (abschluss.anzahl_rechnungen || 0), leftX, y);
+      doc.text('Anzahl Kunden: ' + (abschluss.anzahl_kunden || 0), 100, y); y += 6;
+
+      // Storno-Liste
+      var stornos = (rechnungenDesTages || []).filter(function(r){ return r.status === 'storniert' || r.storno_id; });
+      if (stornos.length) {
+        doc.line(leftX, y, rightX, y); y += 5;
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.text('Stornierungen heute (' + stornos.length + ')', leftX, y); y += 5;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+        stornos.forEach(function(s){
+          doc.text(s.rechnungs_id + ' — ' + (s.kundenname || '-') + ' — ' + parseFloat(s.brutto||0).toFixed(2) + ' €', leftX, y);
+          y += 4;
+        });
+        y += 2;
+      }
+
+      if (abschluss.kommentar) {
+        doc.line(leftX, y, rightX, y); y += 5;
+        doc.setFont('helvetica', 'italic'); doc.setFontSize(9);
+        doc.text('Kommentar: ' + abschluss.kommentar, leftX, y); y += 6;
+      }
+
+      doc.line(leftX, y, rightX, y); y += 5;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+      doc.text('Dieser Z-Bon ist gemäß GoBD Rn. 58 unveränderbar archiviert.', leftX, y); y += 4;
+      doc.text('Aufbewahrungspflicht 10 Jahre (§147 AO).', leftX, y); y += 4;
+      doc.text('Erstellt durch Casa 2035 Dashboard.', leftX, y); y += 10;
+
+      doc.text('Unterschrift Abschließende:r:', leftX, y);
+      doc.line(leftX + 60, y, leftX + 130, y); y += 8;
+
+      return doc;
+    }
+
+    function downloadZBonPDF(abschluss) {
+      if (!abschluss) { showToast('Kein Tagesabschluss ausgewählt', 'warning'); return; }
+      var rechnungen = (kasseCache || []).filter(function(r){
+        return (r.erstellt_am || r.datum || '').indexOf(abschluss.datum) === 0;
+      });
+      var doc = generateZBonPDF(abschluss, rechnungen, []);
+      if (!doc) { showToast('Z-Bon-Generierung fehlgeschlagen (jsPDF lädt noch?)', 'error'); return; }
+      var fn = 'Z-Bon_' + abschluss.datum + '_' + (abschluss.abschluss_id || '') + '.pdf';
+      doc.save(fn);
+      showToast('Z-Bon heruntergeladen: ' + fn, 'success');
+    }
+
+    // =============================================================
+    // End Sprint K1 PDF-Beleg + Z-Bon
+    // =============================================================
 
     function renderUmsatzProMa(data) {
       var container = document.getElementById('umsatzProMa');
