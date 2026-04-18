@@ -4242,6 +4242,9 @@
           return;
         }
 
+        // 18.04.2026 Chrome-Bug-Fix: services ZUERST mappen + cachen, damit mapTermine() Service-Namen aufloesen kann
+        services = mapServices(services || []);
+        if (services.length) window.servicesCache = services;
         // Spalten mappen für Dashboard-Kompatibilitaet
         termine = mapTermine(termine || []);
         // Rollen-Filter clientseitig (RLS ist aktuell FOR ALL)
@@ -4251,7 +4254,6 @@
             termine = termine.filter(function(t) { return t.Stylist === meName; });
           }
         }
-        services = mapServices(services || []);
         lager = mapLager(lager || []);
         kunden = mapKunden(kunden || []);
         beratungen = mapAnfragen(beratungen || []);
@@ -4297,8 +4299,9 @@
           eventsCache = mappedEvents;
           renderEvents(mappedEvents);
         }
-        if (Array.isArray(termine) && termine.length > 0) { termineCache = termine; renderTermine(termine); }
+        // 18.04.2026 Chrome-Bug-Fix: servicesCache VOR termine-mapping laden, damit Service-Namen aufgeloest werden koennen
         if (Array.isArray(services) && services.length > 0) { servicesCache = services; renderServices(services); }
+        if (Array.isArray(termine) && termine.length > 0) { termineCache = termine; renderTermine(termine); }
         if (Array.isArray(lager) && lager.length > 0) { renderLagerTab(lager); }
         if (Array.isArray(kunden) && kunden.length > 0) { kundenCache = kunden; renderKunden(kunden); }
         if (Array.isArray(beratungen) && beratungen.length > 0) { renderBeratungen(beratungen); }
