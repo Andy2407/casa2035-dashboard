@@ -218,11 +218,11 @@
       z-index: 0;
     }
 
-    /* Tabular-Numerics Erzwingen fuer Maskulin */
+    /* Tabular-Numerics Erzwingen für Maskulin */
     [data-style="maskulin"] .stat-value, [data-style="maskulin"] .cockpit-value,
     [data-style="maskulin"] .tabular { font-variant-numeric: tabular-nums; }
 
-    /* Playfair-Numerics Erzwingen fuer Feminin */
+    /* Playfair-Numerics Erzwingen für Feminin */
     [data-style="feminin"] .stat-value, [data-style="feminin"] .cockpit-value {
       font-family: var(--font-display); font-style: italic; font-weight: 500;
     }
@@ -525,7 +525,7 @@
       min-height: 100dvh;
       /* FB 17.04.: body braucht KEIN safe-top — Header hat sein eigenes. Sonst doppelt gezaehlt -> Content zu tief. */
       padding-top: 0;
-      /* +16px statt +8px -> Bottom-Nav ueberlappt nie Content mehr (Capo-Tickets 753a0055, 520c72fc, 2cd49862) */
+      /* +16px statt +8px -> Bottom-Nav überlappt nie Content mehr (Capo-Tickets 753a0055, 520c72fc, 2cd49862) */
       padding-bottom: calc(var(--nav-height) + max(env(safe-area-inset-bottom, 0px), var(--safe-bottom)) + 16px);
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
@@ -538,10 +538,10 @@
       /* A11y-Ersatz für gesperrten Zoom: benutzerwaehlbare Schriftgroesse-Basis via CSS-Var */
       font-size: var(--user-font-size, 14px);
     }
-    /* A11y Schriftgroesse: 3 Stufen (klein/normal/gross/xl) via data-font-size am body */
+    /* A11y Schriftgroesse: 3 Stufen (klein/normal/groß/xl) via data-font-size am body */
     body[data-font-size="klein"]  { --user-font-size: 12px; }
     body[data-font-size="normal"] { --user-font-size: 14px; }
-    body[data-font-size="gross"]  { --user-font-size: 16px; }
+    body[data-font-size="groß"]  { --user-font-size: 16px; }
     body[data-font-size="xl"]     { --user-font-size: 18px; }
 
     .serif { font-family: 'Playfair Display', 'Georgia', serif; }
@@ -590,7 +590,7 @@
     /* === Header (FB-24: iOS safe-area fix) === */
     .header {
       position: sticky; top: 0; z-index: 100;
-      /* FB 17.04. Ticket 351f8adc: iPhone-Status-Leiste (Uhrzeit/WLAN/Batterie) ueberlappt Header -> Mindest-Pad-Top 44px */
+      /* FB 17.04. Ticket 351f8adc: iPhone-Status-Leiste (Uhrzeit/WLAN/Batterie) überlappt Header -> Mindest-Pad-Top 44px */
       padding: max(calc(env(safe-area-inset-top, 0px) + 14px), var(--min-header-pad, 44px)) max(20px, env(safe-area-inset-right, 20px)) 12px max(20px, env(safe-area-inset-left, 20px));
       /* FB 17.04. Ticket 57047aa8: Designer-Balken-Redesign. Premium-Look, iCal-+Workday-inspiriert, nicht kopiert. */
       background: rgba(250,248,246,0.94);
@@ -787,8 +787,8 @@
     [data-style="maskulin"] .stat-icon.casa-stat-ic svg { border-radius: 8px; }
     [data-style="feminin"] .stat-icon.casa-stat-ic { box-shadow: 0 6px 22px rgba(212,169,94,0.22); border-radius: 14px; }
     [data-style="feminin"] .stat-icon.casa-stat-ic svg { border-radius: 14px; }
-    /* 18.04.2026 CHROME-BUG-FIX: im Feminin-Mode war rect-fill nur fuer .casa-icon-wrap gesetzt,
-       nicht fuer Stat-Icons (.casa-stat-ic). Folge: schwarze Bloecke statt Icon-Inhalt. */
+    /* 18.04.2026 CHROME-BUG-FIX: im Feminin-Mode war rect-fill nur für .casa-icon-wrap gesetzt,
+       nicht für Stat-Icons (.casa-stat-ic). Folge: schwarze Bloecke statt Icon-Inhalt. */
     [data-style="feminin"] .casa-stat-ic svg rect:first-of-type,
     [data-style="feminin"] .stat-icon.casa-stat-ic svg rect:first-of-type {
       fill: #fffcf7 !important;
@@ -1611,7 +1611,7 @@
       background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
       padding: 14px 16px; backdrop-filter: blur(12px);
       transition: all 300ms var(--ease);
-      /* FB 17.04. Ticket ea701a1f: Widgets ueberlappen auf schmalem iPhone (293-390 px).
+      /* FB 17.04. Ticket ea701a1f: Widgets überlappen auf schmalem iPhone (293-390 px).
          min-width:0 + word-break laesst Karten in Spalte bleiben statt zu überlaufen. */
       position: relative; overflow: hidden; cursor: pointer;
       min-width: 0; word-break: break-word;
@@ -1940,7 +1940,7 @@
       }
     }
 
-    /* === KI-Vorschlaege === */
+    /* === KI-Vorschläge === */
     .ki-suggestion-card {
       display: flex; gap: 12px; padding: 14px; background: var(--surface);
       border: 1px solid var(--border); border-left: 3px solid var(--gold);
@@ -2396,8 +2396,8 @@
       <!-- Jarvis-Briefing: Der Ironman-Moment, Jarvis spricht zuerst (18.04.2026) -->
       <div id="jarvisBriefing" style="display:none;margin-bottom:16px"></div>
 
-      <!-- KI-Vorschlaege Kachel -->
-      <div class="section-title">KI-Vorschlaege</div>
+      <!-- KI-Vorschläge Kachel -->
+      <div class="section-title">KI-Vorschläge</div>
       <div class="ki-suggestions stagger" id="kiSuggestions"></div>
 
       <div class="section-title">Aktuelle Ereignisse <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten — Klicken für Go-Live Status">D</span></div>
@@ -2542,7 +2542,7 @@
           <button class="filter-btn" onclick="setLagerKategorie('Farbe')">Farbe</button>
           <button class="filter-btn" onclick="setLagerKategorie('Styling')">Styling</button>
           <button class="filter-btn" onclick="setLagerKategorie('Treatment')">Treatment</button>
-          <button class="filter-btn" onclick="setLagerKategorie('Zubehoer')">Zubehoer</button>
+          <button class="filter-btn" onclick="setLagerKategorie('Zubehoer')">Zubehör</button>
         </div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
@@ -2622,7 +2622,7 @@
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px" id="fontSizePicker">
               <button type="button" class="fontsize-opt" data-size="klein" style="padding:8px;border:1px solid var(--border);background:var(--bg-warm);color:var(--text);border-radius:var(--radius-sm);font-size:12px;cursor:pointer">Klein</button>
               <button type="button" class="fontsize-opt" data-size="normal" style="padding:8px;border:1px solid var(--border);background:var(--bg-warm);color:var(--text);border-radius:var(--radius-sm);font-size:14px;cursor:pointer">Normal</button>
-              <button type="button" class="fontsize-opt" data-size="gross" style="padding:8px;border:1px solid var(--border);background:var(--bg-warm);color:var(--text);border-radius:var(--radius-sm);font-size:16px;cursor:pointer">Gross</button>
+              <button type="button" class="fontsize-opt" data-size="groß" style="padding:8px;border:1px solid var(--border);background:var(--bg-warm);color:var(--text);border-radius:var(--radius-sm);font-size:16px;cursor:pointer">Groß</button>
               <button type="button" class="fontsize-opt" data-size="xl" style="padding:8px;border:1px solid var(--border);background:var(--bg-warm);color:var(--text);border-radius:var(--radius-sm);font-size:18px;cursor:pointer">XL</button>
             </div>
           </div>
@@ -2665,7 +2665,7 @@
           <input type="text" id="regelText" placeholder="Neue Regel eingeben..." maxlength="200" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif">
           <button class="btn btn-primary btn-sm" onclick="addSalonRegel()">+</button>
         </div>
-        <div class="section-title" style="margin-top:16px">Vorschlaege</div>
+        <div class="section-title" style="margin-top:16px">Vorschläge</div>
         <div id="regelVorschlaege"></div>
       </div>
       <!-- Profil -->
@@ -2919,8 +2919,8 @@
   <div class="sheet-overlay" id="detailSheet">
     <div class="sheet" style="max-height:92vh;position:relative">
       <div class="sheet-handle"></div>
-      <!-- FB 17.04. Ticket e24911f8: kleiner Schliessen-Button rechts oben im Termin-Detail -->
-      <button onclick="document.getElementById('detailSheet').classList.remove('open')" aria-label="Schliessen"
+      <!-- FB 17.04. Ticket e24911f8: kleiner Schließen-Button rechts oben im Termin-Detail -->
+      <button onclick="document.getElementById('detailSheet').classList.remove('open')" aria-label="Schließen"
         style="position:absolute;top:8px;right:10px;width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:18px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;line-height:1">×</button>
       <div id="detailInner"></div>
     </div>
@@ -3410,7 +3410,7 @@
       if (openA.length > 0) parts.push(openA.length + ' Anfragen');
       var lowStock = (lagerCache||[]).filter(function(p){ return (parseInt(p.Bestand)||0) <= (parseInt(p.Min_Bestand)||3); });
       if (lowStock.length > 0) parts.push(lowStock.length + ' Lager-Alarm');
-      // Workday-Inspiration 17.04.2026: persoenliche Begruessung mit Vornamen
+      // Workday-Inspiration 17.04.2026: persoenliche Begrüßung mit Vornamen
       var userKey = sessionStorage.getItem('casa_user') || '';
       var uObj = (typeof USERS === 'object' && USERS[userKey]) ? USERS[userKey] : null;
       var vorname = uObj && uObj.name ? uObj.name : '';
@@ -3696,7 +3696,7 @@
       ],
       home: [
         '<b>Cmd/Ctrl + K</b> öffnet die globale Suche &mdash; findet Kunde, Termin, Produkt sofort.',
-        '<b>Begruessung</b> zeigt deine wichtigsten Zahlen für heute &mdash; Termine, Anfragen, Lager-Alarm in einem Satz.',
+        '<b>Begrüßung</b> zeigt deine wichtigsten Zahlen für heute &mdash; Termine, Anfragen, Lager-Alarm in einem Satz.',
         '<b>Tipp vom Tag:</b> Wenn etwas rot ist (z.B. Lager-Alarm), ein Tipp auf die Kachel bringt dich direkt hin.',
         '<b>Jarvis:</b> Nach dem Login einmal probieren &mdash; je mehr du fragst, desto besser passt er sich an deinen Salon an.'
       ],
@@ -4106,7 +4106,7 @@
         if (!endeISO && r.datum && r.end_zeit) {
           endeISO = r.datum + 'T' + r.end_zeit;
         }
-        // 18.04.2026 Chrome-Live-Bug-Fix: Service aus service_ids[0] ueber servicesCache aufloesen
+        // 18.04.2026 Chrome-Live-Bug-Fix: Service aus service_ids[0] über servicesCache aufloesen
         var serviceResolved = r.dienstleistung || r.Service || r.service || '';
         if (!serviceResolved && Array.isArray(r.service_ids) && r.service_ids.length > 0) {
           try {
@@ -4363,7 +4363,7 @@
         document.getElementById('liveIndicator').textContent = 'LIVE';
         // Capo 17.04.: Demo-Badges verschwinden sobald echte DB-Daten kommen (Rena-Live-Ready)
         try { updateDemoBadges(); } catch(e) {}
-        // Capo 18.04.: nach ALLEN Caches Begruessung nochmal rendern (Race-Condition-Fix)
+        // Capo 18.04.: nach ALLEN Caches Begrüßung nochmal rendern (Race-Condition-Fix)
         try { updateHeroSubtitle(); } catch(e) {}
         setTimeout(function(){ try { updateHeroSubtitle(); } catch(e) {} }, 600);
       } catch(e) {
@@ -4382,10 +4382,10 @@
       var badge = document.getElementById('unreadBadge');
       if (unread.length > 0) { badge.style.display = ''; badge.textContent = unread.length; }
       else { badge.style.display = 'none'; }
-      // FB 18.04.: Home-Kachel + Begruessung nutzen GLEICHE Quelle (unread events), sonst Zahlen-Inkonsistenz
+      // FB 18.04.: Home-Kachel + Begrüßung nutzen GLEICHE Quelle (unread events), sonst Zahlen-Inkonsistenz
       document.getElementById('statBeratung').textContent = unread.length;
       document.getElementById('statBeratungSub').textContent = 'offene Anfragen';
-      // Begruessung sofort nachziehen, damit Zahlen synchron
+      // Begrüßung sofort nachziehen, damit Zahlen synchron
       try { if (typeof updateHeroSubtitle === 'function') updateHeroSubtitle(); } catch(e) {}
 
       events.slice(0, 8).forEach(function(ev, idx) {
@@ -6994,7 +6994,7 @@
              + 'style="width:100%;padding:8px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);font-size:12px;font-family:Inter,sans-serif;resize:none;box-sizing:border-box">' + esc(t.Notiz || '') + '</textarea></div>';
       }
 
-      // Überlappungs-Vorschlaege
+      // Überlappungs-Vorschläge
       if (statusLabel !== 'storniert' && statusLabel !== 'abgeschlossen') {
         var todayStr = (t.Start_ISO || '').split('T')[0];
         var sameStylistTermine = termineCache.filter(function(x) { return x.Stylist === t.Stylist && (x.Start_ISO||'').indexOf(todayStr) === 0 && x !== t && x.Status !== 'storniert'; });
@@ -7047,7 +7047,7 @@
               }
             });
           } else {
-            html += '<div style="font-size:11px;color:var(--text-dim)">Keine automatischen Vorschlaege verfügbar. Bitte manuell verschieben.</div>';
+            html += '<div style="font-size:11px;color:var(--text-dim)">Keine automatischen Vorschläge verfügbar. Bitte manuell verschieben.</div>';
           }
           html += '</div>';
         }
@@ -7714,7 +7714,7 @@
 
       var intro = document.createElement('div');
       intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
-      intro.textContent = '3-5 Fotos vom Haar aufnehmen \u2014 KI analysiert Struktur, Schaedigung, Porositaet und gibt Pflegeempfehlung mit Heilungsprognose.';
+      intro.textContent = '3-5 Fotos vom Haar aufnehmen \u2014 KI analysiert Struktur, Schädigung, Porositaet und gibt Pflegeempfehlung mit Heilungsprognose.';
       wrapper.appendChild(intro);
 
       // Foto-Tipps
@@ -7883,7 +7883,7 @@
         } else if (s.key === '1m') {
           infoBox.textContent = 'Deutliche Verbesserung: Haarstruktur erholt sich, Bruch reduziert, natuerlicher Glanz, Spitzen weniger gespalten.';
         } else {
-          infoBox.textContent = 'Optimaler Zustand: Haar sieht gesund und kraeftig aus. Schaedigung weitgehend repariert, voller Glanz.';
+          infoBox.textContent = 'Optimaler Zustand: Haar sieht gesund und kraeftig aus. Schädigung weitgehend repariert, voller Glanz.';
         }
         row.appendChild(infoBox);
         panel.appendChild(row);
@@ -7911,7 +7911,7 @@
         teaser.appendChild(teaserTitle);
         var teaserDesc = document.createElement('div');
         teaserDesc.style.cssText = 'font-size:12px;color:var(--text-secondary);margin-bottom:10px;line-height:1.5';
-        teaserDesc.textContent = 'Ihr Paket zeigt: Haartyp, Schaedigung, Kopfhaut, Porenstruktur, Farbhistorie. Mit Salon Pro: alle 17 Parameter + Scoring + Pflegeempfehlung + Produkt-Matching.';
+        teaserDesc.textContent = 'Ihr Paket zeigt: Haartyp, Schädigung, Kopfhaut, Porenstruktur, Farbhistorie. Mit Salon Pro: alle 17 Parameter + Scoring + Pflegeempfehlung + Produkt-Matching.';
         teaser.appendChild(teaserDesc);
         var teaserBtn = document.createElement('button');
         teaserBtn.className = 'btn btn-primary btn-block btn-sm';
@@ -7981,7 +7981,7 @@
     var DEMO_HAARANALYSE = {
       params: [
         { name: 'Haartyp', value: 'Wellig (2B)', score: 7 },
-        { name: 'Schaedigung', value: 'Leicht (Spitzen)', score: 6 },
+        { name: 'Schädigung', value: 'Leicht (Spitzen)', score: 6 },
         { name: 'Kopfhaut', value: 'Normal, leicht trocken', score: 7 },
         { name: 'Porositaet', value: 'Mittel', score: 8 },
         { name: 'Dichte', value: 'Normal bis dicht', score: 7 },
@@ -8151,7 +8151,7 @@
       // === Bereich 2: Wunschfrisur ===
       buildWfUploadSection(wrapper, 'wunsch', '2', 'Wunschlook', '3-5 Referenzbilder: Frisur, Bart, Style — Screenshots, Magazin, Promi-Looks', 'var(--gold-glow)', 'var(--gold)');
 
-      // Gesamt-Zaehler
+      // Gesamt-Zähler
       var totalCount = document.createElement('div');
       totalCount.id = 'wfTotalCount';
       totalCount.style.cssText = 'font-size:11px;font-weight:600;color:var(--text-dim);margin-bottom:12px;padding:8px;background:var(--bg-warm);border-radius:var(--radius-sm);text-align:center';
@@ -8590,7 +8590,7 @@
       var active = regeln.filter(function(r) { return r.aktiv; }).length;
       var countEl = document.getElementById('salonRegelnCount');
       if (countEl) countEl.textContent = active + ' aktiv';
-      if (!regeln.length) { container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-dim);font-size:12px;background:var(--bg-warm);border-radius:var(--radius-sm)">Noch keine Regeln. Fuege deine erste Salon-Regel hinzu!</div>'; return; }
+      if (!regeln.length) { container.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-dim);font-size:12px;background:var(--bg-warm);border-radius:var(--radius-sm)">Noch keine Regeln. Füge deine erste Salon-Regel hinzu!</div>'; return; }
       regeln.forEach(function(r) {
         var kat = REGEL_KATEGORIEN[r.kategorie] || REGEL_KATEGORIEN.sonstiges;
         var card = document.createElement('div');
@@ -8628,9 +8628,9 @@
         { kat: 'produkt', text: 'Nur La Biosthetique Produkte empfehlen' },
         { kat: 'kapazitaet', text: 'Max 3 Termine parallel pro Stylistin' },
         { kat: 'kapazitaet', text: '15 Min Puffer zwischen Farbbehandlungen' },
-        { kat: 'kunde', text: 'VIP-Kunden: Getraenk + persönliche Begruessung' },
+        { kat: 'kunde', text: 'VIP-Kunden: Getraenk + persönliche Begrüßung' },
         { kat: 'kunde', text: 'Neukunden: 10 Min Extra für Beratung einplanen' },
-        { kat: 'service', text: 'Keine Dauerwelle unter Stufe 3 Schaedigung' },
+        { kat: 'service', text: 'Keine Dauerwelle unter Stufe 3 Schädigung' },
         { kat: 'sonstiges', text: 'Allergieabfrage bei JEDER neuen Farbe (Pflicht)' }
       ];
       vorschlaege.forEach(function(v) {
@@ -8968,7 +8968,7 @@
         var typBadge = s.service_typ ? '<span style="font-size:9px;background:var(--surface-hover);padding:2px 5px;border-radius:4px;margin-left:4px">' + esc(s.service_typ) + '</span>' : '';
         var preis = (typeof s.preis === 'number' ? s.preis.toFixed(2) : s.preis || '-') + ' EUR';
         var dauer = (s.dauer_min || s.dauer || '-') + ' Min';
-        // data-typ fuer Style-Toggle-Dimming (18.04.2026 Capo Maskulin/Feminin)
+        // data-typ für Style-Toggle-Dimming (18.04.2026 Capo Maskulin/Feminin)
         html += '<div class="settings-item" data-typ="' + esc(typRaw) + '" style="opacity:' + (aktiv ? '1' : '0.5') + ';transition:opacity 300ms">'
           + '<div class="left"><div><div class="title">' + esc(s.name) + typBadge + '</div>'
           + '<div class="desc">' + preis + ' &middot; ' + dauer + ' &middot; ' + esc(s.kategorie || 'sonstiges') + '</div></div></div>'
@@ -9893,7 +9893,7 @@
       } catch(e) {}
     }
 
-    // === KI-Vorschlaege für Home/Cockpit ===
+    // === KI-Vorschläge für Home/Cockpit ===
     function renderKiSuggestions() {
       var container = document.getElementById('kiSuggestions');
       if (!container) return;
@@ -9997,7 +9997,7 @@
       });
 
       if (suggestions.length === 0) {
-        container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-dim);font-size:12px">Keine KI-Vorschlaege gerade — alles läuft rund!</div>';
+        container.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text-dim);font-size:12px">Keine KI-Vorschläge gerade — alles läuft rund!</div>';
       }
     }
 
@@ -10014,7 +10014,7 @@
       var hasOverlaps = Object.keys(overlaps).length > 0;
 
       if (hasOverlaps) {
-        hints.push({ iconKey: 'warning', title: 'Terminueberschneidung erkannt!', desc: 'Zwei oder mehr Termine ueberlappen sich im Tagesplan — jetzt prüfen und umbuchen, bevor Kunden warten.', prio: 'danger' });
+        hints.push({ iconKey: 'warning', title: 'Terminueberschneidung erkannt!', desc: 'Zwei oder mehr Termine überlappen sich im Tagesplan — jetzt prüfen und umbuchen, bevor Kunden warten.', prio: 'danger' });
       }
       var gaps = [];
       var sorted = todayTermine.slice().sort(function(a,b) { return (a.Start_ISO||'').localeCompare(b.Start_ISO||''); });
@@ -10477,7 +10477,7 @@
         produkte: [{name:'Shampoo Vital',menge:'10 ml'},{name:'Conditioner',menge:'8 ml'}]
       },
       'Balayage + Schnitt': {
-        aufgaben: [{schritt:'Farbanalyse + Beratung',dauer_min:10},{schritt:'Straehnen setzen (Freihand)',dauer_min:45},{schritt:'Einwirkzeit',dauer_min:35,einwirkzeit:true},{schritt:'Auswaschen + Pflege',dauer_min:10},{schritt:'Schneiden',dauer_min:20},{schritt:'Föhnen + Styling',dauer_min:15}],
+        aufgaben: [{schritt:'Farbanalyse + Beratung',dauer_min:10},{schritt:'Strähnen setzen (Freihand)',dauer_min:45},{schritt:'Einwirkzeit',dauer_min:35,einwirkzeit:true},{schritt:'Auswaschen + Pflege',dauer_min:10},{schritt:'Schneiden',dauer_min:20},{schritt:'Föhnen + Styling',dauer_min:15}],
         produkte: [{name:'Blondierpulver',menge:'30 g'},{name:'Oxid 6%',menge:'60 ml',mischung:'1:2 mit Blondierpulver'},{name:'Balayage Folie 30cm',menge:'15-20 Stueck'},{name:'Olaplex No. 1',menge:'3.75 ml',mischung:'In Blondierung einmischen'},{name:'Olaplex No. 2',menge:'15 ml',mischung:'Nach Auswaschen, 10 Min einwirken'},{name:'Shampoo Silber',menge:'15 ml'},{name:'Pflegekur',menge:'20 ml'}]
       },
       'Farbbehandlung Komplett': {
@@ -11072,7 +11072,7 @@
         html += '<b style="color:var(--warning)">Chrome kann das leider nicht</b> — das ist eine Apple-Einschraenkung.<br><br>';
         html += '<span class="step-num">1</span> Kopiere den Link (Button unten)<br>';
         html += '<span class="step-num">2</span> Öffne <b>Safari</b><br>';
-        html += '<span class="step-num">3</span> Fuege den Link ein und öffne die Seite<br>';
+        html += '<span class="step-num">3</span> Füge den Link ein und öffne die Seite<br>';
         html += '<span class="step-num">4</span> Teilen &#8593; → <b>"Zum Home-Bildschirm"</b></div>';
         html += '<div class="pwa-banner-actions">';
         html += '<button class="pwa-btn-copy" onclick="copyPwaUrl()">Link kopieren</button>';
@@ -11784,9 +11784,9 @@
         }
       }
       t = out.join('');
-      // Satz-Anfang gross schreiben
+      // Satz-Anfang groß schreiben
       t = t.replace(/(^|[.!?]\s+)([a-zaeoeue])/g, function(m, pre, c) { return pre + c.toUpperCase(); });
-      // Erster Buchstabe immer gross
+      // Erster Buchstabe immer groß
       if (t.length > 0) t = t.charAt(0).toUpperCase() + t.slice(1);
       // Punkt am Ende wenn keiner da
       if (t.length > 2 && !/[.!?]$/.test(t)) t += '.';
@@ -11950,7 +11950,7 @@
         + '<div style="margin-bottom:12px"><div style="color:var(--text-dim);text-transform:uppercase;font-size:10px;font-weight:700;letter-spacing:0.8px;margin-bottom:6px">Suche & Navigation</div>'
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Globale Suche</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Cmd/Ctrl + K</kbd></div>'
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Tastaturkuerzel-Hilfe</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">?</kbd></div>'
-        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Schliessen / Abbrechen</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Esc</kbd></div>'
+        + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Schließen / Abbrechen</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Esc</kbd></div>'
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Home / Termine / Beratung / Kunden / Lager / Kasse / Admin</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Alt + 1…7</kbd></div></div>'
         + '<div style="margin-bottom:12px"><div style="color:var(--text-dim);text-transform:uppercase;font-size:10px;font-weight:700;letter-spacing:0.8px;margin-bottom:6px">In der Suche</div>'
         + '<div style="display:flex;justify-content:space-between;padding:4px 0"><span>Hoch / Runter</span><kbd style="font-family:monospace;padding:2px 6px;border:1px solid var(--border);border-radius:4px">&uarr; &darr;</kbd></div>'
@@ -11969,7 +11969,7 @@
           e.preventDefault();
           overlay.style.display = 'flex';
         }
-        // Esc schliesst egal welches Overlay offen ist
+        // Esc schließt egal welches Overlay offen ist
         if (e.key === 'Escape') {
           ['globalSearchOverlay','kbHelpOverlay','notifDropdown','detailSheet','profileDropdown'].forEach(function(id){
             var el = document.getElementById(id);
