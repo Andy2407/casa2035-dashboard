@@ -794,14 +794,58 @@
       fill: #fffcf7 !important;
       stroke-opacity: 0.7;
     }
-    /* 18.04.2026 CHROME-DRITTER-BUG: Hell-Gold-Icons auf cream-Hintergrund fast unsichtbar.
-       Filter dunkelt die goldenen Shapes ab, Rose-Hue dreht Richtung warm. */
-    [data-style="feminin"] .casa-stat-ic svg,
-    [data-style="feminin"] .casa-icon-wrap svg,
-    [data-style="feminin"] #jarvisBriefing svg[viewBox="0 0 40 40"],
-    [data-style="feminin"] #notifList svg[viewBox="0 0 40 40"],
-    [data-style="feminin"] .hint-icon svg {
-      filter: contrast(1.4) saturate(0.95) brightness(0.78);
+    /* 18.04.2026 CHROME-DRITTER-BUG V2: Stroke/Fill direkt umstellen damit goldene Inner-Shapes
+       auf cream-Hintergrund klar sichtbar sind. Ueberschreibt url(#gradient)-Referenzen mit festem Hex. */
+    [data-style="feminin"] .casa-stat-ic svg path,
+    [data-style="feminin"] .casa-stat-ic svg polyline,
+    [data-style="feminin"] .casa-stat-ic svg circle,
+    [data-style="feminin"] .casa-stat-ic svg line,
+    [data-style="feminin"] .casa-stat-ic svg polygon,
+    [data-style="feminin"] .casa-stat-ic svg text,
+    [data-style="feminin"] .casa-icon-wrap svg path,
+    [data-style="feminin"] .casa-icon-wrap svg polyline,
+    [data-style="feminin"] .casa-icon-wrap svg circle,
+    [data-style="feminin"] .casa-icon-wrap svg line,
+    [data-style="feminin"] .casa-icon-wrap svg polygon,
+    [data-style="feminin"] .casa-icon-wrap svg text,
+    [data-style="feminin"] #jarvisBriefing svg[viewBox="0 0 40 40"] path,
+    [data-style="feminin"] #jarvisBriefing svg[viewBox="0 0 40 40"] polyline,
+    [data-style="feminin"] #jarvisBriefing svg[viewBox="0 0 40 40"] circle,
+    [data-style="feminin"] #jarvisBriefing svg[viewBox="0 0 40 40"] line,
+    [data-style="feminin"] #jarvisBriefing svg[viewBox="0 0 40 40"] polygon,
+    [data-style="feminin"] #notifList svg[viewBox="0 0 40 40"] path,
+    [data-style="feminin"] #notifList svg[viewBox="0 0 40 40"] polyline,
+    [data-style="feminin"] #notifList svg[viewBox="0 0 40 40"] circle,
+    [data-style="feminin"] #notifList svg[viewBox="0 0 40 40"] line,
+    [data-style="feminin"] #notifList svg[viewBox="0 0 40 40"] polygon,
+    [data-style="feminin"] .hint-icon svg path,
+    [data-style="feminin"] .hint-icon svg polyline,
+    [data-style="feminin"] .hint-icon svg circle,
+    [data-style="feminin"] .hint-icon svg line,
+    [data-style="feminin"] .hint-icon svg polygon {
+      stroke: #8b6f3a !important;
+    }
+    /* fill nur dort ueberschreiben, wo fill bereits gesetzt war (nicht bei fill="none") */
+    [data-style="feminin"] .casa-stat-ic svg polygon[fill^="url"],
+    [data-style="feminin"] .casa-stat-ic svg path[fill^="url"],
+    [data-style="feminin"] .casa-stat-ic svg circle[fill^="#"],
+    [data-style="feminin"] .casa-stat-ic svg circle[fill^="url"],
+    [data-style="feminin"] .casa-stat-ic svg text,
+    [data-style="feminin"] .casa-icon-wrap svg polygon[fill^="url"],
+    [data-style="feminin"] .casa-icon-wrap svg path[fill^="url"],
+    [data-style="feminin"] .casa-icon-wrap svg circle[fill^="#"],
+    [data-style="feminin"] .casa-icon-wrap svg circle[fill^="url"],
+    [data-style="feminin"] .casa-icon-wrap svg text,
+    [data-style="feminin"] #jarvisBriefing svg[viewBox="0 0 40 40"] polygon[fill^="url"],
+    [data-style="feminin"] #jarvisBriefing svg[viewBox="0 0 40 40"] path[fill^="url"],
+    [data-style="feminin"] #jarvisBriefing svg[viewBox="0 0 40 40"] circle[fill^="#"],
+    [data-style="feminin"] #notifList svg[viewBox="0 0 40 40"] polygon[fill^="url"],
+    [data-style="feminin"] #notifList svg[viewBox="0 0 40 40"] path[fill^="url"],
+    [data-style="feminin"] #notifList svg[viewBox="0 0 40 40"] circle[fill^="#"],
+    [data-style="feminin"] .hint-icon svg polygon[fill^="url"],
+    [data-style="feminin"] .hint-icon svg path[fill^="url"],
+    [data-style="feminin"] .hint-icon svg circle[fill^="#"] {
+      fill: #8b6f3a !important;
     }
 
     /* Hint-Card-Kohaerenz pro Modus (18.04. Capo: ‚feminin + maskulin‘) */
