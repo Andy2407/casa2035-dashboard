@@ -642,7 +642,8 @@
 
     /* === Main Content === */
     main { position: relative; z-index: 1; padding: 0 16px; }
-    .page { display: none; padding: 16px 0; animation: fadeIn 300ms var(--ease); overflow-x: hidden; }
+    /* Capo 18.04.2026: overflow-x:hidden erzeugte eigenen Scroll-Container und brach sticky auf iOS. Entfernt. */
+    .page { display: none; padding: 16px 0; animation: fadeIn 300ms var(--ease); }
     /* Capo 18.04.2026: Termine-Page ohne top-padding — Toolbar klebt direkt unter Header */
     #pageTermine { padding-top: 0; }
     .page.active { display: block; }
@@ -1312,8 +1313,8 @@
        Ohne diese Top-Angabe verschwindet die KW-Anzeige hinter dem Header beim Scrollen. */
     /* F4 15.04.2026: Sticky Toolbars auch in Lager + Kasse (Suche + Filter + Aktionen bleiben beim Scrollen sichtbar) */
     .lager-toolbar, .kasse-toolbar {
-      /* Capo 18.04.2026: Pages sind eigene Scroll-Container → sticky top:0 reicht */
-      position: sticky; top: 0; z-index: 50;
+      /* Capo 18.04.2026 v65: body-scroll → sticky unter Header */
+      position: sticky; top: var(--header-h, 95px); z-index: 50;
       background: var(--bg);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       padding: 8px 0 6px;
@@ -1321,8 +1322,8 @@
       margin: 0 -16px 10px; padding-left: 16px; padding-right: 16px;
     }
     .termine-toolbar {
-      /* Capo 18.04.2026: pageTermine ist eigener Scroll-Container → top:0 reicht (Header ist ausserhalb dieses Containers). */
-      position: sticky; top: 0; z-index: 50;
+      /* Capo 18.04.2026: body scrollt, Header ist sticky → Toolbar sticky unter Header mit --header-h Offset */
+      position: sticky; top: var(--header-h, 95px); z-index: 50;
       background: var(--bg);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       padding: 6px 16px 6px;
@@ -1371,8 +1372,8 @@
     }
     .termin-view-btn.active { background: var(--gold); color: #fff; }
     /* === Apple-iCal-Look (17.04.2026, Capo-Ticket 45b8a93a) === */
-    /* Capo 18.04.2026 v58: Wochen-Streifen jetzt IM Kalender, sticky unter Toolbar */
-    .day-week-strip-host { position: sticky; top: var(--tb-h, 74px); z-index: 45; background: var(--bg); padding: 4px 0 6px; margin: 0 -16px; padding-left: 16px; padding-right: 16px; border-bottom: 1px solid var(--border); }
+    /* Capo 18.04.2026 v65: Strip sticky unter Toolbar, im body-Scroll-Kontext → top = header + toolbar Hoehen */
+    .day-week-strip-host { position: sticky; top: calc(var(--header-h, 95px) + var(--tb-h, 74px)); z-index: 45; background: var(--bg); padding: 4px 0 6px; margin: 0 -16px; padding-left: 16px; padding-right: 16px; border-bottom: 1px solid var(--border); }
     .day-week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin: 0; padding: 0; background: transparent; border: none; scroll-behavior: smooth; }
     .day-week-cell { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 4px; padding: 3px 2px; border: 1px solid var(--border); background: var(--surface); border-radius: 6px; cursor: pointer; color: var(--text-dim); font-family: inherit; transition: all 150ms; min-height: 28px; }
     .day-week-cell .dw-dow { font-size: 9px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.7; }
@@ -1405,10 +1406,12 @@
     .now-line { position: absolute; left: 0; right: 0; height: 2px; background: #E74C3C; z-index: 5; pointer-events: none; }
     .now-line::before { content: ''; position: absolute; left: -6px; top: -4px; width: 10px; height: 10px; border-radius: 50%; background: #E74C3C; box-shadow: 0 0 0 3px rgba(231,76,60,0.2); }
 
-    .week-view-wrapper { display: flex; overflow-x: auto; background: var(--surface); border-radius: var(--radius); padding: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    /* Capo 18.04.2026 Bug: Woche zeigte nur 4 Tage weil grid-min-width=560px > Viewport und overflow-x:auto schnitt ab.
+       Fix: kein erzwungenes min-width, Grid passt sich an Viewport an, 5 Tage Hoch / 7 Tage Quer alle sichtbar. */
+    .week-view-wrapper { display: flex; overflow-x: visible; background: var(--surface); border-radius: var(--radius); padding: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
     .week-time-axis { width: 48px; flex-shrink: 0; padding-top: 36px; position: sticky; left: 0; z-index: 3; background: var(--surface); border-right: 1px solid rgba(0,0,0,0.06); }
     .week-time-label { height: 48px; font-size: 9px; color: var(--text-dim); text-align: right; padding: 0 8px 0 4px; font-variant-numeric: tabular-nums; line-height: 16px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase; }
-    .week-view-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; min-width: 560px; }
+    .week-view-grid { flex: 1; display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; min-width: 0; }
     .week-day-col { min-width: 0; border-left: 1px solid rgba(0,0,0,0.06); position: relative; }
     .week-day-col:first-child { border-left: none; }
     .week-day-header {
@@ -1886,7 +1889,7 @@
       .day-hour-label { font-size: 9px; min-width: 28px; padding: 2px 3px; }
       .day-termin-block { font-size: 9px; padding: 2px 4px; }
       /* Wochenansicht: Scrollbar im Wrapper, Achse bleibt sticky + kompaktere Hoehen */
-      .week-view-grid { min-width: 420px; }
+      .week-view-grid { min-width: 0; }
       .week-hour-cell { height: 36px; }
       .week-time-label { height: 36px; line-height: 36px; }
       .week-time-axis { padding-top: 22px; }
