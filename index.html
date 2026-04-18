@@ -1373,7 +1373,16 @@
     .termin-view-btn.active { background: var(--gold); color: #fff; }
     /* === Apple-iCal-Look (17.04.2026, Capo-Ticket 45b8a93a) === */
     /* Capo 18.04.2026 v65: Strip sticky unter Toolbar, im body-Scroll-Kontext → top = header + toolbar Hoehen */
-    .day-week-strip-host { position: sticky; top: calc(var(--header-h, 95px) + var(--tb-h, 74px)); z-index: 45; background: var(--bg); padding: 4px 0 6px; margin: 0 -16px; padding-left: 16px; padding-right: 16px; border-bottom: 1px solid var(--border); }
+    /* Capo 19.04.2026: Extra-Streifen entfernt. Kalendertage sind jetzt IM Kalender (day-tabs-row in DayView, week-day-header in WeekView) und sticken direkt unter der Toolbar. */
+    .day-tabs-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 4px; margin: 0 0 6px; background: var(--bg); position: sticky; top: calc(var(--header-h, 95px) + var(--tb-h, 74px)); z-index: 45; border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    .day-tab { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px; padding: 5px 2px; border: 1px solid var(--border); background: var(--surface); border-radius: 6px; cursor: pointer; color: var(--text-dim); font-family: inherit; transition: all 150ms; min-height: 30px; }
+    .day-tab .dt-dow { font-size: 9px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.7; }
+    .day-tab .dt-num { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1; }
+    .day-tab:hover { border-color: var(--gold); }
+    .day-tab.today { border-color: var(--gold); background: rgba(201,168,76,0.14); }
+    .day-tab.today .dt-num, .day-tab.today .dt-dow { color: var(--gold); opacity: 1; }
+    .day-tab.sel { background: var(--gold-gradient); border-color: var(--gold); box-shadow: var(--shadow-gold, 0 4px 12px rgba(201,168,76,0.4)); }
+    .day-tab.sel .dt-num, .day-tab.sel .dt-dow { color: #fff; opacity: 1; }
     .day-week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin: 0; padding: 0; background: transparent; border: none; scroll-behavior: smooth; }
     .day-week-cell { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 4px; padding: 3px 2px; border: 1px solid var(--border); background: var(--surface); border-radius: 6px; cursor: pointer; color: var(--text-dim); font-family: inherit; transition: all 150ms; min-height: 28px; }
     .day-week-cell .dw-dow { font-size: 9px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.7; }
@@ -1415,11 +1424,13 @@
     .week-day-col { min-width: 0; border-left: 1px solid rgba(0,0,0,0.06); position: relative; }
     .week-day-col:first-child { border-left: none; }
     .week-day-header {
-      font-size: 10px; font-weight: 700; text-align: center; padding: 8px 4px 6px;
+      font-size: 10px; font-weight: 700; text-align: center; padding: 6px 2px;
       color: var(--text-dim); border-bottom: 1px solid rgba(0,0,0,0.08);
-      height: 36px; letter-spacing: 0.5px; text-transform: uppercase;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+      height: 36px; letter-spacing: 0.3px; text-transform: uppercase;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
       background: linear-gradient(180deg, var(--surface) 0%, var(--surface-hover) 100%);
+      /* Capo 19.04.2026: sticky unter Toolbar damit Kalendertage beim Scrollen angeheftet bleiben */
+      position: sticky; top: calc(var(--header-h, 95px) + var(--tb-h, 74px)); z-index: 4;
     }
     .week-day-header .dow-name { font-size: 9px; color: var(--text-dim); letter-spacing: 0.8px; }
     .week-day-header .dow-date { font-size: 16px; font-weight: 700; color: var(--text); letter-spacing: 0; text-transform: none; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -4771,13 +4782,7 @@
       container.textContent = '';
       var dateStr = localDateStr(terminViewDate);
       document.getElementById('terminDateLabel').textContent = fmtDate(dateStr);
-      // Capo 18.04.2026: Strip sticky innerhalb terminContent, direkt oberhalb der Liste
-      var stripHost = document.createElement('div'); stripHost.className = 'day-week-strip-host';
-      container.appendChild(stripHost);
-      renderDayWeekStrip(stripHost, dateStr);
-      var listWrap = document.createElement('div'); listWrap.id = 'terminListWrap';
-      container.appendChild(listWrap);
-      container = listWrap; // nachfolgend renderTerminListInner
+      // Capo 19.04.2026: Extra-Streifen raus — Liste zeigt nur Termine vom gewaehlten Tag
 
       // BUG-FIX 15.04.2026: Liste konsistent mit Tag/Woche — kein impliziter Stylist-Filter
       // (frueher: !perms.alleTermine + currentUser versteckte Termine anderer Stylisten in Liste,
@@ -4832,10 +4837,7 @@
       });
     }
 
-    // Capo 18.04.2026: Wochen-Streifen-Helper (Liste + Tag). Mo-So, Heute + Selected markiert.
-    // Rendert NICHT in container — sondern in einen persistenten Slot VOR terminContent (verhindert Overlap mit sticky-toolbar).
-    // Capo 18.04.2026 v58: Strip wandert aus Toolbar in Kalender (terminContent). Sticky innerhalb pageTermine-Scroll.
-    // Hochformat 5 Tage (zentriert um Heute), Querformat 7 Tage (Mo-So).
+    // Capo 19.04.2026: renderDayWeekStrip wird nicht mehr genutzt. Kalendertage sind IM Kalender (DayView: .day-tabs-row, WeekView: .week-day-header).
     function renderDayWeekStrip(container, dateStr) {
       var toolbar = document.getElementById('termineToolbar');
       // Alten Slot aus Toolbar entfernen (Upgrade-Pfad)
@@ -4877,10 +4879,27 @@
       container.textContent = '';
       var dateStr = localDateStr(terminViewDate);
       document.getElementById('terminDateLabel').textContent = fmtDate(dateStr);
-      // Strip sticky oberhalb Tag-Grid
-      var stripHost = document.createElement('div'); stripHost.className = 'day-week-strip-host';
-      container.appendChild(stripHost);
-      renderDayWeekStrip(stripHost, dateStr);
+      // Capo 19.04.2026: Kalendertage als Tab-Row IM Kalender (nicht als extra-Streifen), sticky unter Toolbar.
+      // 7 Tage Mo-So, gewaehlter Tag Gold, Klick wechselt Datum.
+      var tabsRow = document.createElement('div');
+      tabsRow.className = 'day-tabs-row';
+      var base = new Date(terminViewDate);
+      var dow = base.getDay(); if (dow === 0) dow = 7;
+      base.setDate(base.getDate() - (dow - 1));
+      var DAYS = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+      var todayIso = localDateStr(new Date());
+      for (var i = 0; i < 7; i++) {
+        var d = new Date(base); d.setDate(base.getDate() + i);
+        var iso = localDateStr(d);
+        var isToday = iso === todayIso;
+        var isSel = iso === dateStr;
+        var tab = document.createElement('button');
+        tab.className = 'day-tab' + (isSel ? ' sel' : '') + (isToday ? ' today' : '');
+        tab.innerHTML = '<span class="dt-dow">' + DAYS[i] + '</span><span class="dt-num">' + d.getDate() + '</span>';
+        (function(nd){ tab.onclick = function(){ terminViewDate = nd; renderTermine(termineCache); }; })(d);
+        tabsRow.appendChild(tab);
+      }
+      container.appendChild(tabsRow);
 
       // Filter termine ZUERST — inkl. Staff-Filter
       var filtered = termine.filter(function(t) {
@@ -4988,10 +5007,7 @@
       start.setDate(start.getDate() - dow + 1); // Monday
       document.getElementById('terminDateLabel').textContent = 'KW ' + getWeekNumber(terminViewDate);
 
-      // Capo 18.04.2026 v58: Strip oberhalb der Wochen-Grid, sticky innerhalb pageTermine-Scroll
-      var stripHost = document.createElement('div'); stripHost.className = 'day-week-strip-host';
-      container.appendChild(stripHost);
-      renderDayWeekStrip(stripHost, localDateStr(terminViewDate));
+      // Capo 19.04.2026: Extra-Streifen raus — Wochen-Spalten-Header (week-day-header) uebernehmen Kalendertage, sticky unter Toolbar
 
       var wrapper = document.createElement('div');
       wrapper.className = 'week-view-wrapper';
@@ -5028,9 +5044,8 @@
 
       var grid = document.createElement('div');
       grid.className = 'week-view-grid';
-      // FB-50 (17.04.2026): Hochformat = 5 Tage (Mo-Fr), Querformat = 7 Tage (Mo-So). Auf iPhone/iPad Hochformat ist sonntägliche Spalte zu schmal.
-      var isLandscape = (window.innerWidth > window.innerHeight);
-      var weekDaysCount = isLandscape ? 7 : 5;
+      // Capo 19.04.2026: IMMER 7 Tage (Mo-So) — in 5-Tage-Version verschwanden Sa+So und man sprang in neue Woche.
+      var weekDaysCount = 7;
       var days = ['Mo','Di','Mi','Do','Fr','Sa','So'];
       grid.style.gridTemplateColumns = 'repeat(' + weekDaysCount + ', 1fr)';
       var today = localDateStr(new Date());
