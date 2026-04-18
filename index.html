@@ -1373,8 +1373,19 @@
     .termin-view-btn.active { background: var(--gold); color: #fff; }
     /* === Apple-iCal-Look (17.04.2026, Capo-Ticket 45b8a93a) === */
     /* Capo 18.04.2026 v65: Strip sticky unter Toolbar, im body-Scroll-Kontext → top = header + toolbar Hoehen */
-    /* Capo 19.04.2026: Extra-Streifen entfernt. Kalendertage sind jetzt IM Kalender (day-tabs-row in DayView, week-day-header in WeekView) und sticken direkt unter der Toolbar. */
-    .day-tabs-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 4px; margin: 0 0 6px; background: var(--bg); position: sticky; top: calc(var(--header-h, 95px) + var(--tb-h, 74px)); z-index: 45; border-bottom: 1px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    /* Capo 19.04.2026: Day-Tabs swipebar — horizontal scrollable mit 43 Tagen, scroll-snap, sticky unter Toolbar */
+    .day-tabs-row.swipeable {
+      display: flex; gap: 4px; padding: 4px 8px; margin: 0 0 6px;
+      background: var(--bg);
+      position: sticky; top: calc(var(--header-h, 95px) + var(--tb-h, 74px)); z-index: 45;
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      overflow-x: auto; overflow-y: hidden;
+      scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .day-tabs-row.swipeable::-webkit-scrollbar { display: none; }
+    .day-tabs-row.swipeable .day-tab { flex: 0 0 auto; min-width: 56px; scroll-snap-align: center; }
     .day-tab { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 5px; padding: 5px 2px; border: 1px solid var(--border); background: var(--surface); border-radius: 6px; cursor: pointer; color: var(--text-dim); font-family: inherit; transition: all 150ms; min-height: 30px; }
     .day-tab .dt-dow { font-size: 9px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.7; }
     .day-tab .dt-num { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1; }
@@ -4879,27 +4890,39 @@
       container.textContent = '';
       var dateStr = localDateStr(terminViewDate);
       document.getElementById('terminDateLabel').textContent = fmtDate(dateStr);
-      // Capo 19.04.2026: Kalendertage als Tab-Row IM Kalender (nicht als extra-Streifen), sticky unter Toolbar.
-      // 7 Tage Mo-So, gewaehlter Tag Gold, Klick wechselt Datum.
+      // Capo 19.04.2026: 7-Tabs-Leiste bleibt, jetzt horizontal swipebar (scroll-snap). Zentriert auf gewaehlten Tag.
       var tabsRow = document.createElement('div');
-      tabsRow.className = 'day-tabs-row';
-      var base = new Date(terminViewDate);
-      var dow = base.getDay(); if (dow === 0) dow = 7;
-      base.setDate(base.getDate() - (dow - 1));
+      tabsRow.className = 'day-tabs-row swipeable';
       var DAYS = ['Mo','Di','Mi','Do','Fr','Sa','So'];
       var todayIso = localDateStr(new Date());
-      for (var i = 0; i < 7; i++) {
-        var d = new Date(base); d.setDate(base.getDate() + i);
+      // Rendere 42 Tage (6 Wochen) um aktuelle Auswahl zentriert — genug Reichweite fuer Swipen
+      var SWIPE_RANGE_DAYS = 21;
+      var selTab = null;
+      for (var off = -SWIPE_RANGE_DAYS; off <= SWIPE_RANGE_DAYS; off++) {
+        var d = new Date(terminViewDate); d.setDate(d.getDate() + off);
         var iso = localDateStr(d);
         var isToday = iso === todayIso;
-        var isSel = iso === dateStr;
+        var isSel = off === 0;
+        var dowIdx = d.getDay() === 0 ? 6 : d.getDay() - 1;
         var tab = document.createElement('button');
         tab.className = 'day-tab' + (isSel ? ' sel' : '') + (isToday ? ' today' : '');
-        tab.innerHTML = '<span class="dt-dow">' + DAYS[i] + '</span><span class="dt-num">' + d.getDate() + '</span>';
+        tab.innerHTML = '<span class="dt-dow">' + DAYS[dowIdx] + '</span><span class="dt-num">' + d.getDate() + '</span>';
         (function(nd){ tab.onclick = function(){ terminViewDate = nd; renderTermine(termineCache); }; })(d);
         tabsRow.appendChild(tab);
+        if (isSel) selTab = tab;
       }
       container.appendChild(tabsRow);
+      // Ausgewaehlten Tab ins Viewport zentrieren
+      if (selTab) {
+        requestAnimationFrame(function(){
+          try {
+            var rowRect = tabsRow.getBoundingClientRect();
+            var tabRect = selTab.getBoundingClientRect();
+            var targetScroll = selTab.offsetLeft - (rowRect.width / 2) + (tabRect.width / 2);
+            tabsRow.scrollLeft = Math.max(0, targetScroll);
+          } catch(e) {}
+        });
+      }
 
       // Filter termine ZUERST — inkl. Staff-Filter
       var filtered = termine.filter(function(t) {
