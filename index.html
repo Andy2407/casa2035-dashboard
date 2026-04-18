@@ -1371,8 +1371,9 @@
     }
     .termin-view-btn.active { background: var(--gold); color: #fff; }
     /* === Apple-iCal-Look (17.04.2026, Capo-Ticket 45b8a93a) === */
-    /* Capo 18.04.2026: Wochen-Streifen kompakt (~halbe Hoehe), Teil der sticky-toolbar */
-    .day-week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin: 0; padding: 2px 0 0; background: transparent; border: none; }
+    /* Capo 18.04.2026 v58: Wochen-Streifen jetzt IM Kalender, sticky unter Toolbar */
+    .day-week-strip-host { position: sticky; top: var(--tb-h, 74px); z-index: 45; background: var(--bg); padding: 4px 0 6px; margin: 0 -16px; padding-left: 16px; padding-right: 16px; border-bottom: 1px solid var(--border); }
+    .day-week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin: 0; padding: 0; background: transparent; border: none; scroll-behavior: smooth; }
     .day-week-cell { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 4px; padding: 3px 2px; border: 1px solid var(--border); background: var(--surface); border-radius: 6px; cursor: pointer; color: var(--text-dim); font-family: inherit; transition: all 150ms; min-height: 28px; }
     .day-week-cell .dw-dow { font-size: 9px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.7; }
     .day-week-cell .dw-num { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1; }
@@ -4765,10 +4766,15 @@
     function renderTerminList(termine) {
       var container = document.getElementById('terminContent');
       container.textContent = '';
-      // Capo 18.04.2026: localDateStr statt toISOString (UTC-Drift). Wochenstreifen + Heute-Markierung.
       var dateStr = localDateStr(terminViewDate);
       document.getElementById('terminDateLabel').textContent = fmtDate(dateStr);
-      renderDayWeekStrip(container, dateStr);
+      // Capo 18.04.2026: Strip sticky innerhalb terminContent, direkt oberhalb der Liste
+      var stripHost = document.createElement('div'); stripHost.className = 'day-week-strip-host';
+      container.appendChild(stripHost);
+      renderDayWeekStrip(stripHost, dateStr);
+      var listWrap = document.createElement('div'); listWrap.id = 'terminListWrap';
+      container.appendChild(listWrap);
+      container = listWrap; // nachfolgend renderTerminListInner
 
       // BUG-FIX 15.04.2026: Liste konsistent mit Tag/Woche — kein impliziter Stylist-Filter
       // (frueher: !perms.alleTermine + currentUser versteckte Termine anderer Stylisten in Liste,
@@ -4825,49 +4831,53 @@
 
     // Capo 18.04.2026: Wochen-Streifen-Helper (Liste + Tag). Mo-So, Heute + Selected markiert.
     // Rendert NICHT in container — sondern in einen persistenten Slot VOR terminContent (verhindert Overlap mit sticky-toolbar).
-    function renderDayWeekStrip(_ignored, dateStr) {
+    // Capo 18.04.2026 v58: Strip wandert aus Toolbar in Kalender (terminContent). Sticky innerhalb pageTermine-Scroll.
+    // Hochformat 5 Tage (zentriert um Heute), Querformat 7 Tage (Mo-So).
+    function renderDayWeekStrip(container, dateStr) {
       var toolbar = document.getElementById('termineToolbar');
-      var slot = document.getElementById('dayWeekStripSlot');
-      // v54+: Slot MUSS Kind der sticky-toolbar sein. Alte Slots woanders aufraeumen.
-      if (slot && toolbar && slot.parentElement !== toolbar) { slot.remove(); slot = null; }
-      if (!slot) {
-        slot = document.createElement('div');
-        slot.id = 'dayWeekStripSlot';
-        slot.style.cssText = 'padding:0 16px 8px;';
-        if (toolbar) toolbar.appendChild(slot);
-        else {
-          var tc = document.getElementById('terminContent');
-          tc.parentElement.insertBefore(slot, tc);
-        }
-      }
-      slot.textContent = '';
+      // Alten Slot aus Toolbar entfernen (Upgrade-Pfad)
+      var oldSlot = document.getElementById('dayWeekStripSlot');
+      if (oldSlot) oldSlot.remove();
       var strip = document.createElement('div');
       strip.className = 'day-week-strip';
+      strip.id = 'dayWeekStripSticky';
+      var isLandscape = window.innerWidth > window.innerHeight;
+      var daysCount = isLandscape ? 7 : 5;
       var base = new Date(terminViewDate);
-      var dow = base.getDay(); if (dow === 0) dow = 7;
-      base.setDate(base.getDate() - (dow - 1));
+      if (daysCount === 7) {
+        // Querformat: Mo-So der aktuellen Woche
+        var dow = base.getDay(); if (dow === 0) dow = 7;
+        base.setDate(base.getDate() - (dow - 1));
+      } else {
+        // Hochformat: 5 Tage, aktuelle Auswahl zentriert (Tag -2 bis +2)
+        base.setDate(base.getDate() - 2);
+      }
+      strip.style.gridTemplateColumns = 'repeat(' + daysCount + ', 1fr)';
       var todayIso = localDateStr(new Date());
       var DAYS = ['Mo','Di','Mi','Do','Fr','Sa','So'];
-      for (var i = 0; i < 7; i++) {
+      for (var i = 0; i < daysCount; i++) {
         var d = new Date(base); d.setDate(base.getDate() + i);
         var iso = localDateStr(d);
         var isToday = iso === todayIso;
         var isSel = iso === dateStr;
+        var dowIdx = d.getDay() === 0 ? 6 : d.getDay() - 1;
         var cell = document.createElement('button');
         cell.className = 'day-week-cell' + (isSel ? ' sel' : '') + (isToday ? ' today' : '');
-        cell.innerHTML = '<span class="dw-dow">' + DAYS[i] + '</span><span class="dw-num">' + d.getDate() + '</span>';
+        cell.innerHTML = '<span class="dw-dow">' + DAYS[dowIdx] + '</span><span class="dw-num">' + d.getDate() + '</span>';
         (function(nd){ cell.onclick = function(){ terminViewDate = nd; renderTermine(termineCache); }; })(d);
         strip.appendChild(cell);
       }
-      slot.appendChild(strip);
+      container.appendChild(strip);
     }
     function renderDayView(termine) {
       var container = document.getElementById('terminContent');
       container.textContent = '';
-      // Capo 18.04.2026: localDateStr statt toISOString (UTC-Drift nachts). Plus Wochenstreifen oben.
       var dateStr = localDateStr(terminViewDate);
       document.getElementById('terminDateLabel').textContent = fmtDate(dateStr);
-      renderDayWeekStrip(container, dateStr);
+      // Strip sticky oberhalb Tag-Grid
+      var stripHost = document.createElement('div'); stripHost.className = 'day-week-strip-host';
+      container.appendChild(stripHost);
+      renderDayWeekStrip(stripHost, dateStr);
 
       // Filter termine ZUERST — inkl. Staff-Filter
       var filtered = termine.filter(function(t) {
@@ -4975,14 +4985,20 @@
       start.setDate(start.getDate() - dow + 1); // Monday
       document.getElementById('terminDateLabel').textContent = 'KW ' + getWeekNumber(terminViewDate);
 
+      // Capo 18.04.2026 v58: Strip oberhalb der Wochen-Grid, sticky innerhalb pageTermine-Scroll
+      var stripHost = document.createElement('div'); stripHost.className = 'day-week-strip-host';
+      container.appendChild(stripHost);
+      renderDayWeekStrip(stripHost, localDateStr(terminViewDate));
+
       var wrapper = document.createElement('div');
       wrapper.className = 'week-view-wrapper';
 
       // Sprint-4b: Dynamische Wochen-Stundenrange über alle Termine der Woche.
       var weekMinH = 7, weekMaxH = 22;
-      var weekStartStr = start.toISOString().split('T')[0];
+      // v58: localDateStr statt toISOString (UTC-Drift)
+      var weekStartStr = localDateStr(start);
       var weekEnd = new Date(start); weekEnd.setDate(weekEnd.getDate() + 6);
-      var weekEndStr = weekEnd.toISOString().split('T')[0];
+      var weekEndStr = localDateStr(weekEnd);
       termine.forEach(function(t) {
         var ds = (t.Start_ISO || '').split('T')[0];
         if (ds < weekStartStr || ds > weekEndStr) return;
@@ -5014,13 +5030,13 @@
       var weekDaysCount = isLandscape ? 7 : 5;
       var days = ['Mo','Di','Mi','Do','Fr','Sa','So'];
       grid.style.gridTemplateColumns = 'repeat(' + weekDaysCount + ', 1fr)';
-      var today = new Date().toISOString().split('T')[0];
+      var today = localDateStr(new Date());
 
       var nowDate = new Date();
       var nowHourPx = (nowDate.getHours() - weekMinH) * 48 + (nowDate.getMinutes() / 60) * 48;
       for (var i = 0; i < weekDaysCount; i++) {
         var d = new Date(start); d.setDate(d.getDate() + i);
-        var dStr = d.toISOString().split('T')[0];
+        var dStr = localDateStr(d);
         var col = document.createElement('div');
         col.className = 'week-day-col';
         var header = document.createElement('div');
@@ -5110,7 +5126,26 @@
       } else {
         terminViewDate.setDate(terminViewDate.getDate() + delta);
       }
-      renderTermine(termineCache);
+      // Capo 18.04.2026: flüssiges Übergleiten statt Springen
+      var tc = document.getElementById('terminContent');
+      if (tc) {
+        var dir = delta > 0 ? -14 : 14;
+        tc.style.transition = 'transform 120ms ease-out, opacity 120ms ease-out';
+        tc.style.transform = 'translateX(' + dir + 'px)';
+        tc.style.opacity = '0.55';
+        setTimeout(function(){
+          renderTermine(termineCache);
+          tc.style.transition = 'transform 200ms ease-out, opacity 200ms ease-out';
+          tc.style.transform = 'translateX(' + (-dir) + 'px)';
+          requestAnimationFrame(function(){
+            tc.style.transform = 'translateX(0)';
+            tc.style.opacity = '1';
+          });
+          setTimeout(function(){ tc.style.transition = ''; tc.style.transform=''; tc.style.opacity=''; }, 260);
+        }, 130);
+      } else {
+        renderTermine(termineCache);
+      }
     }
     function goTerminHeute() {
       terminViewDate = new Date();
@@ -8760,7 +8795,7 @@
       var connected = typeof isBackendMode === 'function' && isBackendMode();
       var terminCount = (termineCache || []).length;
       var kundenCount = (kundenCache || []).length;
-      var today = new Date().toISOString().split('T')[0];
+      var today = localDateStr(new Date());
       var todayTermine = (termineCache || []).filter(function(t) { return (t.Start_ISO || '').indexOf(today) === 0; });
       var offeneAnfragen = (eventsCache || []).filter(function(e) { return e.Is_Read === 0 || e.Status === 'ungelesen'; });
 
@@ -10546,7 +10581,7 @@
       }
       if (q.indexOf('termin') > -1 || q.indexOf('heute') > -1) {
         if (termineCache.length > 0) {
-          var today = new Date().toISOString().split('T')[0];
+          var today = localDateStr(new Date());
           var ht = termineCache.filter(function(t) { return (t.Start_ISO || '').indexOf(today) === 0; });
           if (ht.length > 0) { return 'Heute ' + ht.length + ' Termine: ' + ht.slice(0, 3).map(function(t) { return fmtTime(t.Start_ISO) + ' ' + (t.Service || ''); }).join(' | '); }
           return 'Heute keine Termine.';
@@ -10894,6 +10929,20 @@
         window.addEventListener('resize', apply);
         window.addEventListener('orientationchange', function(){ setTimeout(apply, 200); });
       })();
+      // Capo 18.04.2026 v58: --tb-h = Termine-Toolbar-Hoehe, fuer Strip-Sticky im Kalender
+      (function setupToolbarHeight(){
+        var tb = document.getElementById('termineToolbar');
+        if (!tb) return;
+        var apply = function(){ document.documentElement.style.setProperty('--tb-h', Math.ceil(tb.getBoundingClientRect().height) + 'px'); };
+        apply();
+        if (window.ResizeObserver) new ResizeObserver(apply).observe(tb);
+        window.addEventListener('resize', apply);
+        window.addEventListener('orientationchange', function(){ setTimeout(apply, 250); });
+      })();
+      // Re-render bei Orientierungswechsel (5<->7 Tage Strip)
+      window.addEventListener('orientationchange', function(){
+        setTimeout(function(){ if (typeof renderTermine === 'function' && termineCache) renderTermine(termineCache); }, 300);
+      });
       // Apply saved theme
       var savedTheme = localStorage.getItem('casa_theme');
       if (savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
@@ -12116,7 +12165,7 @@
     });
     function buildNotifications() {
       var n = [];
-      var today = new Date().toISOString().split('T')[0];
+      var today = localDateStr(new Date());
       // Heute unbestaetigte Termine
       var unconfirmed = (window.termineCache||[]).filter(function(t){
         return (t.Start_ISO||'').indexOf(today)===0 && (t.Status==='vorgeschlagen' || t.Status==='offen');
