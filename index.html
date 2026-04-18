@@ -1267,18 +1267,23 @@
     /* FB-47: Landscape-iPhone (844x390 etc.) nutzt volle Breite, NICHT Desktop-Zentrierung.
        Desktop-Zentrierung (max-width:600px) nur wenn KEIN Landscape-Phone (d.h. height > 500px oder orientation portrait). */
     @media (min-width: 768px) and (max-width: 1199px) and (min-height: 501px), (min-width: 768px) and (max-width: 1199px) and (orientation: portrait) {
-      /* FB-91 18.04.2026 Capo: iPad Hoch + Quer. Content + Bottom-Nav + Toolbars exakt gleich breit (720px),
-         zentriert. Bottom-Nav fix unten am Screen — scrollt NIE mit. Toolbars sticky und gleiche Breite wie Nav. */
-      main { max-width: 720px; margin: 0 auto; }
+      /* FB-91 19.04.2026 Capo: iPad soll die volle Bildschirm-Breite nutzen, nur leichter Abstand zu den Raendern.
+         Hochformat ~820px: nutzt fast alles. Querformat ~1180px: ebenfalls fast alles. */
+      main { max-width: none; margin: 0 auto; padding: 16px 24px 120px; }
       .bottom-nav {
         position: fixed; bottom: 0;
-        max-width: 720px; left: 50%; transform: translateX(-50%);
-        border-radius: var(--radius) var(--radius) 0 0;
+        left: 0; right: 0; max-width: none; transform: none;
+        border-radius: 0;
         box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
       }
       .termine-toolbar, .lager-toolbar, .kasse-toolbar {
-        max-width: 720px; margin-left: auto; margin-right: auto;
+        max-width: none; margin-left: -24px; margin-right: -24px; padding-left: 24px; padding-right: 24px;
       }
+      /* Headers + Content-Bereich an Screen-Breite anpassen, leichte Rand-Luft */
+      .header { padding-left: max(24px, env(safe-area-inset-left)); padding-right: max(24px, env(safe-area-inset-right)); }
+      /* Stat-Grid auf iPad 4-spaltig (statt 2) — mehr Widgets pro Zeile */
+      .stats-grid { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+      .kasse-summary { grid-template-columns: repeat(4, 1fr); }
     }
     /* DESKTOP / iMac / Laptop (>=1200px): breites Layout, mehr Spalten, nutzt den Bildschirm aus */
     @media (min-width: 1200px) {
