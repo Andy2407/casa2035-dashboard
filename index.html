@@ -11715,11 +11715,20 @@
       });
     }
     setTimeout(injectCasaActionIcons, 400);
-    // Bei Page-Wechsel erneut pr\u00fcfen
+    // Capo 18.04.2026: Sticky-Vars aktiv halten (ResizeObserver feuert nicht wenn Element bei DOMContentLoaded versteckt war)
+    function refreshStickyVars() {
+      var h = document.querySelector('.header');
+      var tb = document.getElementById('termineToolbar');
+      if (h && h.offsetHeight > 0) document.documentElement.style.setProperty('--header-h', h.offsetHeight + 'px');
+      if (tb && tb.offsetHeight > 0) document.documentElement.style.setProperty('--tb-h', tb.offsetHeight + 'px');
+    }
+    // Bei Page-Wechsel erneut pr\u00fcfen + Sticky-Vars nachziehen
     var _origShowPage = window.showPage;
     if (typeof _origShowPage === 'function') {
-      window.showPage = function(){ _origShowPage.apply(this, arguments); setTimeout(injectCasaActionIcons, 60); };
+      window.showPage = function(){ _origShowPage.apply(this, arguments); setTimeout(function(){ injectCasaActionIcons(); refreshStickyVars(); }, 60); setTimeout(refreshStickyVars, 400); };
     }
+    window.addEventListener('load', refreshStickyVars);
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(refreshStickyVars, 600); });
 
     // Stat-Labels + Section-Titles pro Stil umschreiben (Capo 18.04. ‚Design feminin/maskulin‘)
     function applyStyleLabels() {
