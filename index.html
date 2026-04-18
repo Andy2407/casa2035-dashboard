@@ -3758,9 +3758,20 @@
     function toggleTheme() {
       var html = document.documentElement;
       var isDark = html.getAttribute('data-theme') === 'dark';
-      html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-      localStorage.setItem('casa_theme', isDark ? 'light' : 'dark');
+      var newTheme = isDark ? 'light' : 'dark';
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('casa_theme', newTheme);
+      // Capo 18.04. 04:30: Theme + Stil gekoppelt. Dark = Maskulin. Hell = Feminin.
+      var newStyle = newTheme === 'dark' ? 'maskulin' : 'feminin';
+      html.setAttribute('data-style', newStyle);
+      try { localStorage.setItem('casa_style_mode', newStyle); } catch(e) {}
       updateThemeIcon();
+      try {
+        if (typeof applyStyleLabels === 'function') applyStyleLabels();
+        if (typeof renderJarvisBriefing === 'function') renderJarvisBriefing();
+        if (typeof updateHeroSubtitle === 'function') updateHeroSubtitle();
+      } catch(e) {}
+      if (typeof showToast === 'function') showToast(newTheme === 'dark' ? 'Ironman-Modus aktiv — Command-Deck' : 'Spa-Modus aktiv — weiblich, weich', 'info', 2200);
     }
     function updateThemeIcon() {
       var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -11522,6 +11533,68 @@
     setTimeout(renderAllSparklines, 2000);
     setInterval(renderAllSparklines, 60000);
 
+    // === Initial Theme+Style gekoppelt laden (Capo 18.04. 04:30) ===
+    (function initThemeStyleCoupled(){
+      try {
+        var savedTheme = localStorage.getItem('casa_theme');
+        var savedStyle = localStorage.getItem('casa_style_mode');
+        // Wenn nichts gesetzt: Dark+Maskulin als Default
+        if (!savedTheme && !savedStyle) {
+          document.documentElement.setAttribute('data-theme','dark');
+          document.documentElement.setAttribute('data-style','maskulin');
+          return;
+        }
+        // Theme prio
+        if (savedTheme === 'light') {
+          document.documentElement.setAttribute('data-theme','light');
+          document.documentElement.setAttribute('data-style','feminin');
+          try { localStorage.setItem('casa_style_mode','feminin'); } catch(e){}
+        } else if (savedTheme === 'dark') {
+          document.documentElement.setAttribute('data-theme','dark');
+          document.documentElement.setAttribute('data-style','maskulin');
+          try { localStorage.setItem('casa_style_mode','maskulin'); } catch(e){}
+        } else if (savedStyle === 'feminin') {
+          document.documentElement.setAttribute('data-theme','light');
+          document.documentElement.setAttribute('data-style','feminin');
+        } else if (savedStyle === 'maskulin') {
+          document.documentElement.setAttribute('data-theme','dark');
+          document.documentElement.setAttribute('data-style','maskulin');
+        }
+      } catch(e){}
+    })();
+
+    // Service-Sortierung je Modus (Feminin: Damen zuerst, Maskulin: Herren zuerst)
+    function sortServicesByStyle(services) {
+      var mode = document.documentElement.getAttribute('data-style') || 'maskulin';
+      if (!services || !services.length) return services;
+      var prefer = mode === 'feminin' ? ['damen','weiblich','feminin'] : (mode === 'maskulin' ? ['herren','maennlich','männlich'] : []);
+      if (!prefer.length) return services;
+      return services.slice().sort(function(a,b){
+        var ta = String((a.service_typ||a.typ||'unisex')).toLowerCase();
+        var tb = String((b.service_typ||b.typ||'unisex')).toLowerCase();
+        var pa = prefer.indexOf(ta) !== -1 ? 0 : (ta === 'unisex' ? 1 : 2);
+        var pb = prefer.indexOf(tb) !== -1 ? 0 : (tb === 'unisex' ? 1 : 2);
+        return pa - pb;
+      });
+    }
+    // Monkey-Patch: renderServicesBox nutzt Sortierung
+    (function(){
+      var orig = window.renderServicesBox;
+      window.renderServicesBox = function(box) {
+        try {
+          if (typeof servicesCache !== 'undefined' && Array.isArray(servicesCache)) {
+            var sorted = sortServicesByStyle(servicesCache);
+            // Temp swap
+            var bak = servicesCache; servicesCache = sorted;
+            if (typeof orig === 'function') orig(box);
+            servicesCache = bak;
+            return;
+          }
+        } catch(e){}
+        if (typeof orig === 'function') orig(box);
+      };
+    })();
+
     // === Jarvis-Stimm-Auswahl (Capo 18.04.): ElevenLabs EU, optional per User ===
     (function initJarvisStimme(){
       var saved = localStorage.getItem('casa_jarvis_stimme') || '';
@@ -11543,14 +11616,18 @@
       var saved = localStorage.getItem('casa_style_mode') || 'balance';
       if (saved === 'maskulin' || saved === 'feminin') document.documentElement.setAttribute('data-style', saved);
     })();
+    // Capo 18.04. 04:30: binary Maskulin<->Feminin. Theme koppelt mit.
     window.toggleStyleMode = function() {
-      var cur = document.documentElement.getAttribute('data-style') || 'balance';
-      var next = cur === 'balance' ? 'maskulin' : (cur === 'maskulin' ? 'feminin' : 'balance');
-      if (next === 'balance') document.documentElement.removeAttribute('data-style');
-      else document.documentElement.setAttribute('data-style', next);
+      var cur = document.documentElement.getAttribute('data-style') || 'maskulin';
+      var next = cur === 'maskulin' ? 'feminin' : 'maskulin';
+      document.documentElement.setAttribute('data-style', next);
       try { localStorage.setItem('casa_style_mode', next); } catch(e) {}
-      var label = next === 'maskulin' ? 'Maskulin — Ironman' : (next === 'feminin' ? 'Feminin — soft' : 'Balance');
-      if (typeof showToast === 'function') showToast('Design-Stil: ' + label, 'info', 1800);
+      // Theme mitziehen: maskulin=dark, feminin=light
+      var newTheme = next === 'maskulin' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      try { localStorage.setItem('casa_theme', newTheme); } catch(e) {}
+      try { updateThemeIcon(); } catch(e) {}
+      if (typeof showToast === 'function') showToast(next === 'maskulin' ? 'Ironman-Modus aktiv — Command-Deck' : 'Spa-Modus aktiv — weiblich, weich', 'info', 2200);
     };
 
     // Force-Reload: entleert alle Caches + re-registriert SW + reload. Capo-Pflicht 17.04.2026:
