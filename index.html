@@ -11724,6 +11724,13 @@
       document.documentElement.setAttribute('data-theme', newTheme);
       try { localStorage.setItem('casa_theme', newTheme); } catch(e) {}
       try { updateThemeIcon(); } catch(e) {}
+      // 18.04.2026 Chrome-Live-Bug-Fix: Jarvis-Briefing + Labels + Hero nach Modus-Wechsel neu rendern
+      setTimeout(function(){
+        try { if (typeof applyStyleLabels === 'function') applyStyleLabels(); } catch(e){}
+        try { if (typeof renderJarvisBriefing === 'function') renderJarvisBriefing(); } catch(e){}
+        try { if (typeof updateHeroSubtitle === 'function') updateHeroSubtitle(); } catch(e){}
+        try { if (typeof renderHints === 'function') renderHints(); } catch(e){}
+      }, 80);
       if (typeof showToast === 'function') showToast(next === 'maskulin' ? 'Ironman-Modus aktiv — Command-Deck' : 'Spa-Modus aktiv — weiblich, weich', 'info', 2200);
     };
 
