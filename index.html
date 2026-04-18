@@ -1267,9 +1267,18 @@
     /* FB-47: Landscape-iPhone (844x390 etc.) nutzt volle Breite, NICHT Desktop-Zentrierung.
        Desktop-Zentrierung (max-width:600px) nur wenn KEIN Landscape-Phone (d.h. height > 500px oder orientation portrait). */
     @media (min-width: 768px) and (max-width: 1199px) and (min-height: 501px), (min-width: 768px) and (max-width: 1199px) and (orientation: portrait) {
-      /* Tablet / iPad: 600px zentriert */
-      main { max-width: 600px; margin: 0 auto; }
-      .bottom-nav { max-width: 600px; left: 50%; transform: translateX(-50%); border-radius: var(--radius) var(--radius) 0 0; }
+      /* FB-91 18.04.2026 Capo: iPad Hoch + Quer. Content + Bottom-Nav + Toolbars exakt gleich breit (720px),
+         zentriert. Bottom-Nav fix unten am Screen — scrollt NIE mit. Toolbars sticky und gleiche Breite wie Nav. */
+      main { max-width: 720px; margin: 0 auto; }
+      .bottom-nav {
+        position: fixed; bottom: 0;
+        max-width: 720px; left: 50%; transform: translateX(-50%);
+        border-radius: var(--radius) var(--radius) 0 0;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+      }
+      .termine-toolbar, .lager-toolbar, .kasse-toolbar {
+        max-width: 720px; margin-left: auto; margin-right: auto;
+      }
     }
     /* DESKTOP / iMac / Laptop (>=1200px): breites Layout, mehr Spalten, nutzt den Bildschirm aus */
     @media (min-width: 1200px) {
@@ -1667,7 +1676,7 @@
       padding: 14px 16px; backdrop-filter: blur(12px);
       transition: all 300ms var(--ease);
       /* FB 17.04. Ticket ea701a1f: Widgets überlappen auf schmalem iPhone (293-390 px).
-         min-width:0 + word-break laesst Karten in Spalte bleiben statt zu überlaufen. */
+         min-width:0 + word-break lässt Karten in Spalte bleiben statt zu überlaufen. */
       position: relative; overflow: hidden; cursor: pointer;
       min-width: 0; word-break: break-word;
     }
@@ -2918,7 +2927,7 @@
       <div style="margin-top:8px;font-size:13px;font-weight:600;color:var(--text)">Brutto: <span id="auBrutto">0,00</span> EUR</div>
       <div class="sheet-row" style="margin-top:8px">
         <div><label>Zahlungsart</label>
-          <select id="auZahlart"><option value="bar">Bar</option><option value="karte">EC-Karte</option><option value="ueberweisung">Ueberweisung</option></select>
+          <select id="auZahlart"><option value="bar">Bar</option><option value="karte">EC-Karte</option><option value="ueberweisung">Überweisung</option></select>
         </div>
         <div><label>Beleg-Nr.</label><input type="text" id="auBeleg" placeholder="z.B. RE-2026-042"></div>
       </div>
@@ -3052,7 +3061,7 @@
         <div><label>Geschlecht *</label>
           <select id="mitGeschlecht">
             <option value="w">Weiblich</option>
-            <option value="m">Maennlich</option>
+            <option value="m">Männlich</option>
             <option value="d">Divers</option>
           </select>
         </div>
@@ -3803,7 +3812,7 @@
         '<b>Filter "Nachbestellen"</b> zeigt nur die Produkte, die du jetzt bestellen musst.'
       ],
       kasse: [
-        '<b>+ FAB</b> unten rechts erstellt blitzschnell eine Rechnung &mdash; Services sind vorbefuellt.',
+        '<b>+ FAB</b> unten rechts erstellt blitzschnell eine Rechnung &mdash; Services sind vorbefüllt.',
         '<b>MwSt 19 %</b> wird automatisch gerechnet. Du gibst netto ein oder brutto, Casa macht den Rest.',
         '<b>Tagesabschluss</b> unten: prüft Bar + Karte + Gutschein, erzeugt GoBD-konforme PDF.',
         '<b>Filter Datum + Stylistin + Zahlart</b> kombinierbar &mdash; für Provisions-Abrechnung ein Gold wert.',
@@ -6370,7 +6379,7 @@
         var q = kundeName.toLowerCase().trim();
         kunde = kundenCache.find(function(k) { return (k.Name || k.name || '').toLowerCase().trim() === q; });
       }
-      var titel = { wunschfrisur: 'Wunschlook analysiert', haaranalyse: 'Haaranalyse durchgefuehrt', farbcode: 'Farbcode berechnet' }[typ] || typ;
+      var titel = { wunschfrisur: 'Wunschlook analysiert', haaranalyse: 'Haaranalyse durchgeführt', farbcode: 'Farbcode berechnet' }[typ] || typ;
       var beschreibung = (inputDaten && inputDaten.notiz) || (inputDaten && inputDaten.haartyp) || '';
       var eintrag = {
         salon_id: currentSalonId(),
@@ -6685,7 +6694,16 @@
     function renderCockpit() {
       if (!termineCache) termineCache = [];
       var now = new Date();
-      var todayStr = now.toISOString().split('T')[0];
+      // FB-64 Fix (18.04.2026): LOKALE Datums-Strings verwenden, NICHT toISOString() (UTC).
+      // Sonst verschieben sich nachts (Europe/Berlin = UTC+1/+2) alle Wochentage um 1 Tag,
+      // und die Bars zeigen Daten fuer den falschen Tag (Termine landen im "Loch" zwischen den Tagen).
+      function localDateStr(d) {
+        var y = d.getFullYear();
+        var m = String(d.getMonth() + 1).padStart(2, '0');
+        var dd = String(d.getDate()).padStart(2, '0');
+        return y + '-' + m + '-' + dd;
+      }
+      var todayStr = localDateStr(now);
 
       // --- Weekly Revenue Bar Chart ---
       var weekDays = [];
@@ -6693,7 +6711,7 @@
       var mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
       for (var wd = 0; wd < 6; wd++) {
         var d = new Date(now); d.setDate(d.getDate() + mondayOffset + wd);
-        weekDays.push(d.toISOString().split('T')[0]);
+        weekDays.push(localDateStr(d));
       }
       // FB-64 Fix (17.04.2026): gesamtpreis_netto ist für viele Termine NULL in der DB.
       // Fallback: preis_brutto aus services_preisliste per Name-Match, dann EUR 65 Durchschnitt.
@@ -6733,12 +6751,12 @@
       var lastWeekDays = [];
       for (var lw = 0; lw < 6; lw++) {
         var ld = new Date(now); ld.setDate(ld.getDate() + mondayOffset - 7 + lw);
-        lastWeekDays.push(ld.toISOString().split('T')[0]);
+        lastWeekDays.push(localDateStr(ld));
       }
       var lastWeekTotal = lastWeekDays.map(function(ds) {
         return termineCache.filter(function(t) {
           return (t.Start_ISO || '').indexOf(ds) === 0;
-        }).reduce(function(s, t) { return s + (parseFloat(t.Preis) || 0); }, 0);
+        }).reduce(function(s, t) { return s + getTerminPreis(t); }, 0);
       }).reduce(function(a, b) { return a + b; }, 0);
       var trendPct = lastWeekTotal > 0 ? Math.round((weekTotal - lastWeekTotal) / lastWeekTotal * 100) : 0;
       var trendEl = document.getElementById('weekTrend');
@@ -7513,7 +7531,7 @@
 
       var fcMainBtn = document.createElement('button');
       fcMainBtn.type = 'button';
-      fcMainBtn.style.cssText = 'width:100%;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);transition:border-color 150ms;box-sizing:border-box';
+      fcMainBtn.style.cssText = 'width:100%;background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px 12px;box-shadow:inset 0 0 0 1px rgba(201,168,76,0.08);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);transition:border-color 150ms;box-sizing:border-box';
       fcMainBtn.innerHTML = '\u{1F4F8} <span>Foto ausw\u00e4hlen</span>';
 
       var fcMenu = document.createElement('div');
@@ -7937,7 +7955,7 @@
 
       var haMainBtn = document.createElement('button');
       haMainBtn.type = 'button';
-      haMainBtn.style.cssText = 'width:100%;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);transition:border-color 150ms;box-sizing:border-box';
+      haMainBtn.style.cssText = 'width:100%;background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px 12px;box-shadow:inset 0 0 0 1px rgba(201,168,76,0.08);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);transition:border-color 150ms;box-sizing:border-box';
       haMainBtn.innerHTML = '\u{1F4F8} <span>Foto ausw\u00e4hlen</span>';
 
       var haMenu = document.createElement('div');
@@ -8306,7 +8324,7 @@
       // Intro
       var intro = document.createElement('div');
       intro.style.cssText = 'margin-bottom:14px;font-size:13px;color:var(--text-secondary);line-height:1.5';
-      intro.textContent = 'Laden Sie Fotos des aktuellen Looks und des Wunschlooks getrennt hoch. Die KI kombiniert Ihr Gesicht mit dem gewuenschten Style — Frisur, Bart oder beides — für eine realistische Vorschau.';
+      intro.textContent = 'Laden Sie Fotos des aktuellen Looks und des Wunschlooks getrennt hoch. Die KI kombiniert Ihr Gesicht mit dem gewünschten Style — Frisur, Bart oder beides — für eine realistische Vorschau.';
       wrapper.appendChild(intro);
 
       // Foto-Tipps
@@ -8318,7 +8336,7 @@
       tips.appendChild(tSum);
       var tBody = document.createElement('div');
       tBody.style.cssText = 'padding:8px 14px 12px;font-size:11px;color:var(--text-secondary);line-height:1.8';
-      var tipItems = ['\u2022 Tageslicht nutzen (kein Blitz)','\u2022 Neutraler Hintergrund (Wand, Tuer)','\u2022 Haar offen tragen, nicht zusammengebunden','\u2022 Verschiedene Winkel: Vorne, Seite links, Seite rechts, Hinten','\u2022 Keine Filter oder Bearbeitungen','\u2022 Gesicht frei sichtbar (keine Sonnenbrille)'];
+      var tipItems = ['\u2022 Tageslicht nutzen (kein Blitz)','\u2022 Neutraler Hintergrund (Wand, Tür)','\u2022 Haar offen tragen, nicht zusammengebunden','\u2022 Verschiedene Winkel: Vorne, Seite links, Seite rechts, Hinten','\u2022 Keine Filter oder Bearbeitungen','\u2022 Gesicht frei sichtbar (keine Sonnenbrille)'];
       tipItems.forEach(function(t) { var p = document.createElement('div'); p.textContent = t; tBody.appendChild(p); });
       tips.appendChild(tBody);
       wrapper.appendChild(tips);
@@ -8349,8 +8367,8 @@
       fields.appendChild(nameIn); fields.appendChild(selHaar);
       wrapper.appendChild(fields);
       var notiz = document.createElement('textarea');
-      notiz.id = 'wfNotiz'; notiz.placeholder = 'Aktuelle Länge, Vorbehandlungen, Wünsche...'; notiz.rows = 2;
-      notiz.style.cssText = 'width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:none;margin-bottom:12px;box-sizing:border-box';
+      notiz.id = 'wfNotiz'; notiz.placeholder = 'Aktuelle Länge, Vorbehandlungen, Wünsche...'; notiz.rows = 3;
+      notiz.style.cssText = 'width:100%;max-width:100%;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:13px;font-family:Inter,sans-serif;resize:vertical;margin-bottom:12px;box-sizing:border-box;display:block';
       wrapper.appendChild(notiz);
 
       // Button
@@ -8429,7 +8447,7 @@
 
       var mainBtn = document.createElement('button');
       mainBtn.type = 'button';
-      mainBtn.style.cssText = 'width:100%;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);transition:border-color 150ms';
+      mainBtn.style.cssText = 'width:100%;background:var(--bg-warm);border:1px solid var(--border-accent);border-radius:var(--radius);padding:16px 12px;box-shadow:inset 0 0 0 1px rgba(201,168,76,0.08);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);transition:border-color 150ms';
       mainBtn.innerHTML = '\u{1F4F8} <span>Foto hinzufügen</span>';
 
       var menu = document.createElement('div');
@@ -8720,7 +8738,7 @@
       saveSalonRegeln(regeln);
       document.getElementById('regelText').value = '';
       renderSalonRegeln();
-      showToast('Regel hinzugefuegt', 'success');
+      showToast('Regel hinzugefügt', 'success');
     }
     function addSalonRegelFromVorschlag(kat, text) {
       var regeln = getSalonRegeln();
@@ -8728,7 +8746,7 @@
       regeln.push({ id: 'SR-' + String(regeln.length + 1).padStart(3, '0'), kategorie: kat, text: text, aktiv: true, erstellt: new Date().toISOString() });
       saveSalonRegeln(regeln);
       renderSalonRegeln();
-      showToast('Regel hinzugefuegt: ' + text.substring(0, 40), 'success');
+      showToast('Regel hinzugefügt: ' + text.substring(0, 40), 'success');
     }
     function toggleSalonRegel(id) {
       var regeln = getSalonRegeln();
@@ -10209,7 +10227,7 @@
         hints.push({ iconKey: 'clock', title: g.gap + ' Min. freie Zeit bei ' + g.stylist + ' ab ' + g.after, desc: 'Freies Fenster für Walk-In oder Kurztermin — jetzt aktiv ansprechen oder Warteliste prüfen.' });
       }
       if (todayTermine.length >= 20) {
-        hints.push({ iconKey: 'zap', title: 'Voller Tag — ' + todayTermine.length + ' Termine', desc: 'Produktwagen jetzt vorbereiten, Einwirkzeiten straff planen, Getraenke-Station auffuellen.' });
+        hints.push({ iconKey: 'zap', title: 'Voller Tag — ' + todayTermine.length + ' Termine', desc: 'Produktwagen jetzt vorbereiten, Einwirkzeiten straff planen, Getränke-Station auffüllen.' });
       }
       if (todayTermine.length > 0 && todayTermine.length < 5) {
         hints.push({ iconKey: 'sun', title: 'Ruhiger Tag — ' + todayTermine.length + ' Termine', desc: 'Ideal für Produktpflege, Lager-Check oder Vorher/Nachher-Fotos der letzten Ergebnisse für Social Media.' });
@@ -10258,12 +10276,12 @@
         hints.push({ iconKey: 'receipt', title: 'Tagesabschluss noch offen', desc: 'Finanzamt-Pflicht: Kasse jetzt abschliessen, Barentnahmen dokumentieren — Frist läuft um Mitternacht.', prio: 'warning' });
       }
       if (kasseCache.length === 0 && h > 10) {
-        hints.push({ iconKey: 'clock', title: 'Noch keine Buchungen heute', desc: 'Kasse vorbereitet? Wechselgeld auffuellen, Quittungsrolle prüfen, Terminal eingeschaltet?' });
+        hints.push({ iconKey: 'clock', title: 'Noch keine Buchungen heute', desc: 'Kasse vorbereitet? Wechselgeld auffüllen, Quittungsrolle prüfen, Terminal eingeschaltet?' });
       }
       var kFallbacks = [
         { iconKey: 'shoppingBag', title: 'Pflegeprodukt direkt am Stuhl empfehlen', desc: 'Beim Föhnen zeigen was genutzt wird — Kunden kaufen 3x haeufiger wenn sie das Produkt in Aktion sehen.' },
         { iconKey: 'barChart', title: 'Tagesumsatz mit Vorwoche vergleichen', desc: 'Gleicher Wochentag, letzter Monat als Referenz — zeigt ob Aktionen wirken oder Schwaechen aufdecken.' },
-        { iconKey: 'coin', title: 'Kartenzahlung aktiv foerdern', desc: 'QR-Code-Aufsteller gut platzieren — kürzere Abrechnung, kein Rueckgeld, weniger Fehler.' },
+        { iconKey: 'coin', title: 'Kartenzahlung aktiv fördern', desc: 'QR-Code-Aufsteller gut platzieren — kürzere Abrechnung, kein Rückgeld, weniger Fehler.' },
         { iconKey: 'receipt', title: 'Belege sofort erfassen', desc: 'Kassenbeleg direkt nach jedem Termin buchen — Monatende-Stress vermeiden, Finanzamt-sicher bleiben.' }
       ];
       var kfi = 0;
@@ -10293,7 +10311,7 @@
         hints.push({ iconKey: 'heart', title: noVisit60.length + ' Kunden seit 60+ Tagen nicht mehr im Salon', desc: 'Reaktivierung per WhatsApp: "Wir denken an Sie — 10% auf den nächsten Besuch." Guenstigste Form der Neukunden-Werbung.' });
       }
       if (vips.length > 0) {
-        hints.push({ iconKey: 'crown', title: vips.length + ' VIP-Kunden — persönliche Betreuung', desc: 'Geburtstags-Check jetzt: VIPs erhalten Glueckwunsch + Gutschein vorab — stärkste Bindungsmassnahme im Salon.' });
+        hints.push({ iconKey: 'crown', title: vips.length + ' VIP-Kunden — persönliche Betreuung', desc: 'Geburtstags-Check jetzt: VIPs erhalten Glückwunsch + Gutschein vorab — stärkste Bindungsmaßnahme im Salon.' });
       }
       if (kundenCache.length > 0 && kundenCache.length < 30) {
         hints.push({ iconKey: 'users', title: 'Kundenstamm noch im Aufbau — ' + kundenCache.length + ' Kontakte', desc: 'Jeden Walk-In nach Handynummer fragen. Nur 1 neuer Kontakt pro Tag ergibt 365 Stammkunden im Jahr.' });
@@ -10343,7 +10361,7 @@
         { iconKey: 'package', title: 'Freitags bestellen, montags im Regal', desc: 'Wochenend-Übersicht Freitagmittag machen, Bestellung direkt ausloesen — LA Biosthetique liefert in 3-5 Werktagen.' },
         { iconKey: 'shoppingBag', title: 'Sichtbarkeit im Verkaufsregal erhöhen', desc: 'Shampoo + passender Conditioner als Set auf Augenhoehe platzieren — Sets verkaufen sich 40% besser als Einzelstuecke.' },
         { iconKey: 'barChart', title: 'Top-5-Produkte immer doppelt vorhalten', desc: 'Die fuenf meistverkauften Artikel nie unter 5 Stueck fallen lassen — Engpaesse kosten direkt Umsatz.' },
-        { iconKey: 'leaf', title: 'Saisonale Empfehlungen jetzt aufstellen', desc: 'Fruehling/Sommer: Sonnenschutz-Spray + Leave-In. Herbst/Winter: intensive Feuchtigkeitskuren an den Spiegel stellen.' }
+        { iconKey: 'leaf', title: 'Saisonale Empfehlungen jetzt aufstellen', desc: 'Frühling/Sommer: Sonnenschutz-Spray + Leave-In. Herbst/Winter: intensive Feuchtigkeitskuren an den Spiegel stellen.' }
       ];
       var lafi = 0;
       while (hints.length < 3 && lafi < laFallbacks.length) { hints.push(laFallbacks[lafi++]); }
@@ -10496,7 +10514,7 @@
         return 'Die KI hat Ihren aktuellen Lagerbestand analysiert und festgestellt, dass mehrere Produkte unter den definierten Mindestbestand gefallen sind. Bei den aktuellen Verbrauchsraten besteht das Risiko, dass diese Produkte innerhalb der nächsten 1-2 Wochen komplett aufgebraucht sind. Eine rechtzeitige Nachbestellung verhindert Lieferengpaesse und stellt sicher, dass Sie Ihren Kunden weiterhin alle Services anbieten können.';
       }
       if (t.indexOf('termin') > -1 || t.indexOf('luecke') > -1 || t.indexOf('ueberschneidung') > -1) {
-        return 'Die KI hat Ihren Terminkalender analysiert und Optimierungspotenzial erkannt. Terminluecken können für Walk-In-Kunden oder Nachholtermine genutzt werden. Bei Ueberschneidungen empfiehlt sich eine sofortige Umplanung, um Wartezeiten zu vermeiden und die Kundenzufriedenheit zu sichern.';
+        return 'Die KI hat Ihren Terminkalender analysiert und Optimierungspotenzial erkannt. Terminlücken können für Walk-In-Kunden oder Nachholtermine genutzt werden. Bei Überschneidungen empfiehlt sich eine sofortige Umplanung, um Wartezeiten zu vermeiden und die Kundenzufriedenheit zu sichern.';
       }
       if (t.indexOf('follow') > -1 || t.indexOf('kontakt') > -1 || t.indexOf('kunde') > -1) {
         return 'Die KI hat Kunden identifiziert, die für eine Kontaktaufnahme fällig sind. Regelmaessige Follow-Ups erhöhen die Kundenbindung nachweislich um bis zu 40%. Eine persönliche Nachricht per WhatsApp oder ein kurzer Anruf wirkt am stärksten.';
@@ -10514,7 +10532,7 @@
         return 'Schnelle Antwortzeiten sind entscheidend für die Kundenzufriedenheit. Studien zeigen: Kunden, die innerhalb von 30 Minuten eine Antwort erhalten, buchen 3x haeufiger einen Termin als bei laengerer Wartezeit.';
       }
       if (t.indexOf('vip') > -1) {
-        return 'VIP-Kunden sind das Rueckgrat Ihres Salons. Ein personalisierter Geburtstagsgruss mit kleinem Gutschein stärkt die Bindung enorm. Diese Kunden empfehlen Ihren Salon durchschnittlich 4x haeufiger weiter.';
+        return 'VIP-Kunden sind das Rückgrat Ihres Salons. Ein personalisierter Geburtstagsgruß mit kleinem Gutschein stärkt die Bindung enorm. Diese Kunden empfehlen Ihren Salon durchschnittlich 4x häufiger weiter.';
       }
       if (t.indexOf('farb') > -1) {
         return 'Mehrere Farbtermine am selben Tag bieten die Chance, Farbe und Entwickler vorab vorzubereiten. Das spart pro Termin ca. 15 Minuten Arbeitszeit und sorgt für einen reibungsloseren Ablauf.';
@@ -11285,7 +11303,7 @@
         html += '<span class="step-num">1</span> Tippe unten auf <b>Teilen</b> (Quadrat mit Pfeil &#8593;)<br>';
         html += '<span class="step-num">2</span> Scrolle und tippe <b>"Zum Home-Bildschirm"</b><br>';
         html += '<span class="step-num">3</span> Tippe <b>"Hinzufügen"</b> — fertig!</div>';
-        html += '<div class="pwa-banner-actions"><button class="pwa-btn-later" onclick="closePwaBanner()">Spaeter</button></div>';
+        html += '<div class="pwa-banner-actions"><button class="pwa-btn-later" onclick="closePwaBanner()">Später</button></div>';
       } else if (d.isIOS && d.isChromeIOS) {
         // iPhone in Chrome — muss zu Safari wechseln
         html += '<div class="pwa-banner-steps">';
@@ -11296,7 +11314,7 @@
         html += '<span class="step-num">4</span> Teilen &#8593; → <b>"Zum Home-Bildschirm"</b></div>';
         html += '<div class="pwa-banner-actions">';
         html += '<button class="pwa-btn-copy" onclick="copyPwaUrl()">Link kopieren</button>';
-        html += '<button class="pwa-btn-later" onclick="closePwaBanner()">Spaeter</button></div>';
+        html += '<button class="pwa-btn-later" onclick="closePwaBanner()">Später</button></div>';
       } else if (d.isIOS) {
         // iPhone in anderem Browser (Firefox, Edge, etc.)
         html += '<div class="pwa-banner-steps">';
@@ -11305,14 +11323,14 @@
         html += '<span class="step-num">2</span> Teilen &#8593; → <b>"Zum Home-Bildschirm"</b></div>';
         html += '<div class="pwa-banner-actions">';
         html += '<button class="pwa-btn-copy" onclick="copyPwaUrl()">Link kopieren</button>';
-        html += '<button class="pwa-btn-later" onclick="closePwaBanner()">Spaeter</button></div>';
+        html += '<button class="pwa-btn-later" onclick="closePwaBanner()">Später</button></div>';
       } else if (d.isAndroid) {
         // Android — Chrome/Edge haben nativen Install
         if (deferredInstallPrompt) {
           html += '<div class="pwa-banner-steps">Ein Tipp und du hast Casa 2035 als App — ohne App Store!</div>';
           html += '<div class="pwa-banner-actions">';
           html += '<button class="pwa-btn-install" onclick="triggerPwaInstall()">Jetzt installieren</button>';
-          html += '<button class="pwa-btn-later" onclick="closePwaBanner()">Spaeter</button></div>';
+          html += '<button class="pwa-btn-later" onclick="closePwaBanner()">Später</button></div>';
         } else {
           html += '<div class="pwa-banner-steps">';
           html += '<span class="step-num">1</span> Tippe oben rechts auf <b>drei Punkte &#8942;</b><br>';
@@ -11324,7 +11342,7 @@
         // Mac Desktop
         html += '<div class="pwa-banner-steps">';
         if (d.isSafari) {
-          html += '<span class="step-num">1</span> Menueleiste: <b>Ablage → Zum Dock hinzufuegen</b><br>';
+          html += '<span class="step-num">1</span> Menüleiste: <b>Ablage → Zum Dock hinzufügen</b><br>';
           html += '<span class="step-num">2</span> Fertig — im Dock wie eine normale App!</div>';
         } else {
           html += '<span class="step-num">1</span> Klicke in der Adressleiste auf das <b>Install-Symbol</b> (&#8681;)<br>';
@@ -11332,7 +11350,7 @@
           html += '<span class="step-num">3</span> Fertig — eigenes Fenster ohne Browser!</div>';
         }
         if (deferredInstallPrompt) {
-          html += '<div class="pwa-banner-actions"><button class="pwa-btn-install" onclick="triggerPwaInstall()">Jetzt installieren</button><button class="pwa-btn-later" onclick="closePwaBanner()">Spaeter</button></div>';
+          html += '<div class="pwa-banner-actions"><button class="pwa-btn-install" onclick="triggerPwaInstall()">Jetzt installieren</button><button class="pwa-btn-later" onclick="closePwaBanner()">Später</button></div>';
         } else {
           html += '<div class="pwa-banner-actions"><button class="pwa-btn-later" onclick="closePwaBanner()">Verstanden</button></div>';
         }
@@ -11340,7 +11358,7 @@
         // Windows / Linux Desktop
         if (deferredInstallPrompt) {
           html += '<div class="pwa-banner-steps">Ein Klick und du hast Casa 2035 als Desktop-App!</div>';
-          html += '<div class="pwa-banner-actions"><button class="pwa-btn-install" onclick="triggerPwaInstall()">Jetzt installieren</button><button class="pwa-btn-later" onclick="closePwaBanner()">Spaeter</button></div>';
+          html += '<div class="pwa-banner-actions"><button class="pwa-btn-install" onclick="triggerPwaInstall()">Jetzt installieren</button><button class="pwa-btn-later" onclick="closePwaBanner()">Später</button></div>';
         } else {
           html += '<div class="pwa-banner-steps">';
           html += '<span class="step-num">1</span> Klicke in der Adressleiste auf das <b>Install-Symbol</b><br>';
@@ -11630,7 +11648,7 @@
               action: { label: 'Mal gucken', fn: function(){ showPage('beratung'); } } });
           } else if (letzteWocheU > 0 && heuteU > letzteWocheU * 1.3) {
             findings.push({ prio: 4, iconKey: 'chart', title: 'Heute läuft es stärker als gleiche Zeit letzte Woche (+' + Math.round((heuteU/letzteWocheU-1)*100) + ' %)',
-              text: 'Glueckwunsch, das läuft gut für dich. Wenn du magst, mache ich einen kleinen Instagram-Posting-Vorschlag aus dem Moment.',
+              text: 'Glückwunsch, das läuft gut für dich. Wenn du magst, mache ich einen kleinen Instagram-Posting-Vorschlag aus dem Moment.',
               action: { label: 'Zeig mal', fn: function(){ showPage('beratung'); } } });
           }
         }
