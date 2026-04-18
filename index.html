@@ -4819,12 +4819,14 @@
     // Capo 18.04.2026: Wochen-Streifen-Helper (Liste + Tag). Mo-So, Heute + Selected markiert.
     // Rendert NICHT in container — sondern in einen persistenten Slot VOR terminContent (verhindert Overlap mit sticky-toolbar).
     function renderDayWeekStrip(_ignored, dateStr) {
+      var toolbar = document.getElementById('termineToolbar');
       var slot = document.getElementById('dayWeekStripSlot');
+      // v54+: Slot MUSS Kind der sticky-toolbar sein. Alte Slots woanders aufraeumen.
+      if (slot && toolbar && slot.parentElement !== toolbar) { slot.remove(); slot = null; }
       if (!slot) {
         slot = document.createElement('div');
         slot.id = 'dayWeekStripSlot';
         slot.style.cssText = 'padding:0 16px 8px;';
-        var toolbar = document.getElementById('termineToolbar');
         if (toolbar) toolbar.appendChild(slot);
         else {
           var tc = document.getElementById('terminContent');
