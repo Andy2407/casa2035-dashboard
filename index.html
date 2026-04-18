@@ -167,6 +167,20 @@
     [data-style="feminin"] .event-card {
       box-shadow: 0 10px 36px rgba(212,165,120,0.15), 0 2px 8px rgba(200,170,130,0.08);
     }
+
+    /* Service-Typ-Badges pro Stil (18.04. Capo ‚Design auch feminin/maskulin‘) */
+    [data-style="feminin"] [data-typ="herren"], [data-style="feminin"] [data-typ="maennlich"] { opacity: 0.35; }
+    [data-style="feminin"] [data-typ="damen"], [data-style="feminin"] [data-typ="feminin"], [data-style="feminin"] [data-typ="weiblich"] {
+      box-shadow: 0 0 0 1px rgba(212,165,120,0.35), 0 8px 24px rgba(212,165,120,0.15);
+    }
+    [data-style="maskulin"] [data-typ="damen"], [data-style="maskulin"] [data-typ="weiblich"] { opacity: 0.35; }
+    [data-style="maskulin"] [data-typ="herren"], [data-style="maskulin"] [data-typ="maennlich"] {
+      box-shadow: 0 0 0 1px rgba(201,168,76,0.4), 0 8px 24px rgba(201,168,76,0.25);
+    }
+
+    /* Section-Titles pro Stil: feminin weiblicher Ton, maskulin Command-Deck */
+    [data-style="feminin"] .section-title::before { content: '〜 '; color: var(--accent-primary); }
+    [data-style="maskulin"] .section-title::before { content: '// '; color: #C9A84C; font-weight: 900; letter-spacing: 0.1em; }
     [data-style="feminin"] h1, [data-style="feminin"] h2, [data-style="feminin"] h3,
     [data-style="feminin"] .hero-card h3 {
       font-family: var(--font-display);
@@ -11351,6 +11365,58 @@
       });
     }
     setTimeout(injectCasaStatIcons, 300);
+
+    // Stat-Labels + Section-Titles pro Stil umschreiben (Capo 18.04. ‚Design feminin/maskulin‘)
+    function applyStyleLabels() {
+      var mode = document.documentElement.getAttribute('data-style') || 'balance';
+      var L = {
+        feminin: {
+          termine: 'Termine heute',
+          umsatz: 'Heutiger Erlös',
+          beratung: 'offene Gespräche',
+          lager: 'Pflege-Alarm',
+          cockpit: 'Dein Atelier',
+          ki: 'Sanfte Impulse',
+          ereignisse: 'Was bewegt sich',
+          jarvisTitle: 'Hier sind sanfte Gedanken'
+        },
+        maskulin: {
+          termine: 'Heute Kalender',
+          umsatz: 'Umsatz live',
+          beratung: 'Einsatz offen',
+          lager: 'Bestand kritisch',
+          cockpit: 'Command Deck',
+          ki: 'Strategie-Vorschläge',
+          ereignisse: 'Einsatzprotokoll',
+          jarvisTitle: 'Lage-Briefing'
+        },
+        balance: {
+          termine: 'Termine heute',
+          umsatz: 'Tagesumsatz',
+          beratung: 'offene Anfragen',
+          lager: 'Lager-Alarm',
+          cockpit: 'Cockpit',
+          ki: 'KI-Vorschläge',
+          ereignisse: 'Aktuelle Ereignisse',
+          jarvisTitle: 'Ein paar Gedanken für dich — falls du magst'
+        }
+      }[mode] || {};
+      try {
+        var s1 = document.getElementById('statTermineSub'); if (s1 && L.termine) s1.textContent = L.termine;
+        var s2 = document.getElementById('statUmsatzSub'); if (s2 && L.umsatz) s2.textContent = L.umsatz;
+        var s3 = document.getElementById('statBeratungSub'); if (s3 && L.beratung) s3.textContent = L.beratung;
+        var s4 = document.getElementById('statLagerAlarmSub'); if (s4 && L.lager) s4.textContent = L.lager;
+      } catch(e){}
+    }
+    setTimeout(applyStyleLabels, 400);
+    // Beim Stil-Wechsel neu anwenden
+    (function hook(){
+      var orig = window.toggleStyleMode;
+      window.toggleStyleMode = function() {
+        if (typeof orig === 'function') orig.apply(this, arguments);
+        setTimeout(function(){ applyStyleLabels(); if (typeof renderJarvisBriefing === 'function') renderJarvisBriefing(); if (typeof updateHeroSubtitle === 'function') updateHeroSubtitle(); }, 50);
+      };
+    })();
 
     // Automatisches Rendern beim Home-Tab-Load (Demo- + Live-Modus)
     function renderAllSparklines() {
