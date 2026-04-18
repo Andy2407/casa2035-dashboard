@@ -4912,16 +4912,16 @@
         if (isSel) selTab = tab;
       }
       container.appendChild(tabsRow);
-      // Ausgewaehlten Tab ins Viewport zentrieren
+      // Ausgewaehlten Tab ins Viewport zentrieren (nach Layout + Paint)
       if (selTab) {
-        requestAnimationFrame(function(){
+        setTimeout(function(){
           try {
-            var rowRect = tabsRow.getBoundingClientRect();
-            var tabRect = selTab.getBoundingClientRect();
-            var targetScroll = selTab.offsetLeft - (rowRect.width / 2) + (tabRect.width / 2);
+            var rowW = tabsRow.offsetWidth;
+            var tabW = selTab.offsetWidth;
+            var targetScroll = selTab.offsetLeft - (rowW / 2) + (tabW / 2);
             tabsRow.scrollLeft = Math.max(0, targetScroll);
           } catch(e) {}
-        });
+        }, 100);
       }
 
       // Filter termine ZUERST — inkl. Staff-Filter
@@ -7164,7 +7164,7 @@
         html += '<span>Interne Notiz</span>';
         html += '<button type="button" onclick="terminNotizSpeichern()" style="padding:3px 10px;border:1px solid var(--gold);border-radius:10px;background:var(--gold-glow);color:var(--gold);font-size:9px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;text-transform:uppercase;letter-spacing:0.3px">Speichern</button>';
         html += '</div>';
-        html += '<textarea id="terminNotiz" rows="2" placeholder="Notiz hinzufuegen..." '
+        html += '<textarea id="terminNotiz" rows="2" placeholder="Notiz hinzufügen..." '
              + 'data-termin-id="' + esc(t.id || '') + '" '
              + 'data-start-iso="' + esc(t.Start_ISO || '') + '" '
              + 'data-kundenname="' + esc(t.Kundenname || '') + '" '
@@ -8430,7 +8430,7 @@
       var mainBtn = document.createElement('button');
       mainBtn.type = 'button';
       mainBtn.style.cssText = 'width:100%;background:var(--bg-warm);border:2px dashed var(--border-accent);border-radius:var(--radius);padding:16px 12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-size:14px;font-weight:600;color:var(--text);transition:border-color 150ms';
-      mainBtn.innerHTML = '\u{1F4F8} <span>Foto hinzufuegen</span>';
+      mainBtn.innerHTML = '\u{1F4F8} <span>Foto hinzufügen</span>';
 
       var menu = document.createElement('div');
       menu.style.cssText = 'display:none;position:absolute;top:100%;left:0;right:0;margin-top:4px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.18);z-index:20;overflow:hidden';
@@ -11284,7 +11284,7 @@
         html += '<div class="pwa-banner-steps">';
         html += '<span class="step-num">1</span> Tippe unten auf <b>Teilen</b> (Quadrat mit Pfeil &#8593;)<br>';
         html += '<span class="step-num">2</span> Scrolle und tippe <b>"Zum Home-Bildschirm"</b><br>';
-        html += '<span class="step-num">3</span> Tippe <b>"Hinzufuegen"</b> — fertig!</div>';
+        html += '<span class="step-num">3</span> Tippe <b>"Hinzufügen"</b> — fertig!</div>';
         html += '<div class="pwa-banner-actions"><button class="pwa-btn-later" onclick="closePwaBanner()">Spaeter</button></div>';
       } else if (d.isIOS && d.isChromeIOS) {
         // iPhone in Chrome — muss zu Safari wechseln
