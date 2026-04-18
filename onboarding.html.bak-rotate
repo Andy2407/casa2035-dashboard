@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="dark">
+<head>
+  <link rel="stylesheet" href="https://api.casa2035.de/fonts/fonts.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>Casa 2035 — Neuer Salon</title>
+  <style>
+    /* =============================================================
+       Casa 2035 — Onboarding-Wizard
+       Neuen Salon in unter 30 Min einrichten
+       Stand: 17.04.2026 | @db-entwickler + @frontend
+       ============================================================= */
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --card: #1c1c1c;
+      --border: rgba(255,255,255,0.07);
+      --border-accent: rgba(201,168,76,0.25);
+      --text: #f0ece8;
+      --text-secondary: #a09890;
+      --text-dim: #6a6560;
+      --gold: #C9A84C;
+      --gold-light: #D4B95E;
+      --gold-gradient: linear-gradient(135deg, #C9A84C 0%, #D4B95E 40%, #E0C870 100%);
+      --success: #2d8a4e;
+      --danger: #c44040;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* ---- LOGIN SCREEN ---- */
+    #login-screen {
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-logo .wordmark {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .login-logo .sub {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    .login-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+    .login-card h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    .login-error {
+      background: rgba(196,64,64,0.12);
+      border: 1px solid rgba(196,64,64,0.3);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #e88080;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .login-error.show { display: block; }
+
+    /* ---- WIZARD SCREEN ---- */
+    #wizard-screen {
+      width: 100%;
+      max-width: 680px;
+      display: none;
+    }
+
+    .wiz-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .wiz-header .wordmark {
+      font-size: 22px;
+      font-weight: 700;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .wiz-header .tagline {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 28px;
+    }
+    .pb-step {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: var(--border);
+      transition: background 0.4s var(--ease);
+    }
+    .pb-step.active { background: var(--gold); }
+    .pb-step.done { background: rgba(201,168,76,0.4); }
+
+    .step-label {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .step-label strong { color: var(--gold); }
+
+    /* Card */
+    .wiz-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+    .wiz-card h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .wiz-card .step-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* Form Elements */
+    .field-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .field-group.full { grid-template-columns: 1fr; }
+    .field-group.three { grid-template-columns: 1fr 1fr 1fr; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field.span2 { grid-column: span 2; }
+
+    label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    label .req { color: var(--gold); margin-left: 2px; }
+    label .opt { color: var(--text-dim); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="password"],
+    input[type="url"],
+    select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    input:focus, select:focus {
+      border-color: var(--gold);
+    }
+    input.error { border-color: var(--danger); }
+    input::placeholder { color: var(--text-dim); }
+
+    select option { background: #1c1c1c; }
+
+    /* Slug preview */
+    .slug-preview {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-top: 4px;
+    }
+    .slug-preview span { color: var(--gold); }
+
+    /* Color picker */
+    .color-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    input[type="color"] {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      cursor: pointer;
+      padding: 3px;
+    }
+    .color-hex {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      padding: 10px 12px;
+      width: 100px;
+      outline: none;
+    }
+    .color-hex:focus { border-color: var(--gold); }
+
+    /* Logo Upload */
+    .logo-upload-zone {
+      border: 2px dashed var(--border-accent);
+      border-radius: var(--radius);
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .logo-upload-zone:hover { border-color: var(--gold); background: rgba(201,168,76,0.04); }
+    .logo-upload-zone.has-file { border-style: solid; border-color: var(--gold); }
+    .logo-upload-zone input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+      width: 100%; height: 100%;
+    }
+    .logo-upload-zone .upload-icon { font-size: 32px; margin-bottom: 8px; }
+    .logo-upload-zone .upload-text { font-size: 13px; color: var(--text-secondary); }
+    .logo-upload-zone .upload-hint { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+    .logo-preview { max-height: 80px; border-radius: 8px; margin-top: 8px; display: none; }
+
+    /* Temp Password */
+    .temp-pw-wrapper {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .temp-pw-wrapper input { flex: 1; font-family: 'JetBrains Mono', monospace; }
+    .btn-copy {
+      background: rgba(201,168,76,0.12);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-sm);
+      color: var(--gold);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 10px 14px;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-copy:hover { background: rgba(201,168,76,0.2); }
+    .btn-copy.copied { color: var(--success); }
+
+    .btn-regen {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 12px;
+      padding: 6px 10px;
+      margin-top: 6px;
+      display: inline-block;
+      transition: border-color 0.2s;
+    }
+    .btn-regen:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* Opening Hours */
+    .hours-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .hours-row {
+      display: grid;
+      grid-template-columns: 90px 1fr;
+      align-items: center;
+      gap: 12px;
+    }
+    .hours-day {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .hours-times {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hours-times input[type="time"] {
+      width: 110px;
+      font-size: 13px;
+    }
+    .hours-sep { color: var(--text-dim); font-size: 13px; }
+    .hours-closed-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+    input[type="checkbox"] {
+      accent-color: var(--gold);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    /* Services step */
+    .services-choice {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .service-option {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .service-option:hover { border-color: var(--gold); }
+    .service-option.selected {
+      border-color: var(--gold);
+      background: rgba(201,168,76,0.06);
+    }
+    .service-option .opt-icon { font-size: 28px; margin-bottom: 8px; }
+    .service-option .opt-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .service-option .opt-desc { font-size: 12px; color: var(--text-secondary); }
+
+    /* Review */
+    .review-section { margin-bottom: 20px; }
+    .review-section h4 {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--gold);
+      margin-bottom: 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border-accent);
+    }
+    .review-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 16px;
+    }
+    .review-item { font-size: 13px; }
+    .review-item .ri-label { color: var(--text-dim); font-size: 11px; }
+    .review-item .ri-val { color: var(--text); font-weight: 500; margin-top: 2px; }
+    .review-color-dot {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-right: 6px;
+      border: 1px solid var(--border);
+    }
+
+    /* Navigation Buttons */
+    .wiz-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 28px;
+      gap: 12px;
+    }
+    .btn {
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 11px 22px;
+      transition: all 0.2s;
+      border: none;
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+    .btn-ghost:hover { border-color: var(--text-secondary); color: var(--text); }
+    .btn-primary {
+      background: var(--gold-gradient);
+      color: #0a0a0a;
+      box-shadow: 0 4px 16px rgba(201,168,76,0.25);
+    }
+    .btn-primary:hover { filter: brightness(1.08); }
+    .btn-primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: none;
+    }
+    .btn-danger {
+      background: rgba(196,64,64,0.15);
+      border: 1px solid rgba(196,64,64,0.3);
+      color: #e88080;
+    }
+
+    .step-counter {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    /* Submit state */
+    #submit-status {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    #submit-status .status-icon { font-size: 48px; margin-bottom: 12px; }
+    #submit-status .status-msg { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    #submit-status .status-sub { font-size: 13px; color: var(--text-secondary); }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(10,10,10,0.3);
+      border-top-color: #0a0a0a;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .field-group { grid-template-columns: 1fr; }
+      .field.span2 { grid-column: span 1; }
+      .services-choice { grid-template-columns: 1fr; }
+      .review-grid { grid-template-columns: 1fr; }
+      .hours-row { grid-template-columns: 80px 1fr; }
+      .wiz-card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===================== LOGIN SCREEN ===================== -->
+<div id="login-screen">
+  <div class="login-logo">
+    <div class="wordmark">Casa 2035</div>
+    <div class="sub">Salon-Verwaltung · Admin-Bereich</div>
+  </div>
+  <div class="login-card">
+    <h2>Anmeldung erforderlich</h2>
+    <div class="login-error" id="login-error">Falsche E-Mail oder falsches Passwort.</div>
+    <div class="field" style="margin-bottom:14px;">
+      <label>E-Mail</label>
+      <input type="email" id="login-email" placeholder="admin@casa2035.de" autocomplete="email">
+    </div>
+    <div class="field" style="margin-bottom:20px;">
+      <label>Passwort</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn btn-primary" style="width:100%;" onclick="doLogin()">Einloggen</button>
+  </div>
+</div>
+
+<!-- ===================== WIZARD SCREEN ===================== -->
+<div id="wizard-screen">
+  <div class="wiz-header">
+    <div class="wordmark">Casa 2035</div>
+    <div class="tagline">Neuen Salon einrichten</div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-bar" id="progress-bar">
+    <div class="pb-step active" id="pb0"></div>
+    <div class="pb-step" id="pb1"></div>
+    <div class="pb-step" id="pb2"></div>
+    <div class="pb-step" id="pb3"></div>
+    <div class="pb-step" id="pb4"></div>
+    <div class="pb-step" id="pb5"></div>
+  </div>
+  <div class="step-label" id="step-label">Schritt <strong>1</strong> von 6</div>
+
+  <!-- ======== STEP 0: Salon-Daten ======== -->
+  <div class="wiz-card" id="step-0">
+    <h3>Salon-Daten</h3>
+    <p class="step-desc">Grundlegende Informationen zum Salon.</p>
+
+    <div class="field-group" style="margin-bottom:14px;">
+      <div class="field span2">
+        <label>Salon-Name <span class="req">*</span></label>
+        <input type="text" id="s0-name" placeholder="z.B. Musterhaar München" oninput="updateSlug()">
+      </div>
+      <div class="field">
+        <label>Kurz-URL (Slug) <span class="req">*</span></label>
+        <input type="text" id="s0-slug" placeholder="musterhaar-muenchen" pattern="[a-z0-9\-]+" oninput="validateSlug(this)">
+        <div class="slug-preview">Adresse: <span id="slug-preview-val">…</span>.casa2035.de</div>
+      </div>
+      <div class="field">
+        <label>Inhaber / Inhaberin <span class="req">*</span></label>
+        <input type="text" id="s0-inhaber" placeholder="Maria Muster">
+      </div>
+      <div class="field span2">
+        <label>Adresse <span class="req">*</span></label>
+        <input type="text" id="s0-adresse" placeholder="Musterstraße 1, 80000 München">
+      </div>
+      <div class="field">
+        <label>Telefon <span class="req">*</span></label>
+        <input type="tel" id="s0-telefon" placeholder="089-123456">
+      </div>
+      <div class="field">
+        <label>E-Mail <span class="req">*</span></label>
+        <input type="email" id="s0-email" placeholder="info@musterhaar.de">
+      </div>
+      <div class="field">
+        <label>Website <span class="opt">(optional)</span></label>
+        <input type="url" id="s0-website" placeholder="https://musterhaar.de">
+      </div>
+      <div class="field">
+        <label>Instagram <span class="opt">(optional)</span></label>
+        <input type="text" id="s0-instagram" placeholder="@musterhaar">
+      </div>
+      <div class="field">
+        <label>Steuernummer <span class="opt">(optional)</span></label>
+        <input type="text" id="s0-steuernr" placeholder="123/456/78901">
+      </div>
+      <div class="field">
+        <label>Paket <span class="req">*</span></label>
+        <select id="s0-paket">
+          <option value="">— Paket wählen —</option>
+          <option value="basic">Basic — EUR 490 Setup / EUR 29/Mo</option>
+          <option value="smart_start">Smart Start — EUR 990 / EUR 49/Mo</option>
+          <option value="salon_pro">Salon Pro — EUR 2.490 / EUR 79/Mo</option>
+          <option value="full_suite">Full Suite — EUR 4.990 / EUR 199/Mo</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== STEP 1: Branding ======== -->
+  <div class="wiz-card" id="step-1" style="display:none;">
+    <h3>Branding</h3>
+    <p class="step-desc">Farbe und Logo für den Salon.</p>
+
+    <div class="field-group" style="margin-bottom:20px;">
+      <div class="field">
+        <label>Primärfarbe <span class="req">*</span></label>
+        <div class="color-field">
+          <input type="color" id="s1-color" value="#b8962e" oninput="syncColorHex(this)">
+          <input type="text" class="color-hex" id="s1-color-hex" value="#b8962e" maxlength="7" oninput="syncColorPicker(this)" placeholder="#b8962e">
+        </div>
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:8px;">
+      <label>Logo <span class="opt">(optional — PNG/JPG, max 2 MB)</span></label>
+      <div class="logo-upload-zone" id="logo-zone">
+        <input type="file" id="s1-logo" accept="image/png,image/jpeg,image/webp" onchange="previewLogo(this)">
+        <div class="upload-icon">🖼️</div>
+        <div class="upload-text">Logo hier ablegen oder klicken</div>
+        <div class="upload-hint">PNG, JPG oder WebP · max. 2 MB</div>
+        <img class="logo-preview" id="logo-preview-img" alt="Logo Vorschau">
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== STEP 2: Chef-Login ======== -->
+  <div class="wiz-card" id="step-2" style="display:none;">
+    <h3>Chef-Login</h3>
+    <p class="step-desc">Zugangsdaten für den Salon-Chef (Rolle: CHF).</p>
+
+    <div class="field-group" style="margin-bottom:14px;">
+      <div class="field">
+        <label>Vorname <span class="req">*</span></label>
+        <input type="text" id="s2-vorname" placeholder="Maria" oninput="updateUsername()">
+      </div>
+      <div class="field">
+        <label>Nachname <span class="req">*</span></label>
+        <input type="text" id="s2-nachname" placeholder="Muster">
+      </div>
+      <div class="field">
+        <label>Benutzername <span class="req">*</span></label>
+        <input type="text" id="s2-username" placeholder="maria">
+      </div>
+      <div class="field">
+        <label>E-Mail (Login) <span class="req">*</span></label>
+        <input type="email" id="s2-chef-email" placeholder="maria@musterhaar.de">
+      </div>
+      <div class="field span2">
+        <label>Temporäres Passwort <span class="req">*</span></label>
+        <div class="temp-pw-wrapper">
+          <input type="text" id="s2-tmppass" readonly>
+          <button class="btn-copy" onclick="copyTmpPass(this)" type="button">Kopieren</button>
+        </div>
+        <button class="btn-regen" onclick="regenPass()" type="button">↻ Neu generieren</button>
+      </div>
+    </div>
+    <p style="font-size:12px;color:var(--text-dim);">Das Passwort bitte sofort notieren und sicher übergeben. Nach dem ersten Login kann es geändert werden.</p>
+  </div>
+
+  <!-- ======== STEP 3: Öffnungszeiten ======== -->
+  <div class="wiz-card" id="step-3" style="display:none;">
+    <h3>Öffnungszeiten</h3>
+    <p class="step-desc">Wann ist der Salon geöffnet?</p>
+    <div class="hours-grid" id="hours-grid"></div>
+  </div>
+
+  <!-- ======== STEP 4: Services ======== -->
+  <div class="wiz-card" id="step-4" style="display:none;">
+    <h3>Services</h3>
+    <p class="step-desc">Soll der Salon mit Standard-Services starten oder später selbst einrichten?</p>
+    <div class="services-choice">
+      <div class="service-option selected" id="svc-default" onclick="selectService('default')">
+        <div class="opt-icon">⚡</div>
+        <div class="opt-title">Standard-Services</div>
+        <div class="opt-desc">10 typische Friseur-Services werden automatisch angelegt (Schnitt, Färben etc.)</div>
+      </div>
+      <div class="service-option" id="svc-skip" onclick="selectService('skip')">
+        <div class="opt-icon">⏭️</div>
+        <div class="opt-title">Später einrichten</div>
+        <div class="opt-desc">Services manuell im Dashboard anlegen</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== STEP 5: Review ======== -->
+  <div class="wiz-card" id="step-5" style="display:none;">
+    <h3>Alles prüfen</h3>
+    <p class="step-desc">Kurzer Blick auf alle Eingaben — dann geht's los.</p>
+    <div id="review-content"></div>
+
+    <!-- DSGVO Art. 28 Auftragsverarbeitung -->
+    <div style="margin-top:24px; padding:16px; background:rgba(201,169,113,0.08); border-left:4px solid var(--gold,#c9a971); border-radius:8px;">
+      <h4 style="margin:0 0 8px 0; font-size:1rem;">📜 Auftragsverarbeitungs-Vertrag (Pflicht nach DSGVO Art. 28)</h4>
+      <p style="font-size:0.9rem; margin:8px 0; color:var(--text-muted,#aaa);">
+        Casa 2035 verarbeitet Kundendaten des Salons im Auftrag. Vor der Aktivierung
+        muss der Inhaber den AV-Vertrag lesen und bestätigen.
+      </p>
+      <p style="margin:10px 0;">
+        <a href="/rechtliches/AV_VERTRAG_CASA2035.pdf" target="_blank" rel="noopener"
+           style="color:var(--gold,#c9a971); text-decoration:underline;">
+          ➜ AV-Vertrag als PDF öffnen
+        </a>
+      </p>
+      <label style="display:flex; align-items:flex-start; gap:10px; margin-top:12px; cursor:pointer;">
+        <input type="checkbox" id="chk-av" style="margin-top:4px; transform:scale(1.2);">
+        <span style="font-size:0.92rem;">
+          Ich habe den AV-Vertrag gelesen und akzeptiere ihn als rechtsverbindlichen
+          Vertrag zwischen Casa 2035 und dem Salon.
+        </span>
+      </label>
+      <label style="display:flex; align-items:flex-start; gap:10px; margin-top:10px; cursor:pointer;">
+        <input type="checkbox" id="chk-dsgvo" style="margin-top:4px; transform:scale(1.2);">
+        <span style="font-size:0.92rem;">
+          Ich habe die <a href="/rechtliches/DATENSCHUTZERKLAERUNG_CASA2035.pdf"
+          target="_blank" style="color:var(--gold,#c9a971);">Datenschutzerklärung</a> zur Kenntnis genommen.
+        </span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Submit Status -->
+  <div id="submit-status">
+    <div class="status-icon" id="status-icon">⏳</div>
+    <div class="status-msg" id="status-msg">Salon wird eingerichtet…</div>
+    <div class="status-sub" id="status-sub">Bitte warten, das dauert kurz.</div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="wiz-nav" id="wiz-nav">
+    <button class="btn btn-ghost" id="btn-back" onclick="goBack()" style="display:none;">← Zurück</button>
+    <div class="step-counter" id="step-counter">1 / 6</div>
+    <button class="btn btn-primary" id="btn-next" onclick="goNext()">Weiter →</button>
+  </div>
+</div>
+
+<script>
+// =============================================================
+// Casa 2035 — Onboarding-Wizard
+// Stand: 17.04.2026 | @db-entwickler
+// =============================================================
+
+const SUPABASE_URL   = 'https://api.casa2035.de';
+const N8N_WEBHOOK    = 'https://niniho13.app.n8n.cloud/webhook/onboard-salon';
+const ADMIN_EMAIL    = 'admin@casa2035.de';
+
+// Einfacher Admin-Check via Supabase Auth
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('show');
+
+  if (email !== ADMIN_EMAIL) {
+    errEl.textContent = 'Nur admin@casa2035.de hat Zugang zu diesem Bereich.';
+    errEl.classList.add('show');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': await getAnonKey() },
+      body: JSON.stringify({ email, password: pass })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.access_token) {
+      errEl.textContent = 'Anmeldung fehlgeschlagen. Bitte Passwort prüfen.';
+      errEl.classList.add('show');
+      return;
+    }
+    // Speichere Token für spätere Supabase-Calls (Logo-Upload)
+    window._authToken = data.access_token;
+    startWizard();
+  } catch(e) {
+    errEl.textContent = 'Verbindungsfehler. Bitte nochmal versuchen.';
+    errEl.classList.add('show');
+  }
+}
+
+// Anon-Key fuer Supabase Auth Login
+// Stand 17.04.2026: Anon-Key aus Konzept Supabase Zugangsdaten
+async function getAnonKey() {
+  if (window._anonKey) return window._anonKey;
+  return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzc1NTA0NzY1LCJleHAiOjE5MzMxODQ3NjV9.5YsRP4FLKHp7hTae7-RAyi13ofRfSGmjm8P2Ved2Wu4';
+}
+
+// Login auch per Enter
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// =============================================================
+// WIZARD LOGIC
+// =============================================================
+let currentStep = 0;
+const TOTAL_STEPS = 6;
+let servicesChoice = 'default';
+let uploadedLogoFile = null;
+
+const DAYS = ['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
+const DAY_KEYS = ['mo','di','mi','do','fr','sa','so'];
+const DEFAULT_HOURS = {
+  mo: { closed: false, von: '09:00', bis: '19:00' },
+  di: { closed: false, von: '09:00', bis: '19:00' },
+  mi: { closed: false, von: '09:00', bis: '19:00' },
+  do: { closed: false, von: '09:00', bis: '19:00' },
+  fr: { closed: false, von: '09:00', bis: '19:00' },
+  sa: { closed: false, von: '09:00', bis: '17:00' },
+  so: { closed: true,  von: '10:00', bis: '16:00' }
+};
+
+function startWizard() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('wizard-screen').style.display = 'block';
+  buildHoursGrid();
+  regenPass();
+  updateStep();
+}
+
+function buildHoursGrid() {
+  const grid = document.getElementById('hours-grid');
+  grid.innerHTML = '';
+  DAY_KEYS.forEach((key, i) => {
+    const h = DEFAULT_HOURS[key];
+    const row = document.createElement('div');
+    row.className = 'hours-row';
+    row.innerHTML = `
+      <div class="hours-day">${DAYS[i]}</div>
+      <div class="hours-times">
+        <label class="hours-closed-label">
+          <input type="checkbox" id="h-closed-${key}" ${h.closed ? 'checked' : ''} onchange="toggleDay('${key}')">
+          Geschlossen
+        </label>
+        <span class="hours-sep" id="h-sep-${key}" style="${h.closed ? 'display:none' : ''}">|</span>
+        <input type="time" id="h-von-${key}" value="${h.von}" style="${h.closed ? 'display:none' : ''}">
+        <span class="hours-sep" id="h-bis-sep-${key}" style="${h.closed ? 'display:none' : ''}">–</span>
+        <input type="time" id="h-bis-${key}" value="${h.bis}" style="${h.closed ? 'display:none' : ''}">
+      </div>
+    `;
+    grid.appendChild(row);
+  });
+}
+
+function toggleDay(key) {
+  const closed = document.getElementById(`h-closed-${key}`).checked;
+  ['h-sep','h-bis-sep'].forEach(pfx => {
+    const el = document.getElementById(`${pfx}-${key}`);
+    if (el) el.style.display = closed ? 'none' : '';
+  });
+  document.getElementById(`h-von-${key}`).style.display = closed ? 'none' : '';
+  document.getElementById(`h-bis-${key}`).style.display = closed ? 'none' : '';
+}
+
+function updateSlug() {
+  const name = document.getElementById('s0-name').value;
+  const slug = name.toLowerCase()
+    .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,50);
+  document.getElementById('s0-slug').value = slug;
+  document.getElementById('slug-preview-val').textContent = slug || '…';
+}
+
+function validateSlug(input) {
+  input.value = input.value.toLowerCase().replace(/[^a-z0-9-]/g,'');
+  document.getElementById('slug-preview-val').textContent = input.value || '…';
+}
+
+function syncColorHex(picker) {
+  document.getElementById('s1-color-hex').value = picker.value;
+}
+function syncColorPicker(hex) {
+  const v = hex.value;
+  if (/^#[0-9a-fA-F]{6}$/.test(v)) {
+    document.getElementById('s1-color').value = v;
+  }
+}
+
+function previewLogo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { alert('Bild ist größer als 2 MB. Bitte kleinere Datei wählen.'); return; }
+  uploadedLogoFile = file;
+  const zone = document.getElementById('logo-zone');
+  zone.classList.add('has-file');
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('logo-preview-img');
+    img.src = e.target.result;
+    img.style.display = 'block';
+    zone.querySelector('.upload-text').textContent = file.name;
+  };
+  reader.readAsDataURL(file);
+}
+
+function updateUsername() {
+  const v = document.getElementById('s2-vorname').value.toLowerCase().trim()
+    .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+    .replace(/[^a-z0-9]/g,'');
+  document.getElementById('s2-username').value = v;
+}
+
+function regenPass() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#&';
+  let pw = '';
+  for (let i = 0; i < 14; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+  document.getElementById('s2-tmppass').value = pw;
+}
+
+function copyTmpPass(btn) {
+  navigator.clipboard.writeText(document.getElementById('s2-tmppass').value).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Kopiert';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function selectService(choice) {
+  servicesChoice = choice;
+  document.getElementById('svc-default').classList.toggle('selected', choice === 'default');
+  document.getElementById('svc-skip').classList.toggle('selected', choice === 'skip');
+}
+
+// =============================================================
+// NAVIGATION
+// =============================================================
+function goNext() {
+  if (!validateStep(currentStep)) return;
+  if (currentStep === 5) {
+    // AV + DSGVO Checkboxen pruefen
+    var av = document.getElementById('chk-av');
+    var ds = document.getElementById('chk-dsgvo');
+    if (!av || !av.checked) { alert('Bitte AV-Vertrag lesen und bestätigen (Pflicht nach DSGVO Art. 28).'); return; }
+    if (!ds || !ds.checked) { alert('Bitte Datenschutzerklärung bestätigen.'); return; }
+    submitWizard();
+    return;
+  }
+  if (currentStep === 4) { buildReview(); }
+  currentStep++;
+  updateStep();
+}
+
+function goBack() {
+  if (currentStep > 0) { currentStep--; updateStep(); }
+}
+
+function updateStep() {
+  for (let i = 0; i < TOTAL_STEPS; i++) {
+    document.getElementById(`step-${i}`).style.display = i === currentStep ? 'block' : 'none';
+    const pb = document.getElementById(`pb${i}`);
+    pb.className = 'pb-step';
+    if (i < currentStep) pb.classList.add('done');
+    else if (i === currentStep) pb.classList.add('active');
+  }
+  document.getElementById('step-label').innerHTML = `Schritt <strong>${currentStep+1}</strong> von ${TOTAL_STEPS}`;
+  document.getElementById('step-counter').textContent = `${currentStep+1} / ${TOTAL_STEPS}`;
+  document.getElementById('btn-back').style.display = currentStep > 0 ? 'inline-block' : 'none';
+  document.getElementById('btn-next').textContent = currentStep === 5 ? '🚀 Los geht\'s' : 'Weiter →';
+}
+
+function validateStep(step) {
+  if (step === 0) {
+    const req = ['s0-name','s0-slug','s0-inhaber','s0-adresse','s0-telefon','s0-email','s0-paket'];
+    let ok = true;
+    req.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { el.classList.add('error'); ok = false; }
+      else el.classList.remove('error');
+    });
+    if (!ok) { alert('Bitte alle Pflichtfelder ausfüllen.'); return false; }
+    if (!/^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(document.getElementById('s0-slug').value)) {
+      alert('Der Slug darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten (min. 2 Zeichen).');
+      return false;
+    }
+  }
+  if (step === 2) {
+    const req = ['s2-vorname','s2-nachname','s2-username','s2-chef-email','s2-tmppass'];
+    let ok = true;
+    req.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { el.classList.add('error'); ok = false; }
+      else el.classList.remove('error');
+    });
+    if (!ok) { alert('Bitte alle Pflichtfelder für den Chef-Login ausfüllen.'); return false; }
+  }
+  return true;
+}
+
+// =============================================================
+// REVIEW BUILD
+// =============================================================
+function buildReview() {
+  const paketLabels = { basic:'Basic', smart_start:'Smart Start', salon_pro:'Salon Pro', full_suite:'Full Suite' };
+  const color = document.getElementById('s1-color').value;
+  const hoursLines = DAY_KEYS.map((k,i) => {
+    const closed = document.getElementById(`h-closed-${k}`).checked;
+    if (closed) return `${DAYS[i]}: Geschlossen`;
+    const von = document.getElementById(`h-von-${k}`).value;
+    const bis = document.getElementById(`h-bis-${k}`).value;
+    return `${DAYS[i]}: ${von} – ${bis}`;
+  }).join('<br>');
+
+  document.getElementById('review-content').innerHTML = `
+    <div class="review-section">
+      <h4>Salon</h4>
+      <div class="review-grid">
+        <div class="review-item"><div class="ri-label">Name</div><div class="ri-val">${esc(v('s0-name'))}</div></div>
+        <div class="review-item"><div class="ri-label">Slug</div><div class="ri-val">${esc(v('s0-slug'))}.casa2035.de</div></div>
+        <div class="review-item"><div class="ri-label">Inhaber</div><div class="ri-val">${esc(v('s0-inhaber'))}</div></div>
+        <div class="review-item"><div class="ri-label">Paket</div><div class="ri-val">${paketLabels[v('s0-paket')] || '—'}</div></div>
+        <div class="review-item"><div class="ri-label">Adresse</div><div class="ri-val">${esc(v('s0-adresse'))}</div></div>
+        <div class="review-item"><div class="ri-label">Telefon</div><div class="ri-val">${esc(v('s0-telefon'))}</div></div>
+        <div class="review-item"><div class="ri-label">E-Mail</div><div class="ri-val">${esc(v('s0-email'))}</div></div>
+        ${v('s0-instagram') ? `<div class="review-item"><div class="ri-label">Instagram</div><div class="ri-val">${esc(v('s0-instagram'))}</div></div>` : ''}
+      </div>
+    </div>
+    <div class="review-section">
+      <h4>Branding</h4>
+      <div class="review-item">
+        <div class="ri-label">Primärfarbe</div>
+        <div class="ri-val">
+          <span class="review-color-dot" style="background:${color}"></span>${color}
+        </div>
+      </div>
+      ${uploadedLogoFile ? `<div class="review-item" style="margin-top:8px;"><div class="ri-label">Logo</div><div class="ri-val">${esc(uploadedLogoFile.name)}</div></div>` : ''}
+    </div>
+    <div class="review-section">
+      <h4>Chef-Login</h4>
+      <div class="review-grid">
+        <div class="review-item"><div class="ri-label">Name</div><div class="ri-val">${esc(v('s2-vorname'))} ${esc(v('s2-nachname'))}</div></div>
+        <div class="review-item"><div class="ri-label">Benutzername</div><div class="ri-val">${esc(v('s2-username'))}</div></div>
+        <div class="review-item"><div class="ri-label">Login-E-Mail</div><div class="ri-val">${esc(v('s2-chef-email'))}</div></div>
+        <div class="review-item"><div class="ri-label">Temp. Passwort</div><div class="ri-val" style="font-family:monospace;">${esc(v('s2-tmppass'))}</div></div>
+      </div>
+    </div>
+    <div class="review-section">
+      <h4>Öffnungszeiten</h4>
+      <div style="font-size:13px;line-height:1.9;">${hoursLines}</div>
+    </div>
+    <div class="review-section">
+      <h4>Services</h4>
+      <div style="font-size:13px;">${servicesChoice === 'default' ? '10 Standard-Services werden angelegt' : 'Später manuell einrichten'}</div>
+    </div>
+  `;
+}
+
+function v(id) { return document.getElementById(id)?.value || ''; }
+function esc(s) { return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// =============================================================
+// SUBMIT
+// =============================================================
+async function submitWizard() {
+  const btn = document.getElementById('btn-next');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Einrichten…';
+
+  document.getElementById('wiz-nav').style.display = 'none';
+
+  // Öffnungszeiten sammeln
+  const hours = {};
+  DAY_KEYS.forEach(k => {
+    const closed = document.getElementById(`h-closed-${k}`).checked;
+    hours[k] = closed ? 'geschlossen' : `${document.getElementById(`h-von-${k}`).value}–${document.getElementById(`h-bis-${k}`).value}`;
+  });
+
+  const payload = {
+    salon: {
+      name:           v('s0-name').trim(),
+      slug:           v('s0-slug').trim(),
+      inhaber:        v('s0-inhaber').trim(),
+      adresse:        v('s0-adresse').trim(),
+      telefon:        v('s0-telefon').trim(),
+      email:          v('s0-email').trim(),
+      website:        v('s0-website').trim(),
+      instagram:      v('s0-instagram').trim(),
+      steuernummer:   v('s0-steuernr').trim(),
+      paket:          v('s0-paket'),
+      primary_color:  document.getElementById('s1-color').value,
+    },
+    chef: {
+      vorname:        v('s2-vorname').trim(),
+      nachname:       v('s2-nachname').trim(),
+      username:       v('s2-username').trim(),
+      email:          v('s2-chef-email').trim(),
+      tmp_password:   v('s2-tmppass'),
+    },
+    oeffnungszeiten: hours,
+    services_mode:   servicesChoice,
+    meta: {
+      created_by: ADMIN_EMAIL,
+      created_at: new Date().toISOString(),
+    }
+  };
+
+  // Logo hochladen falls vorhanden
+  if (uploadedLogoFile && window._authToken) {
+    try {
+      const slug = payload.salon.slug;
+      const path = `${slug}/logo.png`;
+      const upRes = await fetch(`${SUPABASE_URL}/storage/v1/object/salon-assets/${path}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${window._authToken}`,
+          'Content-Type': uploadedLogoFile.type,
+        },
+        body: uploadedLogoFile
+      });
+      if (upRes.ok) {
+        payload.salon.logo_url = `${SUPABASE_URL}/storage/v1/object/public/salon-assets/${path}`;
+      }
+    } catch(e) {
+      console.warn('Logo-Upload fehlgeschlagen:', e);
+    }
+  }
+
+  // An n8n schicken
+  try {
+    const res = await fetch(N8N_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+      showStatus('success');
+    } else {
+      const txt = await res.text();
+      console.error('n8n Fehler:', txt);
+      showStatus('error', txt);
+    }
+  } catch(e) {
+    console.error('Netzwerkfehler:', e);
+    showStatus('error', e.message);
+  }
+}
+
+function showStatus(type, detail) {
+  // Steps ausblenden
+  for (let i = 0; i < TOTAL_STEPS; i++) document.getElementById(`step-${i}`).style.display = 'none';
+  document.getElementById('progress-bar').style.display = 'none';
+  document.getElementById('step-label').style.display = 'none';
+  const el = document.getElementById('submit-status');
+  el.style.display = 'block';
+
+  if (type === 'success') {
+    const slug = document.getElementById('s0-slug').value;
+    document.getElementById('status-icon').textContent = '🎉';
+    document.getElementById('status-msg').textContent = 'Salon erfolgreich eingerichtet!';
+    document.getElementById('status-sub').innerHTML = `
+      <strong>${slug}.casa2035.de</strong> wird in Kürze aktiv sein.<br>
+      Nächste Schritte: DNS-Eintrag setzen, SSL-Zertifikat aktivieren.<br><br>
+      <a href="index.html" style="color:var(--gold);">← Zurück zum Dashboard</a>
+    `;
+  } else {
+    document.getElementById('status-icon').textContent = '⚠️';
+    document.getElementById('status-msg').textContent = 'Es gab einen Fehler.';
+    document.getElementById('status-sub').innerHTML = `
+      Bitte prüfe die Eingaben und versuche es erneut.<br>
+      <small style="color:var(--text-dim);">${esc(detail || '')}</small><br><br>
+      <button class="btn btn-ghost" onclick="location.reload()">↻ Neu versuchen</button>
+    `;
+  }
+}
+</script>
+</body>
+</html>
