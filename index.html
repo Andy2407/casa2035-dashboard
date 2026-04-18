@@ -3387,7 +3387,9 @@
       var h = now.getHours();
       var todayStr = now.toISOString().split('T')[0];
       var todayT = (termineCache||[]).filter(function(t){ return (t.Start_ISO||'').indexOf(todayStr)===0; });
-      var openA = (beratungenCache||[]).filter(function(b){ return b.Status==='offen'; });
+      // 18.04.2026 Chrome-Bug: Hero zeigte keine Anfragen obwohl Stat-Kachel 45 hat.
+      // Quelle vereinheitlicht: eventsCache.Is_Read/Status=ungelesen (gleich wie renderEvents).
+      var openA = (eventsCache||[]).filter(function(e){ return e.Is_Read === 0 || e.Is_Read === '0' || e.Status === 'ungelesen'; });
       var parts = [];
       if (todayT.length > 0) parts.push(todayT.length + ' Termine');
       if (openA.length > 0) parts.push(openA.length + ' Anfragen');
