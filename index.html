@@ -11014,8 +11014,8 @@
             }
           } catch(e) {}
         }, 1500);
-        // Capo 18.04.2026: SW mit Cachebuster registrieren damit alter SW GARANTIERT ersetzt wird
-        navigator.serviceWorker.register('sw.js?v=' + Date.now()).then(function(reg) {
+        // SW mit stabiler URL registrieren (Cachebuster in register-URL verursacht Endless-Reload!)
+        navigator.serviceWorker.register('sw.js').then(function(reg) {
           // Alle 15s auf Update prüfen (vorher 30s)
           setInterval(function() { try { reg.update(); } catch(e) {} }, 15000);
           reg.update().catch(function() {});
