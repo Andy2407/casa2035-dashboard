@@ -643,6 +643,8 @@
     /* === Main Content === */
     main { position: relative; z-index: 1; padding: 0 16px; }
     .page { display: none; padding: 16px 0; animation: fadeIn 300ms var(--ease); overflow-x: hidden; }
+    /* Capo 18.04.2026: Termine-Page ohne top-padding — Toolbar klebt direkt unter Header */
+    #pageTermine { padding-top: 0; }
     .page.active { display: block; }
     .section-title {
       font-size: 11px; font-weight: 700; color: var(--text-dim);
@@ -1323,10 +1325,10 @@
       position: sticky; top: var(--header-h, 95px); z-index: 50;
       background: var(--bg);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      padding: 8px 16px 8px;
+      padding: 6px 16px 6px;
       border-bottom: 1px solid var(--border);
-      margin: 0 -16px 10px;
-      display: flex; flex-direction: column; gap: 6px;
+      margin: 0 -16px 8px;
+      display: flex; flex-direction: column; gap: 4px;
     }
     /* SPRINT5 (16.04.2026): Zeile 2 (staff-filter) IMMER sticky innerhalb der Toolbar */
     .termine-toolbar .staff-filter { margin-bottom: 0; padding-bottom: 2px; }
@@ -1335,11 +1337,19 @@
       .termine-toolbar { top: calc(env(safe-area-inset-top, 0px) + 36px); padding: 4px 12px; gap: 3px; }
     }
     /* BUG-FIX 15.04.2026: sticky Toolbar — Titel + Liste/Tag/Woche + Datum in einer Zeile */
+    /* Capo 18.04.2026: schlanke 3-Reihen-Toolbar, komplett sticky */
     .termine-toolbar-row {
-      display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 2px 0;
+      display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; padding: 0; min-height: 32px;
     }
+    /* Capo 18.04.2026: Icon-Button uniformer 28×28 fuer gleiche Hoehe wie Pfeile */
+    .tb-icon-btn {
+      width: 28px; height: 28px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+      background: var(--surface); color: var(--text); display: inline-flex; align-items: center;
+      justify-content: center; cursor: pointer; padding: 0; flex: 0 0 auto;
+    }
+    .tb-icon-btn:hover { background: var(--bg-warm); border-color: var(--gold); }
     .termine-date-inline {
-      display: flex; align-items: center; gap: 4px; margin-left: auto; flex: 0 0 auto;
+      display: flex; align-items: center; gap: 4px; flex: 0 0 auto;
     }
     .termine-date-inline > button {
       background: var(--surface); border: 1px solid var(--border); color: var(--text);
@@ -1353,19 +1363,19 @@
     }
     .termine-date-inline .heute-btn.hidden { display: none; }
     /* === Termin Day/Week Views === */
-    .termin-view-toggle { display: flex; gap: 0; margin-bottom: 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+    .termin-view-toggle { display: flex; gap: 0; margin: 0; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; height: 28px; }
     .termin-view-btn {
-      flex: 1; padding: 5px 8px; text-align: center; font-size: 11px; font-weight: 600;
+      flex: 1; padding: 0 10px; text-align: center; font-size: 11px; font-weight: 600; line-height: 26px;
       cursor: pointer; background: var(--surface); color: var(--text-dim);
       border: none; transition: all 200ms;
     }
     .termin-view-btn.active { background: var(--gold); color: #fff; }
     /* === Apple-iCal-Look (17.04.2026, Capo-Ticket 45b8a93a) === */
-    /* Capo 18.04.2026: Wochen-Streifen ueber Tag/Liste — Heute Gold, Sel Gradient, gut sichtbar in Dark+Hell */
-    .day-week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin: 4px 0 14px; padding: 8px; background: rgba(201,168,76,0.06); border: 1px solid rgba(201,168,76,0.2); border-radius: var(--radius-sm); }
-    .day-week-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 2px; border: 1.5px solid var(--border); background: var(--bg-warm, var(--surface)); border-radius: 10px; cursor: pointer; color: var(--text-dim); font-family: inherit; transition: all 150ms; min-height: 58px; }
-    .day-week-cell .dw-dow { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; opacity: 0.75; }
-    .day-week-cell .dw-num { font-size: 18px; font-weight: 800; color: var(--text); line-height: 1; }
+    /* Capo 18.04.2026: Wochen-Streifen kompakt (~halbe Hoehe), Teil der sticky-toolbar */
+    .day-week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin: 0; padding: 2px 0 0; background: transparent; border: none; }
+    .day-week-cell { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 4px; padding: 3px 2px; border: 1px solid var(--border); background: var(--surface); border-radius: 6px; cursor: pointer; color: var(--text-dim); font-family: inherit; transition: all 150ms; min-height: 28px; }
+    .day-week-cell .dw-dow { font-size: 9px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.7; }
+    .day-week-cell .dw-num { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1; }
     .day-week-cell:hover { border-color: var(--gold); transform: translateY(-1px); }
     .day-week-cell.today { border-color: var(--gold); background: rgba(201,168,76,0.14); box-shadow: 0 0 0 2px rgba(201,168,76,0.25); }
     .day-week-cell.today .dw-num { color: var(--gold); }
@@ -2424,31 +2434,28 @@
     <!-- PAGE: Termine -->
     <div class="page" id="pageTermine">
       <div class="termine-toolbar" id="termineToolbar">
-        <!-- FB-62 Fix 17.04.2026: Heute-links, Pfeile+Datum rechts, kein TERMINE-Label -->
+        <!-- Capo 18.04.2026 Layout: 3 schlanke Reihen, sticky. Reihe1: Liste/Tag/Woche links — Lupe, Heute, Datum+Pfeile rechts. Reihe2: Staff-Chips. Reihe3: Wochentage halb-gross. -->
         <div class="termine-toolbar-row">
-          <!-- Links: Heute-Button + View-Toggle -->
-          <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()" style="display:none;padding:0 12px;height:28px;border:1px solid var(--gold);border-radius:14px;background:var(--gold-glow);color:var(--gold);font-size:11px;font-weight:700;cursor:pointer;font-family:Inter,sans-serif;white-space:nowrap;flex-shrink:0">Heute</button>
           <div class="termin-view-toggle" style="margin:0;border:none;flex:0 0 auto">
             <button class="termin-view-btn active" onclick="setTerminView('list')" id="tvList">Liste</button>
             <button class="termin-view-btn" onclick="setTerminView('day')" id="tvDay">Tag</button>
             <button class="termin-view-btn" onclick="setTerminView('week')" id="tvWeek">Woche</button>
           </div>
-          <!-- Rechts: Demo-Badge + Pfeile + Datum -->
-          <span class="demo-badge" onclick="event.stopPropagation();openGoLive()" title="Demo-Daten" style="flex:0 0 auto;margin-left:4px">D</span>
+          <div style="flex:1;min-width:0"></div>
+          <div id="terminSearchWrap" style="display:flex;align-items:center;gap:6px;flex:0 0 auto">
+            <button type="button" id="terminSearchToggle" onclick="toggleTerminSearch()" aria-label="Suche" class="tb-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </button>
+            <input class="search-input" id="terminSearch" placeholder="Termin oder Kunde..." oninput="filterTermineSuche()" style="margin:0;font-size:12px;padding:6px 10px;display:none;width:140px">
+          </div>
+          <button class="heute-btn" id="heuteBtn" onclick="goTerminHeute()" style="display:none">Heute</button>
           <div class="termine-date-inline">
             <button onclick="changeTerminDate(-1)" aria-label="Vorheriger Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="15 18 9 12 15 6"/></svg></button>
             <div class="date-label" id="terminDateLabel" onclick="goTerminHeute()" style="cursor:pointer;font-size:12px;white-space:nowrap" title="Zurück zu Heute">Heute</div>
             <button onclick="changeTerminDate(1)" aria-label="Nächster Tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg></button>
           </div>
         </div>
-        <!-- Capo 18.04.2026: Suchleiste kollabiert zur Lupe, expandiert auf Klick -->
-        <div class="search-wrap" id="terminSearchWrap" style="margin:0;position:relative;z-index:51;display:flex;align-items:center;gap:0;flex:0 0 auto">
-          <button type="button" id="terminSearchToggle" onclick="toggleTerminSearch()" aria-label="Suche" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--bg-warm);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:0 0 auto">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </button>
-          <input class="search-input" id="terminSearch" placeholder="Termin oder Kunde..." oninput="filterTermineSuche()" style="margin-bottom:0;font-size:12px;padding:7px 12px;display:none;margin-left:8px;flex:1;min-width:0">
-        </div>
-        <div class="staff-filter" id="terminStaffFilter" style="margin-bottom:0"></div>
+        <div class="staff-filter" id="terminStaffFilter" style="margin:0"></div>
       </div>
       <div id="terminContent"></div>
       <div class="section-title" style="margin-top:16px">KI-Hinweise</div>
