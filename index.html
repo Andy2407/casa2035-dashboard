@@ -620,6 +620,16 @@
     }
     .live-dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--success); animation: breathe 2.5s infinite; }
     [data-theme="dark"] .live-dot { box-shadow: 0 0 12px rgba(45,138,78,0.2); }
+    /* Capo 19.04.2026: DEMO-State deutlich rot+orange statt gruen, damit iMac vs iPhone nie verwechselt wird */
+    .live-dot.is-demo { color: #c9451a; background: rgba(201,69,26,0.12); }
+    .live-dot.is-demo::before { background: #e8723f; box-shadow: 0 0 8px rgba(232,114,63,0.6); }
+    [data-theme="dark"] .live-dot.is-demo { box-shadow: 0 0 12px rgba(232,114,63,0.3); }
+    /* Demo-Banner direkt unter Header — Balken mit Hinweis + Login-CTA */
+    #demoBanner { display:none; position: sticky; top: var(--header-h, 95px); z-index: 48; background: linear-gradient(90deg, rgba(201,69,26,0.18), rgba(232,114,63,0.10)); border-bottom: 1px solid rgba(232,114,63,0.35); color: var(--text); padding: 8px 16px; font-size: 12px; display: flex; align-items: center; gap: 10px; justify-content: space-between; }
+    #demoBanner.visible { display: flex; }
+    #demoBanner strong { color: #e8723f; letter-spacing: 0.3px; }
+    #demoBanner button { background: var(--gold-gradient); color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    #demoBanner .close-x { background: transparent; color: var(--text-dim); padding: 2px 8px; font-size: 14px; }
     .theme-toggle {
       width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
       background: var(--surface); display: flex; align-items: center; justify-content: center;
@@ -2349,6 +2359,14 @@
   <!-- Main Content -->
   <main id="appMain" style="display:none">
 
+    <!-- Capo 19.04.2026: Demo-Banner — nie verwechseln mit Live -->
+    <div id="demoBanner" role="alert">
+      <span>⚠ <strong>DEMO-MODUS</strong> — du siehst Beispieldaten, KEINE echten Termine aus der Datenbank. Logge dich ein, um Live-Daten zu sehen.</span>
+      <div style="display:flex;gap:6px;align-items:center">
+        <button onclick="(function(){var ls=document.getElementById('loginScreen');if(ls)ls.style.display='flex';})()">Jetzt einloggen</button>
+        <button class="close-x" onclick="document.getElementById('demoBanner').classList.remove('visible')" aria-label="Banner schließen">×</button>
+      </div>
+    </div>
     <!-- Kontext-Hint-Leiste (FB-48) - kontextueller Tipp pro Seite -->
     <div id="pageHintBar" class="page-hint-bar" style="display:none" role="note" aria-live="polite">
       <span class="page-hint-icon">&#128161;</span>
@@ -3776,7 +3794,17 @@
       }
       // Config status
       document.getElementById('configStatus').textContent = isBackendMode() ? 'Verbunden' : 'Demo-Modus (lokal)';
-      document.getElementById('liveIndicator').textContent = isBackendMode() ? 'LIVE' : 'DEMO';
+      var liveInd = document.getElementById('liveIndicator');
+      var isDemo = !isBackendMode() || !sessionStorage.getItem('casa_token');
+      if (liveInd) {
+        liveInd.textContent = isDemo ? 'DEMO' : 'LIVE';
+        if (isDemo) liveInd.classList.add('is-demo'); else liveInd.classList.remove('is-demo');
+      }
+      // Capo 19.04.2026: Grosser DEMO-Banner wenn nicht eingeloggt — verhindert Verwechslung iMac vs iPhone
+      var banner = document.getElementById('demoBanner');
+      if (banner) {
+        if (isDemo) banner.classList.add('visible'); else banner.classList.remove('visible');
+      }
       updateDemoBadges();
     }
 
