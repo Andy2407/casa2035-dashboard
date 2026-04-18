@@ -1312,8 +1312,8 @@
        Ohne diese Top-Angabe verschwindet die KW-Anzeige hinter dem Header beim Scrollen. */
     /* F4 15.04.2026: Sticky Toolbars auch in Lager + Kasse (Suche + Filter + Aktionen bleiben beim Scrollen sichtbar) */
     .lager-toolbar, .kasse-toolbar {
-      /* Capo 18.04.2026 iPhone-Scroll-Bug: Toolbar-Top matcht tatsaechliche Header-Hoehe via --header-h. */
-      position: sticky; top: var(--header-h, 95px); z-index: 50;
+      /* Capo 18.04.2026: Pages sind eigene Scroll-Container → sticky top:0 reicht */
+      position: sticky; top: 0; z-index: 50;
       background: var(--bg);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       padding: 8px 0 6px;
@@ -1321,8 +1321,8 @@
       margin: 0 -16px 10px; padding-left: 16px; padding-right: 16px;
     }
     .termine-toolbar {
-      /* Capo 18.04.2026: Toolbar-Top matcht reale Header-Hoehe via --header-h (JS ResizeObserver setzt den Wert). */
-      position: sticky; top: var(--header-h, 95px); z-index: 50;
+      /* Capo 18.04.2026: pageTermine ist eigener Scroll-Container → top:0 reicht (Header ist ausserhalb dieses Containers). */
+      position: sticky; top: 0; z-index: 50;
       background: var(--bg);
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       padding: 6px 16px 6px;
