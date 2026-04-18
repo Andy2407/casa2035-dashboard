@@ -918,12 +918,27 @@
     .termin-status::before {
       content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor;
     }
-    /* BUG-FIX 15.04.2026: Überlappung uebermalte Stylist-Farbe + sah aus wie Storno.
-       Jetzt: Stylist-Farbe bleibt links, oben feiner amber Warn-Streifen, dezenter Hintergrund. */
+    /* Capo 19.04.2026: Ueberlappende Termine (erster bestaetigter = solid, Konflikt = dashed).
+       Gestrichelter Rahmen + Amber-Warnstreifen, visuell klar getrennt — muss verschoben werden. */
     .termin-overlap-warn {
       box-shadow: inset 0 2px 0 0 #d4a24c !important;
       background: linear-gradient(180deg, rgba(212,162,76,0.10) 0%, transparent 40%) !important;
+      border-style: dashed !important;
+      border-width: 2px !important;
+      border-color: #d4a24c !important;
     }
+    /* Drag-Handle: beim Long-Press vibriert Block + scale + schatten */
+    .day-termin-block.dragging, .week-termin-chip.dragging {
+      box-shadow: 0 8px 24px rgba(201,168,76,0.6), 0 0 0 2px var(--gold) !important;
+      opacity: 0.92;
+      cursor: grabbing;
+      animation: termDragPulse 800ms ease-in-out infinite;
+    }
+    @keyframes termDragPulse {
+      0%, 100% { box-shadow: 0 8px 24px rgba(201,168,76,0.6), 0 0 0 2px var(--gold); }
+      50% { box-shadow: 0 12px 32px rgba(201,168,76,0.8), 0 0 0 3px var(--gold); }
+    }
+    .day-termin-block, .week-termin-chip { touch-action: pan-y; user-select: none; -webkit-user-select: none; }
     .termin-overlap-badge {
       display: inline-flex; align-items: center; gap: 3px; font-size: 9px; font-weight: 700;
       color: #d4a24c; margin-left: 6px;
@@ -5031,7 +5046,8 @@
           + fmtTime(t.Start_ISO) + ' · ' + (t.Dauer_Min || '?') + ' Min</div>'
           + '<div class="dtb-name">' + esc(t.Kundenname || t.Kunde || '—') + '</div>'
           + '<div class="dtb-svc">' + esc(t.Service || '') + (dayRecipe ? ' &#128203;' : '') + ' · ' + esc(t.Stylist || '') + demoDot() + '</div>';
-        block.onclick = function() { openTerminDetail(t); };
+        block.onclick = function() { if(!block.classList.contains('dragging')) openTerminDetail(t); };
+        enableTerminDrag(block, t, 'day');
         slot.appendChild(block);
       });
     }
@@ -5152,7 +5168,8 @@
             chip.innerHTML = timeStr + ' ' + svcStr + (weekRecipe ? ' &#128203;' : '');
           }
           chip.title = timeStr + ' ' + esc(t.Service || '') + ' — ' + esc(t.Kundenname || '');
-          chip.onclick = function() { openTerminDetail(t); };
+          chip.onclick = function() { if(!chip.classList.contains('dragging')) openTerminDetail(t); };
+          enableTerminDrag(chip, t, 'week');
           cells[startH].appendChild(chip);
         });
         grid.appendChild(col);
@@ -5171,7 +5188,8 @@
     function setTerminView(mode) {
       terminViewMode = mode;
       document.querySelectorAll('.termin-view-btn').forEach(function(b) { b.classList.remove('active'); });
-      document.getElementById('tv' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
+      var btn = document.getElementById('tv' + mode.charAt(0).toUpperCase() + mode.slice(1));
+      if (btn) btn.classList.add('active');
       renderTermine(termineCache);
     }
 
@@ -7100,10 +7118,11 @@
           html += '<span style="font-size:11px;font-weight:600;color:var(--gold);white-space:nowrap">' + a.dauer_min + ' Min';
           if (a.einwirkzeit) html += ' <span style="color:var(--warning)" title="Einwirkzeit">&#9201;</span>';
           html += '</span></div>';
-          // Detail-Zeile (eingeklappt)
-          html += '<div id="' + stepId + '" style="display:none;padding:4px 10px 8px 38px;border-top:1px solid var(--border);font-size:11px;color:var(--text-secondary)">';
-          if (a.hinweis) html += '<div>' + esc(a.hinweis) + '</div>';
-          else html += '<div style="color:var(--text-dim);font-style:italic">Kein zusätzlicher Hinweis.</div>';
+          // Detail-Zeile (eingeklappt) — Capo 19.04.2026: Hinweise immer zeigen (eigener oder aus Library)
+          var stepHinweis = a.hinweis || getAufgabenHinweis(a.schritt);
+          html += '<div id="' + stepId + '" style="display:none;padding:8px 12px 10px 38px;border-top:1px solid var(--border);font-size:12px;color:var(--text-secondary);line-height:1.5">';
+          html += '<div>' + esc(stepHinweis) + '</div>';
+          if (a.einwirkzeit) html += '<div style="margin-top:6px;font-size:11px;color:var(--warning);font-weight:600">⏱ Einwirkzeit — Timer empfohlen</div>';
           html += '</div></div>';
         });
         html += '<div style="text-align:right;padding:4px 0 8px;font-size:11px;font-weight:700;color:var(--gold)">Gesamt: ' + totalMin + ' Min</div>';
@@ -7119,13 +7138,16 @@
         html += '<span id="rezArrow_' + rezId + '" style="font-size:12px;color:var(--text-dim);transition:transform 200ms;transform:rotate(180deg)">&#9660;</span>';
         html += '</div>';
         html += '<div id="rezBody_' + rezId + '" style="display:block;padding:8px 12px">';
+        // Capo 19.04.2026: Mengenangabe prominent — Gold-Badge rechts, Mischanleitung unter dem Produkt
         (recipe.produkte || []).forEach(function(p) {
-          html += '<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">';
-          html += '<span style="font-size:12px;flex-shrink:0">&#128225;</span>';
-          html += '<span style="font-size:12px;font-weight:600;flex:1">' + esc(p.name) + '</span>';
-          html += '<span style="font-size:11px;color:var(--text-dim);text-align:right">' + esc(p.menge);
-          if (p.mischung) html += '<br><em style="font-size:10px;color:var(--gold)">' + esc(p.mischung) + '</em>';
-          html += '</span></div>';
+          html += '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">';
+          html += '<span style="font-size:14px;flex-shrink:0;margin-top:2px">&#128225;</span>';
+          html += '<div style="flex:1;min-width:0">';
+          html += '<div style="font-size:13px;font-weight:600;color:var(--text)">' + esc(p.name) + '</div>';
+          if (p.mischung) html += '<div style="font-size:11px;color:var(--gold);margin-top:3px;font-style:italic">&#8250; ' + esc(p.mischung) + '</div>';
+          html += '</div>';
+          html += '<span style="font-size:12px;font-weight:700;color:#fff;background:var(--gold-gradient);padding:4px 10px;border-radius:12px;white-space:nowrap;flex-shrink:0">' + esc(p.menge) + '</span>';
+          html += '</div>';
         });
         html += '</div></div>';
       } else {
@@ -7439,6 +7461,147 @@
       openSheet('detailSheet');
     }
 
+    // Capo 19.04.2026: Long-Press + Drag — Termin in Tag/Woche direkt verschieben
+    function enableTerminDrag(block, termin, gridType) {
+      var pressTimer = null, isDragging = false, startX = 0, startY = 0, currentDx = 0, currentDy = 0;
+      var LONG_PRESS_MS = 450;
+      var SNAP_MIN = 15; // snap auf 15-Minuten-Raster
+      var PX_PER_MIN_DAY = 60/60; // 60px pro Stunde in Day-View (siehe heightPx berechnung)
+      var PX_PER_MIN_WEEK = 48/60; // 48px pro Stunde in Week-View
+      var pxPerMin = gridType === 'day' ? PX_PER_MIN_DAY : PX_PER_MIN_WEEK;
+
+      function getPoint(e) { return e.touches ? e.touches[0] : (e.changedTouches ? e.changedTouches[0] : e); }
+
+      function onStart(e) {
+        var p = getPoint(e);
+        startX = p.clientX; startY = p.clientY;
+        isDragging = false; currentDx = 0; currentDy = 0;
+        pressTimer = setTimeout(function(){
+          isDragging = true;
+          block.classList.add('dragging');
+          if (navigator.vibrate) { try { navigator.vibrate(40); } catch(e){} }
+          try { e.preventDefault && e.preventDefault(); } catch(_){}
+        }, LONG_PRESS_MS);
+      }
+      function onMove(e) {
+        var p = getPoint(e);
+        var dx = p.clientX - startX;
+        var dy = p.clientY - startY;
+        if (!isDragging) {
+          if (Math.abs(dx) > 10 || Math.abs(dy) > 10) clearTimeout(pressTimer);
+          return;
+        }
+        try { e.preventDefault(); } catch(_){}
+        currentDx = dx; currentDy = dy;
+        block.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(1.03)';
+        block.style.zIndex = 999;
+      }
+      function onEnd(e) {
+        clearTimeout(pressTimer);
+        if (!isDragging) return;
+        isDragging = false;
+        block.classList.remove('dragging');
+        block.style.transform = ''; block.style.zIndex = '';
+        // Verschiebung in Minuten
+        var minutesDiff = Math.round(currentDy / pxPerMin / SNAP_MIN) * SNAP_MIN;
+        // Tage-Diff nur in Woche-Ansicht (horizontal = andere Spalte)
+        var daysDiff = 0;
+        if (gridType === 'week') {
+          var col = block.closest('.week-day-col');
+          if (col) {
+            var colW = col.offsetWidth;
+            daysDiff = Math.round(currentDx / colW);
+          }
+        }
+        commitTerminDrag(termin, minutesDiff, daysDiff);
+      }
+
+      block.addEventListener('touchstart', onStart, {passive: false});
+      block.addEventListener('touchmove', onMove, {passive: false});
+      block.addEventListener('touchend', onEnd);
+      block.addEventListener('touchcancel', onEnd);
+      block.addEventListener('mousedown', onStart);
+      // Mouse-Move/Up auf document damit drag auch außerhalb funktioniert
+      var mm = function(e){ onMove(e); };
+      var mu = function(e){ onEnd(e); document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); };
+      block.addEventListener('mousedown', function(){
+        document.addEventListener('mousemove', mm);
+        document.addEventListener('mouseup', mu);
+      });
+    }
+
+    function commitTerminDrag(termin, minutesDiff, daysDiff) {
+      if (minutesDiff === 0 && daysDiff === 0) return;
+      var oldD = new Date(termin.Start_ISO);
+      var newD = new Date(oldD);
+      newD.setDate(newD.getDate() + daysDiff);
+      newD.setMinutes(newD.getMinutes() + minutesDiff);
+      // Minuten auf 15er-Raster runden
+      newD.setMinutes(Math.round(newD.getMinutes() / 15) * 15);
+      newD.setSeconds(0);
+      // Ueberlappungs-Check: Gibt es einen bestaetigten Termin am selben Stylist zur gleichen Zeit?
+      var dur = parseInt(termin.Dauer_Min) || 30;
+      var newStart = newD.getTime();
+      var newEnd = newStart + dur*60000;
+      var conflict = null;
+      (termineCache || []).forEach(function(t){
+        if (t === termin) return;
+        if (t.Stylist !== termin.Stylist) return;
+        if ((t.Status || 'bestätigt') === 'storniert') return;
+        var tS = new Date(t.Start_ISO).getTime();
+        var tE = tS + ((parseInt(t.Dauer_Min) || 30) * 60000);
+        if (newStart < tE && newEnd > tS) conflict = t;
+      });
+      var fmtHM = function(d){ return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
+      if (conflict) {
+        // Finde naechsten freien Slot bei selbem Stylist am Tag
+        var suggestion = findNextFreeSlot(termin, newD, dur);
+        var toast = '⚠ Überlappung mit ' + (conflict.Kundenname||'anderen Termin') + ' (' + fmtHM(new Date(conflict.Start_ISO)) + '). ';
+        toast += suggestion ? 'Vorschlag: ' + fmtHM(suggestion) + ' bei ' + termin.Stylist : 'Kein freier Slot gefunden.';
+        if (typeof showToast === 'function') showToast(toast, 'warning', 6000);
+        // Keine Commit — Termin bleibt wo er war (Block rendert zurueck)
+        renderTermine(termineCache);
+        return;
+      }
+      termin.Start_ISO = localIsoStamp(newD);
+      var end = new Date(newD); end.setMinutes(end.getMinutes() + dur);
+      termin.Ende_ISO = end.toISOString();
+      renderTermine(termineCache);
+      if (typeof showToast === 'function') showToast('Termin verschoben auf ' + fmtHM(newD) + ' · ' + termin.Stylist, 'success', 2500);
+    }
+    // Finde naechsten freien Slot bei selbem Stylist im +/-2h Fenster um Zielzeit
+    function findNextFreeSlot(termin, targetD, durMin) {
+      var stylist = termin.Stylist;
+      var dayStr = localDateStr(targetD);
+      var targetMin = targetD.getHours()*60 + targetD.getMinutes();
+      // 30-Minuten-Raster: probiere ab targetMin aufwaerts, dann rueckwaerts
+      var occupied = [];
+      (termineCache||[]).forEach(function(t){
+        if (t === termin) return;
+        if (t.Stylist !== stylist) return;
+        if ((t.Start_ISO || '').indexOf(dayStr) !== 0) return;
+        if ((t.Status||'bestätigt') === 'storniert') return;
+        var s = new Date(t.Start_ISO);
+        var ms = s.getHours()*60 + s.getMinutes();
+        occupied.push([ms, ms + (parseInt(t.Dauer_Min)||30)]);
+      });
+      function isFree(start) {
+        var end = start + durMin;
+        if (start < 8*60 || end > 20*60) return false;
+        return !occupied.some(function(o){ return start < o[1] && end > o[0]; });
+      }
+      for (var delta = 0; delta <= 240; delta += 15) {
+        for (var dir of [1, -1]) {
+          var m = targetMin + delta*dir;
+          if (isFree(m)) { var d = new Date(targetD); d.setHours(Math.floor(m/60)); d.setMinutes(m%60); return d; }
+        }
+      }
+      return null;
+    }
+    function localIsoStamp(d) {
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0')
+        + 'T' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ':00';
+    }
     function doTerminVerschieben(startISO, kundenname) {
       var found = termineCache.find(function(t) { return t.Start_ISO === startISO && t.Kundenname === kundenname; });
       if (!found) return;
@@ -10668,6 +10831,52 @@
     // === Service Produkte (für Termin-Detail Rezepte) ===
     // DB-Cache (wird aus service_rezepturen Tabelle befuellt, hat Prioritaet vor hardcoded JS-Fallback)
     var dbRezeptCache = {};
+    // Capo 19.04.2026: Zentrale Hinweis-Library pro Aufgaben-Schluesselwort.
+    // Wenn ein recipe.aufgabe keinen eigenen 'hinweis' hat, wird per Pattern-Match aus dieser Bibliothek gezogen.
+    var AUFGABEN_HINWEISE = {
+      'waschen': 'Lauwarmes Wasser (36–38°C). Shampoo in den Händen aufschäumen, gleichmäßig verteilen, 2 Minuten einmassieren, gründlich ausspülen. Bei fettigem Haar 2x waschen, bei Farbbehandlungen nur 1x mit mildem Farbshampoo.',
+      'farbberatung': 'Haarfarbe-Ist-Zustand bestimmen (Stufe 1–10 nach Wella-Skala). Kundenwunsch erfragen und Realistik prüfen. Mischformel und Einwirkzeit festlegen. Foto vom Ansatz machen für Dokumentation.',
+      'farbe anmischen': 'Schale und Pinsel bereitlegen. Farbe exakt nach Formel dosieren. Oxid in 2 Portionen zugeben. Mit Pinsel glatt und klumpenfrei rühren — NICHT schütteln (verändert Oxidation). Mischung innerhalb 10 Min auftragen, sonst Wirkung lässt nach.',
+      'ansatz auftragen': 'Mit Pinsel dünne Scheitel ziehen. Farbe satt am Haaransatz (0,5–1 cm) auftragen. Kopfhaut leicht aussparen wenn empfindlich. Systematisch Hinterkopf → Schläfen → Stirn arbeiten.',
+      'strähnen setzen': 'Folien 12–30 cm je nach Länge. Von unten nach oben, Freihand-Technik für Balayage weicher Ansatz. Folienrand 2 cm von Kopfhaut. Jede Folie exakt beschriften (Start-Zeit).',
+      'einwirkzeit': 'Timer setzen. Bei Wärme (Dampfhaube/Klimazon) Einwirkzeit um 30% verkürzen. Entwicklung alle 5 Min visuell prüfen (Kontrollstreifen). Bei zu warm: Folien öffnen. Kunde bekommt Getränk + Lektüre.',
+      'auswaschen': 'Zuerst ohne Shampoo gründlich emulgieren (2 Min mit lauwarmem Wasser), dann 1x mildes Farbshampoo, abschließend Conditioner für pH-Balance. Haar soll "quietschen" beim Spülen.',
+      'emulgieren': 'Farbe nicht gleich ausspülen — erst mit etwas Wasser auf Kopfhaut einmassieren (2 Min), dann erst ausspülen. Das löst Farbreste auf Kopfhaut und schont die Haut.',
+      'pflege': 'Maske gleichmäßig auf handtuchtrockenes Haar, Längen + Spitzen, Kopfhaut aussparen. 5 Min einwirken. Mit Breitkamm durchkämmen. Gründlich ausspülen.',
+      'schneiden': 'Nass oder trocken je nach Technik. Schere in 45°-Winkel für weiche Linie. Stufen kontrollieren: Kopf gerade + Kopf geneigt. Beide Seiten parallel prüfen. Kein Knick-Effekt.',
+      'schneiden (maschine + schere)': 'Untere Partien mit Maschine (3/4/6 mm je nach Wunsch). Obergang per Fade-Technik. Deckhaar mit Schere texturieren. Pony zum Schluss im Trockenen.',
+      'föhnen': 'Hitzeschutz vorher aufsprühen. Ca. 20 cm Abstand. Von Ansatz Richtung Spitzen föhnen. Rundbürste für Volumen, Skelettbürste für glatt. Kalte Luft zum Fixieren.',
+      'föhnen + styling': 'Haar vor Föhnen in Partien teilen. Volumen am Ansatz aufbauen (entgegen Wuchsrichtung). Mit Rundbürste spannen, Hitze senken, kalt fixieren. Finish mit Haarspray.',
+      'styling': 'Produkte sparsam dosieren (zu viel = klebrig). Erst kleine Menge in Handflächen verteilen, dann ins Haar. Spitzen zuerst, dann Längen, Ansatz zum Schluss.',
+      'bart trimmen': 'Maschine mit Aufsatz 3–6 mm gleichmäßig. Konturen an Wangenlinie + Hals mit Schere/Rasiermesser. Bartöl nach Trocknen 3–4 Tropfen in Bart + Haut einmassieren.',
+      'styling paste': 'Erbsengroße Menge zwischen den Händen warm reiben bis durchsichtig. Erst in Längen, dann Ansatz. Nicht direkt auf trockene Haut klatschen — immer zuerst Hände warm.',
+      'beratungsgespräch': 'Kundenwunsch erfragen + Inspirations-Fotos. Haartyp und Anlass berücksichtigen. Alternative Styles vorschlagen wenn Wunsch nicht ideal passt. Skizze machen.',
+      'probefrisur aufbauen': 'Haar gut durchkämmen, Vorderpartie freihalten. Basis-Struktur legen (Dutt-Kissen/Toupieren). Nicht zu fest — Locken müssen atmen. Zwischen-Fotos machen.',
+      'locken setzen': 'Lockenstab 170–190°C je nach Haartyp. Strähnen 2–3 cm breit. Je 10–15 Sekunden halten. Locken auskühlen lassen bevor ausbürsten. Lockenspray vorher für Halt.',
+      'haarschmuck einarbeiten': 'Schmuck vor Fixierung platzieren — hinterher ist es fester. Symmetrie prüfen. Nadeln kreuzweise verstecken. Kunde soll kopfschütteln zum Test.',
+      'finishing': 'Hairspray aus 30 cm Distanz. Ganze Hand davor halten um Tropfen zu vermeiden. Zwischen-Schichten leicht trocknen lassen. Kunde im Spiegel 360° zeigen.',
+      'olaplex no. 1 auftragen': 'Pur (3,75 ml) oder in Blondierung (3,75 ml auf 30 g Pulver). Mit Pinsel gleichmäßig verteilen. Nicht direkt mit Haut berühren.',
+      'olaplex no. 2 auftragen': '15 ml großzügig nach Auswaschen der Farbe/Blondierung. Auf handtuchtrockenes Haar. Min. 10 Min einwirken, ideal 20 Min mit Folie/Haube.',
+      'trocknen': 'Mit Handtuch sanft ausdrücken, nicht reiben. Dann Diffusor bei lockigem Haar (kalt + warm wechseln), Rundbürste bei glattem Haar. Immer mit Hitzeschutz.',
+      'fotos machen': 'Tageslicht oder neutrales Weißlicht. Einheitlicher Hintergrund. 3 Winkel: frontal, 45°, Profil. Vorher-Nachher für Social Media + Kundenakte.',
+      'default': 'Arbeitsschritt konzentriert und routiniert ausführen. Bei Unsicherheit Kollegin fragen. Zeitfenster einhalten, Qualität vor Geschwindigkeit.'
+    };
+    function getAufgabenHinweis(schritt) {
+      if (!schritt) return AUFGABEN_HINWEISE.default;
+      var sLow = (schritt+'').toLowerCase();
+      var keys = Object.keys(AUFGABEN_HINWEISE);
+      // Exakt matchen (ohne default)
+      for (var i=0; i<keys.length; i++) {
+        if (keys[i] === 'default') continue;
+        if (sLow === keys[i]) return AUFGABEN_HINWEISE[keys[i]];
+      }
+      // Substring-Match
+      for (var i=0; i<keys.length; i++) {
+        if (keys[i] === 'default') continue;
+        if (sLow.indexOf(keys[i]) !== -1) return AUFGABEN_HINWEISE[keys[i]];
+      }
+      return AUFGABEN_HINWEISE.default;
+    }
     var serviceProdukte = {
       'Damenhaarschnitt + Föhn': {
         aufgaben: [{schritt:'Waschen',dauer_min:5},{schritt:'Schneiden',dauer_min:25},{schritt:'Föhnen + Styling',dauer_min:15}],
